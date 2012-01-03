@@ -28,11 +28,11 @@ except ImportError:
 
 
 #parameters
-width = 256			#width of the resulting grid [1, inf)
-height = 256		#height of the resulting grid [1, inf)
-roughness = 0.4		#roughness of the island boundaries, 0.0 = totally smooth, 1.0 = white noise [0.0, 1.0]
-x_scaling = 10.0	#x coordinate scaling, higher values result in more islands, smaller values in less (0.0, +inf)
-y_scaling = 10.0	#y coordinate scaling, higher values result in more islands, smaller values in less (0.0, +inf)
+width = 128			#width of the resulting grid [1, inf)
+height = 257		#height of the resulting grid [1, inf)
+roughness = 0.2		#roughness of the island boundaries, 0.0 = totally smooth, 1.0 = white noise [0.0, 1.0]
+x_scaling = 5.0		#x coordinate scaling, higher values result in more islands, smaller values in less (0.0, +inf)
+y_scaling = 5.0		#y coordinate scaling, higher values result in more islands, smaller values in less (0.0, +inf)
 out_scaling = 0.5	#output value scaling
 out_offset = 0.5	#output value offset
 
@@ -78,7 +78,7 @@ if create_nc:
 
 for j in range(0, height):
 	for i in range(0, width):
-		x = x_scaling * float(i) / float(height)
+		x = x_scaling * float(i) / float(width)
 		y = y_scaling * float(j) / float(height)
 		out = out_offset + out_scaling * noise(x, y, 0, depth, roughness)
 		fileID.write("%f\n" %out)

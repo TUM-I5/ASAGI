@@ -1,4 +1,7 @@
+#include <math.h>
+
 #include "grid.h"
+#include "io/png.h"
 
 Grid::Grid()
 {
@@ -25,8 +28,8 @@ bool Grid::open(const char* filename)
 		return false;
 	}
 	
-	x = file->getXDim();
-	y = file->getYDim();
+	dimX = file->getXDim();
+	dimY = file->getYDim();
 	values = file->getAll();
 	
 	return true;
@@ -34,12 +37,12 @@ bool Grid::open(const char* filename)
 
 unsigned long Grid::getXDim()
 {
-	return x;
+	return dimX;
 }
 
 unsigned long Grid::getYDim()
 {
-	return y;
+	return dimY;
 }
 
 float Grid::get(unsigned long x, unsigned long y)
@@ -52,15 +55,44 @@ float Grid::get(unsigned long x, unsigned long y)
 		y ^= x;
 		x ^= y;
 		
-		x *= getXDim() + y;
+		x = x * getXDim() + y;
 	} else
-		x *= getYDim() + y;
+		x = x * getYDim() + y;
 	
 	return values[x];
 }
 
-void Grid::exportPNG(const char* filename)
+bool Grid::exportPng(const char* filename)
 {
+	float min, max, value;
+	unsigned char red, green, blue;
+	
+	min = max = get(0, 0);
+	for (unsigned long i = 0; i < getXDim(); i++) {
+		for (unsigned long j = 0; j < getYDim(); j++) {
+			value = get(i, j);
+			if (value < min)
+				min = value;
+			if (value > max)
+				max = value;
+		}
+	}
+	
+	io::Png png(getXDim(), getYDim());
+	if (!png.create(filename))
+		return false;
+	
+	for (unsigned long i = 0; i < getXDim(); i++) {
+		for (unsigned long j = 0; j < getYDim(); j++) {
+			// do some magic here
+			h2rgb((get(i, j) - min) / (max - min) * 2 / 3, red, green, blue);
+			png.write(i, getYDim() - j - 1, red, green, blue);
+		}
+	}
+	
+	png.close();
+	
+	return true;
 }
 
 int Grid::c2f()
@@ -70,6 +102,53 @@ int Grid::c2f()
 
 // Fortran <-> c translation array
 fortran::PointerArray<Grid> Grid::pointers;
+
+void Grid::h2rgb(float h, unsigned char &red, unsigned char &green, unsigned char &blue)
+{
+	// h from 0..1
+	
+	h *= 6;
+	float x = fmod(h, 2) - 1;
+	if (x < 0)
+		x *= -1;
+	x = 1 - x;
+	
+	// <= checks are not 100% correct, it should be <
+	// but it solves the "larges-value" issue
+	if (h <= 1) {
+		red = 255;
+		green = x * 255;
+		blue = 0;
+		return;
+	}
+	if (h <= 2) {
+		red = x * 255;
+		green = 255;
+		blue = 0;
+		return;
+	}
+	if (h <= 3) {
+		red = 0;
+		green = 255;
+		blue = x * 255;
+		return;
+	}
+	if (h <= 4) {
+		red = 0;
+		green = x * 255;
+		blue = 255;
+		return;
+	}
+	if (h <= 5) {
+		red = x * 255;
+		green = 0;
+		blue = 255;
+	}
+	// h < 6
+	red = 255;
+	green = 0;
+	blue = x * 255;
+}
 
 Grid* Grid::f2c(int i)
 {

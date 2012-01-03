@@ -19,6 +19,7 @@ io::NetCdf::NetCdf(const char* fileName)
 	}
 	
 	dimSwitched = (z->get_dim(0) != file.get_dim("x"));
+	
 	error = false;
 }
 
@@ -42,19 +43,20 @@ bool io::NetCdf::isDimSwitched()
 	return dimSwitched;
 }
 
-unsigned long io::NetCdf::getMin()
+/*float io::NetCdf::getMin()
 {
 	return file.get_var("z")->get_att("actual_range")->as_float(0);
 }
 
-unsigned long io::NetCdf::getMax()
+float io::NetCdf::getMax()
 {
 	return file.get_var("z")->get_att("actual_range")->as_float(1);
-}
+}*/
 
 float* io::NetCdf::getAll()
 {
 	long x, y;
+	NcVar* z;
 	
 	if (dimSwitched) {
 		y = getXDim();
@@ -66,7 +68,9 @@ float* io::NetCdf::getAll()
 	
 	float* result = new float[x * y];
 	
-	file.get_var("z")->get(result, x, y);
+	z = file.get_var("z");
+	z->set_cur(0, 0);
+	z->get(result, x, y);
 	
 	return result;
 }

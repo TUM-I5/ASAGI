@@ -13,8 +13,8 @@ private:
 	
 	io::NetCdf* file;
 	float* values;
-	unsigned long x;
-	unsigned long y;
+	unsigned long dimX;
+	unsigned long dimY;
 public:
 	Grid();
 	virtual ~Grid();
@@ -23,10 +23,12 @@ public:
 	unsigned long getYDim();
 	float get(unsigned long x, unsigned long y);
 	
-	void exportPNG(const char* filename);
+	bool exportPng(const char* filename);
 	int c2f();
 private:
 	static fortran::PointerArray<Grid> pointers;
+private:
+	static void h2rgb(float h, unsigned char &red, unsigned char &green, unsigned char &blue);
 public:
 	static Grid* f2c(int i);
 };

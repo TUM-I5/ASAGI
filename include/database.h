@@ -17,6 +17,8 @@ public:
 	virtual unsigned long getXDim() = 0;
 	virtual unsigned long getYDim() = 0;
 	virtual float get(unsigned long x, unsigned long y) = 0;
+	
+	virtual bool exportPng(const char* filename) = 0;
 public:
 	static grid::Grid* create();
 };
@@ -35,6 +37,8 @@ unsigned long grid_x(grid_handle* handle);
 unsigned long grid_y(grid_handle* handle);
 
 float grid_get_value(grid_handle* handle, unsigned long x, unsigned long y);
+
+void grid_free(grid_handle* handle);
 
 #ifdef __cplusplus
 }	// end extern "C"

@@ -33,3 +33,8 @@ float grid_get_value(grid_handle* handle, unsigned long x, unsigned long y)
 {
 	return handle->get(x, y);
 }
+
+void grid_free(grid_handle* handle)
+{
+	delete handle;
+}
