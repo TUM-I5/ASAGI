@@ -1,5 +1,6 @@
 #include <asagi.h>
 
+#include "arraygrid.h"
 #include "basicgrid.h"
 
 // Static c++ functions
@@ -17,6 +18,15 @@ asagi::Grid* asagi::Grid::create(Type type)
 		case DOUBLE:
 			return new BasicGrid<double>();
 		case BYTEARRAY:
+			return new ArrayGrid<char>();
+		case INTARRAY:
+			return new ArrayGrid<int>();
+		case LONGARRY:
+			return new ArrayGrid<long>();
+		case FLOATARRAY:
+			return new ArrayGrid<float>();
+		case DOUBLEARRAY:
+			return new ArrayGrid<double>();
 		default:
 			;
 	}

@@ -117,25 +117,53 @@ float io::NetCdf::getYScaling()
 	return (last - first) / dim;
 }
 
-float io::NetCdf::getMin()
+template<> void io::NetCdf::getVar<void>(void* var)
 {
-// 	NcAtt* range = m_file.get_var("z")->get_att("actual_range");
-// 	if (range->is_valid())
-// 		return range->as_float(0);
+	NcVar z;
+	unsigned int bytes = getVarSize();
+	std::vector<size_t> start(2, 0);
+	std::vector<size_t> count(2);
+	std::vector<ptrdiff_t> stride(2, 1);
+	std::vector<ptrdiff_t> imap(2);
 	
-	return NAN;
-}
-
-float io::NetCdf::getMax()
-{
-// 	NcAtt* range = m_file.get_var("z")->get_att("actual_range");
-// 	if (range->is_valid())
-// 		return range->as_float(1);
+	if (m_dimSwitched) {
+		count[0] = getXDim();
+		count[1] = getYDim();
+		
+		imap[0] = bytes;
+		imap[1] = count[0] * bytes;
+	} else {
+		count[0] = getYDim();
+		count[1] = getXDim();
+		
+		imap[0] = count[1] * bytes;
+		imap[1] = bytes;
+	}
 	
-	return NAN;
+	z = m_file->getVar("z");
+	
+	z.getVar(start, count, stride, imap, var);
 }
 
 unsigned int io::NetCdf::getVarSize()
 {
+	return m_file->getVar("z").getType().getSize();
+}
+
+template<> void io::NetCdf::getDefault<void>(void* defaultValue)
+{
+	NcVar z;
+	NcVarAtt att;
 	
+	z = m_file->getVar("z");
+	
+	try {
+		att = z.getAtt("missing_value");
+	} catch (NcException& e) {
+		// Attribute missing
+		memset(defaultValue, 0, z.getType().getSize());
+		return;
+	}
+	
+	att.getValues(defaultValue);
 }

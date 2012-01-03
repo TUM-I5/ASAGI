@@ -17,15 +17,26 @@ namespace asagi {
 class asagi::Grid
 {
 public:
-	enum Type { BYTE, INT, LONG, FLOAT, DOUBLE, BYTEARRAY };
+	enum Type { BYTE, INT, LONG, FLOAT, DOUBLE,
+		BYTEARRAY, INTARRAY, LONGARRY, FLOATARRAY, DOUBLEARRAY };
 public:
 	virtual bool open(const char* filename) = 0;
 	virtual float getXMin() = 0;
 	virtual float getYMin() = 0;
 	virtual float getXMax() = 0;
 	virtual float getYMax() = 0;
+	
+	/**
+	 * @return The number of bytes that are stored at each grid node
+	 */
+	virtual unsigned int getVarSize() = 0;
 	virtual float getFloat(float x, float y) = 0;
 	virtual double getDouble(float x, float y) = 0;
+	/**
+	 * Copys the element at (x,y) into buf. The buffer size has to be
+	 * (at least) {@link getVarSize()} bytes. 
+	 */
+	virtual void getBuf(float x, float y, void* buf) = 0;
 	
 	virtual bool exportPng(const char* filename) = 0;
 public:
@@ -36,7 +47,9 @@ typedef asagi::Grid grid_handle;
 typedef asagi::Grid::Type grid_type;
 #else
 typedef struct grid_handle grid_handle;
-typedef enum { GRID_BYTE, GRID_INT, GRID_LONG, GRID_FLOAT, GRID_DOUBLE, GRID_VOID } grid_type;
+typedef enum { GRID_BYTE, GRID_INT, GRID_LONG, GRID_FLOAT, GRID_DOUBLE,
+	GRID_BYTEARRAY, GRID_INTARRAY, GRID_LONGARRAY,
+	GRID_FLOATARRY, GRID_DOUBLEARRAY } grid_type;
 #endif
 
 /**

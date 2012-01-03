@@ -46,6 +46,10 @@ protected:
 	float getYScaling();
 	
 	virtual bool open(io::NetCdf &file) = 0;
+	
+	/**
+	 * This function is used by exportPng, which only works on floats
+	 */
 	virtual float getAtFloat(long x, long y) = 0;
 private:
 	static fortran::PointerArray<Grid> pointers;

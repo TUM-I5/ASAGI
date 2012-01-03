@@ -3,6 +3,10 @@
 set( SimpleCppSources
 	simple.cpp )
 
+# Array
+set( ArrayCppSources
+	array.cpp )
+
 # ExportPng
 set( ExportPngCppSources
 	exportpng.cpp )
@@ -15,6 +19,14 @@ target_link_libraries( cpp_simple
 	asagi )
 set_target_properties( cpp_simple PROPERTIES
 	OUTPUT_NAME simple )
+
+# Simple
+add_executable( cpp_array
+	${ArrayCppSources} )
+target_link_libraries( cpp_array
+	asagi )
+set_target_properties( cpp_array PROPERTIES
+	OUTPUT_NAME array )
 
 # ExportPng
 add_executable( cpp_exportpng

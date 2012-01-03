@@ -21,45 +21,55 @@ public:
 		delete [] values;
 	}
 	
+	unsigned int getVarSize()
+	{
+		return sizeof(T);
+	}
+	
 	int getInt(float x, float y)
 	{
-		return static_cast<int>(*getAt(x, y));
+		return static_cast<int>(getAt(x, y));
 	}
 	
 	long getLong(float x, float y)
 	{
-		return static_cast<long>(*getAt(x, y));
+		return static_cast<long>(getAt(x, y));
 	}
 	
 	float getFloat(float x, float y)
 	{
-		return static_cast<float>(*getAt(x, y));
+		return static_cast<float>(getAt(x, y));
 	}
 	
 	double getDouble(float x, float y)
 	{
-		return static_cast<double>(*getAt(x, y));
+		return static_cast<double>(getAt(x, y));
+	}
+	
+	void getBuf(float x, float y, void* buf)
+	{
+		*static_cast<T*>(buf) = getAt(x, y);
 	}
 	
 private:
-	const T* getAt(float x, float y)
+	const T getAt(float x, float y)
 	{
 		x = round((x - getXOffset()) / getXScaling());
 		y = round((y - getYOffset()) / getYScaling());
 		return getAt(static_cast<long>(x), static_cast<long>(y));
 	}
 	
-	const T* getAt(long x, long y)
+	const T getAt(long x, long y)
 	{
 		y = y * getXDim() + x;
 		
 		// Range check
 		if (y < 0)
-			return &defaultValue;
+			return defaultValue;
 		if (static_cast<unsigned long>(y) >= getXDim() * getYDim())
-			return &defaultValue;
+			return defaultValue;
 		
-		return &values[y];
+		return values[y];
 	}
 	
 protected:
@@ -69,17 +79,14 @@ protected:
 		
 		file.getVar(values);
 		
-		file.getDefault(defaultValue);
+		file.getDefault(&defaultValue);
 		
 		return true;
 	}
 	
-	/**
-	 * This function is used by exportPng, which only works on floats
-	 */
 	float getAtFloat(long x, long y)
 	{
-		return static_cast<float>(*getAt(x, y));
+		return static_cast<float>(getAt(x, y));
 	}
 
 };
