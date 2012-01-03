@@ -14,7 +14,7 @@ namespace asagi {
 class asagi::Grid
 {
 public:
-	enum Type { BYTE, INT, LONG, FLOAT, DOUBLE, VOID };
+	enum Type { BYTE, INT, LONG, FLOAT, DOUBLE, BYTEARRAY };
 public:
 	virtual bool open(const char* filename) = 0;
 	virtual float getXMin() = 0;
@@ -22,6 +22,7 @@ public:
 	virtual float getXMax() = 0;
 	virtual float getYMax() = 0;
 	virtual float getFloat(float x, float y) = 0;
+	virtual double getDouble(float x, float y) = 0;
 	
 	virtual bool exportPng(const char* filename) = 0;
 public:

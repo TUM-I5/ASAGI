@@ -4,10 +4,10 @@
 #include "grid.h"
 #include "io/netcdf.h"
 
-template<typename T> class TypedGrid : public Grid
+template<typename A, typename T> class TypedGrid : public Grid
 {
 private:
-	T *values;
+	A *values;
 	
 	T defaultValue;
 public:
@@ -30,7 +30,7 @@ public:
 		dimX = file.getXDim();
 		dimY = file.getYDim();
 		
-		values = new T[dimX * dimY];
+		values = new A[dimX * dimY];
 		
 		file.getVar(values);
 		
@@ -96,5 +96,9 @@ protected:
 	}
 
 };
+
+template<> float TypedGrid<char, char*>::getFloat(float x, float y);
+template<> double TypedGrid<char, char*>::getDouble(float x, float y);
+template<> float TypedGrid<char, char*>::getAtFloat(long x, long y);
 
 #endif

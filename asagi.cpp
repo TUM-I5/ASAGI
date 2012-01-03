@@ -7,15 +7,17 @@ asagi::Grid* asagi::Grid::create(Type type)
 {
 	switch (type) {
 		case BYTE:
-			return new TypedGrid<char>();
+			return new TypedGrid<char, char>();
 		case INT:
-			return new TypedGrid<int>();
+			return new TypedGrid<int, int>();
 		case LONG:
-			return new TypedGrid<long>();
+			return new TypedGrid<long, long>();
 		case FLOAT:
-			return new TypedGrid<float>();
+			return new TypedGrid<float, float>();
 		case DOUBLE:
-			return new TypedGrid<double>();
+			return new TypedGrid<double, double>();
+		case BYTEARRAY:
+			return new TypedGrid<char, char*>();
 		default:
 			;
 	}
