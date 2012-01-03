@@ -17,9 +17,9 @@ try:
 	create_nc = True
 except ImportError:
 	# Install numpy-devel files
-	# Download http://code.google.com/p/netcdf4-python/downloads/detail?name=netCDF4-0.8.2.tar.gz
+	## Download http://code.google.com/p/netcdf4-python/downloads/detail?name=netCDF4-0.9.3.tar.gz
 	# Extract
-	# cd netCDF4-0.8.2
+	# cd netCDF4-0.9.3
 	# python setup-nc3.py build
 	# sudo python setup-nc3.py install
 	
