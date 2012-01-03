@@ -1,67 +1,72 @@
 #include <math.h>
 
-#include "grid.h"
+#include "io/netcdf.h"
 #ifdef WITH_PNG
 #include "io/png.h"
 #endif
+
+#include "grid.h"
 
 Grid::Grid()
 {
 	// Prepare for fortran <-> c translation
 	id = pointers.add(this);
-	
-	file = 0L;
 }
 
 Grid::~Grid()
 {
-	delete file;
-	
 	// Remove from fortran <-> c translation
 	pointers.remove(id);
 }
 
 bool Grid::open(const char* filename)
 {
-	file = new io::NetCdf(filename);
-	if (file->hasError()) {
-		delete file;
-		file = 0L;
+	io::NetCdf file(filename);
+	if (file.hasError())
 		return false;
-	}
 	
-	dimX = file->getXDim();
-	dimY = file->getYDim();
-	values = file->getAll();
+	values = file.getAll();
+	dimX = file.getXDim();
+	dimY = file.getYDim();
+	
+	defaultValue = file.getDefault();
+	
+	isDimSwitched = file.isDimSwitched();
+	
+	offsetX = file.getXOffset();
+	offsetY = file.getYOffset();
+	
+	scalingX = file.getXScaling();
+	scalingY = file.getYScaling();
 	
 	return true;
 }
 
-unsigned long Grid::getXDim()
+float Grid::getXMin()
 {
-	return dimX;
+	return offsetX;
 }
 
-unsigned long Grid::getYDim()
+float Grid::getYMin()
 {
-	return dimY;
+	return offsetY;
 }
 
-float Grid::get(unsigned long x, unsigned long y)
+float Grid::getXMax()
 {
-	// no range checking for x and y for performance reason
-	
-	if (file->isDimSwitched()) {
-		// switch x and y
-		x ^= y;
-		y ^= x;
-		x ^= y;
-		
-		x = x * getXDim() + y;
-	} else
-		x = x * getYDim() + y;
-	
-	return values[x];
+	return offsetX + dimX * scalingX;
+}
+
+float Grid::getYMax()
+{
+	return offsetY + dimY * scalingY;
+}
+
+float Grid::get(float x, float y)
+{
+	x = round((x - offsetX) / scalingX);
+	y = round((y - offsetY) / scalingY);
+	return getAt(x, y);
 }
 
 bool Grid::exportPng(const char* filename)
@@ -70,10 +75,10 @@ bool Grid::exportPng(const char* filename)
 	float min, max, value;
 	unsigned char red, green, blue;
 	
-	min = max = get(0, 0);
-	for (unsigned long i = 0; i < getXDim(); i++) {
-		for (unsigned long j = 0; j < getYDim(); j++) {
-			value = get(i, j);
+	min = max = getAt(0, 0);
+	for (unsigned long i = 0; i < dimX; i++) {
+		for (unsigned long j = 0; j < dimY; j++) {
+			value = getAt(i, j);
 			if (value < min)
 				min = value;
 			if (value > max)
@@ -81,15 +86,15 @@ bool Grid::exportPng(const char* filename)
 		}
 	}
 	
-	io::Png png(getXDim(), getYDim());
+	io::Png png(dimX, dimY);
 	if (!png.create(filename))
 		return false;
 	
-	for (unsigned long i = 0; i < getXDim(); i++) {
-		for (unsigned long j = 0; j < getYDim(); j++) {
+	for (unsigned long i = 0; i < dimX; i++) {
+		for (unsigned long j = 0; j < dimY; j++) {
 			// do some magic here
-			h2rgb((get(i, j) - min) / (max - min) * 2 / 3, red, green, blue);
-			png.write(i, getYDim() - j - 1, red, green, blue);
+			h2rgb((getAt(i, j) - min) / (max - min) * 2 / 3, red, green, blue);
+			png.write(i, dimY - j - 1, red, green, blue);
 		}
 	}
 	
@@ -99,6 +104,27 @@ bool Grid::exportPng(const char* filename)
 #else // WITH_PNG
 	return false;
 #endif // WITH_PNG
+}
+
+float Grid::getAt(long x, long y)
+{
+	if (isDimSwitched) {
+		// switch x and y
+		x ^= y;
+		y ^= x;
+		x ^= y;
+		
+		x = x * dimX + y;
+	} else
+		x = x * dimY + y;
+	
+	// Range check
+	if (x < 0)
+		return defaultValue;
+	if (static_cast<unsigned long>(x) >= dimX * dimY)
+		return defaultValue;
+	
+	return values[x];
 }
 
 int Grid::c2f()
@@ -154,6 +180,11 @@ void Grid::h2rgb(float h, unsigned char &red, unsigned char &green, unsigned cha
 	red = 255;
 	green = 0;
 	blue = x * 255;
+}
+
+float Grid::round(float value)
+{
+	return floor(value + 0.5);
 }
 
 Grid* Grid::f2c(int i)

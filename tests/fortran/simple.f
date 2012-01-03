@@ -3,7 +3,8 @@
       program simple
         character*256 filename
         integer grid
-        integer x, y
+        real minimum, maximum
+        real xpos, ypos
         real value
 
         filename = '../data/tohoku_1850m_bath.nc'
@@ -16,10 +17,15 @@
 
         write (*,*) 'File loaded'
 
-        call fgrid_x(grid, x)
-        call fgrid_y(grid, y)
-        write (*,*) 'x/y dim:', x, y
-        call fgrid_get_value(grid, 5, 10, value)
-        write (*,*) '5/10:', value
+        call fgrid_min_x(grid, minimum)
+        call fgrid_max_x(grid, maximum)
+        write (*,*) 'Range x:', minimum, maximum
+        call fgrid_min_y(grid, minimum)
+        call fgrid_max_y(grid, maximum)
+        write (*,*) 'Range y:', minimum, maximum
+        xpos = 5
+        ypos = 10.1
+        call fgrid_get_value(grid, xpos, ypos, value)
+        write (*,*) '5/10.1:', value
 
       end

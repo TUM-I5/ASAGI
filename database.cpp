@@ -19,17 +19,27 @@ grid_handle* grid_load(const char* filename)
 	return grid;
 }
 
-unsigned long grid_x(grid_handle* handle)
+float grid_min_x(grid_handle* handle)
 {
-	return handle->getXDim();
+	return handle->getXMin();
 }
 
-unsigned long grid_y(grid_handle* handle)
+float grid_min_y(grid_handle* handle)
 {
-	return handle->getYDim();
+	return handle->getYMin();
 }
 
-float grid_get_value(grid_handle* handle, unsigned long x, unsigned long y)
+float grid_max_x(grid_handle* handle)
+{
+	return handle->getXMax();
+}
+
+float grid_max_y(grid_handle* handle)
+{
+	return handle->getYMax();
+}
+
+float grid_get_value(grid_handle* handle, float x, float y)
 {
 	return handle->get(x, y);
 }

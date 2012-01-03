@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "netcdf.h"
 
 io::NetCdf::NetCdf(const char* fileName)
@@ -43,15 +45,47 @@ bool io::NetCdf::isDimSwitched()
 	return dimSwitched;
 }
 
-/*float io::NetCdf::getMin()
+float io::NetCdf::getXOffset()
 {
-	return file.get_var("z")->get_att("actual_range")->as_float(0);
+	// TODO
+	return 0;
+}
+
+float io::NetCdf::getYOffset()
+{
+	// TODO
+	return 0;
+}
+
+float io::NetCdf::getXScaling()
+{
+	// TODO
+	return 1;
+}
+
+float io::NetCdf::getYScaling()
+{
+	// TODO
+	return 1;
+}
+
+float io::NetCdf::getMin()
+{
+	NcAtt* range = file.get_var("z")->get_att("actual_range");
+	if (range->is_valid())
+		return range->as_float(0);
+	
+	return NAN;
 }
 
 float io::NetCdf::getMax()
 {
-	return file.get_var("z")->get_att("actual_range")->as_float(1);
-}*/
+	NcAtt* range = file.get_var("z")->get_att("actual_range");
+	if (range->is_valid())
+		return range->as_float(1);
+	
+	return NAN;
+}
 
 float* io::NetCdf::getAll()
 {
@@ -75,3 +109,8 @@ float* io::NetCdf::getAll()
 	return result;
 }
 
+float io::NetCdf::getDefault()
+{
+	// TODO
+	return 0;
+}

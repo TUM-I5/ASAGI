@@ -12,9 +12,12 @@ int main (void)
 		return 1;
 	}
 	
-	printf("Dim (x*y): %u*%u\n", (unsigned int) grid->getXDim(), (unsigned int) grid->getYDim());
+	printf("Range X: %f-%f\n", grid->getXMin(), grid->getXMax());
+	printf("Range Y: %f-%f\n", grid->getYMax(), grid->getYMax());
 	
 	printf("Value at 5x10: %f\n", grid->get(5, 10));
+	printf("Value at 5x10.1: %f\n", grid->get(5, 10.1));
+	printf("Value at -1x-15.32: %f\n", grid->get(-1, -15.32));
 	
 	return 0;
 }

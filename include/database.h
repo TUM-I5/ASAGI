@@ -14,9 +14,11 @@ class grid::Grid
 {
 public:
 	virtual bool open(const char* filename) = 0;
-	virtual unsigned long getXDim() = 0;
-	virtual unsigned long getYDim() = 0;
-	virtual float get(unsigned long x, unsigned long y) = 0;
+	virtual float getXMin() = 0;
+	virtual float getYMin() = 0;
+	virtual float getXMax() = 0;
+	virtual float getYMax() = 0;
+	virtual float get(float x, float y) = 0;
 	
 	virtual bool exportPng(const char* filename) = 0;
 public:
@@ -33,10 +35,12 @@ typedef struct grid_handle grid_handle;
  */
 grid_handle* grid_load(const char* filename);
 
-unsigned long grid_x(grid_handle* handle);
-unsigned long grid_y(grid_handle* handle);
+float grid_min_x(grid_handle* handle);
+float grid_min_y(grid_handle* handle);
+float grid_max_x(grid_handle* handle);
+float grid_max_y(grid_handle* handle);
 
-float grid_get_value(grid_handle* handle, unsigned long x, unsigned long y);
+float grid_get_value(grid_handle* handle, float x, float y);
 
 void grid_free(grid_handle* handle);
 

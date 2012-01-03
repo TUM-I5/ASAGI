@@ -20,9 +20,14 @@ namespace io
 		unsigned long getXDim();
 		unsigned long getYDim();
 		bool isDimSwitched();
-		//float getMin();
-		//float getMax();
+		float getXOffset();
+		float getYOffset();
+		float getXScaling();
+		float getYScaling();
+		float getMin();
+		float getMax();
 		float* getAll();
+		float getDefault();
 	};
 };
 

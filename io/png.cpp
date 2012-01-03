@@ -58,6 +58,11 @@ bool io::Png::create(const char* filename)
 
 void io::Png::write(unsigned long x, unsigned long y, unsigned char red, unsigned char green, unsigned char blue)
 {
+	if (y >= height)
+		return;
+	if (x >= width)
+		return;
+	
 	row_pointers[y][x * PIXEL_SIZE] = red;
 	row_pointers[y][x * PIXEL_SIZE + 1] = green;
 	row_pointers[y][x * PIXEL_SIZE + 2] = blue;

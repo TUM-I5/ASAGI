@@ -4,31 +4,45 @@
 #include <database.h>
 
 #include "fortran/pointerarray.h"
-#include "io/netcdf.h"
 
 class Grid : public grid::Grid
 {
 private:
 	int id;
 	
-	io::NetCdf* file;
 	float* values;
 	unsigned long dimX;
 	unsigned long dimY;
+	
+	float defaultValue;
+	
+	bool isDimSwitched;
+	
+	float offsetX;
+	float offsetY;
+	
+	float scalingX;
+	float scalingY;
 public:
 	Grid();
 	virtual ~Grid();
 	bool open(const char* filename);
-	unsigned long getXDim();
-	unsigned long getYDim();
-	float get(unsigned long x, unsigned long y);
+	float getXMin();
+	float getYMin();
+	float getXMax();
+	float getYMax();
+	float get(float x, float y);
 	
 	bool exportPng(const char* filename);
+	
+	// These are not part of the offical interface
+	float getAt(long x, long y);
 	int c2f();
 private:
 	static fortran::PointerArray<Grid> pointers;
 private:
 	static void h2rgb(float h, unsigned char &red, unsigned char &green, unsigned char &blue);
+	static float round(float value);
 public:
 	static Grid* f2c(int i);
 };

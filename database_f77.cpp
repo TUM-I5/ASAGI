@@ -36,26 +36,42 @@ void fgrid_load(char* filename, int* grid_id, int filename_len)
 	delete c_filename;
 }
 
-GRID_GENERATE_F77_BINDINGS(grid_x, GRID_X,
-	(Fint* grid_id, Fint* x), (grid_id, x))
+GRID_GENERATE_F77_BINDINGS(grid_min_x, GRID_MIN_X,
+	(Fint* grid_id, Freal* x), (grid_id, x))
 
-void fgrid_x(Fint* grid_id, Fint* x)
+void fgrid_min_x(Fint* grid_id, Freal* x)
 {
-	*x = Grid::f2c(*grid_id)->getXDim();
+	*x = Grid::f2c(*grid_id)->getXMin();
 }
 
-GRID_GENERATE_F77_BINDINGS(grid_y, GRID_Y,
-	(Fint* grid_id, Fint* y), (grid_id, y))
+GRID_GENERATE_F77_BINDINGS(grid_min_y, GRID_MIN_Y,
+	(Fint* grid_id, Freal* y), (grid_id, y))
 
-void fgrid_y(Fint* grid_id, Fint* y)
+void fgrid_min_y(Fint* grid_id, Freal* y)
 {
-	*y = Grid::f2c(*grid_id)->getYDim();
+	*y = Grid::f2c(*grid_id)->getYMin();
+}
+
+GRID_GENERATE_F77_BINDINGS(grid_max_x, GRID_MAX_X,
+	(Fint* grid_id, Freal* x), (grid_id, x))
+
+void fgrid_max_x(Fint* grid_id, Freal* x)
+{
+	*x = Grid::f2c(*grid_id)->getXMax();
+}
+
+GRID_GENERATE_F77_BINDINGS(grid_max_y, GRID_MAX_Y,
+	(Fint* grid_id, Freal* y), (grid_id, y))
+
+void fgrid_max_y(Fint* grid_id, Freal* y)
+{
+	*y = Grid::f2c(*grid_id)->getYMax();
 }
 
 GRID_GENERATE_F77_BINDINGS(grid_get_value, GRID_GET_VALUE,
-	(Fint* grid_id, Fint* x, Fint* y, Freal* value), (grid_id, x, y, value))
+	(Fint* grid_id, Freal* x, Freal* y, Freal* value), (grid_id, x, y, value))
 
-void fgrid_get_value(Fint* grid_id, Fint* x, Fint* y, Freal* value)
+void fgrid_get_value(Fint* grid_id, Freal* x, Freal* y, Freal* value)
 {
 	*value = Grid::f2c(*grid_id)->get(*x, *y);
 }

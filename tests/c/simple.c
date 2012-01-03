@@ -12,7 +12,8 @@ int main (void)
 		return 1;
 	}
 	
-	printf("Dim (x*y): %u*%u\n", (unsigned int) grid_x(grid), (unsigned int) grid_y(grid));
+	printf("Range X: %f-%f\n", grid_min_x(grid), grid_max_x(grid));
+	printf("Range Y: %f-%f\n", grid_min_y(grid), grid_max_y(grid));
 	
 	printf("Value at 5x10: %f\n", grid_get_value(grid, 5, 10));
 	
