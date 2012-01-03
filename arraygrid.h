@@ -31,6 +31,21 @@ public:
 		return sizeof(T) * count;
 	}
 	
+	char getByte(float x, float y)
+	{
+		return static_cast<char>(*getAt(x, y));
+	}
+	
+	int getInt(float x, float y)
+	{
+		return static_cast<int>(*getAt(x, y));
+	}
+	
+	long getLong(float x, float y)
+	{
+		return static_cast<long>(*getAt(x, y));
+	}
+	
 	float getFloat(float x, float y)
 	{
 		return static_cast<float>(*getAt(x, y));

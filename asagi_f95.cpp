@@ -32,9 +32,34 @@ float f95grid_max_y(int grid_id)
 	return Grid::f2c(grid_id)->getYMax();
 }
 
+char f95grid_get_byte(int grid_id, float x, float y)
+{
+	return Grid::f2c(grid_id)->getByte(x, y);
+}
+
+int f95grid_get_int(int grid_id, float x, float y)
+{
+	return Grid::f2c(grid_id)->getInt(x, y);
+}
+
+long f95grid_get_long(int grid_id, float x, float y)
+{
+	return Grid::f2c(grid_id)->getLong(x, y);
+}
+
 float f95grid_get_float(int grid_id, float x, float y)
 {
 	return Grid::f2c(grid_id)->getFloat(x, y);
+}
+
+double f95grid_get_double(int grid_id, float x, float y)
+{
+	return Grid::f2c(grid_id)->getDouble(x, y);
+}
+
+void f95grid_get_buf(int grid_id, float x, float y, void* buf)
+{
+	return Grid::f2c(grid_id)->getBuf(x, y, buf);
 }
 
 void f95grid_free(int grid_id)

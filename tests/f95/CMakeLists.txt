@@ -2,12 +2,13 @@
 # Simple
 set( SimpleF95Sources
 	simple.f95 )
-#	../../database.f95 )
+
+# Buf
+set( BufF95Sources
+	buf.f95 )
 
 ##### Build fortran #####
 enable_language( Fortran )
-
-include_directories( ${CMAKE_SOURCE_DIR} )
 
 ##### Executables #####
 # Simple
@@ -17,3 +18,11 @@ target_link_libraries( f95_simple
 	asagi )
 set_target_properties( f95_simple PROPERTIES
 	OUTPUT_NAME simple )
+
+# Buf
+add_executable( f95_buf
+	${BufF95Sources} )
+target_link_libraries( f95_buf
+	asagi )
+set_target_properties( f95_buf PROPERTIES
+	OUTPUT_NAME buf )

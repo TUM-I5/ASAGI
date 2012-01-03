@@ -11,7 +11,6 @@ extern "C" {
  */
 namespace asagi {
 	class Grid;
-	class VarType;
 }
 
 class asagi::Grid
@@ -30,6 +29,9 @@ public:
 	 * @return The number of bytes that are stored at each grid node
 	 */
 	virtual unsigned int getVarSize() = 0;
+	virtual char getByte(float x, float y) = 0;
+	virtual int getInt(float x, float y) = 0;
+	virtual long getLong(float x, float y) = 0;
 	virtual float getFloat(float x, float y) = 0;
 	virtual double getDouble(float x, float y) = 0;
 	/**
@@ -64,7 +66,12 @@ float grid_min_y(grid_handle* handle);
 float grid_max_x(grid_handle* handle);
 float grid_max_y(grid_handle* handle);
 
+char grid_get_char(grid_handle* handle, float x, float y);
+int grid_get_int(grid_handle* handle, float x, float y);
+long grid_get_long(grid_handle* handle, float x, float y);
 float grid_get_float(grid_handle* handle, float x, float y);
+double grid_get_double(grid_handle* handle, float x, float y);
+void grid_get_buf(grid_handle* handle, float x, float y, void* buf);
 
 void grid_free(grid_handle* handle);
 

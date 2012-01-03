@@ -26,6 +26,11 @@ public:
 		return sizeof(T);
 	}
 	
+	char getByte(float x, float y)
+	{
+		return static_cast<char>(getAt(x, y));
+	}
+	
 	int getInt(float x, float y)
 	{
 		return static_cast<int>(getAt(x, y));
