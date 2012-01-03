@@ -47,13 +47,21 @@ bool io::NetCdf::isDimSwitched()
 
 float io::NetCdf::getXOffset()
 {
-	// TODO
+	NcVar* x = file.get_var("x");
+	
+	if (x->is_valid())
+		return x->as_float(0);
+	
 	return 0;
 }
 
 float io::NetCdf::getYOffset()
 {
-	// TODO
+	NcVar* y = file.get_var("y");
+	
+	if (y->is_valid())
+		return y->as_float(0);
+	
 	return 0;
 }
 
