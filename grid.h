@@ -1,9 +1,11 @@
 #ifndef GRID_H
 #define GRID_H
 
+#include <database.h>
+
 #include "io/netcdf.h"
 
-class Grid
+class Grid : public grid
 {
 private:
 	io::NetCdf* file;

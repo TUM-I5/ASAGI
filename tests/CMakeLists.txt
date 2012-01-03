@@ -1,11 +1,4 @@
-##### Files #####
-# Simple
-set( SimpleSources
-	simple.cpp )
-
-##### Executables #####
-# Simple
-add_executable( simple
-	${SimpleSources} )
-target_link_libraries( simple
-	database )
+# Add all test directories
+add_subdirectory( c )
+add_subdirectory( cpp )
+add_subdirectory( fortran )

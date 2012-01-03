@@ -2,7 +2,7 @@
 
 #include "grid.h"
 
-grid_handle grid_load(const char* filename)
+grid_handle* grid_load(const char* filename)
 {
 	Grid* grid = new Grid();
 	
@@ -11,20 +11,20 @@ grid_handle grid_load(const char* filename)
 		return 0L;
 	}
 	
-	return static_cast<grid_handle>(grid);
+	return grid;
 }
 
-unsigned long grid_x(grid_handle handle)
+unsigned long grid_x(grid_handle* handle)
 {
-	return static_cast<Grid*>(handle)->getXDim();
+	return reinterpret_cast<Grid*>(handle)->getXDim();
 }
 
-unsigned long grid_y(grid_handle handle)
+unsigned long grid_y(grid_handle* handle)
 {
-	return static_cast<Grid*>(handle)->getYDim();
+	return reinterpret_cast<Grid*>(handle)->getYDim();
 }
 
-float grid_get_value(grid_handle handle, unsigned long x, unsigned long y)
+float grid_get_value(grid_handle* handle, unsigned long x, unsigned long y)
 {
-	return static_cast<Grid*>(handle)->get(x, y);
+	return reinterpret_cast<Grid*>(handle)->get(x, y);
 }
