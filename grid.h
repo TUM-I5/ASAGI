@@ -5,7 +5,7 @@
 
 #include "io/netcdf.h"
 
-class Grid : public grid
+class Grid : public grid::Grid
 {
 private:
 	io::NetCdf* file;

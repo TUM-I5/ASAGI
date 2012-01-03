@@ -12,5 +12,5 @@ add_library( io
 	${ioSources} )
 target_link_libraries( io
 	${NETCDF_LIBRARIES} )
-set_target_properties( io
-	PROPERTIES COMPILE_FLAGS -fPIC )
+set_target_properties( io PROPERTIES
+	COMPILE_FLAGS -fPIC )

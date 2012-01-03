@@ -2,6 +2,11 @@
 
 #include "grid.h"
 
+grid::Grid* grid::Grid::create()
+{
+	return new ::Grid();
+}
+
 grid_handle* grid_load(const char* filename)
 {
 	Grid* grid = new Grid();
@@ -16,15 +21,15 @@ grid_handle* grid_load(const char* filename)
 
 unsigned long grid_x(grid_handle* handle)
 {
-	return reinterpret_cast<Grid*>(handle)->getXDim();
+	return handle->getXDim();
 }
 
 unsigned long grid_y(grid_handle* handle)
 {
-	return reinterpret_cast<Grid*>(handle)->getYDim();
+	return handle->getYDim();
 }
 
 float grid_get_value(grid_handle* handle, unsigned long x, unsigned long y)
 {
-	return reinterpret_cast<Grid*>(handle)->get(x, y);
+	return handle->get(x, y);
 }
