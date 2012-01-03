@@ -7,7 +7,6 @@ cmake_minimum_required( VERSION 2.8 )
 # Lib Sources
 set( LibSources
 	database.cpp
-	database_f77.cpp
 	database_f95.cpp
 	grid.cpp )
 
@@ -41,6 +40,5 @@ add_subdirectory( tests )
 add_library( database SHARED
 	${LibSources} )
 target_link_libraries( database
-	fortran
 	io
 	netcdf )

@@ -1,4 +1,4 @@
-include 'database.f95'
+include 'database.inc'
 
 ! Simple library test
 program simple
