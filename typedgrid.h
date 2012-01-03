@@ -45,7 +45,7 @@ public:
 		return true;
 	}
 	
-	long getInt(float x, float y)
+	int getInt(float x, float y)
 	{
 		return static_cast<int>(*getAt(x, y));
 	}
