@@ -1,22 +1,37 @@
 #include <asagi.h>
 
-#include "grid.h"
+#include "typedgrid.h"
 
-asagi::Grid* asagi::Grid::create()
+// Static c++ functions
+asagi::Grid* asagi::Grid::create(Type type)
 {
-	return new ::Grid();
-}
-
-grid_handle* grid_load(const char* filename)
-{
-	Grid* grid = new Grid();
-	
-	if (!grid->open(filename)) {
-		delete grid;
-		return 0L;
+	switch (type) {
+		case BYTE:
+			return new TypedGrid<char>();
+		case INT:
+			return new TypedGrid<int>();
+		case LONG:
+			return new TypedGrid<long>();
+		case FLOAT:
+			return new TypedGrid<float>();
+		case DOUBLE:
+			return new TypedGrid<double>();
+		default:
+			;
 	}
 	
-	return grid;
+	return 0L; // should not happen
+}
+
+// C interfae
+grid_handle* grid_create(grid_type type)
+{
+	return asagi::Grid::create(type);
+}
+
+int grid_open(grid_handle* handle, const char* filename)
+{
+	return handle->open(filename);
 }
 
 float grid_min_x(grid_handle* handle)
@@ -39,9 +54,9 @@ float grid_max_y(grid_handle* handle)
 	return handle->getYMax();
 }
 
-float grid_get_value(grid_handle* handle, float x, float y)
+float grid_get_float(grid_handle* handle, float x, float y)
 {
-	return handle->get(x, y);
+	return handle->getFloat(x, y);
 }
 
 void grid_free(grid_handle* handle)

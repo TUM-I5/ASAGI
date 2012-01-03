@@ -8,39 +8,46 @@ extern "C" {
 #ifdef __cplusplus
 namespace asagi {
 	class Grid;
+	class VarType;
 }
 
 class asagi::Grid
 {
+public:
+	enum Type { BYTE, INT, LONG, FLOAT, DOUBLE, VOID };
 public:
 	virtual bool open(const char* filename) = 0;
 	virtual float getXMin() = 0;
 	virtual float getYMin() = 0;
 	virtual float getXMax() = 0;
 	virtual float getYMax() = 0;
-	virtual float get(float x, float y) = 0;
+	virtual float getFloat(float x, float y) = 0;
 	
 	virtual bool exportPng(const char* filename) = 0;
 public:
-	static asagi::Grid* create();
+	static asagi::Grid* create(Type type = FLOAT);
 };
 
 typedef asagi::Grid grid_handle;
+typedef asagi::Grid::Type grid_type;
 #else
 typedef struct grid_handle grid_handle;
+typedef enum { GRID_BYTE, GRID_INT, GRID_LONG, GRID_FLOAT, GRID_DOUBLE, GRID_VOID } grid_type;
 #endif
 
 /**
  * Load a grid form an nc file
  */
-grid_handle* grid_load(const char* filename);
+grid_handle* grid_create(grid_type type);
+
+int grid_open(grid_handle* handle, const char* filename);
 
 float grid_min_x(grid_handle* handle);
 float grid_min_y(grid_handle* handle);
 float grid_max_x(grid_handle* handle);
 float grid_max_y(grid_handle* handle);
 
-float grid_get_value(grid_handle* handle, float x, float y);
+float grid_get_float(grid_handle* handle, float x, float y);
 
 void grid_free(grid_handle* handle);
 

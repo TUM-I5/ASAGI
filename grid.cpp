@@ -1,6 +1,5 @@
 #include <math.h>
 
-#include "io/netcdf.h"
 #ifdef WITH_PNG
 #include "io/png.h"
 #endif
@@ -9,8 +8,6 @@
 
 Grid::Grid()
 {
-	values = 0L;
-	
 	// Prepare for fortran <-> c translation
 	id = pointers.add(this);
 }
@@ -19,29 +16,6 @@ Grid::~Grid()
 {
 	// Remove from fortran <-> c translation
 	pointers.remove(id);
-	
-	delete[] values;
-}
-
-bool Grid::open(const char* filename)
-{
-	io::NetCdf file(filename);
-	if (!file.open())
-		return false;
-	
-	values = file.getAll();
-	dimX = file.getXDim();
-	dimY = file.getYDim();
-	
-	defaultValue = file.getDefault();
-	
-	offsetX = file.getXOffset();
-	offsetY = file.getYOffset();
-	
-	scalingX = file.getXScaling();
-	scalingY = file.getYScaling();
-	
-	return true;
 }
 
 float Grid::getXMin()
@@ -64,23 +38,16 @@ float Grid::getYMax()
 	return offsetY + std::max(0.f, dimY * scalingY);
 }
 
-float Grid::get(float x, float y)
-{
-	x = round((x - offsetX) / scalingX);
-	y = round((y - offsetY) / scalingY);
-	return getAt(x, y);
-}
-
 bool Grid::exportPng(const char* filename)
 {
 #ifdef WITH_PNG
 	float min, max, value;
 	unsigned char red, green, blue;
 	
-	min = max = getAt(0, 0);
+	min = max = getAtFloat(0, 0);
 	for (unsigned long i = 0; i < dimX; i++) {
 		for (unsigned long j = 0; j < dimY; j++) {
-			value = getAt(i, j);
+			value = getAtFloat(i, j);
 			if (value < min)
 				min = value;
 			if (value > max)
@@ -95,7 +62,7 @@ bool Grid::exportPng(const char* filename)
 	for (unsigned long i = 0; i < dimX; i++) {
 		for (unsigned long j = 0; j < dimY; j++) {
 			// do some magic here
-			h2rgb((getAt(i, j) - min) / (max - min) * 2 / 3, red, green, blue);
+			h2rgb((getAtFloat(i, j) - min) / (max - min) * 2 / 3, red, green, blue);
 			png.write(i, dimY - j - 1, red, green, blue);
 		}
 	}
@@ -104,21 +71,9 @@ bool Grid::exportPng(const char* filename)
 	
 	return true;
 #else // WITH_PNG
+	// TODO generate a warning or something like this
 	return false;
 #endif // WITH_PNG
-}
-
-float Grid::getAt(long x, long y)
-{
-	y = y * dimX + x;
-	
-	// Range check
-	if (y < 0)
-		return defaultValue;
-	if (static_cast<unsigned long>(y) >= dimX * dimY)
-		return defaultValue;
-	
-	return values[y];
 }
 
 int Grid::c2f()

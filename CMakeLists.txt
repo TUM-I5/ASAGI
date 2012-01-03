@@ -8,7 +8,8 @@ cmake_minimum_required( VERSION 2.8 )
 set( LibSources
 	asagi.cpp
 	asagi_f95.cpp
-	grid.cpp )
+	grid.cpp
+	typedgrid.cpp )
 
 ##### Other configuration #####
 # Additional cmake modules
@@ -25,12 +26,12 @@ if( PNG_FOUND )
 	add_definitions( -DWITH_PNG )
 endif()
 
+# Add library include files for all exectuables
+include_directories( ${CMAKE_SOURCE_DIR}/include )
+
 # Add static libaries
 add_subdirectory( fortran )
 add_subdirectory( io )
-
-# Add library include files for all exectuables
-include_directories( ${CMAKE_SOURCE_DIR}/include )
 
 # Add tests
 add_subdirectory( tests )
@@ -40,5 +41,4 @@ add_subdirectory( tests )
 add_library( asagi SHARED
 	${LibSources} )
 target_link_libraries( asagi
-	io
-	netcdf )
+	io )

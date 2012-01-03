@@ -6,7 +6,7 @@ using namespace asagi;
 int main (void)
 {
 #ifdef WITH_PNG
-	Grid* grid = Grid::create();
+	Grid* grid = Grid::create(Grid::FLOAT);
 	
 	if (!grid->open("../data/noise.nc")) {
 		printf("Could not load file\n");

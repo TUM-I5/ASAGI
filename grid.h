@@ -10,11 +10,10 @@ class Grid : public asagi::Grid
 private:
 	int id;
 	
-	float* values;
+protected:
+	// variables will be set by child
 	unsigned long dimX;
 	unsigned long dimY;
-	
-	float defaultValue;
 	
 	float offsetX;
 	float offsetY;
@@ -24,22 +23,22 @@ private:
 public:
 	Grid();
 	virtual ~Grid();
-	bool open(const char* filename);
 	float getXMin();
 	float getYMin();
 	float getXMax();
 	float getYMax();
-	float get(float x, float y);
 	
 	bool exportPng(const char* filename);
 	
 	// These are not part of the offical interface
-	float getAt(long x, long y);
 	int c2f();
+protected:
+	virtual float getAtFloat(long x, long y) = 0;
 private:
 	static fortran::PointerArray<Grid> pointers;
 private:
 	static void h2rgb(float h, unsigned char &red, unsigned char &green, unsigned char &blue);
+protected:
 	static float round(float value);
 public:
 	static Grid* f2c(int i);

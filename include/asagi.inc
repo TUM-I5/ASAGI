@@ -1,14 +1,23 @@
 module asagi
   implicit none
-  
-  integer, parameter :: GRID_NULL = -1
+
+  enum, bind( c )
+    enumerator :: GRID_BYTE, GRID_INT, GRID_LONG, GRID_FLOAT, GRID_DOUBLE, GRID_VOID
+  end enum
   
   interface
-    function grid_load( filename ) bind( c, name="f95grid_load" )
+    function grid_create( grid_type ) bind( c, name="f95grid_create" )
       use, intrinsic :: iso_c_binding
+      integer( kind=c_int ), value :: grid_type
+      integer( kind=c_int )        :: grid_create
+    end function grid_create
+    
+    function grid_open( grid_id, filename ) bind( c, name="f95grid_open" )
+      use, intrinsic :: iso_c_binding
+      integer( kind=c_int ), value           :: grid_id
       character( kind=c_char ), dimension(*) :: filename
-      integer( kind=c_int )                  :: grid_load
-    end function grid_load
+      logical( kind=c_bool )                 :: grid_open
+    end function grid_open
     
     function grid_min_x( grid_id ) bind( c, name="f95grid_min_x" )
       use, intrinsic :: iso_c_binding
@@ -34,13 +43,13 @@ module asagi
       real( kind=c_float )         :: grid_max_y
     end function grid_max_y
     
-    function grid_get_value( grid_id, x, y ) bind( c, name="f95grid_get_value" )
+    function grid_get_float( grid_id, x, y ) bind( c, name="f95grid_get_float" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id
       real( kind=c_float ), value  :: x
       real( kind=c_float ), value  :: y
-      real( kind=c_float )         :: grid_get_value
-    end function grid_get_value
+      real( kind=c_float )         :: grid_get_float
+    end function grid_get_float
     
     subroutine grid_free( grid_id ) bind( c, name="f95grid_free" )
       use, intrinsic :: iso_c_binding

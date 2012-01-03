@@ -134,39 +134,3 @@ float io::NetCdf::getMax()
 	
 	return NAN;
 }
-
-float* io::NetCdf::getAll()
-{
-	NcVar z;
-	std::vector<size_t> start(2, 0);
-	std::vector<size_t> count(2);
-	std::vector<ptrdiff_t> stride(2, 1);
-	std::vector<ptrdiff_t> imap(2);
-	
-	if (m_dimSwitched) {
-		count[0] = getXDim();
-		count[1] = getYDim();
-		
-		imap[0] = 1;
-		imap[1] = count[0];
-	} else {
-		count[0] = getYDim();
-		count[1] = getXDim();
-		
-		imap[0] = count[1];
-		imap[1] = 1;
-	}
-	
-	float* result = new float[count[0] * count[1]];
-	
-	z = m_file->getVar("z");
-	z.getVar(start, count, stride, imap, result);
-	
-	return result;
-}
-
-float io::NetCdf::getDefault()
-{
-	// TODO
-	return 0;
-}
