@@ -78,7 +78,7 @@ if create_nc:
 
 for j in range(0, height):
 	for i in range(0, width):
-		x = x_scaling * float(i) / float(width)
+		x = x_scaling * float(i) / float(height)
 		y = y_scaling * float(j) / float(height)
 		out = out_offset + out_scaling * noise(x, y, 0, depth, roughness)
 		fileID.write("%f\n" %out)
