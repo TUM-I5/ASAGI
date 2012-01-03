@@ -1,6 +1,7 @@
 #ifndef FORTRANPOINTERARRAY_H
 #define FORTRANPOINTERARRAY_H
 
+#include <assert.h>
 #include <pthread.h>
 #include <vector>
 
@@ -39,20 +40,16 @@ namespace fortran
 		
 		T* get(int i)
 		{
-			if (i < 0)
-				return 0L;
-			if (static_cast<unsigned int>(i) >= vec.size())
-				return 0L;
+			assert(i >= 0 &&
+				static_cast<unsigned int>(i) < vec.size());
 			
 			return vec[i];
 		}
 		
 		void remove(int i)
 		{
-			if (i < 0)
-				return;
-			if (static_cast<unsigned int>(i) >= vec.size())
-				return;
+			assert(i >= 0 &&
+				static_cast<unsigned int>(i) < vec.size());
 			
 			vec[i] = 0L;
 		}

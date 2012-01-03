@@ -24,7 +24,8 @@ namespace io
 	private:
 		void free();
 	private:
-		static const short PIXEL_SIZE = 3; /* RGB */
+		/** Number of bytes for each pixel; RGB -> 3 */
+		static const short PIXEL_SIZE = 3;
 	};
 };
 
