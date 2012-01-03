@@ -8,6 +8,7 @@
 # Your package can require certain interfaces to be FOUND by setting these
 #
 #  NETCDF_CXX         - require the C++ interface and link the C++ library
+#  NETCDF_CXX4        - require the new C++4 interface and link the C++4 library
 #  NETCDF_F77         - require the F77 interface and link the fortran library
 #  NETCDF_F90         - require the F90 interface and link the fortran library
 #
@@ -58,6 +59,7 @@ macro (NetCDF_check_interface lang header libs)
 endmacro (NetCDF_check_interface)
 
 NetCDF_check_interface (CXX netcdfcpp.h netcdf_c++)
+NetCDF_check_interface (CXX4 netcdf netcdf_c++4)
 NetCDF_check_interface (F77 netcdf.inc  netcdff)
 NetCDF_check_interface (F90 netcdf.mod  netcdff)
 
