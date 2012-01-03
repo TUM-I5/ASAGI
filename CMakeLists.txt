@@ -45,8 +45,8 @@ if( DOXYGEN_FOUND )
 		COMMENT "Generating API documentation with Doxygen" VERBATIM )
 endif( DOXYGEN_FOUND )
 
-# Add tests
-add_subdirectory( tests )
+# Add examples
+add_subdirectory( examples )
 
 ##### Excecutables #####
 # Library
