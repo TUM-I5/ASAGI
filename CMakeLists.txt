@@ -16,7 +16,7 @@ set( LibSources
 # Additional cmake modules
 set( CMAKE_MODULE_PATH
 	${CMAKE_MODULE_PATH}
-	"${CMAKE_SOURCE_DIR}/CMake/Modules/" )
+	${CMAKE_SOURCE_DIR}/CMake/Modules/ )
 
 # Enable warnings
 add_definitions( -Wall )
@@ -44,6 +44,10 @@ if( DOXYGEN_FOUND )
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMENT "Generating API documentation with Doxygen" VERBATIM )
 endif( DOXYGEN_FOUND )
+
+# Add tests
+enable_testing()
+add_subdirectory( tests )
 
 # Add examples
 add_subdirectory( examples )

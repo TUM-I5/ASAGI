@@ -45,7 +45,10 @@ protected:
 	float getXScaling();
 	float getYScaling();
 	
-	virtual bool open(io::NetCdf &file) = 0;
+	/**
+	 * Load the values and the default value from the file
+	 */
+	virtual bool load(io::NetCdf &file) = 0;
 	
 	/**
 	 * This function is used by exportPng, which only works on floats

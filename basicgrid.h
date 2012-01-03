@@ -56,6 +56,39 @@ public:
 		*static_cast<T*>(buf) = getAt(x, y);
 	}
 	
+	/**
+	 * This function is for testing only
+	 * 
+	 * @return The i's value of the array
+	 */
+	T get(long i)
+	{
+		return values[i];
+	}
+	
+	/**
+	 * This function is for testing only
+	 * <br>
+	 * Returns the value without range check
+	 */
+	const T getNoDefault(float x, float y)
+	{
+		x = round((x - getXOffset()) / getXScaling());
+		y = round((y - getYOffset()) / getYScaling());
+		
+		return getNoDefault(static_cast<long>(x), static_cast<long>(y));
+	}
+	
+	/**
+	 * This function is for testing only
+	 * <br>
+	 * Returns the value without range check
+	 */
+	const T getNoDefault(long x, long y)
+	{
+		return values[y * getXDim() + x];
+	}
+	
 private:
 	const T getAt(float x, float y)
 	{
@@ -69,16 +102,15 @@ private:
 		y = y * getXDim() + x;
 		
 		// Range check
-		if (y < 0)
-			return defaultValue;
-		if (static_cast<unsigned long>(y) >= getXDim() * getYDim())
+		if (y < 0 ||
+			static_cast<unsigned long>(y) >= getXDim() * getYDim())
 			return defaultValue;
 		
 		return values[y];
 	}
 	
 protected:
-	bool open(io::NetCdf &file)
+	bool load(io::NetCdf &file)
 	{
 		values = new T[getXDim() * getYDim()];
 		

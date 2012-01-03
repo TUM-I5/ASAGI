@@ -33,7 +33,7 @@ bool Grid::open(const char* filename)
 	scalingX = file.getXScaling();
 	scalingY = file.getYScaling();
 	
-	return open(file);
+	return load(file);
 }
 
 float Grid::getXMin()

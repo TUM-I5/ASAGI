@@ -62,7 +62,7 @@ public:
 	}
 	
 protected:
-	bool open(io::NetCdf &file)
+	bool load(io::NetCdf &file)
 	{
 		if ((file.getVarSize() % sizeof(T)) != 0)
 			// We can't create an array, because the variable size
