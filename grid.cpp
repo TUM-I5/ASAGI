@@ -9,6 +9,8 @@
 
 Grid::Grid()
 {
+	values = 0L;
+	
 	// Prepare for fortran <-> c translation
 	id = pointers.add(this);
 }
@@ -17,6 +19,8 @@ Grid::~Grid()
 {
 	// Remove from fortran <-> c translation
 	pointers.remove(id);
+	
+	delete[] values;
 }
 
 bool Grid::open(const char* filename)
