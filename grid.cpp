@@ -22,7 +22,7 @@ Grid::~Grid()
 bool Grid::open(const char* filename)
 {
 	io::NetCdf file(filename);
-	if (file.hasError())
+	if (!file.open())
 		return false;
 	
 	values = file.getAll();
@@ -30,8 +30,6 @@ bool Grid::open(const char* filename)
 	dimY = file.getYDim();
 	
 	defaultValue = file.getDefault();
-	
-	isDimSwitched = file.isDimSwitched();
 	
 	offsetX = file.getXOffset();
 	offsetY = file.getYOffset();
@@ -44,22 +42,22 @@ bool Grid::open(const char* filename)
 
 float Grid::getXMin()
 {
-	return offsetX;
+	return offsetX + std::min(0.f, dimX * scalingX);
 }
 
 float Grid::getYMin()
 {
-	return offsetY;
+	return offsetY + std::min(0.f, dimY * scalingY);
 }
 
 float Grid::getXMax()
 {
-	return offsetX + dimX * scalingX;
+	return offsetX + std::max(0.f, dimX * scalingX);
 }
 
 float Grid::getYMax()
 {
-	return offsetY + dimY * scalingY;
+	return offsetY + std::max(0.f, dimY * scalingY);
 }
 
 float Grid::get(float x, float y)
@@ -108,23 +106,15 @@ bool Grid::exportPng(const char* filename)
 
 float Grid::getAt(long x, long y)
 {
-	if (isDimSwitched) {
-		// switch x and y
-		x ^= y;
-		y ^= x;
-		x ^= y;
-		
-		x = x * dimX + y;
-	} else
-		x = x * dimY + y;
+	y = y * dimX + x;
 	
 	// Range check
-	if (x < 0)
+	if (y < 0)
 		return defaultValue;
-	if (static_cast<unsigned long>(x) >= dimX * dimY)
+	if (static_cast<unsigned long>(y) >= dimX * dimY)
 		return defaultValue;
 	
-	return values[x];
+	return values[y];
 }
 
 int Grid::c2f()

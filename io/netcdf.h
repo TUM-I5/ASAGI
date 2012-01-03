@@ -1,25 +1,27 @@
 #ifndef IONETCDF_H
 #define IONETCDF_H
 
-#include <netcdfcpp.h>
+#include <ncFile.h>
 
 namespace io
 {
 	class NetCdf
 	{
 	private:
+		const char* m_filename;
 		/** the file, this class will work on */
-		const NcFile file;
-		bool error;
+		const netCDF::NcFile* m_file;
+		bool m_open;
 		/** this is true, if we need to switch x and y wenn accessing data */
-		bool dimSwitched;
+		bool m_dimSwitched;
 		
 	public:
-		NetCdf(const char* fileName);
-		bool hasError();
+		NetCdf(const char* filename);
+		virtual ~NetCdf();
+		bool open();
+		bool isOpen() const;
 		unsigned long getXDim();
 		unsigned long getYDim();
-		bool isDimSwitched();
 		float getXOffset();
 		float getYOffset();
 		float getXScaling();

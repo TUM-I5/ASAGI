@@ -13,7 +13,7 @@ int main (void)
 	}
 	
 	printf("Range X: %f-%f\n", grid->getXMin(), grid->getXMax());
-	printf("Range Y: %f-%f\n", grid->getYMax(), grid->getYMax());
+	printf("Range Y: %f-%f\n", grid->getYMin(), grid->getYMax());
 	
 	printf("Value at 5x10: %f\n", grid->get(5, 10));
 	printf("Value at 5x10.1: %f\n", grid->get(5, 10.1));

@@ -16,8 +16,6 @@ private:
 	
 	float defaultValue;
 	
-	bool isDimSwitched;
-	
 	float offsetX;
 	float offsetY;
 	
