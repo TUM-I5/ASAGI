@@ -19,6 +19,13 @@ set( CMAKE_MODULE_PATH
 # Enable warnings
 add_definitions( -Wall )
 
+
+# Find png
+find_package( PNG )
+if( PNG_FOUND )
+	add_definitions( -DWITH_PNG )
+endif()
+
 # Add static libaries
 add_subdirectory( fortran )
 add_subdirectory( io )

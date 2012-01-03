@@ -3,13 +3,16 @@ set( ioSources
 	netcdf.cpp
 	png.cpp )
 
+if( PNG_FOUND )
+	set( ioSources
+	${ioSources} png.cpp )
+endif()
+
+
 ##### Settings #####
 # Find netcdf
 set( NETCDF_CXX "YES" )
 find_package( NetCDF REQUIRED )
-
-# Find png
-find_package( PNG REQUIRED )
 
 ##### Library #####
 add_library( io

@@ -1,7 +1,9 @@
 #include <math.h>
 
 #include "grid.h"
+#ifdef WITH_PNG
 #include "io/png.h"
+#endif
 
 Grid::Grid()
 {
@@ -64,6 +66,7 @@ float Grid::get(unsigned long x, unsigned long y)
 
 bool Grid::exportPng(const char* filename)
 {
+#ifdef WITH_PNG
 	float min, max, value;
 	unsigned char red, green, blue;
 	
@@ -93,6 +96,9 @@ bool Grid::exportPng(const char* filename)
 	png.close();
 	
 	return true;
+#else // WITH_PNG
+	return false;
+#endif // WITH_PNG
 }
 
 int Grid::c2f()
