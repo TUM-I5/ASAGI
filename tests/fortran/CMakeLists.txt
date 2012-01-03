@@ -15,4 +15,5 @@ add_executable( f_simple
 target_link_libraries( f_simple
 	database )
 set_target_properties( f_simple PROPERTIES
-	OUTPUT_NAME simple )
+	OUTPUT_NAME simple
+	LINKER_LANGUAGE Fortran )

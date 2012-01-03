@@ -8,6 +8,7 @@ cmake_minimum_required( VERSION 2.8 )
 set( LibSources
 	database.cpp
 	database_f77.cpp
+	database_f95.cpp
 	grid.cpp )
 
 ##### Other configuration #####
@@ -18,7 +19,6 @@ set( CMAKE_MODULE_PATH
 
 # Enable warnings
 add_definitions( -Wall )
-
 
 # Find png
 find_package( PNG )

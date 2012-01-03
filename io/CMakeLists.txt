@@ -11,6 +11,7 @@ endif()
 
 ##### Settings #####
 # Find netcdf
+set( NETCDF_CXX "YES" )
 set( NETCDF_CXX4 "YES" )
 find_package( NetCDF REQUIRED )
 

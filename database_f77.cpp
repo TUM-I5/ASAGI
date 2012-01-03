@@ -1,6 +1,7 @@
-#include "database_f77.h"
 #include "grid.h"
 #include "fortran/string.h"
+
+#include "database_f77.h"
 
 #define GRID_GENERATE_F77_BINDINGS(lower_case, \
 		upper_case, \
@@ -28,6 +29,7 @@ void fgrid_load(char* filename, int* grid_id, int filename_len)
 	grid = new Grid();
 	if (!grid->open(c_filename)) {
 		*grid_id = NULL_INDEX;
+		delete grid;
 		delete c_filename;
 		return;
 	}

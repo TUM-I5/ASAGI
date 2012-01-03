@@ -1,5 +1,5 @@
-#ifndef _DATABASE_F77_H
-#define _DATABASE_F77_H
+#ifndef DATABASE_F77_H
+#define DATABASE_F77_H
 
 #define GRID_GENERATE_F77_PROTOTYP(ret, lower_name, upper_name, args) \
 	ret f##lower_name##_f args;    \
@@ -26,4 +26,4 @@ GRID_GENERATE_F77_PROTOTYP(void, grid_get_value, GRID_GET_VALUE, (Fint* grid_id,
 }	// end extern "C"
 #endif
 
-#endif // ifndef _DATABASE_F77_H
+#endif // ifndef DATABASE_F77_H
