@@ -5,6 +5,7 @@ using namespace grid;
 
 int main (void)
 {
+#ifdef WITH_PNG
 	Grid* grid = Grid::create();
 	
 	if (!grid->open("../data/noise.nc")) {
@@ -33,6 +34,9 @@ int main (void)
 	}
 	
 	printf("Png file written\n");
+#else // WITH_PNG
+	printf("Png export not supported\n");
+#endif // WITH_PNG
 	
 	return 0;
 }
