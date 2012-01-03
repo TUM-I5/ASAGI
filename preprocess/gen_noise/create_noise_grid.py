@@ -74,7 +74,7 @@ if create_nc:
 	nc = Dataset('out.nc', 'w')
 	nc.createDimension('x', width)
 	nc.createDimension('y', height)
-	nc_values = nc.createVariable('z', 'f4', ('x', 'y'))
+	nc_values = nc.createVariable('z', 'f4', ('y', 'x'))
 
 for j in range(0, height):
 	for i in range(0, width):
@@ -84,7 +84,7 @@ for j in range(0, height):
 		fileID.write("%f\n" %out)
 		
 		if create_nc:
-			nc_values[i,j] = out
+			nc_values[j,i] = out
 
 fileID.close()
 
