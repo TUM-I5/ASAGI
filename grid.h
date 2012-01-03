@@ -1,11 +1,11 @@
 #ifndef GRID_H
 #define GRID_H
 
-#include <database.h>
+#include <asagi.h>
 
 #include "fortran/pointerarray.h"
 
-class Grid : public grid::Grid
+class Grid : public asagi::Grid
 {
 private:
 	int id;

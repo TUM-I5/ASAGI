@@ -1,7 +1,7 @@
+#include <asagi.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/unistd.h>
-#include <database.h>
 
 int main (void)
 {

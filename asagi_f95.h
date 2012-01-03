@@ -1,5 +1,5 @@
-#ifndef DATABASE_F95_H
-#define DATABASE_F95_H
+#ifndef ASAGI_F95_H
+#define ASAGI_F95_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,4 +20,4 @@ void f95grid_free(int grid_id);
 }	// end extern "C"
 #endif
 
-#endif // ifndef DATABASE_F95_H
+#endif // ifndef ASAGI_F95_H

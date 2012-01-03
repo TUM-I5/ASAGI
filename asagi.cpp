@@ -1,8 +1,8 @@
-#include <database.h>
+#include <asagi.h>
 
 #include "grid.h"
 
-grid::Grid* grid::Grid::create()
+asagi::Grid* asagi::Grid::create()
 {
 	return new ::Grid();
 }

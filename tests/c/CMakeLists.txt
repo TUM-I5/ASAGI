@@ -8,6 +8,6 @@ set( SimpleCSources
 add_executable( c_simple
 	${SimpleCSources} )
 target_link_libraries( c_simple
-	database )
+	asagi )
 set_target_properties( c_simple PROPERTIES
 	OUTPUT_NAME simple )

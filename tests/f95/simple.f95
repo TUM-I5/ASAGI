@@ -1,8 +1,8 @@
-include 'database.inc'
+include 'asagi.inc'
 
 ! Simple library test
 program simple
-  use database
+  use asagi
   implicit none
   
   integer :: grid_id

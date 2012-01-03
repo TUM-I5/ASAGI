@@ -1,4 +1,4 @@
-module database
+module asagi
   implicit none
   
   integer, parameter :: GRID_NULL = -1
@@ -48,4 +48,4 @@ module database
     end subroutine grid_free
 
   end interface
-end module database
+end module asagi

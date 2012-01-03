@@ -1,4 +1,4 @@
-project( database )
+project( asagi )
 
 # Version
 cmake_minimum_required( VERSION 2.8 )
@@ -6,8 +6,8 @@ cmake_minimum_required( VERSION 2.8 )
 ##### Files #####
 # Lib Sources
 set( LibSources
-	database.cpp
-	database_f95.cpp
+	asagi.cpp
+	asagi_f95.cpp
 	grid.cpp )
 
 ##### Other configuration #####
@@ -37,8 +37,8 @@ add_subdirectory( tests )
 
 ##### Excecutables #####
 # Library
-add_library( database SHARED
+add_library( asagi SHARED
 	${LibSources} )
-target_link_libraries( database
+target_link_libraries( asagi
 	io
 	netcdf )

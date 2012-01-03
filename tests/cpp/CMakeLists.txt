@@ -12,7 +12,7 @@ set( ExportPngCppSources
 add_executable( cpp_simple
 	${SimpleCppSources} )
 target_link_libraries( cpp_simple
-	database )
+	asagi )
 set_target_properties( cpp_simple PROPERTIES
 	OUTPUT_NAME simple )
 
@@ -20,6 +20,6 @@ set_target_properties( cpp_simple PROPERTIES
 add_executable( cpp_exportpng
 	${ExportPngCppSources} )
 target_link_libraries( cpp_exportpng
-	database )
+	asagi )
 set_target_properties( cpp_exportpng PROPERTIES
 	OUTPUT_NAME exportpng )

@@ -1,7 +1,7 @@
+#include <asagi.h>
 #include <stdio.h>
-#include <database.h>
 
-using namespace grid;
+using namespace asagi;
 
 int main (void)
 {

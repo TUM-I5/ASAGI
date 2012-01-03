@@ -14,6 +14,6 @@ include_directories( ${CMAKE_SOURCE_DIR} )
 add_executable( f95_simple
 	${SimpleF95Sources} )
 target_link_libraries( f95_simple
-	database )
+	asagi )
 set_target_properties( f95_simple PROPERTIES
 	OUTPUT_NAME simple )

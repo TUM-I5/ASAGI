@@ -1,16 +1,16 @@
-#ifndef _DATABASE_H
-#define _DATABASE_H
+#ifndef _ASAGI_H
+#define _ASAGI_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #ifdef __cplusplus
-namespace grid {
+namespace asagi {
 	class Grid;
 }
 
-class grid::Grid
+class asagi::Grid
 {
 public:
 	virtual bool open(const char* filename) = 0;
@@ -22,10 +22,10 @@ public:
 	
 	virtual bool exportPng(const char* filename) = 0;
 public:
-	static grid::Grid* create();
+	static asagi::Grid* create();
 };
 
-typedef grid::Grid grid_handle;
+typedef asagi::Grid grid_handle;
 #else
 typedef struct grid_handle grid_handle;
 #endif
@@ -48,4 +48,4 @@ void grid_free(grid_handle* handle);
 }	// end extern "C"
 #endif
 
-#endif // ifndef _DATABASE_H
+#endif // ifndef _ASAGI_H
