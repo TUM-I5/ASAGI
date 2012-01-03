@@ -4,14 +4,14 @@
 #include <asagi.h>
 
 #include "fortran/pointerarray.h"
+#include "io/netcdf.h"
 
 class Grid : public asagi::Grid
 {
 private:
+	/** Id of the grid, used for the fortran <-> c interface */
 	int id;
 	
-protected:
-	// variables will be set by child
 	unsigned long dimX;
 	unsigned long dimY;
 	
@@ -23,6 +23,9 @@ protected:
 public:
 	Grid();
 	virtual ~Grid();
+	
+	bool open(const char* filename);
+	
 	float getXMin();
 	float getYMin();
 	float getXMax();
@@ -33,6 +36,16 @@ public:
 	// These are not part of the offical interface
 	int c2f();
 protected:
+	unsigned long getXDim();
+	unsigned long getYDim();
+	
+	float getXOffset();
+	float getYOffset();
+	
+	float getXScaling();
+	float getYScaling();
+	
+	virtual bool open(io::NetCdf &file) = 0;
 	virtual float getAtFloat(long x, long y) = 0;
 private:
 	static fortran::PointerArray<Grid> pointers;

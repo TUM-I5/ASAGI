@@ -6,10 +6,11 @@ cmake_minimum_required( VERSION 2.8 )
 ##### Files #####
 # Lib Sources
 set( LibSources
+	arraygrid.cpp
 	asagi.cpp
 	asagi_f95.cpp
-	grid.cpp
-	typedgrid.cpp )
+	basicgrid.cpp
+	grid.cpp )
 
 ##### Other configuration #####
 # Additional cmake modules

@@ -18,6 +18,24 @@ Grid::~Grid()
 	pointers.remove(id);
 }
 
+bool Grid::open(const char* filename)
+{
+	io::NetCdf file(filename);
+	if (!file.open())
+		return false;
+	
+	dimX = file.getXDim();
+	dimY = file.getYDim();
+	
+	offsetX = file.getXOffset();
+	offsetY = file.getYOffset();
+	
+	scalingX = file.getXScaling();
+	scalingY = file.getYScaling();
+	
+	return open(file);
+}
+
 float Grid::getXMin()
 {
 	return offsetX + std::min(0.f, dimX * scalingX);
@@ -76,9 +94,44 @@ bool Grid::exportPng(const char* filename)
 #endif // WITH_PNG
 }
 
+/**
+ * Converts the C pointer of the grid to the Fortran identifier
+ * 
+ * @return The unique index of the grid
+ */
 int Grid::c2f()
 {
 	return id;
+}
+
+long unsigned Grid::getXDim()
+{
+	return dimX;
+}
+
+long unsigned Grid::getYDim()
+{
+	return dimY;
+}
+
+float Grid::getXOffset()
+{
+	return offsetX;
+}
+
+float Grid::getYOffset()
+{
+	return offsetY;
+}
+
+float Grid::getXScaling()
+{
+	return scalingX;
+}
+
+float Grid::getYScaling()
+{
+	return scalingY;
 }
 
 // Fortran <-> c translation array

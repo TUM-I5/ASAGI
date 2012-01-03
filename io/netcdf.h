@@ -56,6 +56,8 @@ namespace io
 			z.getVar(start, count, stride, imap, var);
 		}
 		
+		unsigned int getVarSize();
+		
 		template<typename T> void getDefault(T &defaultValue)
 		{
 			// TODO

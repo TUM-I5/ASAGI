@@ -134,3 +134,8 @@ float io::NetCdf::getMax()
 	
 	return NAN;
 }
+
+unsigned int io::NetCdf::getVarSize()
+{
+	
+}

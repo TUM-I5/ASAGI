@@ -1,23 +1,22 @@
 #include <asagi.h>
 
-#include "typedgrid.h"
+#include "basicgrid.h"
 
 // Static c++ functions
 asagi::Grid* asagi::Grid::create(Type type)
 {
 	switch (type) {
 		case BYTE:
-			return new TypedGrid<char, char>();
+			return new BasicGrid<char>();
 		case INT:
-			return new TypedGrid<int, int>();
+			return new BasicGrid<int>();
 		case LONG:
-			return new TypedGrid<long, long>();
+			return new BasicGrid<long>();
 		case FLOAT:
-			return new TypedGrid<float, float>();
+			return new BasicGrid<float>();
 		case DOUBLE:
-			return new TypedGrid<double, double>();
+			return new BasicGrid<double>();
 		case BYTEARRAY:
-			return new TypedGrid<char, char*>();
 		default:
 			;
 	}

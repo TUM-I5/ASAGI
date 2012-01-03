@@ -6,6 +6,9 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
+/**
+ * Contains all the exported C++ functionality of the library
+ */
 namespace asagi {
 	class Grid;
 	class VarType;
