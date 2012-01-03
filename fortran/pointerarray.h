@@ -12,16 +12,16 @@ namespace fortran
 	{
 	private:
 		std::vector<T*> vec;
-		pthread_mutex_t* vec_mutex;
+		pthread_mutex_t vec_mutex;
 	public:
 		PointerArray()
 		{
-			pthread_mutex_init(vec_mutex, 0L);
+			pthread_mutex_init(&vec_mutex, 0L);
 		}
 		
 		virtual ~PointerArray()
 		{
-			pthread_mutex_destroy(vec_mutex);
+			pthread_mutex_destroy(&vec_mutex);
 		}
 		
 		int add(T* const p)
@@ -29,10 +29,10 @@ namespace fortran
 			int id;
 			
 			// Lock vector, otherwise the id gets messed up
-			pthread_mutex_lock(vec_mutex);
+			pthread_mutex_lock(&vec_mutex);
 			vec.push_back(p);
 			id = vec.size() - 1;
-			pthread_mutex_unlock(vec_mutex);
+			pthread_mutex_unlock(&vec_mutex);
 			
 			return id;
 		}
