@@ -7,6 +7,7 @@ cmake_minimum_required( VERSION 2.8 )
 # Lib Sources
 set( LibSources
 	database.cpp
+	database_f77.cpp
 	grid.cpp )
 
 ##### Other configuration #####
@@ -19,6 +20,7 @@ set( CMAKE_MODULE_PATH
 add_definitions( -Wall )
 
 # Add static libaries
+add_subdirectory( fortran )
 add_subdirectory( io )
 
 # Add library include files for all exectuables
@@ -32,5 +34,6 @@ add_subdirectory( tests )
 add_library( database SHARED
 	${LibSources} )
 target_link_libraries( database
+	fortran
 	io
 	netcdf )

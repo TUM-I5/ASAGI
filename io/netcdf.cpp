@@ -1,7 +1,5 @@
 #include "netcdf.h"
 
-using namespace std;
-
 io::NetCdf::NetCdf(const char* fileName)
 	: file(fileName, NcFile::ReadOnly)
 {
@@ -42,6 +40,16 @@ unsigned long io::NetCdf::getYDim()
 bool io::NetCdf::isDimSwitched()
 {
 	return dimSwitched;
+}
+
+unsigned long io::NetCdf::getMin()
+{
+	return file.get_var("z")->get_att("actual_range")->as_float(0);
+}
+
+unsigned long io::NetCdf::getMax()
+{
+	return file.get_var("z")->get_att("actual_range")->as_float(1);
 }
 
 float* io::NetCdf::getAll()
