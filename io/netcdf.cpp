@@ -150,20 +150,20 @@ unsigned int io::NetCdf::getVarSize()
 	return m_file->getVar("z").getType().getSize();
 }
 
-template<> void io::NetCdf::getDefault<void>(void* defaultValue)
-{
-	NcVar z;
-	NcVarAtt att;
-	
-	z = m_file->getVar("z");
-	
-	try {
-		att = z.getAtt("missing_value");
-	} catch (NcException& e) {
-		// Attribute missing
-		memset(defaultValue, 0, z.getType().getSize());
-		return;
-	}
-	
-	att.getValues(defaultValue);
-}
+// template<> void io::NetCdf::getDefault<void>(void* defaultValue)
+// {
+// 	NcVar z;
+// 	NcVarAtt att;
+// 	
+// 	z = m_file->getVar("z");
+// 	
+// 	try {
+// 		att = z.getAtt("missing_value");
+// 	} catch (NcException& e) {
+// 		// Attribute missing
+// 		memset(defaultValue, 0, z.getType().getSize());
+// 		return;
+// 	}
+// 	
+// 	att.getValues(defaultValue);
+// }

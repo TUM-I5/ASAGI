@@ -57,33 +57,33 @@ namespace io
 		
 		unsigned int getVarSize();
 		
-		/**
-		 * Reads the "missing_value" attribute from the netcdf file.
-		 * If this attribute is missing, defaultValue is set to 0.
-		 * 
-		 * After COARDS conventions, the attribute should have the same
-		 * type as the variable. (See:
-		 * <a>http://ferret.wrc.noaa.gov/noaa_coop/coop_cdf_profile.html</a>)
-		 */
-		template<typename T> void getDefault(T *defaultValue)
-		{
-			netCDF::NcVarAtt att;
-			
-			try {
-				att = m_file->getVar("z")
-					.getAtt("missing_value");
-			} catch (netCDF::exceptions::NcException& e) {
-				// Attribute missing
-				*defaultValue = 0;
-				return;
-			}
-			
-			att.getValues(defaultValue);
-		}
+// 		/*
+// 		 * Reads the "missing_value" attribute from the netcdf file.
+// 		 * If this attribute is missing, defaultValue is set to 0.
+// 		 * 
+// 		 * After COARDS conventions, the attribute should have the same
+// 		 * type as the variable. (See:
+// 		 * <a>http://ferret.wrc.noaa.gov/noaa_coop/coop_cdf_profile.html</a>)
+// 		 */
+// 		template<typename T> void getDefault(T *defaultValue)
+// 		{
+// 			netCDF::NcVarAtt att;
+// 			
+// 			try {
+// 				att = m_file->getVar("z")
+// 					.getAtt("missing_value");
+// 			} catch (netCDF::exceptions::NcException& e) {
+// 				// Attribute missing
+// 				*defaultValue = 0;
+// 				return;
+// 			}
+// 			
+// 			att.getValues(defaultValue);
+// 		}
 	};
 
 	template<> void NetCdf::getVar<void>(void* var);
-	template<> void NetCdf::getDefault<void>(void* defaultValue);
+// 	template<> void NetCdf::getDefault<void>(void* defaultValue);
 };
 
 #endif

@@ -10,7 +10,7 @@ int main()
 	
 	float sum = 0;
 	for (unsigned int i = 0; i < COUNT_ACCESS; i++) {
-		sum += grid.getNoDefault(INDEX2D[i*2], INDEX2D[i*2+1]);
+		sum += grid.getAtTest(INDEX2D[i*2], INDEX2D[i*2+1]);
 	}
 	
 	// Force compiler to execute loop

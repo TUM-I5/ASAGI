@@ -77,10 +77,6 @@ protected:
 		// void* should work, but does not do any data convertion
 		file.getVar(static_cast<void*>(values));
 		
-		defaultValue = new T[count];
-		
-		file.getDefault(static_cast<void*>(defaultValue));
-		
 		return true;
 	}
 	
@@ -94,13 +90,10 @@ private:
 	
 	const T* getAt(long x, long y)
 	{
-		y = y * getXDim() + x;
+		assert(x >= 0 && x < getXDim()
+			&& y >= 0 && y < getYDim());
 		
-		// Range check
-		if (y < 0)
-			return defaultValue;
-		if (static_cast<unsigned long>(y) >= getXDim() * getYDim())
-			return defaultValue;
+		y = y * getXDim() + x;
 		
 		return &values[y];
 	}

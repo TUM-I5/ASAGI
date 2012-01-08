@@ -24,17 +24,12 @@ set( TestPerfAccessFastSources
 	access_fast.cpp
 	perftests.h )
 
-# Access with 2d array coords (no range check)
+# Access with 2d array coords
 set( TestPerfAccess2dIntSources
 	access_2d_int.cpp
 	perftests.h )
 
-# Access with real world coords but no range check (default value)
-set( TestPerfAccess2dNoDefaultSources
-	access_2d_nodefault.cpp
-	perftests.h )
-
-# Access with real world coords (with default value)
+# Access with real world coords
 set( TestPerfAccess2dSources
 	access_2d.cpp
 	perftests.h )
@@ -55,11 +50,6 @@ add_executable( test_perf_access_2d_int
 target_link_libraries( test_perf_access_2d_int
 	asagi )
 
-add_executable( test_perf_access_2d_nodefault
-	${TestPerfAccess2dNoDefaultSources} )
-target_link_libraries( test_perf_access_2d_nodefault
-	asagi )
-
 add_executable( test_perf_access_2d
 	${TestPerfAccess2dSources} )
 target_link_libraries( test_perf_access_2d
@@ -75,8 +65,6 @@ add_test( NAME PerfAccessFast
 	COMMAND test_perf_access_fast )
 add_test( NAME PerfAccess2dInt
 	COMMAND test_perf_access_2d_int )
-add_test( NAME PerfAccess2dNoDefault
-	COMMAND test_perf_access_2d_nodefault )
 add_test( NAME PerfAccess2d
 	COMMAND test_perf_access_2d )
 add_test( NAME PerfAccessInterface

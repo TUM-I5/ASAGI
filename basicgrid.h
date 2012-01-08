@@ -67,26 +67,11 @@ public:
 	}
 	
 	/**
-	 * This function is for testing only
-	 * <br>
-	 * Returns the value without range check
+	 * Public wrapper for {@link getAt(long, long)} for testing
 	 */
-	const T getNoDefault(float x, float y)
+	const T getAtTest(long x, long y)
 	{
-		x = round((x - getXOffset()) / getXScaling());
-		y = round((y - getYOffset()) / getYScaling());
-		
-		return getNoDefault(static_cast<long>(x), static_cast<long>(y));
-	}
-	
-	/**
-	 * This function is for testing only
-	 * <br>
-	 * Returns the value without range check
-	 */
-	const T getNoDefault(long x, long y)
-	{
-		return values[y * getXDim() + x];
+		return getAt(x, y);
 	}
 	
 private:
@@ -97,14 +82,15 @@ private:
 		return getAt(static_cast<long>(x), static_cast<long>(y));
 	}
 	
+	/**
+	 * @return The value of the 2D internal array at (x, y)
+	 */
 	const T getAt(long x, long y)
 	{
-		y = y * getXDim() + x;
+		assert(x >= 0 && x < getXDim()
+			&& y >= 0 && y < getYDim());
 		
-		// Range check
-		if (y < 0 ||
-			static_cast<unsigned long>(y) >= getXDim() * getYDim())
-			return defaultValue;
+		y = y * getXDim() + x;
 		
 		return values[y];
 	}
@@ -115,8 +101,6 @@ protected:
 		values = new T[getXDim() * getYDim()];
 		
 		file.getVar(values);
-		
-		file.getDefault(&defaultValue);
 		
 		return true;
 	}
