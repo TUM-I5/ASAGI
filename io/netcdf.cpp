@@ -22,7 +22,7 @@ bool io::NetCdf::open()
 	try {
 		m_file = new NcFile(m_filename, NcFile::read);
 	} catch (NcException& e) {
-		// Coudl not open file
+		// Could not open file
 		
 		m_file = 0L;
 		return false;
