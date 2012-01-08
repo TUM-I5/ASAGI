@@ -21,6 +21,14 @@ set( CMAKE_MODULE_PATH
 # Enable warnings
 add_definitions( -Wall )
 
+# Enable fortran
+# Call this before searching for mpi
+enable_language( Fortran )
+
+# Find MPI
+find_package( MPI REQUIRED )
+include_directories( ${MPI_C_INCLUDE_PATH} SYSTEM )
+
 # Find png
 find_package( PNG )
 if( PNG_FOUND )
@@ -57,4 +65,5 @@ add_subdirectory( examples )
 add_library( asagi SHARED
 	${LibSources} )
 target_link_libraries( asagi
-	io )
+	io
+	${MPI_C_LIBARARIES} ${MPI_CXX_LIBRARIES} )

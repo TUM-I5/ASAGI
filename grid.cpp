@@ -134,6 +134,8 @@ float Grid::getYScaling()
 	return scalingY;
 }
 
+MPI_Comm Grid::communicator;
+
 // Fortran <-> c translation array
 fortran::PointerArray<Grid> Grid::pointers;
 
@@ -187,6 +189,22 @@ void Grid::h2rgb(float h, unsigned char &red, unsigned char &green, unsigned cha
 float Grid::round(float value)
 {
 	return floor(value + 0.5);
+}
+
+bool Grid::init(MPI_Comm comm)
+{
+	if (MPI_Comm_dup(comm, &communicator) != MPI_SUCCESS)
+		return false;
+		
+	return true;
+}
+
+bool Grid::finalize()
+{
+	if (MPI_Comm_free(&communicator) != MPI_SUCCESS)
+		return false;
+	
+	return true;
 }
 
 Grid* Grid::f2c(int i)

@@ -55,12 +55,20 @@ protected:
 	 */
 	virtual float getAtFloat(long x, long y) = 0;
 private:
+	/**
+	 * The communicator we use in this library
+	 */
+	static MPI_Comm communicator;
+	
 	static fortran::PointerArray<Grid> pointers;
 private:
 	static void h2rgb(float h, unsigned char &red, unsigned char &green, unsigned char &blue);
 protected:
 	static float round(float value);
 public:
+	static bool init(MPI_Comm comm);
+	static bool finalize();
+	
 	static Grid* f2c(int i);
 };
 

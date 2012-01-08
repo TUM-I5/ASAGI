@@ -1,6 +1,8 @@
 #ifndef _ASAGI_H
 #define _ASAGI_H
 
+#include <mpi.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,7 +44,19 @@ public:
 	
 	virtual bool exportPng(const char* filename) = 0;
 public:
+	/**
+	 * This function should be called before calling any other function
+	 * from this library.
+	 */
+	static bool init(MPI_Comm comm);
 	static asagi::Grid* create(Type type = FLOAT);
+	/**
+	 * This function cleans up Asagi. After calling this function, no other
+	 * function than {@link init(MPI_Comm)} should be called.
+	 * <br>
+	 * Call this <b>before</b> calling <code>MPI_Finalize()</code>
+	 */
+	static bool finalize();
 };
 
 typedef asagi::Grid grid_handle;

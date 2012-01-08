@@ -7,9 +7,6 @@ set( SimpleF95Sources
 set( BufF95Sources
 	buf.f95 )
 
-##### Build fortran #####
-enable_language( Fortran )
-
 ##### Executables #####
 # Simple
 add_executable( f95_simple

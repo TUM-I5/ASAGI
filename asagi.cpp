@@ -4,6 +4,12 @@
 #include "basicgrid.h"
 
 // Static c++ functions
+
+bool asagi::Grid::init(MPI_Comm comm)
+{
+	return ::Grid::init(comm);
+}
+
 asagi::Grid* asagi::Grid::create(Type type)
 {
 	switch (type) {
@@ -32,6 +38,11 @@ asagi::Grid* asagi::Grid::create(Type type)
 	}
 	
 	return 0L; // should not happen
+}
+
+bool asagi::Grid::finalize()
+{
+	return ::Grid::finalize();
 }
 
 // C interfae
