@@ -8,8 +8,6 @@ template<typename T> class BasicGrid : public Grid
 {
 private:
 	T *values;
-	
-	T defaultValue;
 public:
 	BasicGrid()
 	{
