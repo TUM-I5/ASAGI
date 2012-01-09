@@ -51,7 +51,8 @@ protected:
 	virtual bool load(io::NetCdf &file) = 0;
 	
 	/**
-	 * This function is used by exportPng, which only works on floats
+	 * This function is used by {@link exportPng(const char*)},
+	 * which only works on floats
 	 */
 	virtual float getAtFloat(long x, long y) = 0;
 private:
