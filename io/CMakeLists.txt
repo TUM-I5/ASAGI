@@ -13,6 +13,7 @@ endif()
 # Find netcdf
 set( NETCDF_CXX4 "YES" )
 find_package( NetCDF REQUIRED )
+include_directories( ${NETCDF_INCLUDES} SYSTEM )
 
 ##### Library #####
 add_library( io
