@@ -31,6 +31,11 @@ enable_language( Fortran )
 find_package( MPI REQUIRED )
 include_directories( ${MPI_C_INCLUDE_PATH} SYSTEM )
 
+# Find netcdf
+set( NETCDF_CXX4 "YES" )
+find_package( NetCDF REQUIRED )
+include_directories( ${NETCDF_INCLUDES} SYSTEM )
+
 # Find png
 find_package( PNG )
 if( PNG_FOUND )
