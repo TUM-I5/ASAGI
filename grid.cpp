@@ -4,36 +4,92 @@
 #include "io/png.h"
 #endif
 
+#include "types/basictype.h"
+
 #include "grid.h"
 
-Grid::Grid()
+// TODO
+#define BLOCK_SIZE_X 50
+#define BLOCK_SIZE_Y 50
+#define BLOCKS_PER_NODE 80
+
+using namespace io;
+
+Grid::Grid(Type type)
 {
 	// Prepare for fortran <-> c translation
 	id = pointers.add(this);
+	
+	file = 0L;
+	
+	switch (type) {
+	case BYTE:
+		m_type = new types::BasicType<char>();
+		break;
+	case INT:
+		m_type = new types::BasicType<int>();
+		break;
+	case LONG:
+		m_type = new types::BasicType<long>();
+		break;
+	case FLOAT:
+		m_type = new types::BasicType<float>();
+		break;
+	case DOUBLE:
+		m_type = new types::BasicType<double>();
+		break;
+	/*case BYTEARRAY:
+		return new ArrayGrid<char>();
+	case INTARRAY:
+		return new ArrayGrid<int>();
+	case LONGARRY:
+		return new ArrayGrid<long>();
+	case FLOATARRAY:
+		return new ArrayGrid<float>();
+	case DOUBLEARRAY:
+		return new ArrayGrid<double>();*/
+	default:
+		m_type = 0L;
+		assert(false);
+	}
 }
 
 Grid::~Grid()
 {
+	delete file;
+	
+	delete m_type;
+	
 	// Remove from fortran <-> c translation
 	pointers.remove(id);
 }
 
 bool Grid::open(const char* filename)
 {
-	io::NetCdf file(filename);
-	if (!file.open())
+	MPI_Comm_rank(communicator, &m_mpiRank);
+	MPI_Comm_size(communicator, &m_mpiSize);
+	
+	file = new NetCdf(filename);
+	if (!file->open())
 		return false;
 	
-	dimX = file.getXDim();
-	dimY = file.getYDim();
+	dimX = file->getXDim();
+	dimY = file->getYDim();
 	
-	offsetX = file.getXOffset();
-	offsetY = file.getYOffset();
+	offsetX = file->getXOffset();
+	offsetY = file->getYOffset();
 	
-	scalingX = file.getXScaling();
-	scalingY = file.getYScaling();
+	scalingX = file->getXScaling();
+	scalingY = file->getYScaling();
 	
-	return load(file);
+	// Integer way of rounding up
+	blocksX = (dimX + BLOCK_SIZE_X - 1) / BLOCK_SIZE_X;
+	blocksY = (dimY + BLOCK_SIZE_Y - 1) / BLOCK_SIZE_Y;
+	
+	if (!m_type->check(*file))
+		return false;
+	
+	return init();
 }
 
 float Grid::getXMin()
@@ -56,6 +112,40 @@ float Grid::getYMax()
 	return offsetY + std::max(0.f, dimY * scalingY);
 }
 
+unsigned int Grid::getVarSize()
+{
+	return m_type->getSize();
+}
+
+char Grid::getByte(float x, float y)
+{
+	return m_type->getByte(getAt(x, y));
+}
+
+int Grid::getInt(float x, float y)
+{
+	return m_type->getInt(getAt(x, y));
+}
+
+long Grid::getLong(float x, float y)
+{
+	return m_type->getLong(getAt(x, y));
+}
+
+float Grid::getFloat(float x, float y)
+{
+	return m_type->getFloat(getAt(x, y));
+}
+
+double Grid::getDouble(float x, float y)
+{
+	return m_type->getDouble(getAt(x, y));
+}
+
+void Grid::getBuf(float x, float y, void* buf)
+{
+	memcpy(buf, getAt(x, y), m_type->getSize());
+}
 bool Grid::exportPng(const char* filename)
 {
 #ifdef WITH_PNG
@@ -73,7 +163,7 @@ bool Grid::exportPng(const char* filename)
 		}
 	}
 	
-	io::Png png(dimX, dimY);
+	Png png(dimX, dimY);
 	if (!png.create(filename))
 		return false;
 	
@@ -104,6 +194,23 @@ int Grid::c2f()
 	return id;
 }
 
+void* Grid::getAt(float x, float y)
+{
+	x = round((x - offsetX) / scalingX);
+	y = round((y - offsetY) / scalingY);
+	
+	assert(x >= 0 && x < getXDim()
+		&& y >= 0 && y < getYDim());
+	
+	return getAt(static_cast<unsigned long>(x),
+		static_cast<unsigned long>(y));
+}
+
+float Grid::getAtFloat(unsigned long x, unsigned long y)
+{
+	return m_type->getFloat(getAt(x, y));
+}
+
 long unsigned Grid::getXDim()
 {
 	return dimX;
@@ -132,6 +239,55 @@ float Grid::getXScaling()
 float Grid::getYScaling()
 {
 	return scalingY;
+}
+
+/**
+ * @return The number of blocks we should store on this node
+ */
+unsigned long Grid::getBlocksPerNode()
+{
+	return BLOCKS_PER_NODE;
+}
+
+/**
+ * @return The number of values in x direction in each block
+ */
+unsigned long Grid::getXBlockSize()
+{
+	return BLOCK_SIZE_X;
+}
+
+/**
+ * @return The number of values in y direction in each block
+ */
+unsigned long Grid::getYBlockSize()
+{
+	return BLOCK_SIZE_Y;
+}
+
+/**
+ * @return The number of blocks in the grid
+ */
+unsigned long Grid::getBlockCount()
+{
+	return blocksX * blocksY;
+}
+
+/**
+ * Calculates the position of <code>block</code> in the grid
+ */
+void Grid::getBlockPos(unsigned long block, unsigned long &x, unsigned long &y)
+{
+	x = block % blocksX;
+	y = block / blocksX;
+}
+
+/**
+ * @return The block that stores the value at (x, y)
+ */
+unsigned long Grid::getBlockByCoords(unsigned long x, unsigned long y)
+{
+	return (y / BLOCK_SIZE_Y) * blocksX + (x / BLOCK_SIZE_X);
 }
 
 MPI_Comm Grid::communicator;

@@ -21,6 +21,10 @@ public:
 	enum Type { BYTE, INT, LONG, FLOAT, DOUBLE,
 		BYTEARRAY, INTARRAY, LONGARRY, FLOATARRAY, DOUBLEARRAY };
 public:
+	virtual ~Grid();	// This one does nothing, but destructors of
+				// child classes are only called if we have it
+				// here
+	
 	virtual bool open(const char* filename) = 0;
 	virtual float getXMin() = 0;
 	virtual float getYMin() = 0;

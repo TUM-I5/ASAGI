@@ -117,8 +117,12 @@ float io::NetCdf::getYScaling()
 	return (last - first) / dim;
 }
 
-template<> void io::NetCdf::getVar<void>(void* var)
+template<> void io::NetCdf::getVar<void>(void* var,
+	size_t xoffset, size_t yoffset,
+	size_t xsize, size_t ysize)
 {
+	// TODO
+	
 	NcVar z;
 	unsigned int bytes = getVarSize();
 	std::vector<size_t> start(2, 0);

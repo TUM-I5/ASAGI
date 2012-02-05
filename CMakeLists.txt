@@ -6,11 +6,10 @@ cmake_minimum_required( VERSION 2.8 )
 ##### Files #####
 # Lib Sources
 set( LibSources
-	arraygrid.cpp
 	asagi.cpp
 	asagi_f95.cpp
-	basicgrid.cpp
-	grid.cpp )
+	grid.cpp
+	simplegrid.cpp )
 
 ##### Other configuration #####
 # Additional cmake modules
@@ -20,6 +19,9 @@ set( CMAKE_MODULE_PATH
 
 # Enable warnings
 add_definitions( -Wall )
+
+# Set c++11 standard
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" )
 
 # Enable fortran
 # Call this before searching for mpi
@@ -36,11 +38,16 @@ if( PNG_FOUND )
 endif()
 
 # Add library include files for all exectuables
-include_directories( ${CMAKE_SOURCE_DIR}/include )
+include_directories( ${CMAKE_SOURCE_DIR}/include SYSTEM )
+
+# For sub directories
+include_directories( ${CMAKE_SOURCE_DIR} )
 
 # Add static libaries
+add_subdirectory( blocks )
 add_subdirectory( fortran )
 add_subdirectory( io )
+add_subdirectory( types )
 
 # Doxygen
 find_package( Doxygen )
@@ -55,7 +62,7 @@ endif( DOXYGEN_FOUND )
 
 # Add tests
 enable_testing()
-add_subdirectory( tests )
+#add_subdirectory( tests )
 
 # Add examples
 add_subdirectory( examples )
@@ -65,5 +72,7 @@ add_subdirectory( examples )
 add_library( asagi SHARED
 	${LibSources} )
 target_link_libraries( asagi
+	comm
 	io
+	types
 	${MPI_C_LIBARARIES} ${MPI_CXX_LIBRARIES} )

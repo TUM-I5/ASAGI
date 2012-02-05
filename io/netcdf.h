@@ -1,5 +1,5 @@
-#ifndef IONETCDF_H
-#define IONETCDF_H
+#ifndef IO_NETCDF_H
+#define IO_NETCDF_H
 
 #include <ncAtt.h>
 #include <ncFile.h>
@@ -29,29 +29,76 @@ namespace io
 		float getXScaling();
 		float getYScaling();
 		
-		template<typename T> void getVar(T *var)
+		template<typename T> void getVar(T *var,
+			size_t xoffset = 0, size_t yoffset = 0,
+			size_t xsize = 0, size_t ysize = 0)
 		{
-			netCDF::NcVar z;
-			std::vector<size_t> start(2, 0);
+			// TODO test m_dimSwitched = 1!!!
+			
+			netCDF::NcVar z = m_file->getVar("z");
+			std::vector<size_t> start(2);
 			std::vector<size_t> count(2);
 			std::vector<ptrdiff_t> stride(2, 1);
 			std::vector<ptrdiff_t> imap(2);
 			
+			if (xsize == 0)
+				xsize = getXDim();
+			
+			if (ysize == 0)
+				ysize = getYDim();
+			
+			if (yoffset + ysize > getYDim())
+				ysize = getYDim() - yoffset;
+			
 			if (m_dimSwitched) {
-				count[0] = getXDim();
-				count[1] = getYDim();
+				start[0] = xoffset;
+				start[1] = yoffset;
+				
+				count[0] = xsize;
+				count[1] = ysize;
 				
 				imap[0] = 1;
 				imap[1] = count[0];
 			} else {
-				count[0] = getYDim();
-				count[1] = getXDim();
+				start[0] = yoffset;
+				start[1] = xoffset;
+				
+				count[0] = ysize;
+				count[1] = xsize;
 				
 				imap[0] = count[1];
 				imap[1] = 1;
 			}
 			
-			z = m_file->getVar("z");
+			if (xoffset + xsize > getXDim()) {
+				// This is difficult, we have to load
+				// data row by row
+				
+				if (m_dimSwitched) {
+					count[0] = getXDim() - xoffset;
+					count[1] = 1;
+					
+					//imap[0] = 1;	// already correct
+					imap[1] = count[0];
+				} else {
+					count[0] = 1;
+					count[1] = getXDim() - xoffset;
+					
+					imap[0] = count[1];
+					//imap[1] = 1;	// already correct
+				}
+				
+				for (size_t i = 0; i < ysize; i++) {
+					z.getVar(start, count, stride, imap,
+						static_cast<T*>(&var[i * xsize]));
+					
+					// Add 1 to the yoffset
+					start[(m_dimSwitched ? 1 : 0)]++;
+				}
+				
+				return;
+			}
+			
 			z.getVar(start, count, stride, imap, var);
 		}
 		
@@ -85,8 +132,10 @@ namespace io
 		}
 	};
 
-	template<> void NetCdf::getVar<void>(void* var);
+	template<> void NetCdf::getVar<void>(void* var,
+			size_t xoffset, size_t yoffset,
+			size_t xsize, size_t ysize);
 	template<> void NetCdf::getDefault<void>(void* defaultValue);
 };
 
-#endif
+#endif // IO_NETCDF_H

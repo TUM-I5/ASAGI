@@ -1,7 +1,12 @@
 #include <asagi.h>
 
-#include "arraygrid.h"
-#include "basicgrid.h"
+#include "grid.h"
+#include "simplegrid.h"
+
+// Empty destructor
+asagi::Grid::~Grid()
+{
+}
 
 // Static c++ functions
 
@@ -12,32 +17,7 @@ bool asagi::Grid::init(MPI_Comm comm)
 
 asagi::Grid* asagi::Grid::create(Type type)
 {
-	switch (type) {
-		case BYTE:
-			return new BasicGrid<char>();
-		case INT:
-			return new BasicGrid<int>();
-		case LONG:
-			return new BasicGrid<long>();
-		case FLOAT:
-			return new BasicGrid<float>();
-		case DOUBLE:
-			return new BasicGrid<double>();
-		case BYTEARRAY:
-			return new ArrayGrid<char>();
-		case INTARRAY:
-			return new ArrayGrid<int>();
-		case LONGARRY:
-			return new ArrayGrid<long>();
-		case FLOATARRAY:
-			return new ArrayGrid<float>();
-		case DOUBLEARRAY:
-			return new ArrayGrid<double>();
-		default:
-			;
-	}
-	
-	return 0L; // should not happen
+	return new SimpleGrid(type);
 }
 
 bool asagi::Grid::finalize()
