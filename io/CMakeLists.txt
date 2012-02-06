@@ -1,11 +1,10 @@
 ##### Files #####
 set( ioSources
-	netcdf.cpp
-	png.cpp )
+	netcdf.cpp )
 
 if( PNG_FOUND )
 	set( ioSources
-	${ioSources} png.cpp )
+		${ioSources} png.cpp )
 endif()
 
 ##### Library #####
