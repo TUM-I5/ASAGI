@@ -17,8 +17,6 @@ int main (int argc, char **argv)
 		printf("Running on %d nodes\n", size);
 	}
 	
-	Grid::init(MPI_COMM_WORLD);
-	
 	Grid* grid = Grid::create(Grid::FLOAT);
 	
 	if (!grid->open("../data/tohoku_1850m_bath.nc")) {
@@ -39,8 +37,6 @@ int main (int argc, char **argv)
 	}
 	
 	delete grid;
-	
-	Grid::finalize();
 	
 	MPI_Finalize();
 	

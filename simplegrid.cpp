@@ -1,3 +1,5 @@
+#include <malloc.h>
+
 #include "types/type.h"
 
 #include "simplegrid.h"
@@ -24,42 +26,42 @@ bool SimpleGrid::init()
 	unsigned long blockSize = getXBlockSize() * getYBlockSize();
 	unsigned long blockX, blockY;
 	
-	masterBlockCount = (getBlockCount() + m_mpiSize - 1) / m_mpiSize;
+	masterBlockCount = (getBlockCount() + getMPISize() - 1) / getMPISize();
 
-	MPI_Alloc_mem(m_type->getSize() * blockSize * masterBlockCount,
+	MPI_Alloc_mem(getType()->getSize() * blockSize * masterBlockCount,
 		MPI_INFO_NULL, &masterData);
 	
 	// Load the blocks from the file, which we control
 	for (unsigned long i = 0; i < masterBlockCount; i++) {
-		if (i + m_mpiRank * masterBlockCount >= getBlockCount())
+		if (i + getMPIRank() * masterBlockCount >= getBlockCount())
 			// Last process may controll less blocks
 			break;
 		
 		// Get x and y coordinates of the block
-		getBlockPos(i + m_mpiRank * masterBlockCount, blockX, blockY);
+		getBlockPos(i + getMPIRank() * masterBlockCount, blockX, blockY);
 		
 		// Get x and y coordinates of the first value in the block
 		blockX = blockX * getXBlockSize();
 		blockY = blockY * getYBlockSize();
 		
-		m_type->load(*file,
+		getType()->load(*getInputFile(),
 			blockX, blockY,
 			getXBlockSize(), getYBlockSize(),
-			&masterData[m_type->getSize() * blockSize * i]);
+			&masterData[getType()->getSize() * blockSize * i]);
 	}
 	
 	// Create the mpi window for the master data
 	if (MPI_Win_create(masterData,
-		m_type->getSize() * blockSize * masterBlockCount,
-		m_type->getSize(),
+		getType()->getSize() * blockSize * masterBlockCount,
+		getType()->getSize(),
 		MPI_INFO_NULL,
-		communicator,
+		getMPICommunicator(),
 		&window) != MPI_SUCCESS)
 		return false;
 	
 	// Allocate memory for slave blocks
 	slaveData = static_cast<unsigned char*>(
-		malloc(m_type->getSize() * blockSize * getBlocksPerNode()));
+		malloc(getType()->getSize() * blockSize * getBlocksPerNode()));
 	blockManager.init(getBlocksPerNode());
 	
 	return true;
@@ -76,13 +78,13 @@ void* SimpleGrid::getAt(unsigned long x, unsigned long y)
 	x %= getXBlockSize();
 	y %= getYBlockSize();
 	
-	if ((block >= m_mpiRank * masterBlockCount)
-		&& (block < (m_mpiRank + 1) * masterBlockCount)) {
+	if ((block >= getMPIRank() * masterBlockCount)
+		&& (block < (getMPIRank() + 1) * masterBlockCount)) {
 		// Nice, this is a block where we are the master
 		
-		block -= m_mpiRank * masterBlockCount;
+		block -= getMPIRank() * masterBlockCount;
 	
-		return &masterData[m_type->getSize() *
+		return &masterData[getType()->getSize() *
 			(blockSize * block // jump to the correct block
 			+ y * getXBlockSize() + x) // correct value inside the block
 			];
@@ -106,19 +108,19 @@ void* SimpleGrid::getAt(unsigned long x, unsigned long y)
 		MPI_Win_lock(MPI_LOCK_SHARED, remoteRank,
 			MPI_MODE_NOCHECK, window);
 		
-		MPI_Get(&slaveData[m_type->getSize() * blockSize * block],
+		MPI_Get(&slaveData[getType()->getSize() * blockSize * block],
 			blockSize,
-			m_type->getMPIType(),
+			getType()->getMPIType(),
 			remoteRank,
 			remoteOffset * blockSize,
 			blockSize,
-			m_type->getMPIType(),
+			getType()->getMPIType(),
 			window);
 		
 		MPI_Win_unlock(remoteRank, window);
 	}
 		
-	return &slaveData[m_type->getSize() *
+	return &slaveData[getType()->getSize() *
 		(blockSize * block // correct block
 		+ y * getXBlockSize() + x) // correct value inside the block
 		];

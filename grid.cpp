@@ -20,7 +20,9 @@ Grid::Grid(Type type)
 	// Prepare for fortran <-> c translation
 	id = pointers.add(this);
 	
-	file = 0L;
+	m_inputFile = 0L;
+	
+	communicator = MPI_COMM_NULL;
 	
 	switch (type) {
 	case BYTE:
@@ -56,37 +58,42 @@ Grid::Grid(Type type)
 
 Grid::~Grid()
 {
-	delete file;
+	delete m_inputFile;
 	
 	delete m_type;
+	
+	MPI_Comm_free(&communicator);
 	
 	// Remove from fortran <-> c translation
 	pointers.remove(id);
 }
 
-bool Grid::open(const char* filename)
+bool Grid::open(const char* filename, MPI_Comm comm)
 {
+	if (MPI_Comm_dup(comm, &communicator) != MPI_SUCCESS)
+		return false;
+	
 	MPI_Comm_rank(communicator, &m_mpiRank);
 	MPI_Comm_size(communicator, &m_mpiSize);
 	
-	file = new NetCdf(filename);
-	if (!file->open())
+	m_inputFile = new NetCdf(filename);
+	if (!m_inputFile->open())
 		return false;
 	
-	dimX = file->getXDim();
-	dimY = file->getYDim();
+	dimX = m_inputFile->getXDim();
+	dimY = m_inputFile->getYDim();
 	
-	offsetX = file->getXOffset();
-	offsetY = file->getYOffset();
+	offsetX = m_inputFile->getXOffset();
+	offsetY = m_inputFile->getYOffset();
 	
-	scalingX = file->getXScaling();
-	scalingY = file->getYScaling();
+	scalingX = m_inputFile->getXScaling();
+	scalingY = m_inputFile->getYScaling();
 	
 	// Integer way of rounding up
 	blocksX = (dimX + BLOCK_SIZE_X - 1) / BLOCK_SIZE_X;
 	blocksY = (dimY + BLOCK_SIZE_Y - 1) / BLOCK_SIZE_Y;
 	
-	if (!m_type->check(*file))
+	if (!m_type->check(*m_inputFile))
 		return false;
 	
 	return init();
@@ -211,6 +218,31 @@ float Grid::getAtFloat(unsigned long x, unsigned long y)
 	return m_type->getFloat(getAt(x, y));
 }
 
+MPI_Comm Grid::getMPICommunicator()
+{
+	return communicator;
+}
+
+int Grid::getMPIRank()
+{
+	return m_mpiRank;
+}
+
+int Grid::getMPISize()
+{
+	return m_mpiSize;
+}
+
+NetCdf* Grid::getInputFile()
+{
+	return m_inputFile;
+}
+
+types::Type* Grid::getType()
+{
+	return m_type;
+}
+
 long unsigned Grid::getXDim()
 {
 	return dimX;
@@ -290,8 +322,6 @@ unsigned long Grid::getBlockByCoords(unsigned long x, unsigned long y)
 	return (y / BLOCK_SIZE_Y) * blocksX + (x / BLOCK_SIZE_X);
 }
 
-MPI_Comm Grid::communicator;
-
 // Fortran <-> c translation array
 fortran::PointerArray<Grid> Grid::pointers;
 
@@ -345,22 +375,6 @@ void Grid::h2rgb(float h, unsigned char &red, unsigned char &green, unsigned cha
 float Grid::round(float value)
 {
 	return floor(value + 0.5);
-}
-
-bool Grid::init(MPI_Comm comm)
-{
-	if (MPI_Comm_dup(comm, &communicator) != MPI_SUCCESS)
-		return false;
-		
-	return true;
-}
-
-bool Grid::finalize()
-{
-	if (MPI_Comm_free(&communicator) != MPI_SUCCESS)
-		return false;
-	
-	return true;
 }
 
 Grid* Grid::f2c(int i)

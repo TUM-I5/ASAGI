@@ -4,7 +4,11 @@
 #include <asagi.h>
 
 #include "fortran/pointerarray.h"
-#include "io/netcdf.h"
+
+namespace io
+{
+	class NetCdf;
+}
 
 namespace types
 {
@@ -16,6 +20,21 @@ class Grid : public asagi::Grid
 private:
 	/** Id of the grid, used for the fortran <-> c interface */
 	int id;
+	
+	/** The communicator we use */
+	MPI_Comm communicator;
+	/** Rank of this process */
+	int m_mpiRank;
+	/** Size of the MPI communicator */
+	int m_mpiSize;
+	
+	io::NetCdf *m_inputFile;
+	
+	/**
+	 * The type of values we save in the grid.
+	 * This class implements all type specific operations.
+	 */
+	types::Type *m_type;
 	
 	/** Total number of elements in x dimension */
 	unsigned long dimX;
@@ -32,25 +51,11 @@ private:
 	unsigned long blocksX;
 	/** Number of blocks in y dimension */
 	unsigned long blocksY;
-	
-protected:
-	/** Rank of this process */
-	int m_mpiRank;
-	/** Size of the MPI communicator */
-	int m_mpiSize;
-	
-	io::NetCdf *file;
-	
-	/**
-	 * The type of values we save in the grid.
-	 * This class implements all type specific operations.
-	 */
-	types::Type *m_type;
 public:
 	Grid(Type type = FLOAT);
 	virtual ~Grid();
 	
-	bool open(const char* filename);
+	bool open(const char* filename, MPI_Comm comm = MPI_COMM_WORLD);
 	
 	float getXMin();
 	float getYMin();
@@ -79,6 +84,14 @@ private:
 	 */
 	float getAtFloat(unsigned long x, unsigned long y);
 protected:
+	MPI_Comm getMPICommunicator();
+	int getMPIRank();
+	int getMPISize();
+	
+	io::NetCdf* getInputFile();
+	
+	types::Type* getType();
+	
 	unsigned long getXDim();
 	unsigned long getYDim();
 	
@@ -104,19 +117,11 @@ protected:
 	virtual void* getAt(unsigned long x, unsigned long y) = 0;
 private:
 	static fortran::PointerArray<Grid> pointers;
-protected:
-	/**
-	 * The communicator we use in this library
-	 */
-	static MPI_Comm communicator;
 private:
 	static void h2rgb(float h, unsigned char &red, unsigned char &green, unsigned char &blue);
 protected:
 	static float round(float value);
 public:
-	static bool init(MPI_Comm comm);
-	static bool finalize();
-	
 	static Grid* f2c(int i);
 };
 

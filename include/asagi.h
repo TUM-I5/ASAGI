@@ -25,14 +25,14 @@ public:
 				// child classes are only called if we have it
 				// here
 	
-	virtual bool open(const char* filename) = 0;
+	virtual bool open(const char* filename, MPI_Comm comm = MPI_COMM_WORLD) = 0;
 	virtual float getXMin() = 0;
 	virtual float getYMin() = 0;
 	virtual float getXMax() = 0;
 	virtual float getYMax() = 0;
 	
 	/**
-	 * @return The number of bytes that are stored at each grid node
+	 * @return The number of bytes that are stored in each grid cell
 	 */
 	virtual unsigned int getVarSize() = 0;
 	virtual char getByte(float x, float y) = 0;
@@ -49,18 +49,9 @@ public:
 	virtual bool exportPng(const char* filename) = 0;
 public:
 	/**
-	 * This function should be called before calling any other function
-	 * from this library.
+	 * Creates a new grid of type <code>type</code>
 	 */
-	static bool init(MPI_Comm comm);
 	static asagi::Grid* create(Type type = FLOAT);
-	/**
-	 * This function cleans up Asagi. After calling this function, no other
-	 * function than {@link init(MPI_Comm)} should be called.
-	 * <br>
-	 * Call this <b>before</b> calling <code>MPI_Finalize()</code>
-	 */
-	static bool finalize();
 };
 
 typedef asagi::Grid grid_handle;

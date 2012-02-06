@@ -12,8 +12,6 @@ int main (int argc, char **argv)
 	
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	
-	Grid::init(MPI_COMM_WORLD);
-	
 	grid = Grid::create(Grid::FLOAT);
 	
 	if (!grid->open("../data/noise.nc")) {
@@ -54,10 +52,7 @@ int main (int argc, char **argv)
 	
 	printf("Png file written\n");
 	
-	Grid::finalize();
-	
 	MPI_Finalize();
-	printf("Png export not supported\n");
 	
 	return 0;
 }

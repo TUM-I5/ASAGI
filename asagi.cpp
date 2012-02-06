@@ -9,20 +9,9 @@ asagi::Grid::~Grid()
 }
 
 // Static c++ functions
-
-bool asagi::Grid::init(MPI_Comm comm)
-{
-	return ::Grid::init(comm);
-}
-
 asagi::Grid* asagi::Grid::create(Type type)
 {
 	return new SimpleGrid(type);
-}
-
-bool asagi::Grid::finalize()
-{
-	return ::Grid::finalize();
 }
 
 // C interfae
