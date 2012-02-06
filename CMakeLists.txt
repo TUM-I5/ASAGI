@@ -11,6 +11,10 @@ set( LibSources
 	grid.cpp
 	simplegrid.cpp )
 
+##### User configuration #####
+option( FORTRAN_SUPPORT "Enable Fortran support" ON )
+option( EXAMPLES "Compile examples" OFF )
+
 ##### Other configuration #####
 # Additional cmake modules
 set( CMAKE_MODULE_PATH
@@ -39,7 +43,7 @@ include_directories( ${NETCDF_INCLUDES} SYSTEM )
 # Find png
 find_package( PNG )
 if( PNG_FOUND )
-	add_definitions( -DWITH_PNG )
+	add_definitions( -DPNG_ENABLED )
 endif()
 
 # Add library include files for all exectuables
@@ -69,8 +73,10 @@ endif( DOXYGEN_FOUND )
 enable_testing()
 #add_subdirectory( tests )
 
-# Add examples
-add_subdirectory( examples )
+if( EXAMPLES )
+	# Add examples
+	add_subdirectory( examples )
+endif()
 
 ##### Excecutables #####
 # Library

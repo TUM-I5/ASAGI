@@ -1,6 +1,6 @@
 #include <math.h>
 
-#ifdef WITH_PNG
+#ifdef PNG_ENABLED
 #include "io/png.h"
 #endif
 
@@ -148,7 +148,7 @@ void Grid::getBuf(float x, float y, void* buf)
 }
 bool Grid::exportPng(const char* filename)
 {
-#ifdef WITH_PNG
+#ifdef PNG_ENABLED
 	float min, max, value;
 	unsigned char red, green, blue;
 	
@@ -178,10 +178,10 @@ bool Grid::exportPng(const char* filename)
 	png.close();
 	
 	return true;
-#else // WITH_PNG
+#else // PNG_ENABLED
 	// TODO generate a warning or something like this
 	return false;
-#endif // WITH_PNG
+#endif // PNG_ENABLED
 }
 
 /**

@@ -20,7 +20,7 @@ target_link_libraries( cpp_simple
 set_target_properties( cpp_simple PROPERTIES
 	OUTPUT_NAME simple )
 
-# Simple
+# Array
 add_executable( cpp_array
 	${ArrayCppSources} )
 target_link_libraries( cpp_array
@@ -28,10 +28,12 @@ target_link_libraries( cpp_array
 set_target_properties( cpp_array PROPERTIES
 	OUTPUT_NAME array )
 
-# ExportPng
-add_executable( cpp_exportpng
-	${ExportPngCppSources} )
-target_link_libraries( cpp_exportpng
-	asagi )
-set_target_properties( cpp_exportpng PROPERTIES
-	OUTPUT_NAME exportpng )
+if( PNG_FOUND )
+	# ExportPng
+	add_executable( cpp_exportpng
+		${ExportPngCppSources} )
+	target_link_libraries( cpp_exportpng
+		asagi )
+	set_target_properties( cpp_exportpng PROPERTIES
+		OUTPUT_NAME exportpng )
+endif()

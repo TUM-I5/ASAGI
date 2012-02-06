@@ -5,7 +5,6 @@ using namespace asagi;
 
 int main (int argc, char **argv)
 {
-#ifdef WITH_PNG
 	int rank;
 	Grid* grid;
 	
@@ -58,9 +57,7 @@ int main (int argc, char **argv)
 	Grid::finalize();
 	
 	MPI_Finalize();
-#else // WITH_PNG
 	printf("Png export not supported\n");
-#endif // WITH_PNG
 	
 	return 0;
 }
