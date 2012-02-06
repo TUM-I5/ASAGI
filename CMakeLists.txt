@@ -12,6 +12,7 @@ set( LibSources
 	simplegrid.cpp )
 
 ##### User configuration #####
+option( STATIC_LIB "Compile asagi as static library" OFF )
 option( FORTRAN_SUPPORT "Enable Fortran support" ON )
 option( EXAMPLES "Compile examples" OFF )
 
@@ -80,8 +81,13 @@ endif()
 
 ##### Excecutables #####
 # Library
-add_library( asagi SHARED
-	${LibSources} )
+if( STATIC_LIB )
+	add_library( asagi
+		${LibSources} )
+else()
+	add_library( asagi SHARED
+		${LibSources} )
+endif()
 target_link_libraries( asagi
 	comm
 	io

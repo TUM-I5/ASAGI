@@ -13,5 +13,7 @@ add_library( io
 target_link_libraries( io
 	${NETCDF_LIBRARIES}
 	${PNG_LIBRARY} )
-set_target_properties( io PROPERTIES
-	COMPILE_FLAGS -fPIC )
+if( NOT STATIC_LIB )
+	set_target_properties( io PROPERTIES
+		COMPILE_FLAGS -fPIC )
+endif()

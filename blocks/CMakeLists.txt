@@ -6,5 +6,7 @@ set( commSources
 ##### Library #####
 add_library( comm
 	${commSources} )
-set_target_properties( comm PROPERTIES
-	COMPILE_FLAGS -fPIC )
+if( NOT STATIC_LIB )
+	set_target_properties( comm PROPERTIES
+		COMPILE_FLAGS -fPIC )
+endif()

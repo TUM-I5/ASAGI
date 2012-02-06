@@ -6,5 +6,7 @@ set( typesSources
 ##### Library #####
 add_library( types
 	${typesSources} )
-set_target_properties( types PROPERTIES
-	COMPILE_FLAGS -fPIC )
+if( NOT STATIC_LIB )
+	set_target_properties( types PROPERTIES
+		COMPILE_FLAGS -fPIC )
+endif()
