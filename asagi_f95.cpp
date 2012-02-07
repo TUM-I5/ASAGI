@@ -14,52 +14,52 @@ bool f95grid_open(int grid_id, const char* filename, int comm)
 	return Grid::f2c(grid_id)->open(filename, MPI_Comm_f2c(comm));
 }
 
-float f95grid_min_x(int grid_id)
+double f95grid_min_x(int grid_id)
 {
 	return Grid::f2c(grid_id)->getXMin();
 }
 
-float f95grid_min_y(int grid_id)
+double f95grid_min_y(int grid_id)
 {
 	return Grid::f2c(grid_id)->getYMin();
 }
 
-float f95grid_max_x(int grid_id)
+double f95grid_max_x(int grid_id)
 {
 	return Grid::f2c(grid_id)->getXMax();
 }
 
-float f95grid_max_y(int grid_id)
+double f95grid_max_y(int grid_id)
 {
 	return Grid::f2c(grid_id)->getYMax();
 }
 
-char f95grid_get_byte(int grid_id, float x, float y)
+char f95grid_get_byte(int grid_id, double x, double y)
 {
 	return Grid::f2c(grid_id)->getByte(x, y);
 }
 
-int f95grid_get_int(int grid_id, float x, float y)
+int f95grid_get_int(int grid_id, double x, double y)
 {
 	return Grid::f2c(grid_id)->getInt(x, y);
 }
 
-long f95grid_get_long(int grid_id, float x, float y)
+long f95grid_get_long(int grid_id, double x, double y)
 {
 	return Grid::f2c(grid_id)->getLong(x, y);
 }
 
-float f95grid_get_float(int grid_id, float x, float y)
+float f95grid_get_float(int grid_id, double x, double y)
 {
 	return Grid::f2c(grid_id)->getFloat(x, y);
 }
 
-double f95grid_get_double(int grid_id, float x, float y)
+double f95grid_get_double(int grid_id, double x, double y)
 {
 	return Grid::f2c(grid_id)->getDouble(x, y);
 }
 
-void f95grid_get_buf(int grid_id, float x, float y, void* buf)
+void f95grid_get_buf(int grid_id, double x, double y, void* buf)
 {
 	return Grid::f2c(grid_id)->getBuf(x, y, buf);
 }

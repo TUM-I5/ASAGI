@@ -57,9 +57,9 @@ unsigned long io::NetCdf::getYDim()
 	return m_file->getDim("y").getSize();
 }
 
-float io::NetCdf::getXOffset()
+double io::NetCdf::getXOffset()
 {
-	float result;
+	double result;
 	NcVar x = m_file->getVar("x");
 	
 	if (x.isNull())
@@ -69,9 +69,9 @@ float io::NetCdf::getXOffset()
 	return result;
 }
 
-float io::NetCdf::getYOffset()
+double io::NetCdf::getYOffset()
 {
-	float result;
+	double result;
 	NcVar y = m_file->getVar("y");
 	
 	if (y.isNull())
@@ -81,9 +81,9 @@ float io::NetCdf::getYOffset()
 	return result;
 }
 
-float io::NetCdf::getXScaling()
+double io::NetCdf::getXScaling()
 {
-	float first, last;
+	double first, last;
 	std::vector<size_t> index(1);
 	NcVar x = m_file->getVar("x");
 	unsigned long dim = getXDim();
@@ -99,9 +99,9 @@ float io::NetCdf::getXScaling()
 	return (last - first) / dim;
 }
 
-float io::NetCdf::getYScaling()
+double io::NetCdf::getYScaling()
 {
-	float first, last;
+	double first, last;
 	std::vector<size_t> index(1);
 	NcVar y = m_file->getVar("y");
 	unsigned long dim = getYDim();

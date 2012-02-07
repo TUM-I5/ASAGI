@@ -24,10 +24,10 @@ namespace io
 		bool isOpen() const;
 		unsigned long getXDim();
 		unsigned long getYDim();
-		float getXOffset();
-		float getYOffset();
-		float getXScaling();
-		float getYScaling();
+		double getXOffset();
+		double getYOffset();
+		double getXScaling();
+		double getYScaling();
 		
 		template<typename T> void getVar(T *var,
 			size_t xoffset = 0, size_t yoffset = 0,

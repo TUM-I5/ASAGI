@@ -25,52 +25,52 @@ int grid_open(grid_handle* handle, const char* filename, MPI_Comm comm)
 	return handle->open(filename, comm);
 }
 
-float grid_min_x(grid_handle* handle)
+double grid_min_x(grid_handle* handle)
 {
 	return handle->getXMin();
 }
 
-float grid_min_y(grid_handle* handle)
+double grid_min_y(grid_handle* handle)
 {
 	return handle->getYMin();
 }
 
-float grid_max_x(grid_handle* handle)
+double grid_max_x(grid_handle* handle)
 {
 	return handle->getXMax();
 }
 
-float grid_max_y(grid_handle* handle)
+double grid_max_y(grid_handle* handle)
 {
 	return handle->getYMax();
 }
 
-char grid_get_byte(grid_handle* handle, float x, float y)
+char grid_get_byte(grid_handle* handle, double x, double y)
 {
 	return handle->getByte(x, y);
 }
 
-int grid_get_int(grid_handle* handle, float x, float y)
+int grid_get_int(grid_handle* handle, double x, double y)
 {
 	return handle->getInt(x, y);
 }
 
-long grid_get_long(grid_handle* handle, float x, float y)
+long grid_get_long(grid_handle* handle, double x, double y)
 {
 	return handle->getLong(x, y);
 }
 
-float grid_get_float(grid_handle* handle, float x, float y)
+float grid_get_float(grid_handle* handle, double x, double y)
 {
 	return handle->getFloat(x, y);
 }
 
-double grid_get_double(grid_handle* handle, float x, float y)
+double grid_get_double(grid_handle* handle, double x, double y)
 {
 	return handle->getDouble(x, y);
 }
 
-void grid_get_buf(grid_handle* handle, float x, float y, void* buf)
+void grid_get_buf(grid_handle* handle, double x, double y, void* buf)
 {
 	handle->getBuf(x, y, buf);
 }

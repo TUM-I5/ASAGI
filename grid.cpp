@@ -99,24 +99,24 @@ bool Grid::open(const char* filename, MPI_Comm comm)
 	return init();
 }
 
-float Grid::getXMin()
+double Grid::getXMin()
 {
-	return offsetX + std::min(0.f, dimX * scalingX);
+	return offsetX + std::min(0., dimX * scalingX);
 }
 
-float Grid::getYMin()
+double Grid::getYMin()
 {
-	return offsetY + std::min(0.f, dimY * scalingY);
+	return offsetY + std::min(0., dimY * scalingY);
 }
 
-float Grid::getXMax()
+double Grid::getXMax()
 {
-	return offsetX + std::max(0.f, dimX * scalingX);
+	return offsetX + std::max(0., dimX * scalingX);
 }
 
-float Grid::getYMax()
+double Grid::getYMax()
 {
-	return offsetY + std::max(0.f, dimY * scalingY);
+	return offsetY + std::max(0., dimY * scalingY);
 }
 
 unsigned int Grid::getVarSize()
@@ -124,32 +124,32 @@ unsigned int Grid::getVarSize()
 	return m_type->getSize();
 }
 
-char Grid::getByte(float x, float y)
+char Grid::getByte(double x, double y)
 {
 	return m_type->getByte(getAt(x, y));
 }
 
-int Grid::getInt(float x, float y)
+int Grid::getInt(double x, double y)
 {
 	return m_type->getInt(getAt(x, y));
 }
 
-long Grid::getLong(float x, float y)
+long Grid::getLong(double x, double y)
 {
 	return m_type->getLong(getAt(x, y));
 }
 
-float Grid::getFloat(float x, float y)
+float Grid::getFloat(double x, double y)
 {
 	return m_type->getFloat(getAt(x, y));
 }
 
-double Grid::getDouble(float x, float y)
+double Grid::getDouble(double x, double y)
 {
 	return m_type->getDouble(getAt(x, y));
 }
 
-void Grid::getBuf(float x, float y, void* buf)
+void Grid::getBuf(double x, double y, void* buf)
 {
 	memcpy(buf, getAt(x, y), m_type->getSize());
 }
@@ -202,7 +202,7 @@ int Grid::c2f()
 	return id;
 }
 
-void* Grid::getAt(float x, float y)
+void* Grid::getAt(double x, double y)
 {
 	x = round((x - offsetX) / scalingX);
 	y = round((y - offsetY) / scalingY);
@@ -254,22 +254,22 @@ long unsigned Grid::getYDim()
 	return dimY;
 }
 
-float Grid::getXOffset()
+double Grid::getXOffset()
 {
 	return offsetX;
 }
 
-float Grid::getYOffset()
+double Grid::getYOffset()
 {
 	return offsetY;
 }
 
-float Grid::getXScaling()
+double Grid::getXScaling()
 {
 	return scalingX;
 }
 
-float Grid::getYScaling()
+double Grid::getYScaling()
 {
 	return scalingY;
 }
@@ -373,7 +373,7 @@ void Grid::h2rgb(float h, unsigned char &red, unsigned char &green, unsigned cha
 	blue = x * 255;
 }
 
-float Grid::round(float value)
+double Grid::round(double value)
 {
 	return floor(value + 0.5);
 }

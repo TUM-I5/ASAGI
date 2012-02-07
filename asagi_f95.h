@@ -11,17 +11,17 @@ int f95grid_create(grid_type type);
 
 bool f95grid_open(int grid_id, const char *filename, int comm);
 
-float f95grid_min_x(int grid_id);
-float f95grid_min_y(int grid_id);
-float f95grid_max_x(int grid_id);
-float f95grid_max_y(int grid_id);
+double f95grid_min_x(int grid_id);
+double f95grid_min_y(int grid_id);
+double f95grid_max_x(int grid_id);
+double f95grid_max_y(int grid_id);
 
-char f95grid_get_byte(int grid_id, float x, float y);
-int f95grid_get_int(int grid_id, float x, float y);
-long f95grid_get_long(int grid_id, float x, float y);
-float f95grid_get_float(int grid_id, float x, float y);
-double f95grid_get_double(int grid_id, float x, float y);
-void f95grid_get_buf(int grid_id, float x, float y, void* buf);
+char f95grid_get_byte(int grid_id, double x, double y);
+int f95grid_get_int(int grid_id, double x, double y);
+long f95grid_get_long(int grid_id, double x, double y);
+float f95grid_get_float(int grid_id, double x, double y);
+double f95grid_get_double(int grid_id, double x, double y);
+void f95grid_get_buf(int grid_id, double x, double y, void* buf);
 
 void f95grid_free(int grid_id);
 

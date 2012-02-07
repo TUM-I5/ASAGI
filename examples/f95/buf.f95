@@ -21,7 +21,7 @@ program buf
   end if
 
   allocate( value )
-  call grid_get_buf( grid_id, -1., -5005.32, c_loc( value ) )
+  call grid_get_buf( grid_id, -1.d+0, -5005.32d+0, c_loc( value ) )
   write (*,*) "Value at -1x-5005.32:", value
 
   call grid_free( grid_id )

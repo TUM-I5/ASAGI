@@ -41,11 +41,11 @@ private:
 	/** Total number of elements in y dimension */
 	unsigned long dimY;
 	
-	float offsetX;
-	float offsetY;
+	double offsetX;
+	double offsetY;
 	
-	float scalingX;
-	float scalingY;
+	double scalingX;
+	double scalingY;
 	
 	/** Number of blocks in x dimension */
 	unsigned long blocksX;
@@ -57,26 +57,26 @@ public:
 	
 	bool open(const char* filename, MPI_Comm comm = MPI_COMM_WORLD);
 	
-	float getXMin();
-	float getYMin();
-	float getXMax();
-	float getYMax();
+	double getXMin();
+	double getYMin();
+	double getXMax();
+	double getYMax();
 	
 	unsigned int getVarSize();
 	
-	char getByte(float x, float y);
-	int getInt(float x, float y);
-	long getLong(float x, float y);
-	float getFloat(float x, float y);
-	double getDouble(float x, float y);
-	void getBuf(float x, float y, void* buf);
+	char getByte(double x, double y);
+	int getInt(double x, double y);
+	long getLong(double x, double y);
+	float getFloat(double x, double y);
+	double getDouble(double x, double y);
+	void getBuf(double x, double y, void* buf);
 	
 	bool exportPng(const char* filename);
 	
 	// These are not part of the offical interface
 	int c2f();
 private:
-	void* getAt(float x, float y);
+	void* getAt(double x, double y);
 	
 	/**
 	 * This function is used by {@link exportPng(const char*)},
@@ -95,11 +95,11 @@ protected:
 	unsigned long getXDim();
 	unsigned long getYDim();
 	
-	float getXOffset();
-	float getYOffset();
+	double getXOffset();
+	double getYOffset();
 	
-	float getXScaling();
-	float getYScaling();
+	double getXScaling();
+	double getYScaling();
 	
 	unsigned long getBlocksPerNode();
 	
@@ -120,7 +120,7 @@ private:
 private:
 	static void h2rgb(float h, unsigned char &red, unsigned char &green, unsigned char &blue);
 protected:
-	static float round(float value);
+	static double round(double value);
 public:
 	static Grid* f2c(int i);
 };

@@ -27,25 +27,25 @@ public:
 	
 	virtual bool open(const char* filename,
 		MPI_Comm comm = MPI_COMM_WORLD) = 0;
-	virtual float getXMin() = 0;
-	virtual float getYMin() = 0;
-	virtual float getXMax() = 0;
-	virtual float getYMax() = 0;
+	virtual double getXMin() = 0;
+	virtual double getYMin() = 0;
+	virtual double getXMax() = 0;
+	virtual double getYMax() = 0;
 	
 	/**
 	 * @return The number of bytes that are stored in each grid cell
 	 */
 	virtual unsigned int getVarSize() = 0;
-	virtual char getByte(float x, float y) = 0;
-	virtual int getInt(float x, float y) = 0;
-	virtual long getLong(float x, float y) = 0;
-	virtual float getFloat(float x, float y) = 0;
-	virtual double getDouble(float x, float y) = 0;
+	virtual char getByte(double x, double y) = 0;
+	virtual int getInt(double x, double y) = 0;
+	virtual long getLong(double x, double y) = 0;
+	virtual float getFloat(double x, double y) = 0;
+	virtual double getDouble(double x, double y) = 0;
 	/**
 	 * Copys the element at (x,y) into buf. The buffer size has to be
 	 * (at least) {@link getVarSize()} bytes. 
 	 */
-	virtual void getBuf(float x, float y, void* buf) = 0;
+	virtual void getBuf(double x, double y, void* buf) = 0;
 	
 	virtual bool exportPng(const char* filename) = 0;
 public:
@@ -71,17 +71,17 @@ grid_handle* grid_create(grid_type type);
 
 int grid_open(grid_handle* handle, const char* filename, MPI_Comm comm);
 
-float grid_min_x(grid_handle* handle);
-float grid_min_y(grid_handle* handle);
-float grid_max_x(grid_handle* handle);
-float grid_max_y(grid_handle* handle);
+double grid_min_x(grid_handle* handle);
+double grid_min_y(grid_handle* handle);
+double grid_max_x(grid_handle* handle);
+double grid_max_y(grid_handle* handle);
 
-char grid_get_char(grid_handle* handle, float x, float y);
-int grid_get_int(grid_handle* handle, float x, float y);
-long grid_get_long(grid_handle* handle, float x, float y);
-float grid_get_float(grid_handle* handle, float x, float y);
-double grid_get_double(grid_handle* handle, float x, float y);
-void grid_get_buf(grid_handle* handle, float x, float y, void* buf);
+char grid_get_char(grid_handle* handle, double x, double y);
+int grid_get_int(grid_handle* handle, double x, double y);
+long grid_get_long(grid_handle* handle, double x, double y);
+float grid_get_float(grid_handle* handle, double x, double y);
+double grid_get_double(grid_handle* handle, double x, double y);
+void grid_get_buf(grid_handle* handle, double x, double y, void* buf);
 
 void grid_free(grid_handle* handle);
 
