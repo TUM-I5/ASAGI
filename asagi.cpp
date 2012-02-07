@@ -20,9 +20,9 @@ grid_handle* grid_create(grid_type type)
 	return asagi::Grid::create(type);
 }
 
-int grid_open(grid_handle* handle, const char* filename)
+int grid_open(grid_handle* handle, const char* filename, MPI_Comm comm)
 {
-	return handle->open(filename);
+	return handle->open(filename, comm);
 }
 
 float grid_min_x(grid_handle* handle)

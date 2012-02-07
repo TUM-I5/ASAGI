@@ -14,10 +14,11 @@ module asagi
       integer( kind=c_int )        :: grid_create
     end function grid_create
     
-    function grid_open( grid_id, filename ) bind( c, name="f95grid_open" )
+    function grid_open( grid_id, filename, comm ) bind( c, name="f95grid_open" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value           :: grid_id
       character( kind=c_char ), dimension(*) :: filename
+      integer( kind=c_int ), value           :: comm
       logical( kind=c_bool )                 :: grid_open
     end function grid_open
     

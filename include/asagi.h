@@ -25,7 +25,8 @@ public:
 				// child classes are only called if we have it
 				// here
 	
-	virtual bool open(const char* filename, MPI_Comm comm = MPI_COMM_WORLD) = 0;
+	virtual bool open(const char* filename,
+		MPI_Comm comm = MPI_COMM_WORLD) = 0;
 	virtual float getXMin() = 0;
 	virtual float getYMin() = 0;
 	virtual float getXMax() = 0;
@@ -68,7 +69,7 @@ typedef enum { GRID_BYTE, GRID_INT, GRID_LONG, GRID_FLOAT, GRID_DOUBLE,
  */
 grid_handle* grid_create(grid_type type);
 
-int grid_open(grid_handle* handle, const char* filename);
+int grid_open(grid_handle* handle, const char* filename, MPI_Comm comm);
 
 float grid_min_x(grid_handle* handle);
 float grid_min_y(grid_handle* handle);

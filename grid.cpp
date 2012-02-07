@@ -153,6 +153,7 @@ void Grid::getBuf(float x, float y, void* buf)
 {
 	memcpy(buf, getAt(x, y), m_type->getSize());
 }
+
 bool Grid::exportPng(const char* filename)
 {
 #ifdef PNG_ENABLED

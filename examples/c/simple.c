@@ -1,13 +1,16 @@
 #include <asagi.h>
+#include <mpi.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/unistd.h>
+// #include <sys/unistd.h>
 
-int main (void)
+int main (int argc, char** argv)
 {
+	MPI_Init(&argc, &argv);
+	
 	grid_handle* grid = grid_create(GRID_FLOAT);
 	
-	if (!grid_open(grid, "../data/tohoku_1850m_bath.nc")) {
+	if (!grid_open(grid, "../data/tohoku_1850m_bath.nc", MPI_COMM_WORLD)) {
 		printf("Could not load file\n");
 		return 1;
 	}
@@ -18,16 +21,20 @@ int main (void)
 	printf("Value at 5x10: %f\n", grid_get_float(grid, 5, 10));
 	
 	// Print memory usage
-	char status_path[100];
-	snprintf(status_path, 99, "/proc/%d/status", getpid());
+// 	char status_path[100];
+// 	snprintf(status_path, 99, "/proc/%d/status", getpid());
+// 	
+// 	FILE* f = fopen(status_path, "r");
+// 	
+// 	char buf[256];
+// 	while (fgets(buf, sizeof buf, f)) {
+// 		printf("%s", buf);
+// 	}
+// 	fclose(f);
 	
-	FILE* f = fopen(status_path, "r");
+	grid_free(grid);
 	
-	char buf[256];
-	while (fgets(buf, sizeof buf, f)) {
-		printf("%s", buf);
-	}
-	fclose(f);
+	MPI_Finalize();
 	
 	return 0;
 }

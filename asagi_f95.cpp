@@ -7,9 +7,11 @@ int f95grid_create(grid_type type)
 	return static_cast<Grid*>(asagi::Grid::create(type))->c2f();
 }
 
-bool f95grid_open(int grid_id, const char* filename)
+bool f95grid_open(int grid_id, const char* filename, int comm)
 {
-	return Grid::f2c(grid_id)->open(filename);
+	// MPI_Comm_f2c expects an MPI_Fint, however iso_c_bindings
+	// already converts this parameter into c integer
+	return Grid::f2c(grid_id)->open(filename, MPI_Comm_f2c(comm));
 }
 
 float f95grid_min_x(int grid_id)

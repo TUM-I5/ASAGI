@@ -35,6 +35,9 @@ enable_language( Fortran )
 # Find MPI
 find_package( MPI REQUIRED )
 include_directories( ${MPI_C_INCLUDE_PATH} SYSTEM )
+set( CMAKE_C_COMPILER ${MPI_C_COMPILER} )
+set( CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER} )
+set( CMAKE_Fortran_COMPILER ${MPI_Fortran_COMPILER} )
 
 # Find netcdf
 set( NETCDF_CXX4 "YES" )
@@ -91,5 +94,4 @@ endif()
 target_link_libraries( asagi
 	comm
 	io
-	types
-	${MPI_C_LIBARARIES} ${MPI_CXX_LIBRARIES} )
+	types )

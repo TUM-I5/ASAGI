@@ -9,7 +9,7 @@ extern "C" {
 
 int f95grid_create(grid_type type);
 
-bool f95grid_open(int grid_id, const char *filename);
+bool f95grid_open(int grid_id, const char *filename, int comm);
 
 float f95grid_min_x(int grid_id);
 float f95grid_min_y(int grid_id);
