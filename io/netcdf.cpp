@@ -33,10 +33,6 @@ bool io::NetCdf::open()
 	if (z.isNull())
 		return false;
 	
-	if (z.getType().getTypeClass() != NcType::nc_FLOAT)
-		// Only float is supported at the moment
-		return false;
-	
 	m_dimSwitched = (z.getDim(0) != m_file->getDim("y"));
 	
 	return true;
