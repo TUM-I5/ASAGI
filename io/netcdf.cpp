@@ -92,7 +92,7 @@ double io::NetCdf::getXScaling()
 	index[0] = dim - 1;
 	x.getVar(index, &last);
 	
-	return (last - first) / dim;
+	return (last - first) / (dim - 1);
 }
 
 double io::NetCdf::getYScaling()
@@ -110,7 +110,7 @@ double io::NetCdf::getYScaling()
 	index[0] = dim - 1;
 	y.getVar(index, &last);
 	
-	return (last - first) / dim;
+	return (last - first) / (dim - 1);
 }
 
 template<> void io::NetCdf::getVar<void>(void* var,

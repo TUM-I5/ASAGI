@@ -89,6 +89,9 @@ namespace io
 				}
 				
 				for (size_t i = 0; i < ysize; i++) {
+					// I think we do not need stride and imap
+					// here.
+					// Well, never touch a running version ...
 					z.getVar(start, count, stride, imap,
 						static_cast<T*>(&var[i * xsize]));
 					
