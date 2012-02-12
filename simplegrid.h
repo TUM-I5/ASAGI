@@ -1,7 +1,9 @@
 #ifndef SIMPLEGRID_H
 #define SIMPLEGRID_H
 
+#ifndef THREADSAFETY_DISABLED
 #include <mutex>
+#endif // THREADSAFETY_DISABLED
 #include <unordered_map>
 
 #include "blocks/blockmanager.h"
@@ -24,11 +26,13 @@ private:
 	
 	MPI_Win window;
 	
+#ifndef THREADSAFETY_DISABLED
 	/**
 	 * Lock slave memory
 	 * @todo Use a shared mutex, to allow multiple readers
 	 */
 	std::mutex slave_mutex;
+#endif // THREADSAFETY_DISABLED
 public:
 	SimpleGrid(Type type = FLOAT);
 	virtual ~SimpleGrid();

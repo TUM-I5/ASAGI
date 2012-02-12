@@ -30,8 +30,10 @@ add_definitions( -Wall )
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" )
 
 # Enable fortran
-# Call this before searching for mpi
-enable_language( Fortran )
+if( FORTRAN_SUPPORT )
+	# Call this before searching for mpi
+	enable_language( Fortran )
+endif()
 
 # Thread-safety
 if( THREADSAFETY_DISABLED )

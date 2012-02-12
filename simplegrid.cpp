@@ -92,7 +92,9 @@ void SimpleGrid::getAt(unsigned long x, unsigned long y, void* buf,
 			buf);
 	}
 	
+#ifndef THREADSAFETY_DISABLED
 	std::lock_guard<std::mutex> lock(slave_mutex);
+#endif // THREADSAFETY_DISABLED
 	
 	if (!blockManager.getIndex(block)) {
 		// We do not have this block, transfer it first
