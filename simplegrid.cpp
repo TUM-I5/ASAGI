@@ -92,6 +92,8 @@ void SimpleGrid::getAt(unsigned long x, unsigned long y, void* buf,
 			buf);
 	}
 	
+	std::lock_guard<std::mutex> lock(slave_mutex);
+	
 	if (!blockManager.getIndex(block)) {
 		// We do not have this block, transfer it first
 	

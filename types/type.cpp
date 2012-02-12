@@ -1,6 +1,15 @@
 #include "type.h"
 
 /**
+ * Check compatibility of the input file with this type.
+ */
+bool types::Type::check(io::NetCdf& file)
+{
+	// Default: everything is okay
+	return true;
+}
+
+/**
  * This is the "no-conversation" function. It simple copys a whole variable
  * from data to buf
  */

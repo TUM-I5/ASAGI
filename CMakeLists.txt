@@ -13,6 +13,7 @@ set( LibSources
 
 ##### User configuration #####
 option( STATIC_LIB "Compile asagi as static library" OFF )
+option( THREADSAFETY_DISABLED "Disable support for multiple threads on each node" OFF )
 option( FORTRAN_SUPPORT "Enable Fortran support" ON )
 option( EXAMPLES "Compile examples" OFF )
 
@@ -31,6 +32,11 @@ set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" )
 # Enable fortran
 # Call this before searching for mpi
 enable_language( Fortran )
+
+# Thread-safety
+if( THREADSAFETY_DISABLED )
+	add_definitions( -DTHREADSAFETY_DISABLED )
+endif()
 
 # Find MPI
 find_package( MPI REQUIRED )

@@ -16,14 +16,7 @@ public:
 	typedef void (Type::*converter_t)(void*, void*);
 	
 public:
-	/**
-	 * Check compatibility of the input file with this type.
-	 */
-	virtual bool check(io::NetCdf &file)
-	{
-		// Default: everything is okay
-		return true;
-	}
+	virtual bool check(io::NetCdf &file);
 	
 	/**
 	 * @return The size of the variable

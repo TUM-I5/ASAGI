@@ -1,6 +1,7 @@
 #ifndef SIMPLEGRID_H
 #define SIMPLEGRID_H
 
+#include <mutex>
 #include <unordered_map>
 
 #include "blocks/blockmanager.h"
@@ -22,6 +23,12 @@ private:
 	blocks::BlockManager blockManager;
 	
 	MPI_Win window;
+	
+	/**
+	 * Lock slave memory
+	 * @todo Use a shared mutex, to allow multiple readers
+	 */
+	std::mutex slave_mutex;
 public:
 	SimpleGrid(Type type = FLOAT);
 	virtual ~SimpleGrid();
