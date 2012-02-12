@@ -1,3 +1,5 @@
+#include <grid.h>
+
 #include <math.h>
 
 #ifdef PNG_ENABLED
@@ -5,8 +7,6 @@
 #endif
 
 #include "types/basictype.h"
-
-#include "grid.h"
 
 // TODO
 #define BLOCK_SIZE_X 50

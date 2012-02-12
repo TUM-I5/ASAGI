@@ -1,9 +1,9 @@
 #ifndef TYPES_BASICTYPE_H
 #define TYPES_BASICTYPE_H
 
-#include "io/netcdf.h"
-
 #include "type.h"
+
+#include "io/netcdf.h"
 
 namespace types {
 
