@@ -4,15 +4,11 @@
 #include <asagi.h>
 
 #include "fortran/pointerarray.h"
+#include "types/type.h"
 
 namespace io
 {
 	class NetCdf;
-}
-
-namespace types
-{
-	class Type;
 }
 
 class Grid : public asagi::Grid
@@ -76,7 +72,8 @@ public:
 	// These are not part of the offical interface
 	int c2f();
 private:
-	void* getAt(double x, double y);
+	void getAt(double x, double y, void* buf,
+		types::Type::converter_t converter);
 	
 	/**
 	 * This function is used by {@link exportPng(const char*)},
@@ -114,7 +111,8 @@ protected:
 	
 	virtual bool init() = 0;
 	
-	virtual void* getAt(unsigned long x, unsigned long y) = 0;
+	virtual void getAt(unsigned long x, unsigned long y, void* buf,
+		types::Type::converter_t converter) = 0;
 private:
 	static fortran::PointerArray<Grid> pointers;
 private:

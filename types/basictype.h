@@ -26,29 +26,29 @@ public:
 	
 	MPI_Datatype getMPIType();
 	
-	char getByte(void* buf)
+	void convertByte(void* data, void* buf)
 	{
-		return *static_cast<T*>(buf);
+		*static_cast<char*>(buf) = *static_cast<T*>(data);
 	}
 	
-	int getInt(void* buf)
+	void convertInt(void* data, void* buf)
 	{
-		return *static_cast<T*>(buf);
+		*static_cast<int*>(buf) = *static_cast<T*>(data);
 	}
 	
-	long getLong(void* buf)
+	void convertLong(void* data, void* buf)
 	{
-		return *static_cast<T*>(buf);
+		*static_cast<long*>(buf) = *static_cast<T*>(data);
 	}
 	
-	float getFloat(void* buf)
+	void convertFloat(void* data, void* buf)
 	{
-		return *static_cast<T*>(buf);
+		*static_cast<float*>(buf) = *static_cast<T*>(data);
 	}
 	
-	double getDouble(void* buf)
+	void convertDouble(void* data, void* buf)
 	{
-		return *static_cast<T*>(buf);
+		*static_cast<double*>(buf) = *static_cast<T*>(data);
 	}
 };
 

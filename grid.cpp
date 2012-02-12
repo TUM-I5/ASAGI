@@ -126,32 +126,47 @@ unsigned int Grid::getVarSize()
 
 char Grid::getByte(double x, double y)
 {
-	return m_type->getByte(getAt(x, y));
+	char buf;
+	getAt(x, y, &buf, &types::Type::convertByte);
+	
+	return buf;
 }
 
 int Grid::getInt(double x, double y)
 {
-	return m_type->getInt(getAt(x, y));
+	int buf;
+	getAt(x, y, &buf, &types::Type::convertInt);
+
+	return buf;
 }
 
 long Grid::getLong(double x, double y)
 {
-	return m_type->getLong(getAt(x, y));
+	long buf;
+	getAt(x, y, &buf, &types::Type::convertLong);
+
+	return buf;
 }
 
 float Grid::getFloat(double x, double y)
 {
-	return m_type->getFloat(getAt(x, y));
+	float buf;
+	getAt(x, y, &buf, &types::Type::convertFloat);
+
+	return buf;
 }
 
 double Grid::getDouble(double x, double y)
 {
-	return m_type->getDouble(getAt(x, y));
+	double buf;
+	getAt(x, y, &buf, &types::Type::convertDouble);
+
+	return buf;
 }
 
 void Grid::getBuf(double x, double y, void* buf)
 {
-	memcpy(buf, getAt(x, y), m_type->getSize());
+	getAt(x, y, buf, &types::Type::convertBuffer);
 }
 
 bool Grid::exportPng(const char* filename)
@@ -202,21 +217,26 @@ int Grid::c2f()
 	return id;
 }
 
-void* Grid::getAt(double x, double y)
+void Grid::getAt(double x, double y, void* buf,
+	types::Type::converter_t converter)
 {
 	x = round((x - offsetX) / scalingX);
 	y = round((y - offsetY) / scalingY);
-	
+
 	assert(x >= 0 && x < getXDim()
 		&& y >= 0 && y < getYDim());
-	
-	return getAt(static_cast<unsigned long>(x),
-		static_cast<unsigned long>(y));
+
+	getAt(static_cast<unsigned long>(x),
+		static_cast<unsigned long>(y),
+		buf, converter);
 }
 
 float Grid::getAtFloat(unsigned long x, unsigned long y)
 {
-	return m_type->getFloat(getAt(x, y));
+	float buf;
+	getAt(x, y, &buf, &types::Type::convertFloat);
+	
+	return buf;
 }
 
 MPI_Comm Grid::getMPICommunicator()

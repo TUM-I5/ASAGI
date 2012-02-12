@@ -29,7 +29,8 @@ public:
 protected:
 	bool init();
 	
-	void* getAt(unsigned long x, unsigned long y);
+	void getAt(unsigned long x, unsigned long y, void* buf,
+		types::Type::converter_t converter);
 };
 
 #endif // SIMPLEGRID_H

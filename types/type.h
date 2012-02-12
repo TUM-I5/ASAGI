@@ -13,6 +13,9 @@ namespace types
 class Type
 {
 public:
+	typedef void (Type::*converter_t)(void*, void*);
+	
+public:
 	/**
 	 * Check compatibility of the input file with this type.
 	 */
@@ -23,7 +26,7 @@ public:
 	}
 	
 	/**
-	 * @return The size of a single variable
+	 * @return The size of the variable
 	 */
 	virtual unsigned int getSize() = 0;
 	
@@ -37,11 +40,21 @@ public:
 	
 	virtual MPI_Datatype getMPIType() = 0;
 	
-	virtual char getByte(void* buf) = 0;
-	virtual int getInt(void* buf) = 0;
-	virtual long getLong(void* buf) = 0;
-	virtual float getFloat(void* buf) = 0;
-	virtual double getDouble(void* buf) = 0;
+	/**
+	 * Conversation functions:
+	 * The value is copied from data to buf, doing transformations between
+	 * basic types.<br>
+	 * E.g.: If the type of this class is "float" and the "convertDouble" is
+	 * called, *data should be a float and *buf a double.<br>
+	 * All these functions have the type "converter_t". This way it is
+	 * possible to pass them arround as pointers.
+	 */
+	virtual void convertByte(void* data, void* buf) = 0;
+	virtual void convertInt(void* data, void* buf) = 0;
+	virtual void convertLong(void* data, void* buf) = 0;
+	virtual void convertFloat(void* data, void* buf) = 0;
+	virtual void convertDouble(void* data, void* buf) = 0;
+	void convertBuffer(void* data, void* buf);
 };
 
 }

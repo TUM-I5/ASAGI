@@ -67,7 +67,8 @@ bool SimpleGrid::init()
 	return true;
 }
 
-void* SimpleGrid::getAt(unsigned long x, unsigned long y)
+void SimpleGrid::getAt(unsigned long x, unsigned long y, void* buf,
+	types::Type::converter_t converter)
 {
 	unsigned long blockSize = getXBlockSize() * getYBlockSize();
 	unsigned long block = getBlockByCoords(x, y);
@@ -84,10 +85,11 @@ void* SimpleGrid::getAt(unsigned long x, unsigned long y)
 		
 		block -= getMPIRank() * masterBlockCount;
 	
-		return &masterData[getType()->getSize() *
+		(getType()->*converter)(&masterData[getType()->getSize() *
 			(blockSize * block // jump to the correct block
 			+ y * getXBlockSize() + x) // correct value inside the block
-			];
+			],
+			buf);
 	}
 	
 	if (!blockManager.getIndex(block)) {
@@ -120,8 +122,9 @@ void* SimpleGrid::getAt(unsigned long x, unsigned long y)
 		MPI_Win_unlock(remoteRank, window);
 	}
 		
-	return &slaveData[getType()->getSize() *
+	(getType()->*converter)(&slaveData[getType()->getSize() *
 		(blockSize * block // correct block
 		+ y * getXBlockSize() + x) // correct value inside the block
-		];
+		],
+		buf);
 }
