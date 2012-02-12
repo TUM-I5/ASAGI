@@ -18,6 +18,7 @@ target_link_libraries( f90_simple
 	asagi
 	${MPI_Fortran_LIBRARIES} )
 set_target_properties( f90_simple PROPERTIES
+	LINKER_LANGUAGE Fortran
 	OUTPUT_NAME simple )
 
 # Buf
@@ -27,4 +28,5 @@ target_link_libraries( f90_buf
 	asagi
 	${MPI_Fortran_LIBRARIES} )
 set_target_properties( f90_buf PROPERTIES
+	LINKER_LANGUAGE Fortran
 	OUTPUT_NAME buf )
