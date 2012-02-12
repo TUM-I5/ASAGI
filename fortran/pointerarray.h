@@ -2,7 +2,7 @@
 #define FORTRANPOINTERARRAY_H
 
 #include <assert.h>
-#include <pthread.h>
+#include <mutex>
 #include <vector>
 
 #define NULL_INDEX -1
@@ -13,29 +13,16 @@ namespace fortran
 	{
 	private:
 		std::vector<T*> vec;
-		pthread_mutex_t vec_mutex;
+		std::mutex vec_mutex;
 	public:
-		PointerArray()
-		{
-			pthread_mutex_init(&vec_mutex, 0L);
-		}
-		
-		virtual ~PointerArray()
-		{
-			pthread_mutex_destroy(&vec_mutex);
-		}
-		
 		int add(T* const p)
 		{
-			int id;
+			// Lock vector, otherwise the id (return value)
+			// gets messed up
+			std::lock_guard<std::mutex> lock(vec_mutex);
 			
-			// Lock vector, otherwise the id gets messed up
-			pthread_mutex_lock(&vec_mutex);
 			vec.push_back(p);
-			id = vec.size() - 1;
-			pthread_mutex_unlock(&vec_mutex);
-			
-			return id;
+			return vec.size() - 1;
 		}
 		
 		T* get(int i)
