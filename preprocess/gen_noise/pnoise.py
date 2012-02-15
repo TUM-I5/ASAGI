@@ -34,8 +34,44 @@ def lerp(t, a, b):
   
 def fade(t):
     return t * t * t * (t * (t * 6 - 15) + 10)
+
+def grad1D(hash, x):
+    h = hash & 15
+    if h < 8:
+        u = x
+    else:
+        u = 0
+    if h < 4:
+        v = 0
+    elif h == 12 or h == 14:
+        v = x
+    else:
+        v = 0
+    if h & 1 != 0:
+        u = -u
+    if h & 2 != 0:
+        v = -v
+    return u + v
+
+def grad2D(hash, x, y):
+    h = hash & 15
+    if h < 8:
+        u = x
+    else:
+        u = y
+    if h < 4:
+        v = y
+    elif h == 12 or h == 14:
+        v = x
+    else:
+        v = 0
+    if h & 1 != 0:
+        u = -u
+    if h & 2 != 0:
+        v = -v
+    return u + v
   
-def grad(hash, x, y, z):
+def grad3D(hash, x, y, z):
     h = hash & 15
     if h < 8:
         u = x
@@ -52,8 +88,49 @@ def grad(hash, x, y, z):
     if h & 2 != 0:
         v = -v
     return u + v
-  
-def pnoise(x, y, z):
+
+def pnoise1D(x, y):
+    global p
+    X = int(math.floor(x)) & 255
+    Y = int(math.floor(y)) & 255
+    x -= math.floor(x)
+    y -= math.floor(y)
+    
+    u = fade(x)
+    v = fade(y)
+    
+    A =  p[X]
+    B =  p[(X + 1) & 255]
+    
+    gradA = grad1D(A, x)
+    gradB = grad1D(B, x-1)
+    return lerp(u, gradA, gradB)
+ 
+def pnoise2D(x, y):
+    global p
+    X = int(math.floor(x)) & 255
+    Y = int(math.floor(y)) & 255
+    x -= math.floor(x)
+    y -= math.floor(y)
+    
+    u = fade(x)
+    v = fade(y)
+    
+    A = p[X] + Y
+    B = p[(X + 1) & 255] + Y
+    
+    AA = p[A]
+    AB = p[(A + 1) & 255]
+    BA = p[B]
+    BB = p[(B + 1) & 255]
+    
+    gradAA = grad2D(AA, x,   y)
+    gradBA = grad2D(BA, x-1, y)
+    gradAB = grad2D(AB, x,   y-1)
+    gradBB = grad2D(BB, x-1, y-1)
+    return lerp(v, lerp(u, gradAA, gradBA), lerp(u, gradAB, gradBB)) 
+
+def pnoise3D(x, y, z):
     global p
     X = int(math.floor(x)) & 255
     Y = int(math.floor(y)) & 255
@@ -66,30 +143,73 @@ def pnoise(x, y, z):
     v = fade(y)
     w = fade(z)
     
-    A =  p[X] + Y
+    A = p[X] + Y
+    B = p[(X + 1) & 255] + Y
+    
     AA = p[A] + Z
     AB = p[(A + 1) & 255] + Z
-    B =  p[(X + 1) & 255] + Y
     BA = p[B] + Z
     BB = p[(B + 1) & 255] + Z
     
-    pAA = p[AA]
-    pAB = p[AB]
-    pBA = p[BA]
-    pBB = p[BB]
-    pAA1 = p[AA + 1]
-    pBA1 = p[BA + 1]
-    pAB1 = p[AB + 1]
-    pBB1 = p[BB + 1]
+    AAA = p[AA]
+    ABA = p[AB]
+    BAA = p[BA]
+    BBA = p[BB]
+    AAB = p[AA + 1]
+    BAB = p[BA + 1]
+    ABB = p[AB + 1]
+    BBB = p[BB + 1]
     
-    gradAA =  grad(pAA, x,   y,   z)
-    gradBA =  grad(pBA, x-1, y,   z)
-    gradAB =  grad(pAB, x,   y-1, z)
-    gradBB =  grad(pBB, x-1, y-1, z)
-    gradAA1 = grad(pAA1,x,   y,   z-1)
-    gradBA1 = grad(pBA1,x-1, y,   z-1)
-    gradAB1 = grad(pAB1,x,   y-1, z-1)
-    gradBB1 = grad(pBB1,x-1, y-1, z-1)
+    gradAAA = grad3D(AAA, x,   y,   z)
+    gradBAA = grad3D(BAA, x-1, y,   z)
+    gradABA = grad3D(ABA, x,   y-1, z)
+    gradBBA = grad3D(BBA, x-1, y-1, z)
+    gradAAB = grad3D(AAB,x,   y,   z-1)
+    gradBAB = grad3D(BAB,x-1, y,   z-1)
+    gradABB = grad3D(ABB,x,   y-1, z-1)
+    gradBBB = grad3D(BBB,x-1, y-1, z-1)
     return lerp(w, 
-    lerp(v, lerp(u, gradAA, gradBA), lerp(u, gradAB, gradBB)),
-    lerp(v, lerp(u, gradAA1,gradBA1),lerp(u, gradAB1,gradBB1)))  
+    lerp(v, lerp(u, gradAAA, gradBAA), lerp(u, gradABA, gradBBA)),
+    lerp(v, lerp(u, gradAAB, gradBAB), lerp(u, gradABB, gradBBB)))
+
+def noise1D(x, depth, roughness):
+	f = 1.0
+	n = 0.0
+	sum_f = 0.0
+	
+	for i in range(0, depth):
+		n += f * pnoise1D(x)
+		sum_f += f
+		f *= roughness
+		x *= 2.0
+	
+	return n / sum_f
+
+def noise2D(x, y, depth, roughness):
+	f = 1.0
+	n = 0.0
+	sum_f = 0.0
+	
+	for i in range(0, depth):
+		n += f * pnoise2D(x, y)
+		sum_f += f
+		f *= roughness
+		x *= 2.0
+		y *= 2.0
+	
+	return n / sum_f
+
+def noise3D(x, y, z, depth, roughness):
+	f = 1.0
+	n = 0.0
+	sum_f = 0.0
+	
+	for i in range(0, depth):
+		n += f * pnoise3D(x, y, z)
+		sum_f += f
+		f *= roughness
+		x *= 2.0
+		y *= 2.0
+		z *= 2.0
+	
+	return n / sum_f
