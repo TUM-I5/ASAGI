@@ -14,13 +14,13 @@ module asagi
       integer( kind=c_int )        :: grid_create
     end function grid_create
     
-    function grid_open( grid_id, filename, comm ) bind( c, name="f90grid_open" )
+    function grid_open_c( grid_id, filename, comm ) bind( c, name="f90grid_open" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value           :: grid_id
       character( kind=c_char ), dimension(*) :: filename
       integer( kind=c_int ), value           :: comm
-      logical( kind=c_bool )                 :: grid_open
-    end function grid_open
+      logical( kind=c_bool )                 :: grid_open_c
+    end function grid_open_c
     
     function grid_min_x( grid_id ) bind( c, name="f90grid_min_x" )
       use, intrinsic :: iso_c_binding
@@ -100,4 +100,21 @@ module asagi
     end subroutine grid_free
 
   end interface
+
+  contains
+    function grid_open( grid_id, filename, comm )
+      use, intrinsic :: iso_c_binding
+      use mpi
+      integer                  :: grid_id
+      character*(*)            :: filename
+      integer, value, optional :: comm
+      logical                  :: grid_open
+
+      if (.not. present( comm ) ) then
+        comm = MPI_COMM_WORLD
+      endif
+
+      grid_open = grid_open_c( grid_id, filename // c_null_char, comm )
+
+    end function grid_open
 end module asagi
