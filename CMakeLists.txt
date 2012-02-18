@@ -7,7 +7,7 @@ cmake_minimum_required( VERSION 2.8 )
 # Lib Sources
 set( LibSources
 	asagi.cpp
-	asagi_f95.cpp
+	asagi_f90.cpp
 	grid.cpp
 	simplegrid.cpp )
 
