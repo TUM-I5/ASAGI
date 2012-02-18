@@ -16,6 +16,8 @@ int main()
 		sum += grid->getFloat(INDEX2D[i*2], INDEX2D[i*2+1]);
 	}
 	
+	delete grid;
+	
 	// Force compiler to execute loop
 	if (sum < 0)
 		return 1;

@@ -20,5 +20,7 @@ int main (void)
 	grid->getBuf(5, 10, &value);
 	printf("Value at 5x10: %f\n", value);
 	
+	delete grid;
+	
 	return 0;
 }
