@@ -1,8 +1,8 @@
+#include "simplegrid.h"
+
 #include <malloc.h>
 
 #include "types/type.h"
-
-#include "simplegrid.h"
 
 SimpleGrid::SimpleGrid(Type type)
 	: Grid(type)
