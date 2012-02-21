@@ -107,14 +107,18 @@ module asagi
       use mpi
       integer                  :: grid_id
       character*(*)            :: filename
-      integer, value, optional :: comm
+      integer, optional        :: comm
       logical                  :: grid_open
 
-      if (.not. present( comm ) ) then
-        comm = MPI_COMM_WORLD
+      integer :: c !the communicator we send asagi
+
+      if ( present( comm ) ) then
+        c = comm
+      else
+        c = MPI_COMM_WORLD
       endif
 
-      grid_open = grid_open_c( grid_id, filename // c_null_char, comm )
+      grid_open = grid_open_c( grid_id, filename // c_null_char, c )
 
     end function grid_open
 end module asagi
