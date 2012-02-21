@@ -1,14 +1,14 @@
 #ifndef SIMPLEGRID_H
 #define SIMPLEGRID_H
 
+#include "grid.h"
+
 #ifndef THREADSAFETY_DISABLED
 #include <mutex>
 #endif // THREADSAFETY_DISABLED
 #include <unordered_map>
 
 #include "blocks/blockmanager.h"
-
-#include "grid.h"
 
 class SimpleGrid : public Grid
 {
