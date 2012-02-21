@@ -1,4 +1,5 @@
 #include "type.h"
+#include <cstring>
 
 /**
  * Check compatibility of the input file with this type.
