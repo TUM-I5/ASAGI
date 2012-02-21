@@ -15,7 +15,7 @@ SimpleGrid::SimpleGrid(Type type)
 
 SimpleGrid::~SimpleGrid()
 {
-	if (window == MPI_WIN_NULL)
+	if (window != MPI_WIN_NULL)
 		MPI_Win_free(&window);
 	
 	MPI_Free_mem(masterData);
