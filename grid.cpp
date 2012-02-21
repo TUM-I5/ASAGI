@@ -101,22 +101,22 @@ bool Grid::open(const char* filename, MPI_Comm comm)
 
 double Grid::getXMin()
 {
-	return offsetX + std::min(0., dimX * scalingX);
+	return offsetX + std::min(scalingX * (0. - 0.5), scalingX * (dimX - 0.5));
 }
 
 double Grid::getYMin()
 {
-	return offsetY + std::min(0., dimY * scalingY);
+	return offsetY + std::min(scalingY * (0. - 0.5), scalingY * (dimY - 0.5));
 }
 
 double Grid::getXMax()
 {
-	return offsetX + std::max(0., dimX * scalingX);
+	return offsetX + std::max(scalingX * (0. - 0.5), scalingX * (dimX - 0.5));
 }
 
 double Grid::getYMax()
 {
-	return offsetY + std::max(0., dimY * scalingY);
+	return offsetY + std::max(scalingY * (0. - 0.5), scalingY * (dimY - 0.5));
 }
 
 unsigned int Grid::getVarSize()

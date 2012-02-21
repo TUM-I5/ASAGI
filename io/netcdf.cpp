@@ -1,5 +1,6 @@
 #include <math.h>
 #include <netcdf>
+#include <limits>
 
 #include "netcdf.h"
 
@@ -84,8 +85,8 @@ double io::NetCdf::getXScaling()
 	NcVar x = m_file->getVar("x");
 	unsigned long dim = getXDim();
 	
-	if (x.isNull())
-		return 1;
+	if (dim < 2)
+		return std::numeric_limits<double>::infinity();
 	
 	index[0] = 0;
 	x.getVar(index, &first);
@@ -102,8 +103,8 @@ double io::NetCdf::getYScaling()
 	NcVar y = m_file->getVar("y");
 	unsigned long dim = getYDim();
 	
-	if (y.isNull())
-		return 1;
+	if (dim < 2)
+		return std::numeric_limits<double>::infinity();
 	
 	index[0] = 0;
 	y.getVar(index, &first);
