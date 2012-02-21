@@ -91,6 +91,7 @@ void SimpleGrid::getAt(unsigned long x, unsigned long y, void* buf,
 			+ y * getXBlockSize() + x) // correct value inside the block
 			],
 			buf);
+		return;
 	}
 	
 #ifndef THREADSAFETY_DISABLED
