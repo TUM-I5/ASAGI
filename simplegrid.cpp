@@ -1,6 +1,8 @@
 #include "simplegrid.h"
 
+#include <cassert>
 #include <malloc.h>
+#include <iostream>
 
 #include "types/type.h"
 
@@ -75,6 +77,7 @@ void SimpleGrid::getAt(unsigned long x, unsigned long y, void* buf,
 	unsigned long block = getBlockByCoords(x, y);
 	int remoteRank;
 	unsigned long remoteOffset;
+	int mpiResult;
 	
 	// Offset inside the block
 	x %= getXBlockSize();
@@ -113,10 +116,11 @@ void SimpleGrid::getAt(unsigned long x, unsigned long y, void* buf,
 		// I think we can use nocheck, because we only read
 		// -> no conflicting locks
 		// TODO check this
-		MPI_Win_lock(MPI_LOCK_SHARED, remoteRank,
+		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, remoteRank,
 			MPI_MODE_NOCHECK, window);
+		assert(mpiResult == MPI_SUCCESS);
 		
-		MPI_Get(&slaveData[getType()->getSize() * blockSize * block],
+		mpiResult = MPI_Get(&slaveData[getType()->getSize() * blockSize * block],
 			blockSize,
 			getType()->getMPIType(),
 			remoteRank,
@@ -124,8 +128,10 @@ void SimpleGrid::getAt(unsigned long x, unsigned long y, void* buf,
 			blockSize,
 			getType()->getMPIType(),
 			window);
+		assert(mpiResult == MPI_SUCCESS);
 		
-		MPI_Win_unlock(remoteRank, window);
+		mpiResult =MPI_Win_unlock(remoteRank, window);
+		assert(mpiResult == MPI_SUCCESS);
 	}
 		
 	(getType()->*converter)(&slaveData[getType()->getSize() *

@@ -42,7 +42,15 @@ endif()
 
 # Find MPI
 find_package( MPI REQUIRED )
-include_directories( ${MPI_C_INCLUDE_PATH} SYSTEM )
+if( ${MPI_LIBRARY} )
+	include_directories( ${MPI_C_INCLUDE_PATH} SYSTEM )
+else()
+	#Workaround for stupid mpicc/mpicxx
+	get_filename_component( MPI_BASE ${MPI_C_COMPILER} PATH )
+	set( MPI_BASE ${MPI_BASE}/.. )
+	include_directories( ${MPI_BASE}/include )
+	link_directories( ${MPI_BASE}/lib )
+endif()
 set( CMAKE_C_COMPILER ${MPI_C_COMPILER} )
 set( CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER} )
 set( CMAKE_Fortran_COMPILER ${MPI_Fortran_COMPILER} )
