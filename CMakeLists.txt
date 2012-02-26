@@ -42,7 +42,7 @@ endif()
 
 # Find MPI
 find_package( MPI REQUIRED )
-if( ${MPI_LIBRARY} )
+if( MPI_LIBRARY )
 	include_directories( ${MPI_C_INCLUDE_PATH} SYSTEM )
 else()
 	#Workaround for stupid mpicc/mpicxx
