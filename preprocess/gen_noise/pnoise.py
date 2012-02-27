@@ -177,7 +177,7 @@ def noise1D(x, depth, roughness):
 	n = 0.0
 	sum_f = 0.0
 	
-	for i in range(0, depth):
+	for i in range(0, depth + 1):
 		n += f * pnoise1D(x)
 		sum_f += f
 		f *= roughness
@@ -190,7 +190,7 @@ def noise2D(x, y, depth, roughness):
 	n = 0.0
 	sum_f = 0.0
 	
-	for i in range(0, depth):
+	for i in range(0, depth + 1):
 		n += f * pnoise2D(x, y)
 		sum_f += f
 		f *= roughness
@@ -204,7 +204,7 @@ def noise3D(x, y, z, depth, roughness):
 	n = 0.0
 	sum_f = 0.0
 	
-	for i in range(0, depth):
+	for i in range(0, depth + 1):
 		n += f * pnoise3D(x, y, z)
 		sum_f += f
 		f *= roughness
