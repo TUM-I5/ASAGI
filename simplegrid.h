@@ -34,14 +34,14 @@ private:
 	std::mutex slave_mutex;
 #endif // THREADSAFETY_DISABLED
 public:
-	SimpleGrid(Type type = FLOAT);
+	SimpleGrid(GridContainer &container);
 	virtual ~SimpleGrid();
 	
 protected:
-	bool init();
+	asagi::Grid::Error init();
 	
-	void getAt(unsigned long x, unsigned long y, void* buf,
-		types::Type::converter_t converter);
+	void getAt(void* buf, types::Type::converter_t converter,
+		unsigned long x, unsigned long y = 0, unsigned long z = 0);
 };
 
 #endif // SIMPLEGRID_H

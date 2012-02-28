@@ -1,14 +1,19 @@
 #include <math.h>
-#include <netcdf>
 #include <limits>
 
 #include "netcdf.h"
 
+#include "debug/dbg.h"
+
+#define DIM_NOT_MAPPED "<not mapped>"
+
+using namespace asagi;
+
 using namespace netCDF;
 using namespace netCDF::exceptions;
 
-io::NetCdf::NetCdf(const char* filename) :
-	m_filename(filename)
+io::NetCdf::NetCdf(const char* filename, int rank) :
+	m_filename(filename), m_rank(rank)
 {
 	m_file = 0L;
 }
@@ -18,7 +23,7 @@ io::NetCdf::~NetCdf()
 	delete m_file;
 }
 
-bool io::NetCdf::open()
+Grid::Error io::NetCdf::open(const char* varname)
 {
 	try {
 		m_file = new NcFile(m_filename, NcFile::read);
@@ -26,17 +31,41 @@ bool io::NetCdf::open()
 		// Could not open file
 		
 		m_file = 0L;
-		return false;
+		return Grid::NOT_OPEN;
 	}
 	
-	NcVar z = m_file->getVar("z");
+	m_variable = m_file->getVar(varname);
 		
-	if (z.isNull())
-		return false;
+	if (m_variable.isNull())
+		return Grid::VAR_NOT_FOUND;
 	
-	m_dimSwitched = (z.getDim(0) != m_file->getDim("y"));
+	m_dimensions = m_variable.getDimCount();
+	switch (m_dimensions) {
+	case 1:
+		m_nameX = m_variable.getDim(0).getName();
+		m_nameY = DIM_NOT_MAPPED;
+		m_nameZ = DIM_NOT_MAPPED;
+		break;
+	case 2:
+		m_nameX = m_variable.getDim(1).getName();
+		m_nameY = m_variable.getDim(0).getName();
+		m_nameZ = DIM_NOT_MAPPED;
+		break;
+	case 3:
+		m_nameX = m_variable.getDim(2).getName();
+		m_nameY = m_variable.getDim(1).getName();
+		m_nameZ = m_variable.getDim(0).getName();
+		break;
+	default:
+		dbgDebug(m_rank) << "Unsupported number of variable dimensions:"
+			<< m_dimensions;
+		return Grid::UNSUPPORTED_DIMENSIONS;
+	}
 	
-	return true;
+	dbgDebug(m_rank) << "Dimension mapping: x :=" << m_nameX << "y :="
+		<< m_nameY << "z :=" << m_nameZ;
+	
+	return Grid::SUCCESS;
 }
 
 bool io::NetCdf::isOpen() const
@@ -46,18 +75,27 @@ bool io::NetCdf::isOpen() const
 
 unsigned long io::NetCdf::getXDim()
 {
-	return m_file->getDim("x").getSize();
+	return m_file->getDim(m_nameX).getSize();
 }
 
 unsigned long io::NetCdf::getYDim()
 {
-	return m_file->getDim("y").getSize();
+	if (m_dimensions < 2)
+		return 1;
+	return m_file->getDim(m_nameY).getSize();
+}
+
+unsigned long io::NetCdf::getZDim()
+{
+	if (m_dimensions < 3)
+		return 1;
+	return m_file->getDim(m_nameZ).getSize();
 }
 
 double io::NetCdf::getXOffset()
 {
 	double result;
-	NcVar x = m_file->getVar("x");
+	NcVar x = m_file->getVar(m_nameX);
 	
 	if (x.isNull())
 		return 0;
@@ -69,7 +107,7 @@ double io::NetCdf::getXOffset()
 double io::NetCdf::getYOffset()
 {
 	double result;
-	NcVar y = m_file->getVar("y");
+	NcVar y = m_file->getVar(m_nameY);
 	
 	if (y.isNull())
 		return 0;
@@ -78,15 +116,32 @@ double io::NetCdf::getYOffset()
 	return result;
 }
 
+double io::NetCdf::getZOffset()
+{
+	double result;
+	NcVar z = m_file->getVar(m_nameZ);
+	
+	if (z.isNull())
+		return 0;
+	
+	z.getVar(std::vector<size_t>(1, 0), &result);
+	return result;
+}
+
 double io::NetCdf::getXScaling()
 {
 	double first, last;
 	std::vector<size_t> index(1);
-	NcVar x = m_file->getVar("x");
-	unsigned long dim = getXDim();
+	NcVar x;
+	unsigned long dim;
 	
-	if (dim < 2)
+	dim = getXDim();
+	if (dim == 1)
 		return std::numeric_limits<double>::infinity();
+	
+	x = m_file->getVar(m_nameX);
+	if (x.isNull())
+		return 1;
 	
 	index[0] = 0;
 	x.getVar(index, &first);
@@ -100,11 +155,20 @@ double io::NetCdf::getYScaling()
 {
 	double first, last;
 	std::vector<size_t> index(1);
-	NcVar y = m_file->getVar("y");
-	unsigned long dim = getYDim();
+	NcVar y;
+	unsigned long dim;
 	
-	if (dim < 2)
+	if (m_dimensions < 2)
+		return 0.;
+	
+	dim = getYDim();
+	
+	if (dim == 1)
 		return std::numeric_limits<double>::infinity();
+	
+	y = m_file->getVar(m_nameY);
+	if (y.isNull())
+		return 1;
 	
 	index[0] = 0;
 	y.getVar(index, &first);
@@ -114,57 +178,33 @@ double io::NetCdf::getYScaling()
 	return (last - first) / (dim - 1);
 }
 
-template<> void io::NetCdf::getVar<void>(void* var,
-	size_t xoffset, size_t yoffset,
-	size_t xsize, size_t ysize)
+double io::NetCdf::getZScaling()
 {
-	// TODO
-	
+	double first, last;
+	std::vector<size_t> index(1);
 	NcVar z;
-	unsigned int bytes = getVarSize();
-	std::vector<size_t> start(2, 0);
-	std::vector<size_t> count(2);
-	std::vector<ptrdiff_t> stride(2, 1);
-	std::vector<ptrdiff_t> imap(2);
+	unsigned long dim;
 	
-	if (m_dimSwitched) {
-		count[0] = getXDim();
-		count[1] = getYDim();
-		
-		imap[0] = bytes;
-		imap[1] = count[0] * bytes;
-	} else {
-		count[0] = getYDim();
-		count[1] = getXDim();
-		
-		imap[0] = count[1] * bytes;
-		imap[1] = bytes;
-	}
+	if (m_dimensions < 3)
+		return 0.;
 	
-	z = m_file->getVar("z");
+	dim = getZDim();
+	if (dim == 1)
+		return std::numeric_limits<double>::infinity();
 	
-	z.getVar(start, count, stride, imap, var);
+	z = m_file->getVar(m_nameZ);
+	if (z.isNull())
+		return 1;
+	
+	index[0] = 0;
+	z.getVar(index, &first);
+	index[0] = dim - 1;
+	z.getVar(index, &last);
+	
+	return (last - first) / (dim - 1);
 }
 
 unsigned int io::NetCdf::getVarSize()
 {
-	return m_file->getVar("z").getType().getSize();
-}
-
-template<> void io::NetCdf::getDefault<void>(void* defaultValue)
-{
-	NcVar z;
-	NcVarAtt att;
-	
-	z = m_file->getVar("z");
-	
-	try {
-		att = z.getAtt("missing_value");
-	} catch (NcException& e) {
-		// Attribute missing
-		memset(defaultValue, 0, z.getType().getSize());
-		return;
-	}
-	
-	att.getValues(defaultValue);
+	return m_variable.getType().getSize();
 }

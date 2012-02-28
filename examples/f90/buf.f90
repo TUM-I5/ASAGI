@@ -15,13 +15,18 @@ program buf
   
   grid_id = grid_create( GRID_FLOAT )
 
-  if (.not. grid_open( grid_id, "../data/tohoku_1850m_bath.nc", MPI_COMM_WORLD )) then
+  if( grid_init( grid_id ) /= GRID_SUCCESS ) then
+    write (*,*) 'Failed to init grid'
+    call exit(1)
+  end if
+
+  if( grid_open( grid_id, "../data/tohoku_1850m_bath.nc" ) /= GRID_SUCCESS ) then
     write (*,*) 'Could not load file'
     call exit(1)
   end if
 
   allocate( value )
-  call grid_get_buf( grid_id, -1.d+0, -5005.32d+0, c_loc( value ) )
+  call grid_get_buf_2d( grid_id, c_loc( value ), -1.d+0, -5005.32d+0 )
   write (*,*) "Value at -1x-5005.32:", value
 
   call grid_free( grid_id )

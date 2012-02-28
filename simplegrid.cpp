@@ -2,12 +2,13 @@
 
 #include <cassert>
 #include <malloc.h>
-#include <iostream>
+#include <stdlib.h>
 
 #include "types/type.h"
+#include "debug/dbg.h"
 
-SimpleGrid::SimpleGrid(Type type)
-	: Grid(type)
+SimpleGrid::SimpleGrid(GridContainer &container)
+	: Grid(container)
 {
 	masterData = 0L;
 	slaveData = 0L;
@@ -24,14 +25,15 @@ SimpleGrid::~SimpleGrid()
 	free(slaveData);
 }
 
-bool SimpleGrid::init()
+asagi::Grid::Error SimpleGrid::init()
 {
-	unsigned long blockSize = getXBlockSize() * getYBlockSize();
-	unsigned long blockX, blockY;
+	unsigned long blockSize = getXBlockSize() * getYBlockSize()
+		* getZBlockSize();
+	unsigned long blockX, blockY, blockZ;
 	
 	masterBlockCount = (getBlockCount() + getMPISize() - 1) / getMPISize();
 
-	MPI_Alloc_mem(getType()->getSize() * blockSize * masterBlockCount,
+	MPI_Alloc_mem(getType().getSize() * blockSize * masterBlockCount,
 		MPI_INFO_NULL, &masterData);
 	
 	// Load the blocks from the file, which we control
@@ -40,58 +42,62 @@ bool SimpleGrid::init()
 			// Last process may controll less blocks
 			break;
 		
-		// Get x and y coordinates of the block
-		getBlockPos(i + getMPIRank() * masterBlockCount, blockX, blockY);
+		// Get x, y and z coordinates of the block
+		getBlockPos(i + getMPIRank() * masterBlockCount,
+			blockX, blockY, blockZ);
 		
-		// Get x and y coordinates of the first value in the block
+		// Get x, y and z coordinates of the first value in the block
 		blockX = blockX * getXBlockSize();
 		blockY = blockY * getYBlockSize();
+		blockZ = blockZ * getZBlockSize();
 		
-		getType()->load(*getInputFile(),
-			blockX, blockY,
-			getXBlockSize(), getYBlockSize(),
-			&masterData[getType()->getSize() * blockSize * i]);
+		getType().load(getInputFile(),
+			blockX, blockY, blockZ,
+			getXBlockSize(), getYBlockSize(), getZBlockSize(),
+			&masterData[getType().getSize() * blockSize * i]);
 	}
 	
 	// Create the mpi window for the master data
 	if (MPI_Win_create(masterData,
-		getType()->getSize() * blockSize * masterBlockCount,
-		getType()->getSize(),
+		getType().getSize() * blockSize * masterBlockCount,
+		getType().getSize(),
 		MPI_INFO_NULL,
 		getMPICommunicator(),
 		&window) != MPI_SUCCESS)
-		return false;
+		return asagi::Grid::MPI_ERROR;
 	
 	// Allocate memory for slave blocks
 	slaveData = static_cast<unsigned char*>(
-		malloc(getType()->getSize() * blockSize * getBlocksPerNode()));
+		malloc(getType().getSize() * blockSize * getBlocksPerNode()));
 	blockManager.init(getBlocksPerNode());
 	
-	return true;
+	return asagi::Grid::SUCCESS;
 }
 
-void SimpleGrid::getAt(unsigned long x, unsigned long y, void* buf,
-	types::Type::converter_t converter)
+void SimpleGrid::getAt(void* buf, types::Type::converter_t converter,
+	unsigned long x, unsigned long y, unsigned long z)
 {
-	unsigned long blockSize = getXBlockSize() * getYBlockSize();
-	unsigned long block = getBlockByCoords(x, y);
+	unsigned long blockSize = getXBlockSize() * getYBlockSize()
+		* getZBlockSize();
+	unsigned long block = getBlockByCoords(x, y, z);
 	int remoteRank;
 	unsigned long remoteOffset;
-	int mpiResult;
+	int mpiResult; NDBG_UNUSED(mpiResult);
 	
 	// Offset inside the block
 	x %= getXBlockSize();
 	y %= getYBlockSize();
+	z %= getZBlockSize();
 	
 	if ((block >= getMPIRank() * masterBlockCount)
 		&& (block < (getMPIRank() + 1) * masterBlockCount)) {
 		// Nice, this is a block where we are the master
 		
 		block -= getMPIRank() * masterBlockCount;
-	
-		(getType()->*converter)(&masterData[getType()->getSize() *
+		
+		(getType().*converter)(&masterData[getType().getSize() *
 			(blockSize * block // jump to the correct block
-			+ y * getXBlockSize() + x) // correct value inside the block
+			+ (z * getYBlockSize() + y) * getXBlockSize() + x) // correct value inside the block
 			],
 			buf);
 		return;
@@ -120,23 +126,23 @@ void SimpleGrid::getAt(unsigned long x, unsigned long y, void* buf,
 			MPI_MODE_NOCHECK, window);
 		assert(mpiResult == MPI_SUCCESS);
 		
-		mpiResult = MPI_Get(&slaveData[getType()->getSize() * blockSize * block],
+		mpiResult = MPI_Get(&slaveData[getType().getSize() * blockSize * block],
 			blockSize,
-			getType()->getMPIType(),
+			getType().getMPIType(),
 			remoteRank,
 			remoteOffset * blockSize,
 			blockSize,
-			getType()->getMPIType(),
+			getType().getMPIType(),
 			window);
 		assert(mpiResult == MPI_SUCCESS);
 		
-		mpiResult =MPI_Win_unlock(remoteRank, window);
+		mpiResult = MPI_Win_unlock(remoteRank, window);
 		assert(mpiResult == MPI_SUCCESS);
 	}
 		
-	(getType()->*converter)(&slaveData[getType()->getSize() *
+	(getType().*converter)(&slaveData[getType().getSize() *
 		(blockSize * block // correct block
-		+ y * getXBlockSize() + x) // correct value inside the block
+		+ (z * getYBlockSize() + y) * getXBlockSize() + x) // correct value inside the block
 		],
 		buf);
 }

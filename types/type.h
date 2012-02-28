@@ -1,7 +1,9 @@
 #ifndef TYPES_TYPE_H
 #define TYPES_TYPE_H
 
-#include <mpi.h>
+#include <asagi.h>
+
+#include <cstring>
 
 namespace io {
 	class NetCdf;
@@ -16,7 +18,14 @@ public:
 	typedef void (Type::*converter_t)(void*, void*);
 	
 public:
-	virtual bool check(io::NetCdf &file);
+	/**
+	 * Check compatibility of the input file with this type.
+	 */
+	virtual asagi::Grid::Error check(io::NetCdf &file)
+	{
+		// Default: everything is okay
+		return asagi::Grid::SUCCESS;
+	}
 	
 	/**
 	 * @return The size of the variable
@@ -27,8 +36,8 @@ public:
 	 * Loads a block form the netcdf file into the buffer
 	 */
 	virtual void load(io::NetCdf &file,
-		unsigned long xoffset, unsigned long yoffset,
-		unsigned long xsize, unsigned long ysize,
+		unsigned long xoffset, unsigned long yoffset, unsigned long zoffset,
+		unsigned long xsize, unsigned long ysize, unsigned long zsize,
 		void *buf) = 0;
 	
 	virtual MPI_Datatype getMPIType() = 0;
@@ -47,7 +56,14 @@ public:
 	virtual void convertLong(void* data, void* buf) = 0;
 	virtual void convertFloat(void* data, void* buf) = 0;
 	virtual void convertDouble(void* data, void* buf) = 0;
-	void convertBuffer(void* data, void* buf);
+	/**
+	 * This is the "no-conversation" function. It simple copys a whole
+	 * variable from data to buf
+	 */
+	void convertBuffer(void* data, void* buf)
+	{
+		memcpy(buf, data, getSize());
+	}
 };
 
 }

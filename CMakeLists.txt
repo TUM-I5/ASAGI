@@ -9,6 +9,7 @@ set( LibSources
 	asagi.cpp
 	asagi_f90.cpp
 	grid.cpp
+	gridcontainer.cpp
 	simplegrid.cpp )
 
 ##### User configuration #####
@@ -16,6 +17,7 @@ option( STATIC_LIB "Compile asagi as static library" OFF )
 option( THREADSAFETY_DISABLED "Disable support for multiple threads on each node" OFF )
 option( FORTRAN_SUPPORT "Enable Fortran support" ON )
 option( EXAMPLES "Compile examples" OFF )
+option( TESTS "Test library" OFF )
 
 ##### Other configuration #####
 # Additional cmake modules
@@ -48,7 +50,7 @@ else()
 	#Workaround for stupid mpicc/mpicxx
 	get_filename_component( MPI_BASE ${MPI_C_COMPILER} PATH )
 	set( MPI_BASE ${MPI_BASE}/.. )
-	include_directories( ${MPI_BASE}/include )
+	include_directories( ${MPI_BASE}/include SYSTEM )
 	link_directories( ${MPI_BASE}/lib )
 endif()
 set( CMAKE_C_COMPILER ${MPI_C_COMPILER} )
@@ -74,6 +76,7 @@ include_directories( ${CMAKE_SOURCE_DIR} )
 
 # Add static libaries
 add_subdirectory( blocks )
+add_subdirectory( debug )
 add_subdirectory( fortran )
 add_subdirectory( io )
 add_subdirectory( types )
@@ -89,9 +92,11 @@ if( DOXYGEN_FOUND )
 		COMMENT "Generating API documentation with Doxygen" VERBATIM )
 endif( DOXYGEN_FOUND )
 
-# Add tests
-enable_testing()
-#add_subdirectory( tests )
+if( TESTS )
+	# Add tests
+	enable_testing()
+	add_subdirectory( tests )
+endif()
 
 if( EXAMPLES )
 	# Add examples

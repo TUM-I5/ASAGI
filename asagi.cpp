@@ -1,7 +1,6 @@
 #include <asagi.h>
 
-#include "grid.h"
-#include "simplegrid.h"
+#include "gridcontainer.h"
 
 // Empty destructor
 asagi::Grid::~Grid()
@@ -9,71 +8,151 @@ asagi::Grid::~Grid()
 }
 
 // Static c++ functions
-asagi::Grid* asagi::Grid::create(Type type)
+asagi::Grid* asagi::Grid::create(Type type, unsigned int hint,
+	unsigned int levels)
 {
-	return new SimpleGrid(type);
+	return new GridContainer(type, levels);
 }
 
 // C interfae
-grid_handle* grid_create(grid_type type)
+
+// Init functions
+
+grid_handle* grid_create(grid_type type, unsigned int hint, unsigned int levels)
 {
-	return asagi::Grid::create(type);
+	return asagi::Grid::create(type, hint, levels);
 }
 
-int grid_open(grid_handle* handle, const char* filename, MPI_Comm comm)
+grid_error grid_init(grid_handle* handle, MPI_Comm comm)
 {
-	return handle->open(filename, comm);
+	return handle->init(comm);
 }
+
+grid_error grid_set_param(grid_handle* handle, const char* name,
+	const char* value, unsigned int level)
+{
+	return handle->setParam(name, value, level);
+}
+
+grid_error grid_open(grid_handle* handle, const char* filename,
+	unsigned int level)
+{
+	return handle->open(filename, level);
+}
+
+// Min/Max functions
 
 double grid_min_x(grid_handle* handle)
 {
 	return handle->getXMin();
 }
-
 double grid_min_y(grid_handle* handle)
 {
 	return handle->getYMin();
 }
-
 double grid_max_x(grid_handle* handle)
 {
 	return handle->getXMax();
 }
-
 double grid_max_y(grid_handle* handle)
 {
 	return handle->getYMax();
 }
 
-char grid_get_byte(grid_handle* handle, double x, double y)
+// 1d functions
+
+char grid_get_byte_1d(grid_handle* handle, double x, unsigned int level)
 {
-	return handle->getByte(x, y);
+	return handle->getByte1D(x, level);
+}
+int grid_get_int_1d(grid_handle* handle, double x, unsigned int level)
+{
+	return handle->getInt1D(x, level);
+}
+long grid_get_long_1d(grid_handle* handle, double x, unsigned int level)
+{
+	return handle->getLong1D(x, level);
+}
+float grid_get_float_1d(grid_handle* handle, double x, unsigned int level)
+{
+	return handle->getFloat1D(x, level);
+}
+double grid_get_double_1d(grid_handle* handle, double x, unsigned int level)
+{
+	return handle->getDouble1D(x, level);
+}
+void grid_get_buf_1d(grid_handle* handle, void* buf, double x,
+	unsigned int level)
+{
+	handle->getBuf1D(buf, x, level);
 }
 
-int grid_get_int(grid_handle* handle, double x, double y)
+// 2d functions
+
+char grid_get_byte_2d(grid_handle* handle, double x, double y,
+	unsigned int level)
 {
-	return handle->getInt(x, y);
+	return handle->getByte2D(x, y, level);
+}
+int grid_get_int_2d(grid_handle* handle, double x, double y, unsigned int level)
+{
+	return handle->getInt2D(x, y, level);
+}
+long grid_get_long_2d(grid_handle* handle, double x, double y,
+	unsigned int level)
+{
+	return handle->getLong2D(x, y, level);
+}
+float grid_get_float_2d(grid_handle* handle, double x, double y,
+	unsigned int level)
+{
+	return handle->getFloat2D(x, y, level);
+}
+double grid_get_double_2d(grid_handle* handle, double x, double y,
+	unsigned int level)
+{
+	return handle->getDouble2D(x, y, level);
+}
+void grid_get_buf_2d(grid_handle* handle, void* buf, double x, double y,
+	unsigned int level)
+{
+	handle->getBuf2D(buf, x, y, level);
 }
 
-long grid_get_long(grid_handle* handle, double x, double y)
+// 3d functions
+
+char grid_get_byte_3d(grid_handle* handle, double x, double y, double z,
+	unsigned int level)
 {
-	return handle->getLong(x, y);
+	return handle->getByte3D(x, y, z, level);
+}
+int grid_get_int_3d(grid_handle* handle, double x, double y, double z,
+	unsigned int level)
+{
+	return handle->getInt3D(x, y, z, level);
+}
+long grid_get_long_3d(grid_handle* handle, double x, double y, double z,
+	unsigned int level)
+{
+	return handle->getLong3D(x, y, z, level);
+}
+float grid_get_float_3d(grid_handle* handle, double x, double y, double z,
+	unsigned int level)
+{
+	return handle->getFloat3D(x, y, z, level);
+}
+double grid_get_double_3d(grid_handle* handle, double x, double y, double z,
+	unsigned int level)
+{
+	return handle->getDouble3D(x, y, z, level);
+}
+void grid_get_buf_3d(grid_handle* handle, void* buf, double x, double y, double z,
+	unsigned int level)
+{
+	handle->getBuf3D(buf, x, y, z, level);
 }
 
-float grid_get_float(grid_handle* handle, double x, double y)
-{
-	return handle->getFloat(x, y);
-}
-
-double grid_get_double(grid_handle* handle, double x, double y)
-{
-	return handle->getDouble(x, y);
-}
-
-void grid_get_buf(grid_handle* handle, double x, double y, void* buf)
-{
-	handle->getBuf(x, y, buf);
-}
+// destructor
 
 void grid_free(grid_handle* handle)
 {

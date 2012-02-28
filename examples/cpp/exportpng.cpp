@@ -14,7 +14,12 @@ int main (int argc, char **argv)
 	
 	grid = Grid::create(Grid::FLOAT);
 	
-	if (!grid->open("../data/noise.nc")) {
+	if (grid->init() != Grid::SUCCESS) {
+		printf("Error initializing grid");
+		return 1;
+	}
+	
+	if (grid->open("../data/noise.nc") != Grid::SUCCESS) {
 		printf("Could not load file\n");
 		return 1;
 	}
@@ -28,9 +33,35 @@ int main (int argc, char **argv)
 	
 	delete grid;
 	
+	grid = Grid::create(Grid::FLOAT);
+	
+	if (grid->init() != Grid::SUCCESS) {
+		printf("Error initializing grid");
+		return 1;
+	}
+	
+	if (grid->open("../data/1dgrid.nc") != Grid::SUCCESS) {
+		printf("Could not load file\n");
+		return 1;
+	}
+	
+	if (rank == 0) {
+		if (!grid->exportPng("../data/1dgrid.png")) {
+			printf("Could not write png file\n");
+			return 1;
+		}
+	}
+	
+	delete grid;
+	
 	grid = Grid::create();
 	
-	if (!grid->open("../data/tohoku_1850m_bath.nc")) {
+	if (grid->init() != Grid::SUCCESS) {
+		printf("Error initializing grid");
+		return 1;
+	}
+	
+	if (grid->open("../data/tohoku_1850m_bath.nc") != Grid::SUCCESS) {
 	//if (!grid->open("../data/noise.nc")) {
 		printf("Could not load file\n");
 		return 1;

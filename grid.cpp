@@ -1,172 +1,200 @@
-#include <grid.h>
+#include "grid.h"
+#include "gridcontainer.h"
 
 #include <math.h>
+#include <limits>
 
 #ifdef PNG_ENABLED
 #include "io/png.h"
 #endif
 
 #include "types/basictype.h"
+#include "debug/dbg.h"
 
 // TODO
-#define BLOCK_SIZE_X 50
-#define BLOCK_SIZE_Y 50
 #define BLOCKS_PER_NODE 80
 
 using namespace io;
 
-Grid::Grid(Type type)
+Grid::Grid(GridContainer &container)
+	: m_container(container)
 {
-	// Prepare for fortran <-> c translation
-	id = pointers.add(this);
 	
 	m_inputFile = 0L;
 	
-	communicator = MPI_COMM_NULL;
-	
-	switch (type) {
-	case BYTE:
-		m_type = new types::BasicType<char>();
-		break;
-	case INT:
-		m_type = new types::BasicType<int>();
-		break;
-	case LONG:
-		m_type = new types::BasicType<long>();
-		break;
-	case FLOAT:
-		m_type = new types::BasicType<float>();
-		break;
-	case DOUBLE:
-		m_type = new types::BasicType<double>();
-		break;
-	/*case BYTEARRAY:
-		return new ArrayGrid<char>();
-	case INTARRAY:
-		return new ArrayGrid<int>();
-	case LONGARRY:
-		return new ArrayGrid<long>();
-	case FLOATARRAY:
-		return new ArrayGrid<float>();
-	case DOUBLEARRAY:
-		return new ArrayGrid<double>();*/
-	default:
-		m_type = 0L;
-		assert(false);
-	}
+	// Set defaul block size
+	m_blockSizeX = m_blockSizeY = m_blockSizeZ = 50;
 }
 
 Grid::~Grid()
 {
 	delete m_inputFile;
-	
-	delete m_type;
-	
-	MPI_Comm_free(&communicator);
-	
-	// Remove from fortran <-> c translation
-	pointers.remove(id);
 }
 
-bool Grid::open(const char* filename, MPI_Comm comm)
+asagi::Grid::Error Grid::open(const char* filename)
 {
-	if (MPI_Comm_dup(comm, &communicator) != MPI_SUCCESS)
-		return false;
+	asagi::Grid::Error error;
 	
-	MPI_Comm_rank(communicator, &m_mpiRank);
-	MPI_Comm_size(communicator, &m_mpiSize);
+	m_inputFile = new NetCdf(filename, getMPIRank());
+	if ((error = m_inputFile->open()) != asagi::Grid::SUCCESS)
+		return error;
 	
-	m_inputFile = new NetCdf(filename);
-	if (!m_inputFile->open())
-		return false;
+	m_dimX = m_inputFile->getXDim();
+	m_dimY = m_inputFile->getYDim();
+	m_dimZ = m_inputFile->getZDim();
 	
-	dimX = m_inputFile->getXDim();
-	dimY = m_inputFile->getYDim();
+	// A block size large than the dimension does not make any sense
+	if (m_dimX < m_blockSizeX) {
+		dbgDebug(getMPIRank()) << "Shrinking x block size to" << m_dimX;
+		m_blockSizeX = m_dimX;
+	}
+	if (m_dimY < m_blockSizeY) {
+		dbgDebug(getMPIRank()) << "Shrinking y block size to" << m_dimY;
+		m_blockSizeY = m_dimY;
+	}
+	if (m_dimZ < m_blockSizeZ) {
+		dbgDebug(getMPIRank()) << "Shrinking z block size to" << m_dimZ;
+		m_blockSizeZ = m_dimZ;
+	}
 	
 	offsetX = m_inputFile->getXOffset();
 	offsetY = m_inputFile->getYOffset();
+	offsetZ = m_inputFile->getZOffset();
 	
 	scalingX = m_inputFile->getXScaling();
 	scalingY = m_inputFile->getYScaling();
+	scalingZ = m_inputFile->getZScaling();
+	
+	scalingInvX = getInvScaling(scalingX);
+	scalingInvY = getInvScaling(scalingY);
+	scalingInvZ = getInvScaling(scalingZ);
 	
 	// Integer way of rounding up
-	blocksX = (dimX + BLOCK_SIZE_X - 1) / BLOCK_SIZE_X;
-	blocksY = (dimY + BLOCK_SIZE_Y - 1) / BLOCK_SIZE_Y;
+	blocksX = (m_dimX + m_blockSizeX - 1) / m_blockSizeX;
+	blocksY = (m_dimY + m_blockSizeY - 1) / m_blockSizeY;
+	blocksZ = (m_dimZ + m_blockSizeZ - 1) / m_blockSizeZ;
 	
-	if (!m_type->check(*m_inputFile))
-		return false;
+	if ((error = getType().check(*m_inputFile)) != asagi::Grid::SUCCESS)
+		return error;
 	
 	return init();
 }
 
 double Grid::getXMin()
 {
-	return offsetX + std::min(scalingX * (0. - 0.5), scalingX * (dimX - 0.5));
+	if (isinf(scalingX))
+		return -std::numeric_limits<double>::infinity();
+	
+	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
+		return offsetX + std::min(scalingX * (0. - 0.5),
+			scalingX * (m_dimX - 1 - 0.5));
+	
+	return offsetX + std::min(0., (m_dimX - 1) * scalingX);
 }
 
 double Grid::getYMin()
 {
-	return offsetY + std::min(scalingY * (0. - 0.5), scalingY * (dimY - 0.5));
+	if (isinf(scalingY))
+		return -std::numeric_limits<double>::infinity();
+	
+	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
+		return offsetY + std::min(scalingY * (0. - 0.5),
+			scalingY * (m_dimY - 1 - 0.5));
+	
+	return offsetY + std::min(0., (m_dimY - 1) * scalingY);
+}
+
+double Grid::getZMin()
+{
+	if (isinf(scalingZ))
+		return -std::numeric_limits<double>::infinity();
+	
+	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
+		return offsetZ + std::min(scalingZ * (0. - 0.5),
+			scalingZ * (m_dimZ - 1 - 0.5));
+	
+	return offsetZ + std::min(0., (m_dimZ - 1) * scalingZ);
 }
 
 double Grid::getXMax()
 {
-	return offsetX + std::max(scalingX * (0. - 0.5), scalingX * (dimX - 0.5));
+	if (isinf(scalingX))
+		return std::numeric_limits<double>::infinity();
+	
+	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
+		return offsetX + std::max(scalingX * (0. - 0.5),
+			scalingX * (m_dimX - 1 + 0.5));
+	
+	return offsetX + std::max(0., (m_dimX - 1) * scalingX);
 }
 
 double Grid::getYMax()
 {
-	return offsetY + std::max(scalingY * (0. - 0.5), scalingY * (dimY - 0.5));
+	if (isinf(scalingY))
+		return std::numeric_limits<double>::infinity();
+	
+	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
+		return offsetY + std::max(scalingY * (0. - 0.5),
+			scalingY * (m_dimY - 1 + 0.5));
+	
+	return offsetY + std::max(0., (m_dimY - 1) * scalingY);
 }
 
-unsigned int Grid::getVarSize()
+double Grid::getZMax()
 {
-	return m_type->getSize();
+	if (isinf(scalingZ))
+		return std::numeric_limits<double>::infinity();
+	
+	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
+		return offsetZ + std::max(scalingZ * (0. - 0.5),
+			scalingZ * (m_dimZ - 1 + 0.5));
+	
+	return offsetZ + std::max(0., (m_dimZ - 1) * scalingZ);
 }
 
-char Grid::getByte(double x, double y)
+char Grid::getByte(double x, double y, double z)
 {
 	char buf;
-	getAt(x, y, &buf, &types::Type::convertByte);
+	getAt(&buf, &types::Type::convertByte, x, y, z);
 	
 	return buf;
 }
 
-int Grid::getInt(double x, double y)
+int Grid::getInt(double x, double y, double z)
 {
 	int buf;
-	getAt(x, y, &buf, &types::Type::convertInt);
+	getAt(&buf, &types::Type::convertInt, x, y, z);
 
 	return buf;
 }
 
-long Grid::getLong(double x, double y)
+long Grid::getLong(double x, double y, double z)
 {
 	long buf;
-	getAt(x, y, &buf, &types::Type::convertLong);
+	getAt(&buf, &types::Type::convertLong, x, y, z);
 
 	return buf;
 }
 
-float Grid::getFloat(double x, double y)
+float Grid::getFloat(double x, double y, double z)
 {
 	float buf;
-	getAt(x, y, &buf, &types::Type::convertFloat);
+	getAt(&buf, &types::Type::convertFloat, x, y, z);
 
 	return buf;
 }
 
-double Grid::getDouble(double x, double y)
+double Grid::getDouble(double x, double y, double z)
 {
 	double buf;
-	getAt(x, y, &buf, &types::Type::convertDouble);
+	getAt(&buf, &types::Type::convertDouble, x, y, z);
 
 	return buf;
 }
 
-void Grid::getBuf(double x, double y, void* buf)
+void Grid::getBuf(void* buf, double x, double y, double z)
 {
-	getAt(x, y, buf, &types::Type::convertBuffer);
+	getAt(buf, &types::Type::convertBuffer, x, y, z);
 }
 
 bool Grid::exportPng(const char* filename)
@@ -176,8 +204,8 @@ bool Grid::exportPng(const char* filename)
 	unsigned char red, green, blue;
 	
 	min = max = getAtFloat(0, 0);
-	for (unsigned long i = 0; i < dimX; i++) {
-		for (unsigned long j = 0; j < dimY; j++) {
+	for (unsigned long i = 0; i < m_dimX; i++) {
+		for (unsigned long j = 0; j < m_dimY; j++) {
 			value = getAtFloat(i, j);
 			if (value < min)
 				min = value;
@@ -186,15 +214,15 @@ bool Grid::exportPng(const char* filename)
 		}
 	}
 	
-	Png png(dimX, dimY);
+	Png png(m_dimX, m_dimY);
 	if (!png.create(filename))
 		return false;
 	
-	for (unsigned long i = 0; i < dimX; i++) {
-		for (unsigned long j = 0; j < dimY; j++) {
+	for (unsigned long i = 0; i < m_dimX; i++) {
+		for (unsigned long j = 0; j < m_dimY; j++) {
 			// do some magic here
 			h2rgb((getAtFloat(i, j) - min) / (max - min) * 2 / 3, red, green, blue);
-			png.write(i, dimY - j - 1, red, green, blue);
+			png.write(i, m_dimY - j - 1, red, green, blue);
 		}
 	}
 	
@@ -207,91 +235,28 @@ bool Grid::exportPng(const char* filename)
 #endif // PNG_ENABLED
 }
 
-/**
- * Converts the C pointer of the grid to the Fortran identifier
- * 
- * @return The unique index of the grid
- */
-int Grid::c2f()
+void Grid::getAt(void* buf, types::Type::converter_t converter,
+	double x, double y, double z)
 {
-	return id;
-}
-
-void Grid::getAt(double x, double y, void* buf,
-	types::Type::converter_t converter)
-{
-	x = round((x - offsetX) / scalingX);
-	y = round((y - offsetY) / scalingY);
+	x = round((x - offsetX) * scalingInvX);
+	y = round((y - offsetY) * scalingInvY);
+	z = round((z - offsetZ) * scalingInvZ);
 
 	assert(x >= 0 && x < getXDim()
-		&& y >= 0 && y < getYDim());
+		&& y >= 0 && y < getYDim()
+		&& z >= 0 && z < getZDim());
 
-	getAt(static_cast<unsigned long>(x),
-		static_cast<unsigned long>(y),
-		buf, converter);
+	getAt(buf, converter, static_cast<unsigned long>(x),
+		static_cast<unsigned long>(y), static_cast<unsigned long>(z));
 }
 
 float Grid::getAtFloat(unsigned long x, unsigned long y)
 {
 	float buf;
-	getAt(x, y, &buf, &types::Type::convertFloat);
+	
+	getAt(&buf, &types::Type::convertFloat, x, y);
 	
 	return buf;
-}
-
-MPI_Comm Grid::getMPICommunicator()
-{
-	return communicator;
-}
-
-int Grid::getMPIRank()
-{
-	return m_mpiRank;
-}
-
-int Grid::getMPISize()
-{
-	return m_mpiSize;
-}
-
-NetCdf* Grid::getInputFile()
-{
-	return m_inputFile;
-}
-
-types::Type* Grid::getType()
-{
-	return m_type;
-}
-
-long unsigned Grid::getXDim()
-{
-	return dimX;
-}
-
-long unsigned Grid::getYDim()
-{
-	return dimY;
-}
-
-double Grid::getXOffset()
-{
-	return offsetX;
-}
-
-double Grid::getYOffset()
-{
-	return offsetY;
-}
-
-double Grid::getXScaling()
-{
-	return scalingX;
-}
-
-double Grid::getYScaling()
-{
-	return scalingY;
 }
 
 /**
@@ -302,51 +267,8 @@ unsigned long Grid::getBlocksPerNode()
 	return BLOCKS_PER_NODE;
 }
 
-/**
- * @return The number of values in x direction in each block
- */
-unsigned long Grid::getXBlockSize()
-{
-	return BLOCK_SIZE_X;
-}
-
-/**
- * @return The number of values in y direction in each block
- */
-unsigned long Grid::getYBlockSize()
-{
-	return BLOCK_SIZE_Y;
-}
-
-/**
- * @return The number of blocks in the grid
- */
-unsigned long Grid::getBlockCount()
-{
-	return blocksX * blocksY;
-}
-
-/**
- * Calculates the position of <code>block</code> in the grid
- */
-void Grid::getBlockPos(unsigned long block, unsigned long &x, unsigned long &y)
-{
-	x = block % blocksX;
-	y = block / blocksX;
-}
-
-/**
- * @return The block that stores the value at (x, y)
- */
-unsigned long Grid::getBlockByCoords(unsigned long x, unsigned long y)
-{
-	return (y / BLOCK_SIZE_Y) * blocksX + (x / BLOCK_SIZE_X);
-}
-
-// Fortran <-> c translation array
-fortran::PointerArray<Grid> Grid::pointers;
-
-void Grid::h2rgb(float h, unsigned char &red, unsigned char &green, unsigned char &blue)
+void Grid::h2rgb(float h, unsigned char &red, unsigned char &green,
+	unsigned char &blue)
 {
 	// h from 0..1
 	
@@ -393,12 +315,19 @@ void Grid::h2rgb(float h, unsigned char &red, unsigned char &green, unsigned cha
 	blue = x * 255;
 }
 
+/**
+ * Calculates 1/scaling, except for scaling = 0 and scaling = inf. In this
+ * case it returns 0
+ */
+double Grid::getInvScaling(double scaling)
+{
+	if ((scaling == 0) || isinf(scaling))
+		return 0;
+	
+	return 1/scaling;
+}
+
 double Grid::round(double value)
 {
 	return floor(value + 0.5);
-}
-
-Grid* Grid::f2c(int i)
-{
-	return pointers.get(i);
 }

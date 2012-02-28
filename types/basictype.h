@@ -16,12 +16,12 @@ public:
 	}
 	
 	void load(io::NetCdf &file,
-		unsigned long xoffset, unsigned long yoffset,
-		unsigned long xsize, unsigned long ysize,
+		unsigned long xoffset, unsigned long yoffset, unsigned long zoffset,
+		unsigned long xsize, unsigned long ysize, unsigned long zsize,
 		void *buf)
 	{
 		file.getVar(static_cast<T*>(buf),
-			xoffset, yoffset, xsize, ysize);
+			xoffset, yoffset, zoffset, xsize, ysize, zsize);
 	}
 	
 	MPI_Datatype getMPIType();
