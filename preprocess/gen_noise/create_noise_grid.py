@@ -68,7 +68,7 @@ def create_grid(width = 128, height = 128, roughness = 0.2, nc_file = None, vtk_
 			out = -7.0e-8 * (noise2D(10.0 * x - 2.0, 10.0 * y, depth, roughness) + 0.7 - 4.0 * y * (1.0 - y)) + 0.5e-8
 			out = max(0.0, min(1.0e-8, out))
 	
-			nc_values[i,j] = out
+			nc_values[j,i] = out
 
 	if vtk_file:
 		for j in range(0, height):

@@ -11,7 +11,7 @@ asagi::Grid::~Grid()
 asagi::Grid* asagi::Grid::create(Type type, unsigned int hint,
 	unsigned int levels)
 {
-	return new GridContainer(type, levels);
+	return new GridContainer(type, hint, levels);
 }
 
 // C interfae

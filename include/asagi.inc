@@ -1,6 +1,8 @@
 module asagi
   implicit none
 
+# include 'mpif.h'
+
   integer, parameter :: GRID_NO_HINT = 0
   integer, parameter :: GRID_HAS_TIME = 1
 
@@ -291,7 +293,7 @@ module asagi
     end function grid_create
 
     function grid_init( grid_id, comm )
-      use mpi
+      !use mpi
       integer, intent(in)           :: grid_id
       integer, optional, intent(in) :: comm
       integer                       :: grid_init
