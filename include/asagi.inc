@@ -260,6 +260,43 @@ module asagi
 
   end interface
 
+  ! Special interface for get functions
+  interface grid_get_byte
+    module procedure grid_get_byte_1d
+    module procedure grid_get_byte_2d
+    module procedure grid_get_byte_3d
+  end interface grid_get_byte
+
+  interface grid_get_int
+    module procedure grid_get_int_1d
+    module procedure grid_get_int_2d
+    module procedure grid_get_int_3d
+  end interface grid_get_int
+
+  interface grid_get_long
+    module procedure grid_get_long_1d
+    module procedure grid_get_long_2d
+    module procedure grid_get_long_3d
+  end interface grid_get_long
+
+  interface grid_get_float
+    module procedure grid_get_float_1d
+    module procedure grid_get_float_2d
+    module procedure grid_get_float_3d
+  end interface grid_get_float
+
+  interface grid_get_double
+    module procedure grid_get_double_1d
+    module procedure grid_get_double_2d
+    module procedure grid_get_double_3d
+  end interface grid_get_double
+
+  interface grid_get_buf
+    module procedure grid_get_buf_1d
+    module procedure grid_get_buf_2d
+    module procedure grid_get_buf_3d
+  end interface grid_get_buf
+
   contains
     ! Init
     function grid_create( grid_type, hint, levels )
