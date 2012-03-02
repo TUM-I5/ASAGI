@@ -32,7 +32,7 @@ int main (int argc, char** argv)
 // 	}
 // 	fclose(f);
 	
-	grid_free(grid);
+	grid_close(grid);
 	
 	MPI_Finalize();
 	

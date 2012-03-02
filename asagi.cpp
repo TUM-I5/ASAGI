@@ -154,7 +154,7 @@ void grid_get_buf_3d(grid_handle* handle, void* buf, double x, double y, double 
 
 // destructor
 
-void grid_free(grid_handle* handle)
+void grid_close(grid_handle* handle)
 {
 	delete handle;
 }

@@ -169,7 +169,7 @@ double grid_get_double_3d(grid_handle* handle, double x, double y, double z,
 void grid_get_buf_3d(grid_handle* handle,void* buf, double x, double y, double z,
 	unsigned int level);
 
-void grid_free(grid_handle* handle);
+void grid_close(grid_handle* handle);
 
 #ifdef __cplusplus
 }	// end extern "C"

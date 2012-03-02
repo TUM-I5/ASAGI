@@ -143,7 +143,7 @@ void f90grid_get_buf_3d(int grid_id, void* buf, double x, double y, double z,
 
 // destructor
 
-void f90grid_free(int grid_id)
+void f90grid_close(int grid_id)
 {
 	delete GridContainer::f2c(grid_id);
 }

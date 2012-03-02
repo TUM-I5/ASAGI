@@ -24,7 +24,7 @@ program buf
   call grid_get_buf_2d( grid_id, c_loc( value ), -1.d+0, -5005.32d+0 )
   write (*,*) "Value at -1x-5005.32:", value
 
-  call grid_free( grid_id )
+  call grid_close( grid_id )
 
   call MPI_Finalize( error )
   

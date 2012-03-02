@@ -253,10 +253,10 @@ module asagi
     end subroutine grid_get_buf_3d_c
     
     ! Free
-    subroutine grid_free( grid_id ) bind( c, name="f90grid_free" )
+    subroutine grid_close( grid_id ) bind( c, name="f90grid_close" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id
-    end subroutine grid_free
+    end subroutine grid_close
 
   end interface
 

@@ -26,7 +26,7 @@ program simple
   write (*,*) "Value at 5x10.1:", grid_get_float_2d( grid_id, 5.d+0, 10.1d+0 )
   write (*,*) "Value at -1x-5005.32:", grid_get_float_2d( grid_id, -1.d+0, -5005.32d+0 )
 
-  call grid_free( grid_id )
+  call grid_close( grid_id )
 
   call MPI_Finalize( error )
   
