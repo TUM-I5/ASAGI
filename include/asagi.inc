@@ -26,7 +26,7 @@ module asagi
       integer( kind=c_int )        :: grid_create_c
     end function grid_create_c
 
-    function grid_set_comm( grid_id, comm ) bind( c, name="f90grid_init" )
+    function grid_set_comm( grid_id, comm ) bind( c, name="f90grid_set_comm" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id
       integer( kind=c_int ), value :: comm
