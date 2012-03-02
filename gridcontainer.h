@@ -41,7 +41,7 @@ public:
 		unsigned int level = 1);
 	virtual ~GridContainer();
 		
-	Error init(MPI_Comm comm = MPI_COMM_WORLD);
+	Error setComm(MPI_Comm comm = MPI_COMM_WORLD);
 	Error setParam(const char* name, const char* value,
 		unsigned int level = 0);
 	Error open(const char* filename, unsigned int level = 0);

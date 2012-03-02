@@ -19,9 +19,6 @@ int main(int argc, char** argv)
 	
 	Grid* grid = Grid::create(); // FLOAT is default
 	
-	if (grid->init() != Grid::SUCCESS)
-		return 1;
-	
 	if (grid->open(NC_1DPSEUDO) != Grid::SUCCESS)
 		return 1;
 	

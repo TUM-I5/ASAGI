@@ -13,11 +13,6 @@ program simple
   
   grid_id = grid_create( GRID_FLOAT )
 
-  if( grid_init( grid_id ) /= GRID_SUCCESS ) then
-    write (*,*) 'Failed to init grid'
-    call exit(1)
-  end if
-
   if( grid_open( grid_id, "../data/tohoku_1850m_bath.nc" ) /= GRID_SUCCESS ) then
     write (*,*) 'Could not load file'
     call exit(1)

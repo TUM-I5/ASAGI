@@ -30,7 +30,7 @@ public:
 				// child classes are only called if we have it
 				// here
 	
-	virtual Error init(MPI_Comm comm = MPI_COMM_WORLD) = 0;
+	virtual Error setComm(MPI_Comm comm) = 0;
 	virtual Error setParam(const char* name, const char* value,
 		unsigned int level = 0) = 0;
 	virtual Error open(const char* filename,
@@ -122,7 +122,7 @@ typedef enum { GRID_SUCCESS = 0, GRID_MPI_ERROR, GRID_UNKNOWN_PARAM,
 grid_handle* grid_create(grid_type type, unsigned int hint,
 	unsigned int levels);
 
-grid_error grid_init(grid_handle* handle, MPI_Comm comm);
+grid_error grid_set_comm(grid_handle* handle, MPI_Comm comm);
 grid_error grid_set_param(grid_handle* handle, const char* name,
 	const char* value, unsigned int level);
 grid_error grid_open(grid_handle* handle, const char* filename,

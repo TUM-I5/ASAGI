@@ -26,12 +26,12 @@ module asagi
       integer( kind=c_int )        :: grid_create_c
     end function grid_create_c
 
-    function grid_init_c( grid_id, comm ) bind( c, name="f90grid_init" )
+    function grid_set_comm( grid_id, comm ) bind( c, name="f90grid_init" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id
       integer( kind=c_int ), value :: comm
-      integer( kind=c_int )        :: grid_init_c
-    end function grid_init_c
+      integer( kind=c_int )        :: grid_set_comm
+    end function grid_set_comm
 
     function grid_set_param_c( grid_id, name, value, level ) bind( c, name="f90grid_set_param" )
       use, intrinsic :: iso_c_binding
@@ -289,23 +289,6 @@ module asagi
 
       grid_create = grid_create_c( g, h, l )
     end function grid_create
-
-    function grid_init( grid_id, comm )
-      use mpi
-      integer, intent(in)           :: grid_id
-      integer, optional, intent(in) :: comm
-      integer                       :: grid_init
-
-      integer :: c !the communicator we send asagi
-
-      if( present( comm ) ) then
-        c = comm
-      else
-        c = MPI_COMM_WORLD
-      endif
-
-      grid_init = grid_init_c( grid_id, c )
-    end function grid_init
 
     function grid_set_param( grid_id, name, value, level )
       use, intrinsic :: iso_c_binding

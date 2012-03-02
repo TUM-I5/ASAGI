@@ -10,11 +10,11 @@ int f90grid_create(grid_type type, int hint, int levels)
 		asagi::Grid::create(type, hint, levels))->c2f();
 }
 
-grid_error f90grid_init(int grid_id, int comm)
+grid_error f90grid_set_comm(int grid_id, int comm)
 {
 	// MPI_Comm_f2c expects an MPI_Fint, however iso_c_bindings
 	// already converts this parameter into c integer
-	return GridContainer::f2c(grid_id)->init(MPI_Comm_f2c(comm));
+	return GridContainer::f2c(grid_id)->setComm(MPI_Comm_f2c(comm));
 }
 
 grid_error f90grid_set_param(int grid_id, const char* name,

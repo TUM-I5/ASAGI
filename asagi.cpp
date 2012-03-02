@@ -23,9 +23,9 @@ grid_handle* grid_create(grid_type type, unsigned int hint, unsigned int levels)
 	return asagi::Grid::create(type, hint, levels);
 }
 
-grid_error grid_init(grid_handle* handle, MPI_Comm comm)
+grid_error grid_set_comm(grid_handle* handle, MPI_Comm comm)
 {
-	return handle->init(comm);
+	return handle->setComm(comm);
 }
 
 grid_error grid_set_param(grid_handle* handle, const char* name,

@@ -61,8 +61,12 @@ GridContainer::~GridContainer()
 	m_pointers.remove(m_id);
 }
 
-asagi::Grid::Error GridContainer::init(MPI_Comm comm)
+asagi::Grid::Error GridContainer::setComm(MPI_Comm comm)
 {
+	if (m_communicator != MPI_COMM_NULL)
+		// set communicator once once
+		return SUCCESS;
+	
 	if (MPI_Comm_dup(comm, &m_communicator) != MPI_SUCCESS)
 		return MPI_ERROR;
 	
@@ -97,6 +101,8 @@ asagi::Grid::Error GridContainer::setParam(const char* name, const char* value,
 asagi::Grid::Error GridContainer::open(const char* filename, unsigned int level)
 {
 	assert(level < m_levels);
+	
+	setComm(); // Make sure we have our own communicator
 	
 	return m_grids[level]->open(filename);
 }
