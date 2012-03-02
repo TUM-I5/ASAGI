@@ -1,6 +1,13 @@
 # Tests may want to include more header files
 include_directories( ${CMAKE_SOURCE_DIR} )
 
+# Adds an MPI test
+function( add_mpi_test name command numproc )
+	add_test( NAME ${name} COMMAND ${MPIEXEC} ${MPIEXEC_PREFLAGS}
+		${MPIEXEC_NUMPROC_FLAG} ${numproc} ${command}
+		${MPIEXEC_POSTFLAGS} )
+endfunction( add_mpi_test )
+
 ##### Prepare tests #####
 # Files
 set( TestPrepareSources
@@ -38,10 +45,10 @@ target_link_libraries( test_grid3d asagi ${MPI_C_LIBRARIES} )
 add_dependencies( test_grid3d test_prepare )
 
 # Tests
-add_test( NAME Grid1D COMMAND test_grid1d )
-add_test( NAME Grid1DPseudo COMMAND test_grid1dpseudo )
-add_test( NAME Grid2D COMMAND test_grid2d )
-add_test( NAME Grid3D COMMAND test_grid3d )
+add_mpi_test( Grid1D test_grid1d 2 )
+add_mpi_test( Grid1DPseudo test_grid1dpseudo 2 )
+add_mpi_test( Grid2D test_grid2d 2 )
+add_mpi_test( Grid3D test_grid3d 2 )
 
 # Performance tests
 # if ( CMAKE_BUILD_TYPE STREQUAL "Release" )
