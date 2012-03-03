@@ -19,6 +19,9 @@ private:
 	/** The container we belong too */
 	GridContainer &m_container;
 	
+	/** Name of the variable in the netcdf file (default: "z") */
+	std::string m_variableName;
+	
 	io::NetCdf *m_inputFile;
 	
 	/** Total number of elements in x dimension */
@@ -61,6 +64,8 @@ private:
 public:
 	Grid(GridContainer &container);
 	virtual ~Grid();
+	
+	asagi::Grid::Error setParam(const char* name, const char* value);
 	
 	asagi::Grid::Error open(const char* filename);
 	

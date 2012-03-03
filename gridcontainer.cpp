@@ -94,8 +94,7 @@ asagi::Grid::Error GridContainer::setParam(const char* name, const char* value,
 	}
 	
 	assert(level < m_levels);
-	// TODO let grid get parameter
-	return UNKNOWN_PARAM;
+	return m_grids[level]->setParam(name, value);
 }
 
 asagi::Grid::Error GridContainer::open(const char* filename, unsigned int level)

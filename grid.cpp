@@ -17,7 +17,7 @@
 using namespace io;
 
 Grid::Grid(GridContainer &container)
-	: m_container(container)
+	: m_container(container), m_variableName("z")
 {
 	
 	m_inputFile = 0L;
@@ -31,12 +31,23 @@ Grid::~Grid()
 	delete m_inputFile;
 }
 
+asagi::Grid::Error Grid::setParam(const char* name, const char* value)
+{
+	if (strcmp(name, "variable-name") == 0) {
+		m_variableName = value;
+		return asagi::Grid::SUCCESS;
+	}
+	
+	return asagi::Grid::UNKNOWN_PARAM;
+}
+
 asagi::Grid::Error Grid::open(const char* filename)
 {
 	asagi::Grid::Error error;
 	
 	m_inputFile = new NetCdf(filename, getMPIRank());
-	if ((error = m_inputFile->open()) != asagi::Grid::SUCCESS)
+	if ((error = m_inputFile->open(m_variableName.c_str()))
+		!= asagi::Grid::SUCCESS)
 		return error;
 	
 	m_dimX = m_inputFile->getXDim();
