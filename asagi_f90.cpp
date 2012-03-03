@@ -10,6 +10,12 @@ int f90grid_create(grid_type type, int hint, int levels)
 		asagi::Grid::create(type, hint, levels))->c2f();
 }
 
+int f90grid_create_array(grid_type basic_type, int hint, int levels)
+{
+	return static_cast<GridContainer*>(
+		asagi::Grid::createArray(basic_type, hint, levels))->c2f();
+}
+
 grid_error f90grid_set_comm(int grid_id, int comm)
 {
 	// MPI_Comm_f2c expects an MPI_Fint, however iso_c_bindings

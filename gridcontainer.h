@@ -37,7 +37,8 @@ private:
 	
 	ValuePos m_valuePos;
 public:
-	GridContainer(Type type, unsigned int hint = asagi::NO_HINT,
+	GridContainer(Type type, bool isArray = false,
+		unsigned int hint = asagi::NO_HINT,
 		unsigned int level = 1);
 	virtual ~GridContainer();
 		

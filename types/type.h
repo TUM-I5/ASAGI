@@ -19,6 +19,12 @@ public:
 	
 public:
 	/**
+	 * Empty destructor, makes sure constructor
+	 * of child classes is called
+	 */
+	virtual ~Type() { }
+	
+	/**
 	 * Check compatibility of the input file with this type.
 	 */
 	virtual asagi::Grid::Error check(io::NetCdf &file)

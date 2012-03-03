@@ -11,7 +11,13 @@ asagi::Grid::~Grid()
 asagi::Grid* asagi::Grid::create(Type type, unsigned int hint,
 	unsigned int levels)
 {
-	return new GridContainer(type, hint, levels);
+	return new GridContainer(type, false, hint, levels);
+}
+
+asagi::Grid* asagi::Grid::createArray(Type basicType, unsigned int hint,
+	unsigned int levels)
+{
+	return new GridContainer(basicType, true, hint, levels);
 }
 
 // C interfae
@@ -21,6 +27,11 @@ asagi::Grid* asagi::Grid::create(Type type, unsigned int hint,
 grid_handle* grid_create(grid_type type, unsigned int hint, unsigned int levels)
 {
 	return asagi::Grid::create(type, hint, levels);
+}
+
+grid_handle* grid_create_array(grid_type basic_type, unsigned int hint, unsigned int levels)
+{
+	return asagi::Grid::createArray(basic_type, hint, levels);
 }
 
 grid_error grid_set_comm(grid_handle* handle, MPI_Comm comm)

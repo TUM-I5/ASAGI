@@ -46,13 +46,16 @@ namespace io
 		double getYScaling();
 		double getZScaling();
 		
-		template<typename T> void getVar(T *var,
+		template<typename T> void getVar(void *var,
 			size_t xoffset = 0, size_t yoffset = 0, size_t zoffset = 0,
 			size_t xsize = 0, size_t ysize = 0, size_t zsize = 0)
 		{
 			size_t y;
 			std::vector<size_t> start(m_dimensions);
 			std::vector<size_t> count(m_dimensions);
+			
+			// Convert to char, so we can do pointer arthmetic
+			unsigned char* const buffer = static_cast<unsigned char*>(var);
 			
 			if (xsize == 0)
 				xsize = getXDim();
@@ -90,7 +93,8 @@ namespace io
 				
 					for (size_t i = 0; i < ysize; i++) {
 						m_variable.getVar(start, count,
-							static_cast<T*>(&var[i * xsize]));
+							reinterpret_cast<T*>(&buffer[i * xsize
+								* getVarSize()]));
 					
 						// Add 1 to the yoffset
 						start[0]++;
@@ -128,7 +132,8 @@ namespace io
 						for (size_t j = 0; j < y; j++) {
 							// loop through y dimension
 							m_variable.getVar(start, count,
-								static_cast<T*>(&var[(i * ysize + j) * xsize]));
+								reinterpret_cast<T*>(&buffer[(i * ysize + j) * xsize
+									* getVarSize()]));
 							
 							// Add 1 to yoffset
 							start[1]++;
@@ -149,7 +154,8 @@ namespace io
 					
 					for (size_t i = 0; i < zsize; i++) {
 						m_variable.getVar(start, count,
-							static_cast<T*>(&var[i * ysize * xsize]));
+							reinterpret_cast<T*>(&buffer[i * ysize * xsize
+								* getVarSize()]));
 						
 						// Add 1 to zoffset
 						start[0]++;
@@ -163,10 +169,13 @@ namespace io
 				assert(false);
 			}
 			
-			m_variable.getVar(start, count, var);
+			m_variable.getVar(start, count, static_cast<T*>(var));
 		}
 		
-		unsigned int getVarSize();
+		unsigned int getVarSize()
+		{
+			return m_variable.getType().getSize();
+		}
 	};
 }
 

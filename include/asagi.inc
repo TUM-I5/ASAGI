@@ -26,6 +26,14 @@ module asagi
       integer( kind=c_int )        :: grid_create_c
     end function grid_create_c
 
+    function grid_create_array_c( grid_basictype, hint, levels ) bind( c, name="f90grid_create_array" )
+      use, intrinsic :: iso_c_binding
+      integer( kind=c_int ), value :: grid_basictype
+      integer( kind=c_int ), value :: hint
+      integer( kind=c_int ), value :: levels
+      integer( kind=c_int )        :: grid_create_array_c
+    end function grid_create_array_c
+
     function grid_set_comm( grid_id, comm ) bind( c, name="f90grid_set_comm" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id
@@ -326,6 +334,34 @@ module asagi
 
       grid_create = grid_create_c( g, h, l )
     end function grid_create
+
+    function grid_create_array( grid_basictype, hint, levels )
+      integer, optional, intent(in) :: grid_basictype
+      integer, optional, intent(in) :: hint
+      integer, optional, intent(in) :: levels
+      integer                       :: grid_create_array
+
+      !variables send to asagi
+      integer :: g, h, l
+
+      if( present( grid_basictype ) ) then
+        g = grid_basictype
+      else
+        g = GRID_FLOAT
+      endif
+      if( present( hint ) ) then
+        h = hint
+      else
+        h = GRID_NO_HINT
+      endif
+      if( present( levels ) ) then
+        l = levels
+      else
+        l = 1
+      endif
+
+      grid_create_array = grid_create_array_c( g, h, l )
+    end function grid_create_array
 
     function grid_set_param( grid_id, name, value, level )
       use, intrinsic :: iso_c_binding

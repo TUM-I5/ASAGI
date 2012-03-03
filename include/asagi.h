@@ -92,13 +92,21 @@ public:
 		unsigned int level = 0) = 0;
 public:
 	/**
-	 * Creates a new grid
+	 * Creates a new grid with basic values
 	 * 
 	 * @param type The type of the grid
 	 * @param hint A combination of hints
 	 * @param level The number of level this grid should have
 	 */
 	static asagi::Grid* create(Type type = FLOAT,
+		unsigned int hint = NO_HINT, unsigned int levels = 1);
+	
+	/**
+	 * Creates a new grid with array values
+	 * 
+	 * @param basicType The type of the array values in the grid
+	 */
+	static asagi::Grid* createArray(Type basicType = FLOAT,
 		unsigned int hint = NO_HINT, unsigned int levels = 1);
 };
 
@@ -116,10 +124,10 @@ typedef enum { GRID_SUCCESS = 0, GRID_MPI_ERROR, GRID_UNKNOWN_PARAM,
 	GRID_UNSUPPORTED_DIMENSIONS, GRID_INVALID_VAR_SIZE } grid_error;
 #endif
 
-/**
- * Load a grid form an nc file
- */
+
 grid_handle* grid_create(grid_type type, unsigned int hint,
+	unsigned int levels);
+grid_handle* grid_create_array(grid_type basic_type, unsigned int hint,
 	unsigned int levels);
 
 grid_error grid_set_comm(grid_handle* handle, MPI_Comm comm);

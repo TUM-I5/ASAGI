@@ -1,5 +1,6 @@
 ##### Files #####
 set( typesSources
+	arraytype.cpp
 	basictype.cpp
 	type.cpp )
 

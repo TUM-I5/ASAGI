@@ -20,8 +20,7 @@ public:
 		unsigned long xsize, unsigned long ysize, unsigned long zsize,
 		void *buf)
 	{
-		file.getVar(static_cast<T*>(buf),
-			xoffset, yoffset, zoffset, xsize, ysize, zsize);
+		file.getVar<T>(buf, xoffset, yoffset, zoffset, xsize, ysize, zsize);
 	}
 	
 	MPI_Datatype getMPIType();

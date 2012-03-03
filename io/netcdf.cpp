@@ -203,8 +203,3 @@ double io::NetCdf::getZScaling()
 	
 	return (last - first) / (dim - 1);
 }
-
-unsigned int io::NetCdf::getVarSize()
-{
-	return m_variable.getType().getSize();
-}

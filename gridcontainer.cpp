@@ -2,12 +2,13 @@
 
 #include "simplegrid.h"
 
+#include "types/arraytype.h"
 #include "types/basictype.h"
 
 #include <cassert>
 #include <cstring>
 
-GridContainer::GridContainer(Type type, unsigned int hint,
+GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	unsigned int levels)
 {
 	assert(levels > 0); // 0 levels don't make sense
@@ -19,25 +20,48 @@ GridContainer::GridContainer(Type type, unsigned int hint,
 	
 	m_communicator = MPI_COMM_NULL;
 	
-	switch (type) {
-	case BYTE:
-		m_type = new types::BasicType<char>();
-		break;
-	case INT:
-		m_type = new types::BasicType<int>();
-		break;
-	case LONG:
-		m_type = new types::BasicType<long>();
-		break;
-	case FLOAT:
-		m_type = new types::BasicType<float>();
-		break;
-	case DOUBLE:
-		m_type = new types::BasicType<double>();
-		break;
-	default:
-		m_type = 0L;
-		assert(false);
+	if (isArray) {
+		switch (type) {
+		case BYTE:
+			m_type = new types::ArrayType<char>();
+			break;
+		case INT:
+			m_type = new types::ArrayType<int>();
+			break;
+		case LONG:
+			m_type = new types::ArrayType<long>();
+			break;
+		case FLOAT:
+			m_type = new types::ArrayType<float>();
+			break;
+		case DOUBLE:
+			m_type = new types::ArrayType<double>();
+			break;
+		default:
+			m_type = 0L;
+			assert(false);
+		}
+	} else {
+		switch (type) {
+		case BYTE:
+			m_type = new types::BasicType<char>();
+			break;
+		case INT:
+			m_type = new types::BasicType<int>();
+			break;
+		case LONG:
+			m_type = new types::BasicType<long>();
+			break;
+		case FLOAT:
+			m_type = new types::BasicType<float>();
+			break;
+		case DOUBLE:
+			m_type = new types::BasicType<double>();
+			break;
+		default:
+			m_type = 0L;
+			assert(false);
+		}
 	}
 	
 	m_valuePos = CELL_CENTERED;
