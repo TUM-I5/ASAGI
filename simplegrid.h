@@ -3,9 +3,9 @@
 
 #include "grid.h"
 
-#ifndef THREADSAFETY_DISABLED
+#ifndef THREADSAFETY
 #include <mutex>
-#endif // THREADSAFETY_DISABLED
+#endif // THREADSAFETY
 #include <unordered_map>
 
 #include "blocks/blockmanager.h"
@@ -26,13 +26,13 @@ private:
 	
 	MPI_Win window;
 	
-#ifndef THREADSAFETY_DISABLED
+#ifndef THREADSAFETY
 	/**
 	 * Lock slave memory
 	 * @todo Use a shared mutex, to allow multiple readers
 	 */
 	std::mutex slave_mutex;
-#endif // THREADSAFETY_DISABLED
+#endif // THREADSAFETY
 public:
 	SimpleGrid(GridContainer &container);
 	virtual ~SimpleGrid();

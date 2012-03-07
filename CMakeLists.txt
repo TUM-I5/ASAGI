@@ -14,7 +14,7 @@ set( LibSources
 
 ##### User configuration #####
 option( STATIC_LIB "Compile asagi as static library" OFF )
-option( THREADSAFETY_DISABLED "Disable support for multiple threads on each node" OFF )
+option( THREADSAFETY "Enable support for multiple threads on each node" ON )
 option( FORTRAN_SUPPORT "Enable Fortran support" ON )
 option( EXAMPLES "Compile examples" OFF )
 option( TESTS "Test library" OFF )
@@ -45,8 +45,8 @@ if( FORTRAN_SUPPORT )
 endif()
 
 # Thread-safety
-if( THREADSAFETY_DISABLED )
-	add_definitions( -DTHREADSAFETY_DISABLED )
+if( THREADSAFETY )
+	add_definitions( -DTHREADSAFETY )
 endif()
 
 # Find MPI

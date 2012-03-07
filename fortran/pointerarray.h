@@ -2,9 +2,9 @@
 #define FORTRAN_POINTERARRAY_H
 
 #include <assert.h>
-#ifndef THREADSAFETY_DISABLED
+#ifndef THREADSAFETY
 #include <mutex>
-#endif // THREADSAFETY_DISABLED
+#endif // THREADSAFETY
 #include <vector>
 
 #define NULL_INDEX -1
@@ -15,17 +15,17 @@ namespace fortran
 	{
 	private:
 		std::vector<T*> vec;
-#ifndef THREADSAFETY_DISABLED
+#ifndef THREADSAFETY
 		std::mutex vec_mutex;
-#endif // THREADSAFETY_DISABLED
+#endif // THREADSAFETY
 	public:
 		int add(T* const p)
 		{
-#ifndef THREADSAFETY_DISABLED
+#ifndef THREADSAFETY
 			// Lock vector, otherwise the id (return value)
 			// gets messed up
 			std::lock_guard<std::mutex> lock(vec_mutex);
-#endif // THREADSAFETY_DISABLED
+#endif // THREADSAFETY
 			
 			vec.push_back(p);
 			return vec.size() - 1;
