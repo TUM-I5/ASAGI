@@ -19,6 +19,13 @@ option( FORTRAN_SUPPORT "Enable Fortran support" ON )
 option( EXAMPLES "Compile examples" OFF )
 option( TESTS "Test library" OFF )
 
+##### Default build type #####
+if( NOT CMAKE_BUILD_TYPE )
+	set( CMAKE_BUILD_TYPE "Release" CACHE STRING
+		"Choose the type of build, options are: Debug Release" FORCE)
+endif( NOT CMAKE_BUILD_TYPE )
+
+
 ##### Other configuration #####
 # Additional cmake modules
 set( CMAKE_MODULE_PATH
