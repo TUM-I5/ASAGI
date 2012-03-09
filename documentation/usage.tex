@@ -1,0 +1,21 @@
+\section{Using ASAGI}
+
+\subsection{Minimal examples}
+
+These are minimal C, C++ and FORTRAN examples that load a 2-dimensional grid and print the value at (0,0). In each case the grid consists of floating point values.
+
+\lstinputlisting[language=c,caption={Minimal C example}]{minimal.c}
+
+\lstinputlisting[language=c++,caption={Minimal C++ example}]{minimal.cpp}
+
+\lstinputlisting[language=fortran,caption={Minimal FORTRAN example}]{minimal.f90}
+
+\subsection{Dimensions}
+
+ASAGI supports grids with up to three dimensions. The number of dimension cannot be specified by calling an ASAGI function but depends on the NetCDF input file. To access values of an $n$-dimensional grid (with $n\in\{1,2,3\}$), use any of the \texttt{get\_$n$d} functions.
+
+\subsection{Level of detail}
+
+A grid can have multiple resolutions. Each resolution is identified by a level id (level of detail). You can omit the level arguments if you have a grid with only one resolution\footnote{Since C does not support default arguments or overloading, omitting arguments is not possible when using the C interface.}.
+
+To use a grid with multiple levels, you have to specify the number of levels when creating the grid. To load the different levels, call \texttt{open} once for each level. Several levels can be stored in a single NetCDF file with different variable names (check $TODO$ on how to set the variable name). The most coarsen resolution should have the level id 0. With ascending level id, the resolution should get finer. When accessing values with any \texttt{get} function, the level of detail can be selected with the last argument. \texttt{Close} has to be called only once for the whole grid.

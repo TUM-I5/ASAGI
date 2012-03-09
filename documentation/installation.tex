@@ -1,0 +1,59 @@
+\section{Building and Installing ASAGI}
+
+\subsection{Pre-requirements}
+
+\subsubsection{MPI}
+
+ASAGI makes use of the RMA (Remote Memory Access) API of the MPI-2 standard to transfer data. An MPI library that supports the new standard is required.
+
+\subsubsection{NetCDF}
+
+ASAGI uses the NetCDF library\footnote{\url{http://www.unidata.ucar.edu/software/netcdf/}} to load data files. Since most standard NetCDF packages do not support the new NetCDF-4 C++ interface, you may need to compile the NetCDF library yourself.
+
+To enable the NetCDF-4 C++ support, make sure to add the option ``enable-cxx-4'' to the Configure script:
+
+\lstset{language=bash}
+\begin{lstlisting}
+./configure --enable-shared --enable-cxx-4 --prefix=<install_dir>
+make
+make install
+\end{lstlisting}
+
+\subsection{Compilation}
+
+To generate the Makefiles, CMake is used. For CMake it is recommend to keep source and build directory apart:
+
+\lstset{language=bash}
+\begin{lstlisting}
+mkdir build
+cd build
+cmake <path/to/asagi_sources>
+\end{lstlisting}
+
+Several environment variables affect the behavior of CMake. They must be set before running ``cmake''.
+
+\begin{description}
+ \item[Compiler] The compiler can be selected by setting \texttt{CC} (C compiler), \texttt{CXX} (C++ compiler) and \texttt{FC} (FORTRAN compiler) environment variables. C and FORTRAN compiler are only required for C and FORTRAN examples.
+ \item[Libraries] The \texttt{CMAKE\_PREFIX\_PATH} is used when searching for the NetCDF and PNG library. If NetCDF was configured with \texttt{--prefix=<install\_dir>} for example, set \texttt{CMAKE\_PREFIX\_PATH=<install\_dir>}.
+\end{description}
+
+Besides the environment variables, you can change the behavior by setting internal CMake variables. They can be configured by adding one ore more \texttt{-D<variable>=<value>} options when running ``cmake''. These variables can also be changed later with the following command:
+\lstset{language=bash}
+\begin{lstlisting}
+ccmake <path/to/asagi_build>
+\end{lstlisting}
+
+The important variables are listed below. Most of the variables are ASAGI specific and will not work with other CMake projects.
+\begin{description}
+ \item[CMAKE\_BUILD\_TYPE = Debug\textbar Release] When set to ``Debug'', addi\-tion\-al run-time checks are enabled as well as debug messages. \texttt{[Release]}
+ \item[CMAKE\_INSTALL\_PREFIX] Installation directory for ASAGI.\\ \texttt{[/usr/local/]}
+ \item[EXAMPLES = ON\textbar OFF] Compile example programs. \texttt{[OFF]}
+ \item[FORTRAN\_SUPPORT = ON\textbar OFF] Compile with FORTRAN support.\\ \texttt{[ON]}
+ \item[STATIC\_LIB = ON\textbar OFF] Compile ASAGI as a static library. \texttt{[OFF]}
+ \item[TESTS = ON\textbar OFF] Compile tests. \texttt{[OFF]}
+ \item[THREADSAFETY = ON\textbar OFF] If enabled all ASAGI functions are thread-safe. This is required, for example, if ASAGI is used in hybrid MPI/""OpenMP programs. \texttt{[ON]}
+\end{description}
+
+\subsection{Installation}
+
+Installation is currently not supported.

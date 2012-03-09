@@ -1,0 +1,5 @@
+\section{Troubleshooting}
+
+\subsection{The program hangs}
+
+Due to a bug\footnote{\url{http://software.intel.com/en-us/forums/showthread.php?t=103456}} in the Intel MPI library (version 4.0 update 3 and probably earlier versions) the remote memory access in ASAGI does not work properly. This only happens when fabric is set to ``ofa'' or ``shm:ofa''. Selecting a different fabric by changing the environment variable ``I\_MPI\_FABRICS'' solves the problem.

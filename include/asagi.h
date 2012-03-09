@@ -1,3 +1,10 @@
+/**
+ * @file
+ * @author Sebastian Rettenberger <rettenbs@in.tum.de>
+ * 
+ * Include file for C and C++ API
+ */
+
 #ifndef _ASAGI_H
 #define _ASAGI_H
 
