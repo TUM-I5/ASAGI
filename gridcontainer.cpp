@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <limits>
 
 GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	unsigned int levels)
@@ -64,6 +65,9 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 		}
 	}
 	
+	m_minX = m_minY = m_minZ = -std::numeric_limits<double>::infinity();
+	m_maxX = m_maxY = m_maxZ = std::numeric_limits<double>::infinity();
+	
 	m_valuePos = CELL_CENTERED;
 	
 	m_grids = new ::Grid*[levels];
@@ -88,7 +92,7 @@ GridContainer::~GridContainer()
 asagi::Grid::Error GridContainer::setComm(MPI_Comm comm)
 {
 	if (m_communicator != MPI_COMM_NULL)
-		// set communicator once once
+		// set communicator only once
 		return SUCCESS;
 	
 	if (MPI_Comm_dup(comm, &m_communicator) != MPI_SUCCESS)
@@ -123,47 +127,25 @@ asagi::Grid::Error GridContainer::setParam(const char* name, const char* value,
 
 asagi::Grid::Error GridContainer::open(const char* filename, unsigned int level)
 {
+	Error result;
+	
 	assert(level < m_levels);
 	
 	setComm(); // Make sure we have our own communicator
 	
-	return m_grids[level]->open(filename);
-}
-
-double GridContainer::getXMin()
-{
-	// TODO check that all grids have the same range
-	return m_grids[0]->getXMin();
-}
-
-double GridContainer::getYMin()
-{
-	// TODO check that all grids have the same range
-	return m_grids[0]->getYMin();
-}
-
-double GridContainer::getZMin()
-{
-	// TODO check that all grids have the same range
-	return m_grids[0]->getZMin();
-}
-
-double GridContainer::getXMax()
-{
-	// TODO check that all grids have the same range
-	return m_grids[0]->getXMax();
-}
-
-double GridContainer::getYMax()
-{
-	// TODO check that all grids have the same range
-	return m_grids[0]->getYMax();
-}
-
-double GridContainer::getZMax()
-{
-	// TODO check that all grids have the same range
-	return m_grids[0]->getZMax();
+	result = m_grids[level]->open(filename);
+	if (result != SUCCESS)
+		return result;
+	
+	m_minX = std::max(m_minX, m_grids[level]->getXMin());
+	m_minY = std::max(m_minY, m_grids[level]->getYMin());
+	m_minZ = std::max(m_minZ, m_grids[level]->getZMin());
+	
+	m_maxX = std::min(m_maxX, m_grids[level]->getXMax());
+	m_maxY = std::min(m_maxY, m_grids[level]->getYMax());
+	m_maxZ = std::min(m_maxZ, m_grids[level]->getZMax());
+	
+	return result;
 }
 
 char GridContainer::getByte3D(double x, double y, double z, unsigned int level)

@@ -35,6 +35,13 @@ private:
 	 */
 	types::Type *m_type;
 	
+	double m_minX;
+	double m_minY;
+	double m_minZ;
+	double m_maxX;
+	double m_maxY;
+	double m_maxZ;
+	
 	ValuePos m_valuePos;
 public:
 	GridContainer(Type type, bool isArray = false,
@@ -47,12 +54,30 @@ public:
 		unsigned int level = 0);
 	Error open(const char* filename, unsigned int level = 0);
 	
-	double getXMin();
-	double getYMin();
-	double getZMin();
-	double getXMax();
-	double getYMax();
-	double getZMax();
+	double getXMin()
+	{
+		return m_minX;
+	}
+	double getYMin()
+	{
+		return m_minY;
+	}
+	double getZMin()
+	{
+		return m_minZ;
+	}
+	double getXMax()
+	{
+		return m_maxX;
+	}
+	double getYMax()
+	{
+		return m_maxY;
+	}
+	double getZMax()
+	{
+		return m_maxZ;
+	}
 	
 	unsigned int getVarSize()
 	{
