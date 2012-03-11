@@ -34,7 +34,7 @@ private:
 	std::mutex slave_mutex;
 #endif // THREADSAFETY
 public:
-	SimpleGrid(GridContainer &container);
+	SimpleGrid(GridContainer &container, unsigned int hint = asagi::NO_HINT);
 	virtual ~SimpleGrid();
 	
 protected:

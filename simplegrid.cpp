@@ -7,8 +7,8 @@
 #include "types/type.h"
 #include "debug/dbg.h"
 
-SimpleGrid::SimpleGrid(GridContainer &container)
-	: Grid(container)
+SimpleGrid::SimpleGrid(GridContainer &container, unsigned int hint)
+	: Grid(container, hint)
 {
 	masterData = 0L;
 	slaveData = 0L;

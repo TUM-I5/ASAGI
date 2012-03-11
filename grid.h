@@ -24,12 +24,8 @@ private:
 	
 	io::NetCdf *m_inputFile;
 	
-	/** Total number of elements in x dimension */
-	unsigned long m_dimX;
-	/** Total number of elements in y dimension */
-	unsigned long m_dimY;
-	/** Total number of elements in z dimension */
-	unsigned long m_dimZ;
+	/** Total number of elements in x, y and z dimension */
+	unsigned long m_dim[3];
 	
 	double offsetX;
 	double offsetY;
@@ -50,19 +46,22 @@ private:
 	double scalingInvY;
 	double scalingInvZ;
 	
-	/** Number of blocks in x dimension */
-	unsigned long blocksX;
-	/** Number of blocks in y dimension */
-	unsigned long blocksY;
-	/** Number of blocks in z dimension */
-	unsigned long blocksZ;
+	/** Number of blocks in x, y and z dimension */
+	unsigned long blocks[3];
 	
-	/** Number of values in x dimension in one block */
-	unsigned long m_blockSizeX;
-	unsigned long m_blockSizeY;
-	unsigned long m_blockSizeZ;
+	/** Number of values in x, y and z dimension in one block */
+	unsigned long m_blockSize[3];
+	
+	/**
+	 * 0, 1 or 2 if x, y or z is a time dimension (z is default if
+	 * the HAS_TIME hint is specified);
+	 * -1 if we don't have any time dimension
+	 * <br>
+	 * Declare as signed, to remove compiler warning
+	 */
+	signed char m_timeDimension;
 public:
-	Grid(GridContainer &container);
+	Grid(GridContainer &container, unsigned int hint = asagi::NO_HINT);
 	virtual ~Grid();
 	
 	asagi::Grid::Error setParam(const char* name, const char* value);
@@ -120,15 +119,15 @@ protected:
 	
 	unsigned long getXDim()
 	{
-		return m_dimX;
+		return m_dim[0];
 	}
 	unsigned long getYDim()
 	{
-		return m_dimY;
+		return m_dim[1];
 	}
 	unsigned long getZDim()
 	{
-		return m_dimZ;
+		return m_dim[2];
 	}
 	
 	unsigned long getBlocksPerNode();
@@ -138,21 +137,21 @@ protected:
 	 */
 	unsigned long getXBlockSize()
 	{
-		return m_blockSizeX;
+		return m_blockSize[0];
 	}
 	/**
 	 * @return The number of values in y direction in each block
 	 */
 	unsigned long getYBlockSize()
 	{
-		return m_blockSizeY;
+		return m_blockSize[1];
 	}
 	/**
 	 * @return The number of values in z direction in each block
 	 */
 	unsigned long getZBlockSize()
 	{
-		return m_blockSizeZ;
+		return m_blockSize[2];
 	}
 	
 	/**
@@ -160,7 +159,7 @@ protected:
 	 */
 	unsigned long getBlockCount()
 	{
-		return blocksX * blocksY * blocksZ;
+		return blocks[0] * blocks[1] * blocks[2];
 	}
 	
 	/**
@@ -169,9 +168,9 @@ protected:
 	void getBlockPos(unsigned long block,
 		unsigned long &x, unsigned long &y, unsigned long &z)
 	{
-		x = block % blocksX;
-		y = (block / blocksX) % blocksY;
-		z = block / (blocksX * blocksY);
+		x = block % blocks[0];
+		y = (block / blocks[0]) % blocks[1];
+		z = block / (blocks[0] * blocks[1]);
 	}
 	
 
@@ -181,15 +180,18 @@ protected:
 	unsigned long getBlockByCoords(unsigned long x, unsigned long y,
 		unsigned long z)
 	{
-		return (((z / m_blockSizeZ) * blocksY
-			+ (y / m_blockSizeY)) * blocksX)
-			+ (x / m_blockSizeX);
+		return (((z / getZBlockSize()) * blocks[1]
+			+ (y / getYBlockSize())) * blocks[0])
+			+ (x / getXBlockSize());
 	}
 	
 	virtual asagi::Grid::Error init() = 0;
 	
 	virtual void getAt(void* buf, types::Type::converter_t converter,
 		unsigned long x, unsigned long y = 0, unsigned long z = 0) = 0;
+private:
+	/** Name of the dimensions: "x", "y" and "z" */
+	static const char* DIMENSION_NAMES[3];
 private:
 	static void h2rgb(float h, unsigned char &red, unsigned char &green,
 		unsigned char &blue);

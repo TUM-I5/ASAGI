@@ -16,14 +16,18 @@
 
 using namespace io;
 
-Grid::Grid(GridContainer &container)
+Grid::Grid(GridContainer &container, unsigned int hint)
 	: m_container(container), m_variableName("z")
 {
-	
 	m_inputFile = 0L;
 	
 	// Set defaul block size
-	m_blockSizeX = m_blockSizeY = m_blockSizeZ = 50;
+	m_blockSize[0] = m_blockSize[1] = m_blockSize[2] = 50;
+	
+	if (hint & asagi::HAS_TIME)
+		m_timeDimension = 2;
+	else
+		m_timeDimension = -1;
 }
 
 Grid::~Grid()
@@ -50,22 +54,29 @@ asagi::Grid::Error Grid::open(const char* filename)
 		!= asagi::Grid::SUCCESS)
 		return error;
 	
-	m_dimX = m_inputFile->getXDim();
-	m_dimY = m_inputFile->getYDim();
-	m_dimZ = m_inputFile->getZDim();
+	m_dim[0] = m_inputFile->getXDim();
+	m_dim[1] = m_inputFile->getYDim();
+	m_dim[2] = m_inputFile->getZDim();
 	
-	// A block size large than the dimension does not make any sense
-	if (m_dimX < m_blockSizeX) {
-		dbgDebug(getMPIRank()) << "Shrinking x block size to" << m_dimX;
-		m_blockSizeX = m_dimX;
+	if (m_timeDimension >= 0) {
+		dbgDebug(getMPIRank()) << "Setting block size in time dimension"
+			<< DIMENSION_NAMES[m_timeDimension] << "to 1";
+		m_blockSize[m_timeDimension] = 1;
 	}
-	if (m_dimY < m_blockSizeY) {
-		dbgDebug(getMPIRank()) << "Shrinking y block size to" << m_dimY;
-		m_blockSizeY = m_dimY;
-	}
-	if (m_dimZ < m_blockSizeZ) {
-		dbgDebug(getMPIRank()) << "Shrinking z block size to" << m_dimZ;
-		m_blockSizeZ = m_dimZ;
+	
+#ifdef __INTEL_COMPILER
+	#pragma unroll(3)
+#endif // __INTEL_COMPILER
+	for (unsigned char i = 0; i < 3; i++) {
+		// A block size large than the dimension does not make any sense
+		if (m_dim[i] < m_blockSize[i]) {
+			dbgDebug(getMPIRank()) << "Shrinking" << DIMENSION_NAMES[i]
+				<< "block size to" << m_dim[i];
+			m_blockSize[i] = m_dim[i];
+		}
+		
+		// Integer way of rounding up
+		blocks[i] = (m_dim[i] + m_blockSize[i] - 1) / m_blockSize[i];
 	}
 	
 	offsetX = m_inputFile->getXOffset();
@@ -80,11 +91,6 @@ asagi::Grid::Error Grid::open(const char* filename)
 	scalingInvY = getInvScaling(scalingY);
 	scalingInvZ = getInvScaling(scalingZ);
 	
-	// Integer way of rounding up
-	blocksX = (m_dimX + m_blockSizeX - 1) / m_blockSizeX;
-	blocksY = (m_dimY + m_blockSizeY - 1) / m_blockSizeY;
-	blocksZ = (m_dimZ + m_blockSizeZ - 1) / m_blockSizeZ;
-	
 	if ((error = getType().check(*m_inputFile)) != asagi::Grid::SUCCESS)
 		return error;
 	
@@ -98,9 +104,9 @@ double Grid::getXMin()
 	
 	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
 		return offsetX + std::min(scalingX * (0. - 0.5),
-			scalingX * (m_dimX - 1 - 0.5));
+			scalingX * (getXDim() - 1 - 0.5));
 	
-	return offsetX + std::min(0., (m_dimX - 1) * scalingX);
+	return offsetX + std::min(0., (getXDim() - 1) * scalingX);
 }
 
 double Grid::getYMin()
@@ -110,9 +116,9 @@ double Grid::getYMin()
 	
 	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
 		return offsetY + std::min(scalingY * (0. - 0.5),
-			scalingY * (m_dimY - 1 - 0.5));
+			scalingY * (getYDim() - 1 - 0.5));
 	
-	return offsetY + std::min(0., (m_dimY - 1) * scalingY);
+	return offsetY + std::min(0., (getYDim() - 1) * scalingY);
 }
 
 double Grid::getZMin()
@@ -122,9 +128,9 @@ double Grid::getZMin()
 	
 	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
 		return offsetZ + std::min(scalingZ * (0. - 0.5),
-			scalingZ * (m_dimZ - 1 - 0.5));
+			scalingZ * (getZDim() - 1 - 0.5));
 	
-	return offsetZ + std::min(0., (m_dimZ - 1) * scalingZ);
+	return offsetZ + std::min(0., (getZDim() - 1) * scalingZ);
 }
 
 double Grid::getXMax()
@@ -134,9 +140,9 @@ double Grid::getXMax()
 	
 	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
 		return offsetX + std::max(scalingX * (0. - 0.5),
-			scalingX * (m_dimX - 1 + 0.5));
+			scalingX * (getXDim() - 1 + 0.5));
 	
-	return offsetX + std::max(0., (m_dimX - 1) * scalingX);
+	return offsetX + std::max(0., (getXDim() - 1) * scalingX);
 }
 
 double Grid::getYMax()
@@ -146,9 +152,9 @@ double Grid::getYMax()
 	
 	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
 		return offsetY + std::max(scalingY * (0. - 0.5),
-			scalingY * (m_dimY - 1 + 0.5));
+			scalingY * (getYDim() - 1 + 0.5));
 	
-	return offsetY + std::max(0., (m_dimY - 1) * scalingY);
+	return offsetY + std::max(0., (getYDim() - 1) * scalingY);
 }
 
 double Grid::getZMax()
@@ -158,9 +164,9 @@ double Grid::getZMax()
 	
 	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
 		return offsetZ + std::max(scalingZ * (0. - 0.5),
-			scalingZ * (m_dimZ - 1 + 0.5));
+			scalingZ * (getZDim() - 1 + 0.5));
 	
-	return offsetZ + std::max(0., (m_dimZ - 1) * scalingZ);
+	return offsetZ + std::max(0., (getZDim() - 1) * scalingZ);
 }
 
 char Grid::getByte(double x, double y, double z)
@@ -215,8 +221,8 @@ bool Grid::exportPng(const char* filename)
 	unsigned char red, green, blue;
 	
 	min = max = getAtFloat(0, 0);
-	for (unsigned long i = 0; i < m_dimX; i++) {
-		for (unsigned long j = 0; j < m_dimY; j++) {
+	for (unsigned long i = 0; i < getXDim(); i++) {
+		for (unsigned long j = 0; j < getYDim(); j++) {
 			value = getAtFloat(i, j);
 			if (value < min)
 				min = value;
@@ -225,15 +231,15 @@ bool Grid::exportPng(const char* filename)
 		}
 	}
 	
-	Png png(m_dimX, m_dimY);
+	Png png(getXDim(), getYDim());
 	if (!png.create(filename))
 		return false;
 	
-	for (unsigned long i = 0; i < m_dimX; i++) {
-		for (unsigned long j = 0; j < m_dimY; j++) {
+	for (unsigned long i = 0; i < getXDim(); i++) {
+		for (unsigned long j = 0; j < getYDim(); j++) {
 			// do some magic here
 			h2rgb((getAtFloat(i, j) - min) / (max - min) * 2 / 3, red, green, blue);
-			png.write(i, m_dimY - j - 1, red, green, blue);
+			png.write(i, getYDim() - j - 1, red, green, blue);
 		}
 	}
 	
@@ -277,6 +283,8 @@ unsigned long Grid::getBlocksPerNode()
 {
 	return BLOCKS_PER_NODE;
 }
+
+const char* Grid::DIMENSION_NAMES[] = {"x", "y", "z"};
 
 void Grid::h2rgb(float h, unsigned char &red, unsigned char &green,
 	unsigned char &blue)
