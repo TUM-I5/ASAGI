@@ -13,7 +13,9 @@ set( DocInputs
 	troubleshooting.tex
 	minimal.c
 	minimal.cpp
-	minimal.f90 )
+	minimal.f90
+	images/cell-centered.tex
+	images/vertex-centered.tex )
 
 # User Manual
 if( PDFLATEX_COMPILER )
