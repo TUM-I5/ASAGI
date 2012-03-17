@@ -1,4 +1,11 @@
-module asagi
+!> @file
+!! @author Sebastian Rettenberger <rettenbs@in.tum.de>
+!!
+!! @defgroup f_interface Fortran Interface
+
+!>
+!! %ASAGI Fortran Interface
+module ASAGI
   implicit none
 
   integer, parameter :: GRID_NO_HINT = 0
@@ -16,8 +23,9 @@ module asagi
       GRID_UNSUPPORTED_DIMENSIONS, GRID_INVALID_VAR_SIZE
   end enum
   
+  !> @cond ingore
   interface
-    ! Init
+  !> @endcond ingore
     function grid_create_c( grid_type, hint, levels ) bind( c, name="f90grid_create" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_type
@@ -34,6 +42,9 @@ module asagi
       integer( kind=c_int )        :: grid_create_array_c
     end function grid_create_array_c
 
+    !> @ingroup f_interface
+    !!
+    !! @see asagi::Grid::setComm()
     function grid_set_comm( grid_id, comm ) bind( c, name="f90grid_set_comm" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id
@@ -59,6 +70,9 @@ module asagi
     end function grid_open_c
     
     ! Dimension
+    !> @ingroup f_interface
+    !!
+    !! @see asagi::Grid::getXMin()
     function grid_min_x( grid_id ) bind( c, name="f90grid_min_x" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id
@@ -266,7 +280,9 @@ module asagi
       integer( kind=c_int ), value :: grid_id
     end subroutine grid_close
 
+  !> @cond ignore
   end interface
+  !> @endcond ignore
 
   ! Special interface for get functions
   interface grid_get_byte
@@ -383,6 +399,9 @@ module asagi
         value // c_null_char, l )
     end function grid_set_param
 
+    !> @ingroup f_interface
+    !!
+    !! @see asagi::Grid::open(const char*, unsigned int)
     function grid_open( grid_id, filename, level )
       use, intrinsic :: iso_c_binding
       integer, intent(in)           :: grid_id
@@ -745,4 +764,4 @@ module asagi
 
       call grid_get_buf_3d_c( grid_id, buf, x, y, z, l )
     end subroutine grid_get_buf_3d
-end module asagi
+end module ASAGI

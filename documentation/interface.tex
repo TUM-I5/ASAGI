@@ -1,0 +1,6 @@
+\def\interfacefiles{group__c__interface,group__cxx__interface,group__f__interface}
+
+\foreach \interfacefile in \interfacefiles
+{
+ \InputIfFileExists{interfacedoc/\interfacefile}{}{}
+}

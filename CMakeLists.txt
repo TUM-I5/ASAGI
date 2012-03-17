@@ -12,6 +12,11 @@ set( LibSources
 	gridcontainer.cpp
 	simplegrid.cpp )
 
+# Include files for other programs
+set( InterfaceHeaders
+	${CMAKE_SOURCE_DIR}/include/asagi.h
+	${CMAKE_SOURCE_DIR}/include/asagi.inc )
+
 ##### User configuration #####
 option( STATIC_LIB "Compile asagi as static library" OFF )
 option( THREADSAFETY "Enable support for multiple threads on each node" ON )

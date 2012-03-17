@@ -4,6 +4,8 @@
 \defineshorthand{""}{{\hskip 0pt}}
 \useshorthands{"}
 
+\usepackage{doxygen} % custom doxygen style
+
 \usepackage{graphicx}
 \usepackage{subfig}
 
@@ -12,7 +14,21 @@
 \usepackage{listings}
 \usepackage{color}
 
-\usepackage{hyperref}
+\usepackage{ifpdf}
+\ifpdf
+\usepackage[pdftex,
+            colorlinks=true,
+            linkcolor=red,
+            unicode
+           ]{hyperref}
+\else
+\usepackage[ps2pdf,
+            colorlinks=true,
+            linkcolor=red,
+            unicode
+           ]{hyperref}
+\usepackage{pspicture}
+\fi
 
 \DeclareGraphicsExtensions{.pdf}
 

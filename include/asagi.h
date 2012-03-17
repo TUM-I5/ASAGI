@@ -3,6 +3,9 @@
  * @author Sebastian Rettenberger <rettenbs@in.tum.de>
  * 
  * Include file for C and C++ API
+ * 
+ * @defgroup c_interface C Interface
+ * @defgroup cxx_interface C++ Interface
  */
 
 #ifndef _ASAGI_H
@@ -25,6 +28,9 @@ namespace asagi {
 	const unsigned int HAS_TIME = 1;
 }
 
+/**
+ * @ingroup cxx_interface
+ */
 class asagi::Grid
 {
 public:
@@ -38,12 +44,52 @@ public:
 				// here
 	
 	virtual Error setComm(MPI_Comm comm) = 0;
+	/**
+	 * @ingroup cxx_interface
+	 * 
+	 * @brief Changes a grid parameter
+	 * 
+	 * This function allows you to change %ASAGI's configuration. It must
+	 * be called before calling {@link open(const char*, unsigned int)}.
+	 * 
+	 * The following parameters are supported:
+	 * @li @b value-position The value should be either @c cell-centered
+	 * (default) or @c vertex-centered. <br> Note: This parameter does not
+	 * depend on the level.
+	 * @li @b variable-name The name of the variable in the NetCDF file
+	 * (default: "z")
+	 * 
+	 * @param name The name of the parameter
+	 * @param value The new value for the parameter
+	 * @param level Change the parameter for the specified level of detail.
+	 * <br> Should be 0 when setting @b value-position
+	 * @return @c SUCCESS if the parameter was successfully changed <br>
+	 * @c UNKNOWN_PARAM if the parameter is not supported <br>
+	 * @c INVALID_VALUE if the parameter does not accept this value
+	 */
 	virtual Error setParam(const char* name, const char* value,
 		unsigned int level = 0) = 0;
+	/**
+	 * @ingroup cxx_interface
+	 * 
+	 * @brief Loads values from a NetCDF file
+	 * 
+	 * This function must be called for each level of detail
+	 */
 	virtual Error open(const char* filename,
 		unsigned int level = 0) = 0;
 
+	/**
+	 * @ingroup cxx_interface
+	 * 
+	 * @return The minimum allowed coordinate in x dimension
+	 */
 	virtual double getXMin() = 0;
+	/**
+	 * @ingroup cxx_interface
+	 * 
+	 * @return The minimum allowed coordinate in y dimension
+	 */
 	virtual double getYMin() = 0;
 	virtual double getZMin() = 0;
 	virtual double getXMax() = 0;
@@ -51,6 +97,8 @@ public:
 	virtual double getZMax() = 0;
 	
 	/**
+	 * @ingroup cxx_interface
+	 * 
 	 * @return The number of bytes that are stored in each grid cell
 	 */
 	virtual unsigned int getVarSize() = 0;
@@ -61,6 +109,8 @@ public:
 	virtual float getFloat1D(double x, unsigned int level = 0) = 0;
 	virtual double getDouble1D(double x, unsigned int level = 0) = 0;
 	/**
+	 * @ingroup cxx_interface
+	 * 
 	 * @see #getBuf2D
 	 */
 	virtual void getBuf1D(void* buf, double x, unsigned int level = 0) = 0;
@@ -73,6 +123,8 @@ public:
 	virtual double getDouble2D(double x, double y,
 		unsigned int level = 0) = 0;
 	/**
+	 * @ingroup cxx_interface
+	 * 
 	 * Copys the element at (x,y) into buf. The buffer size has to be
 	 * (at least) {@link getVarSize()} bytes. 
 	 */
@@ -90,6 +142,8 @@ public:
 	virtual double getDouble3D(double x, double y, double z,
 		unsigned int level = 0) = 0;
 	/**
+	 * @ingroup cxx_interface
+	 * 
 	 * @see #getBuf2D
 	 */
 	virtual void getBuf3D(void* buf, double x, double y, double z,
@@ -99,16 +153,20 @@ public:
 		unsigned int level = 0) = 0;
 public:
 	/**
+	 * @ingroup cxx_interface
+	 * 
 	 * Creates a new grid with basic values
 	 * 
 	 * @param type The type of the grid
 	 * @param hint A combination of hints
-	 * @param level The number of level this grid should have
+	 * @param levels The number of level this grid should have
 	 */
 	static asagi::Grid* create(Type type = FLOAT,
 		unsigned int hint = NO_HINT, unsigned int levels = 1);
 	
 	/**
+	 * @ingroup cxx_interface
+	 * 
 	 * Creates a new grid with array values
 	 * 
 	 * @param basicType The type of the array values in the grid
@@ -143,6 +201,11 @@ grid_error grid_set_param(grid_handle* handle, const char* name,
 grid_error grid_open(grid_handle* handle, const char* filename,
 	unsigned int level);
 
+/**
+ * @ingroup c_interface
+ * 
+ * @see ::asagi::Grid::getXMin()
+ */
 double grid_min_x(grid_handle* handle);
 double grid_min_y(grid_handle* handle);
 double grid_min_z(grid_handle* handle);
