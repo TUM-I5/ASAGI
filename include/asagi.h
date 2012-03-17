@@ -41,6 +41,8 @@ public:
 public:
 	/**
 	 * @ingroup cxx_interface
+	 * 
+	 * @see #close(asagi::Grid*)
 	 */
 	virtual ~Grid();	// This one does nothing, but destructors of
 				// child classes are only called if we have it
@@ -184,6 +186,24 @@ public:
 	 */
 	static asagi::Grid* createArray(Type basicType = FLOAT,
 		unsigned int hint = NO_HINT, unsigned int levels = 1);
+	
+	/**
+	 * @ingroup cxx_interface
+	 * 
+	 * Frees all memory resources assciated with @c grid. After a grid is
+	 * closed you cannot access any values and you can not reopen another
+	 * NetCDF file.
+	 * <br>
+	 * This function does the same as calling <code>delete grid;</code> and
+	 * it is the C++ equivalent to {@link grid_close(grid_handle*)} and
+	 * {@link ASAGI::grid_close}
+	 * 
+	 * @param grid The grid that should be closed.
+	 */
+	static void close(asagi::Grid* grid)
+	{
+		delete grid;
+	}
 };
 
 typedef asagi::Grid grid_handle;
@@ -258,6 +278,11 @@ double grid_get_double_3d(grid_handle* handle, double x, double y, double z,
 void grid_get_buf_3d(grid_handle* handle,void* buf, double x, double y, double z,
 	unsigned int level);
 
+/**
+ * @ingroup c_interface
+ * 
+ * @see asagi::Grid#close(asagi::Grid*)
+ */
 void grid_close(grid_handle* handle);
 
 #ifdef __cplusplus

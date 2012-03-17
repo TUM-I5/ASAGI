@@ -131,7 +131,9 @@ asagi::Grid::Error GridContainer::open(const char* filename, unsigned int level)
 	
 	assert(level < m_levels);
 	
-	setComm(); // Make sure we have our own communicator
+	result = setComm(); // Make sure we have our own communicator
+	if (result != SUCCESS)
+		return result;
 	
 	result = m_grids[level]->open(filename);
 	if (result != SUCCESS)

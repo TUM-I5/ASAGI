@@ -44,7 +44,7 @@ module ASAGI
 
     !> @ingroup f_interface
     !!
-    !! @see asagi::Grid::setComm()
+    !! @see asagi::Grid#setComm(MPI_Comm)
     function grid_set_comm( grid_id, comm ) bind( c, name="f90grid_set_comm" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id
@@ -72,7 +72,7 @@ module ASAGI
     ! Dimension
     !> @ingroup f_interface
     !!
-    !! @see asagi::Grid::getXMin()
+    !! @see asagi::Grid#getXMin()
     function grid_min_x( grid_id ) bind( c, name="f90grid_min_x" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id
@@ -274,7 +274,9 @@ module ASAGI
       integer( kind=c_int ), value :: level
     end subroutine grid_get_buf_3d_c
     
-    ! Free
+    !> @ingroup f_interface
+    !!
+    !! @see asagi::Grid#close(asagi::Grid*)
     subroutine grid_close( grid_id ) bind( c, name="f90grid_close" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id
@@ -401,7 +403,7 @@ module ASAGI
 
     !> @ingroup f_interface
     !!
-    !! @see asagi::Grid::open(const char*, unsigned int)
+    !! @see asagi::Grid#open(const char*, unsigned int)
     function grid_open( grid_id, filename, level )
       use, intrinsic :: iso_c_binding
       integer, intent(in)           :: grid_id
