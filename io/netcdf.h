@@ -36,6 +36,15 @@ namespace io
 		virtual ~NetCdf();
 		asagi::Grid::Error open(const char* varname = "z");
 		bool isOpen() const;
+		
+		/**
+		 * @return The number of dimensions
+		 */
+		int getDimensions()
+		{
+			return m_dimensions;
+		}
+		
 		unsigned long getXDim();
 		unsigned long getYDim();
 		unsigned long getZDim();

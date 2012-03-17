@@ -55,7 +55,8 @@ private:
 	/**
 	 * 0, 1 or 2 if x, y or z is a time dimension (z is default if
 	 * the HAS_TIME hint is specified);
-	 * -1 if we don't have any time dimension
+	 * -2 if we don't have any time dimension;
+	 * -1 if the time dimension is not (yet) specified
 	 * <br>
 	 * Declare as signed, to remove compiler warning
 	 */

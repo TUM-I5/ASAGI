@@ -25,9 +25,9 @@ Grid::Grid(GridContainer &container, unsigned int hint)
 	m_blockSize[0] = m_blockSize[1] = m_blockSize[2] = 50;
 	
 	if (hint & asagi::HAS_TIME)
-		m_timeDimension = 2;
-	else
 		m_timeDimension = -1;
+	else
+		m_timeDimension = -2;
 }
 
 Grid::~Grid()
@@ -35,11 +35,33 @@ Grid::~Grid()
 	delete m_inputFile;
 }
 
+/**
+ * Accpets the following parameters:
+ * @li @b variable-name
+ * @li @b time-dimension
+ * 
+ * @see asagi::Grid::setParam(const char*, const char*, unsigned int)
+ */
 asagi::Grid::Error Grid::setParam(const char* name, const char* value)
 {
 	if (strcmp(name, "variable-name") == 0) {
 		m_variableName = value;
 		return asagi::Grid::SUCCESS;
+	} else if (strcmp(name, "time-dimension") == 0) {
+		if (m_timeDimension <= -2)
+			// HAS_TIME hint was not specified
+			//-> ignore this variable
+			return asagi::Grid::SUCCESS;
+		
+		// Value should be x, y or z
+		for (signed char i = 0; i < 3; i++) {
+			if (strcmp(value, DIMENSION_NAMES[i]) == 0) {
+				m_timeDimension = i;
+				return asagi::Grid::SUCCESS;
+			}
+		}
+		
+		return asagi::Grid::INVALID_VALUE;
 	}
 	
 	return asagi::Grid::UNKNOWN_PARAM;
@@ -57,6 +79,13 @@ asagi::Grid::Error Grid::open(const char* filename)
 	m_dim[0] = m_inputFile->getXDim();
 	m_dim[1] = m_inputFile->getYDim();
 	m_dim[2] = m_inputFile->getZDim();
+	
+	if (m_timeDimension == -1) {
+		// Time grid, but time dimension not sepecified
+		m_timeDimension = m_inputFile->getDimensions() - 1;
+		dbgDebug(getMPIRank()) << "Assuming time dimension"
+			<< DIMENSION_NAMES[m_timeDimension];
+	}
 	
 	if (m_timeDimension >= 0) {
 		dbgDebug(getMPIRank()) << "Setting block size in time dimension"

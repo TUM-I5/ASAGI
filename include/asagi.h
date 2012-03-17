@@ -39,6 +39,9 @@ public:
 		NOT_OPEN, VAR_NOT_FOUND, UNSUPPORTED_DIMENSIONS,
 		INVALID_VAR_SIZE };
 public:
+	/**
+	 * @ingroup cxx_interface
+	 */
 	virtual ~Grid();	// This one does nothing, but destructors of
 				// child classes are only called if we have it
 				// here
@@ -58,6 +61,9 @@ public:
 	 * depend on the level.
 	 * @li @b variable-name The name of the variable in the NetCDF file
 	 * (default: "z")
+	 * @li @b time-dimension The dimension that holds the time. Only useful
+	 * with the hint HAS_TIME. Should be either "x", "y" or "z". (Default:
+	 * the last dimension of the grid)
 	 * 
 	 * @param name The name of the parameter
 	 * @param value The new value for the parameter
@@ -91,6 +97,9 @@ public:
 	 * @return The minimum allowed coordinate in y dimension
 	 */
 	virtual double getYMin() = 0;
+	/**
+	 * @ingroup cxx_interface
+	 */
 	virtual double getZMin() = 0;
 	virtual double getXMax() = 0;
 	virtual double getYMax() = 0;
@@ -170,6 +179,8 @@ public:
 	 * Creates a new grid with array values
 	 * 
 	 * @param basicType The type of the array values in the grid
+	 * @param hint A combination of hints
+	 * @param levels The number of levels this grid should have
 	 */
 	static asagi::Grid* createArray(Type basicType = FLOAT,
 		unsigned int hint = NO_HINT, unsigned int levels = 1);
@@ -204,7 +215,7 @@ grid_error grid_open(grid_handle* handle, const char* filename,
 /**
  * @ingroup c_interface
  * 
- * @see ::asagi::Grid::getXMin()
+ * @see asagi::Grid#getXMin()
  */
 double grid_min_x(grid_handle* handle);
 double grid_min_y(grid_handle* handle);
