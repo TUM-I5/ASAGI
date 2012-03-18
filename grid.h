@@ -52,6 +52,9 @@ private:
 	/** Number of values in x, y and z dimension in one block */
 	unsigned long m_blockSize[3];
 	
+	/** Number of cached blocks on each node */
+	long m_blocksPerNode;
+	
 	/**
 	 * 0, 1 or 2 if x, y or z is a time dimension (z is default if
 	 * the HAS_TIME hint is specified);
@@ -131,7 +134,13 @@ protected:
 		return m_dim[2];
 	}
 	
-	unsigned long getBlocksPerNode();
+	/**
+	 * @return The number of blocks we should store on this node
+	 */
+	unsigned long getBlocksPerNode()
+	{
+		return m_blocksPerNode;
+	}
 	
 	/**
 	 * @return The number of values in x direction in each block
@@ -186,6 +195,10 @@ protected:
 			+ (x / getXBlockSize());
 	}
 	
+	/**
+	 * This function is called after opening the NetCDF file. Subclasses
+	 * should override it to initialize the grid.
+	 */
 	virtual asagi::Grid::Error init() = 0;
 	
 	virtual void getAt(void* buf, types::Type::converter_t converter,

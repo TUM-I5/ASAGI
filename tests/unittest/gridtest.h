@@ -36,5 +36,9 @@ public:
 		
 		c.setParam("z-block-size", "42");
 		TS_ASSERT_EQUALS(c.m_grids[0]->m_blockSize[2], 42u);
+		
+		TS_ASSERT_EQUALS(c.setParam("block-cache-size", "100"),
+			asagi::Grid::SUCCESS);
+		TS_ASSERT_EQUALS(c.m_grids[0]->m_blocksPerNode, 100);
 	}
 };

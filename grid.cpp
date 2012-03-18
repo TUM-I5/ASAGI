@@ -13,9 +13,6 @@
 
 #include <cstdlib>
 
-// TODO
-#define BLOCKS_PER_NODE 80
-
 using namespace io;
 
 Grid::Grid(GridContainer &container, unsigned int hint)
@@ -23,8 +20,9 @@ Grid::Grid(GridContainer &container, unsigned int hint)
 {
 	m_inputFile = 0L;
 	
-	// Set defaul block size
 	m_blockSize[0] = m_blockSize[1] = m_blockSize[2] = 0;
+	
+	m_blocksPerNode = -1;
 	
 	if (hint & asagi::HAS_TIME)
 		m_timeDimension = -1;
@@ -41,6 +39,10 @@ Grid::~Grid()
  * Accpets the following parameters:
  * @li @b variable-name
  * @li @b time-dimension
+ * @li @b x-block-size
+ * @li @b y-block-size
+ * @li @b z-block-size
+ * @li @b block-cache-size
  * 
  * @see asagi::Grid::setParam(const char*, const char*, unsigned int)
  */
@@ -86,6 +88,19 @@ asagi::Grid::Error Grid::setParam(const char* name, const char* value)
 		}
 	}
 	
+	if (strcmp(name, "block-cache-size") == 0) {
+		m_blocksPerNode = atol(value);
+		
+		if (m_blocksPerNode < 0)
+			// We set a correct value later
+			return asagi::Grid::INVALID_VALUE;
+		
+		if ((m_blocksPerNode == 0) && (getMPISize() > 1))
+			dbgDebug() << "Warning: empty block cache size may lead to failures!";
+		
+		return asagi::Grid::SUCCESS;
+	}
+	
 	return asagi::Grid::UNKNOWN_PARAM;
 }
 
@@ -93,15 +108,18 @@ asagi::Grid::Error Grid::open(const char* filename)
 {
 	asagi::Grid::Error error;
 	
+	// Open NetCDF file
 	m_inputFile = new NetCdf(filename, getMPIRank());
 	if ((error = m_inputFile->open(m_variableName.c_str()))
 		!= asagi::Grid::SUCCESS)
 		return error;
 	
+	// Get dimension size
 	m_dim[0] = m_inputFile->getXDim();
 	m_dim[1] = m_inputFile->getYDim();
 	m_dim[2] = m_inputFile->getZDim();
 	
+	// Set time dimension
 	if (m_timeDimension == -1) {
 		// Time grid, but time dimension not sepecified
 		m_timeDimension = m_inputFile->getDimensions() - 1;
@@ -109,12 +127,14 @@ asagi::Grid::Error Grid::open(const char* filename)
 			<< DIMENSION_NAMES[m_timeDimension];
 	}
 	
+	// Set block size in time dimension
 	if ((m_timeDimension >= 0) && (m_blockSize[m_timeDimension] == 0)) {
 		dbgDebug(getMPIRank()) << "Setting block size in time dimension"
 			<< DIMENSION_NAMES[m_timeDimension] << "to 1";
 		m_blockSize[m_timeDimension] = 1;
 	}
 	
+	// Set default block size and calculate number of blocks
 #ifdef __INTEL_COMPILER
 	#pragma unroll(3)
 #endif // __INTEL_COMPILER
@@ -134,6 +154,12 @@ asagi::Grid::Error Grid::open(const char* filename)
 		blocks[i] = (m_dim[i] + m_blockSize[i] - 1) / m_blockSize[i];
 	}
 	
+	// Set default cache size
+	if (m_blocksPerNode < 0)
+		// Default value
+		m_blocksPerNode = 80;
+	
+	// Get values for min/max
 	offsetX = m_inputFile->getXOffset();
 	offsetY = m_inputFile->getYOffset();
 	offsetZ = m_inputFile->getZOffset();
@@ -142,13 +168,16 @@ asagi::Grid::Error Grid::open(const char* filename)
 	scalingY = m_inputFile->getYScaling();
 	scalingZ = m_inputFile->getZScaling();
 	
+	// Set scaling for coordinate -> index mapping
 	scalingInvX = getInvScaling(scalingX);
 	scalingInvY = getInvScaling(scalingY);
 	scalingInvZ = getInvScaling(scalingZ);
 	
+	// Init type
 	if ((error = getType().check(*m_inputFile)) != asagi::Grid::SUCCESS)
 		return error;
 	
+	// Init subclass
 	return init();
 }
 
@@ -329,14 +358,6 @@ float Grid::getAtFloat(unsigned long x, unsigned long y)
 	getAt(&buf, &types::Type::convertFloat, x, y);
 	
 	return buf;
-}
-
-/**
- * @return The number of blocks we should store on this node
- */
-unsigned long Grid::getBlocksPerNode()
-{
-	return BLOCKS_PER_NODE;
 }
 
 const char* Grid::DIMENSION_NAMES[] = {"x", "y", "z"};

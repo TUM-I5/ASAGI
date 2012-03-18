@@ -71,6 +71,8 @@ public:
 	 * 1 if it is an 1-dimensional grid)
 	 * @li @b z-block-size The block size in z dimension (Default: 50 or
 	 * 1 if it is an 1- or 2-dimensional grid)
+	 * @li @b block-cache-size Number of blocks cached on each node
+	 * (Default: 80)
 	 * 
 	 * @param name The name of the parameter
 	 * @param value The new value for the parameter

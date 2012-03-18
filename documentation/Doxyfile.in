@@ -665,6 +665,7 @@ EXCLUDE               += @CMAKE_SOURCE_DIR@/examples
 EXCLUDE               += @CMAKE_SOURCE_DIR@/preprocess
 EXCLUDE               += @CMAKE_SOURCE_DIR@/tests
 EXCLUDE               += @CMAKE_SOURCE_DIR@/test_progs
+EXCLUDE               += @CMAKE_SOURCE_DIR@/tools
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
