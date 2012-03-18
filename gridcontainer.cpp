@@ -83,7 +83,8 @@ GridContainer::~GridContainer()
 	delete [] m_grids;
 	delete m_type;
 	
-	MPI_Comm_free(&m_communicator);
+	if (m_communicator != MPI_COMM_NULL)
+		MPI_Comm_free(&m_communicator);
 	
 	// Remove from fortran <-> c translation
 	m_pointers.remove(m_id);

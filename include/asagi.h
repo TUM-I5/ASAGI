@@ -66,6 +66,11 @@ public:
 	 * @li @b time-dimension The dimension that holds the time. Only useful
 	 * with the hint HAS_TIME. Should be either "x", "y" or "z". (Default:
 	 * the last dimension of the grid)
+	 * @li @b x-block-size The block size in x dimension (Default: 50)
+	 * @li @b y-block-size The block size in y dimension (Default: 50 or
+	 * 1 if it is an 1-dimensional grid)
+	 * @li @b z-block-size The block size in z dimension (Default: 50 or
+	 * 1 if it is an 1- or 2-dimensional grid)
 	 * 
 	 * @param name The name of the parameter
 	 * @param value The new value for the parameter

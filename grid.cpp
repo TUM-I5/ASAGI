@@ -11,6 +11,8 @@
 #include "types/basictype.h"
 #include "debug/dbg.h"
 
+#include <cstdlib>
+
 // TODO
 #define BLOCKS_PER_NODE 80
 
@@ -22,7 +24,7 @@ Grid::Grid(GridContainer &container, unsigned int hint)
 	m_inputFile = 0L;
 	
 	// Set defaul block size
-	m_blockSize[0] = m_blockSize[1] = m_blockSize[2] = 50;
+	m_blockSize[0] = m_blockSize[1] = m_blockSize[2] = 0;
 	
 	if (hint & asagi::HAS_TIME)
 		m_timeDimension = -1;
@@ -44,10 +46,14 @@ Grid::~Grid()
  */
 asagi::Grid::Error Grid::setParam(const char* name, const char* value)
 {
+	long blockSize;
+	
 	if (strcmp(name, "variable-name") == 0) {
 		m_variableName = value;
 		return asagi::Grid::SUCCESS;
-	} else if (strcmp(name, "time-dimension") == 0) {
+	}
+	
+	if (strcmp(name, "time-dimension") == 0) {
 		if (m_timeDimension <= -2)
 			// HAS_TIME hint was not specified
 			//-> ignore this variable
@@ -62,6 +68,22 @@ asagi::Grid::Error Grid::setParam(const char* name, const char* value)
 		}
 		
 		return asagi::Grid::INVALID_VALUE;
+	}
+	
+	if (strcmp(&name[1], "-block-size") == 0) {
+		// Check for [xyz]-block-size
+		
+		for (signed char i = 0; i < 3; i++) {
+			if (name[0] == DIMENSION_NAMES[i][0]) {
+				blockSize = atol(value);
+				
+				if (blockSize <= 0)
+					return asagi::Grid::INVALID_VALUE;
+				
+				m_blockSize[i] = blockSize;
+				return asagi::Grid::SUCCESS;
+			}
+		}
 	}
 	
 	return asagi::Grid::UNKNOWN_PARAM;
@@ -87,7 +109,7 @@ asagi::Grid::Error Grid::open(const char* filename)
 			<< DIMENSION_NAMES[m_timeDimension];
 	}
 	
-	if (m_timeDimension >= 0) {
+	if ((m_timeDimension >= 0) && (m_blockSize[m_timeDimension] == 0)) {
 		dbgDebug(getMPIRank()) << "Setting block size in time dimension"
 			<< DIMENSION_NAMES[m_timeDimension] << "to 1";
 		m_blockSize[m_timeDimension] = 1;
@@ -97,6 +119,10 @@ asagi::Grid::Error Grid::open(const char* filename)
 	#pragma unroll(3)
 #endif // __INTEL_COMPILER
 	for (unsigned char i = 0; i < 3; i++) {
+		if (m_blockSize[i] == 0)
+			// Setting default block size, if not yet set
+			m_blockSize[i] = 50;
+		
 		// A block size large than the dimension does not make any sense
 		if (m_dim[i] < m_blockSize[i]) {
 			dbgDebug(getMPIRank()) << "Shrinking" << DIMENSION_NAMES[i]

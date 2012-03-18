@@ -44,6 +44,9 @@ add_executable( test_grid3d grid3d.cpp )
 target_link_libraries( test_grid3d asagi ${MPI_C_LIBRARIES} )
 add_dependencies( test_grid3d test_prepare )
 
+# Unit Tests
+add_subdirectory( unittest )
+
 # Tests
 add_mpi_test( Grid1D test_grid1d 2 )
 add_mpi_test( Grid1DPseudo test_grid1dpseudo 2 )
