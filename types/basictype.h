@@ -10,12 +10,12 @@ namespace types {
 template<typename T> class BasicType : public Type
 {   
 public:
-	unsigned int getSize()
+	virtual unsigned int getSize()
 	{
 		return sizeof(T);
 	}
 	
-	void load(io::NetCdf &file,
+	virtual void load(io::NetCdf &file,
 		unsigned long xoffset, unsigned long yoffset, unsigned long zoffset,
 		unsigned long xsize, unsigned long ysize, unsigned long zsize,
 		void *buf)
@@ -23,7 +23,7 @@ public:
 		file.getVar<T>(buf, xoffset, yoffset, zoffset, xsize, ysize, zsize);
 	}
 	
-	MPI_Datatype getMPIType();
+	virtual MPI_Datatype getMPIType();
 	
 	void convertByte(void* data, void* buf)
 	{

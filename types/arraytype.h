@@ -1,13 +1,18 @@
 #ifndef TYPES_ARRAYTYPE_H
 #define TYPES_ARRAYTYPE_H
 
-#include "type.h"
+#include "basictype.h"
 
 #include "io/netcdf.h"
 
 namespace types {
 
-template<typename T> class ArrayType : public Type
+/**
+ * We use {@link types::BasicType}. This way {@link #convertByte} and similar
+ * functions convert the first element of the array to the correct datatype. One
+ * can use {@link #convertBuffer} to get the whole array.
+ */
+template<typename T> class ArrayType : public BasicType<T>
 {
 private:
 	/** Number of elements in the array */
@@ -32,7 +37,7 @@ public:
 		m_arraySize = file.getVarSize() / sizeof(T);
 		
 		// Create the mpi datatype
-		if (MPI_Type_contiguous(m_arraySize, getBasicMPIType(),
+		if (MPI_Type_contiguous(m_arraySize, BasicType<T>::getMPIType(),
 			&m_mpiType) != MPI_SUCCESS)
 			return asagi::Grid::MPI_ERROR;
 		if (MPI_Type_commit(&m_mpiType) != MPI_SUCCESS)
@@ -43,7 +48,7 @@ public:
 	
 	unsigned int getSize()
 	{
-		return m_arraySize * sizeof(T);
+		return m_arraySize * BasicType<T>::getSize();
 	}
 	
 	void load(io::NetCdf &file,
@@ -58,46 +63,7 @@ public:
 	{
 		return m_mpiType;
 	}
-	
-	/**
-	 * {@link asagi::Grid::getFloat3D()} & Co. should return the converted
-	 * first element of the array
-	 */
-	void convertByte(void* data, void* buf)
-	{
-		*static_cast<char*>(buf) = *static_cast<T*>(data);
-	}
-	
-	void convertInt(void* data, void* buf)
-	{
-		*static_cast<int*>(buf) = *static_cast<T*>(data);
-	}
-	
-	void convertLong(void* data, void* buf)
-	{
-		*static_cast<long*>(buf) = *static_cast<T*>(data);
-	}
-	
-	void convertFloat(void* data, void* buf)
-	{
-		*static_cast<float*>(buf) = *static_cast<T*>(data);
-	}
-	
-	void convertDouble(void* data, void* buf)
-	{
-		*static_cast<double*>(buf) = *static_cast<T*>(data);
-	}
-	
-private:
-	/** The basic MPI type, depends on T */
-	MPI_Datatype getBasicMPIType();
 };
-
-template<> MPI_Datatype ArrayType<char>::getBasicMPIType();
-template<> MPI_Datatype ArrayType<int>::getBasicMPIType();
-template<> MPI_Datatype ArrayType<long>::getBasicMPIType();
-template<> MPI_Datatype ArrayType<float>::getBasicMPIType();
-template<> MPI_Datatype ArrayType<double>::getBasicMPIType();
 
 }
 

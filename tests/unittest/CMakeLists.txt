@@ -22,4 +22,6 @@ if( CXXTEST_FOUND )
 
 	# Tests
 	unittest_add_test( GridUnitTest gridtest.h )
+
+	add_subdirectory( types )
 endif( CXXTEST_FOUND )
