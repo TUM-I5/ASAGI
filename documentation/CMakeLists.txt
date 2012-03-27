@@ -36,13 +36,12 @@ if( PDFLATEX_COMPILER )
 
 	if( DOXYGEN_FOUND )
 		# Also depend on doxygen latex files if doxygen is available
-		set( DocInputs
-			${DocInputs}
-			${DocInterfaceInputs} )
+		set( DocGenerated ${DocInterfaceInputs} )
 	endif( DOXYGEN_FOUND )
 	add_latex_document( ${DocMain}
 		INPUTS ${DocInputs}
 		IMAGE_DIRS images
+		DEPENDS ${DocGenerated}
 		DEFAULT_SAFEPDF
 		MANGLE_TARGET_NAMES )
 	add_custom_target( doc DEPENDS documentation_pdf )

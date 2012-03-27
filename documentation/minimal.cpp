@@ -17,6 +17,7 @@ int main(int argc, char** argv)
   
   std::cout << "Value at (0,0): " << grid->getFloat2D(0, 0) << std::endl;
   
+  // The same as: "Grid::close(grid);"
   delete grid;
   
   MPI_Finalize();

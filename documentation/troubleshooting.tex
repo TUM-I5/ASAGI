@@ -3,3 +3,7 @@
 \subsection{The program hangs}
 
 Due to a bug\footnote{\url{http://software.intel.com/en-us/forums/showthread.php?t=103456}} in the Intel MPI library (version 4.0 update 3 and probably earlier versions) the remote memory access in ASAGI does not work properly. This only happens when fabric is set to ``ofa'' or ``shm:ofa''. Selecting a different fabric by changing the environment variable ``I\_MPI\_FABRICS'' solves the problem.
+
+\subsection{The program fails with ``PMPI\_Win\_create: Assertion `winptr\mbox{-\textgreater}""lock\_table[i]' failed'' or ``function:MPI\_\-WIN\_LOCK, Invalid win argument''}
+
+The SGI Message Passing Toolkit uses a special mapped memory for one-sided communication. For large grids the default size of mapped memory may be too small. It is possible to increase the size by setting the environment variable \texttt{MPI\_MAPPED\_HEAP\_SIZE}.

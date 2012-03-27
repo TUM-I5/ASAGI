@@ -34,7 +34,7 @@ Several environment variables affect the behavior of CMake. They must be set bef
 
 \begin{description}
  \item[Compiler] The compiler can be selected by setting \texttt{CC} (C compiler), \texttt{CXX} (C++ compiler) and \texttt{FC} (FORTRAN compiler) environment variables. C and FORTRAN compiler are only required for C and FORTRAN examples.
- \item[Libraries] The \texttt{CMAKE\_PREFIX\_PATH} is used when searching for the NetCDF and PNG library. If NetCDF was configured with \texttt{--prefix=<install\_dir>} for example, set \texttt{CMAKE\_PREFIX\_PATH=<install\_dir>}.
+ \item[Libraries] The \texttt{CMAKE\_PREFIX\_PATH} is used when searching for the MPI, Net\-CDF and PNG library. If NetCDF was configured with \texttt{--prefix=<in\-stall\_dir>} for example, set \texttt{CMAKE\_PREFIX\_PATH=<install\_dir>}.
 \end{description}
 
 Besides the environment variables, you can change the behavior by setting internal CMake variables. They can be configured by adding one ore more \texttt{-D<variable>=<value>} options when running ``cmake''. These variables can also be changed later with the following command:

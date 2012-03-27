@@ -2,7 +2,7 @@
 
 \subsection{Minimal examples}
 
-These are minimal C, C++ and FORTRAN examples that load a 2-dimensional grid and print the value at (0,0). In each case the grid consists of floating point values.
+These are minimal C, C++ and FORTRAN examples that load a 2-dimensional grid and print the value at (0,0). In each case the grid contains floating point values.
 
 \lstinputlisting[language=c,caption={Minimal C example}]{minimal.c}
 
@@ -12,25 +12,25 @@ These are minimal C, C++ and FORTRAN examples that load a 2-dimensional grid and
 
 \subsection{Dimensions}
 
-ASAGI supports grids with up to three dimensions. The number of dimension cannot be specified by calling an ASAGI function but depends on the NetCDF input file. To access values of an $n$-dimensional grid (with $n\in\{1,2,3\}$), use any of the \texttt{get\_$n$d} functions.
+ASAGI supports grids with up to three dimensions. The number of dimension cannot be specified by calling an ASAGI function but depends on the NetCDF input file. For example, to access an integer of a 2-dimensional grid in C++, use \texttt{getInt2D}. For a 3-dimensional grid, the corresponding call is \texttt{getInt3D}.
 
 \subsection{Level of detail}
 
-A grid can have multiple resolutions. Each resolution is identified by a level id (level of detail). You can omit the level arguments if you have a grid with only one resolution\footnote{Since C does not support default arguments or overloading, omitting arguments is not possible when using the C interface.}.
+A grid can have multiple resolutions. Each resolution is identified by a level id (level of detail). If the number of levels is not specified when creating a grid, the grid will contain only one level of detail. In this case you can also omit the level id in all other functions, since level 0 will be used by default.\footnote{C does not support default arguments or overloading, therefore omitting arguments is not possible when using the C interface.}
 
-To use a grid with multiple levels, you have to specify the number of levels when creating the grid. To load the different levels, call \texttt{open} once for each level. Several levels can be stored in a single NetCDF file with different variable names (check section $TODO$ on how to set the variable name). The most coarsen resolution should have the level id 0. With ascending level id, the resolution should get finer. When accessing values with any \texttt{get} function, the level of detail can be selected with the last argument. \texttt{Close} has to be called only once for the whole grid.
+For grids with multiple levels \texttt{open} must be called once for each level. Several levels can be stored in a single NetCDF file with different variable names\footnote{Use \texttt{setParam} to specify the variable name.}. The coarsest resolution should have the level id 0. With ascending level id, the resolution should get finer. When accessing values with any \texttt{get} function, the level of detail can be selected with the last argument. The function \texttt{close} has to be called only once for the whole grid.
 
 \subsection{Coordinate mapping}
 
-ASAGI distinguishes between actual coordinates and internal array indexes. All \texttt{getValue} functions expect actual coordinates. ASAGI maps each coordinate to the nearest array index using the coordinate variables from the NetCDF file (see section \ref{sec:netcdf files} on how specify coordinate variables in NetCDF files). If no coordinate variable is available, ASAGI uses a one-to-one mapping from coordinates to array indexes.
+ASAGI distinguishes between actual coordinates and internal array indexes. All functions, that return a grid value, expect actual coordinates. ASAGI maps each coordinate to an array index using the coordinate variables from the NetCDF file (see section \ref{sec:netcdf files} on how specify coordinate variables in NetCDF files). If no coordinate variable is available, the mapping is omitted. After the mapping, the coordinate is rounded to the nearest array index. ASAGI does not interpolate between array values.
 
 The actual range of the grid can be obtained with the \texttt{getMin}/\texttt{getMax} functions. They also return coordinates, not array indexes. It is erroneous to access values outside range of the grid.
 
-The range of a dimension can be $\infty$. This is the case if the size of the dimension in the NetCDF file is one.
+The range of a dimension can be ($-\infty$,$\infty$). This is the case if the size of the dimension in the NetCDF file is one.
 
 \subsection{Value position}
 
-ASAGI supports cell-centered and vertex-centered grids as shown in figure \ref{fig:cell-centered vertex-centered}. The value position can be switched with the \texttt{setParam} function (see section $TODO$).
+ASAGI supports cell-centered and vertex-centered grids as shown in figure \ref{fig:cell-centered vertex-centered}. The value position can be switched with the \texttt{setParam} function.
 
 \begin{figure}[h]
  \def\xwidth{7}
@@ -55,6 +55,6 @@ All NetCDF files opened with ASAGI should respect the COARDS conventions\footnot
  \item Variables with more than three dimensions are not supported.
 \end{itemize}
 
-It is possible to open a NetCDF file multiple times with different grid instances. This allows you, for example, to store several grids in a single NetCDF file distinguished by the variable name.
+It is possible to open a NetCDF file by different grids or levels at the same time. This allows you, for example, to store all levels of one grid in a single NetCDF file. In this case the levels must be distinguished by the variable names.
 
 \input{interface}
