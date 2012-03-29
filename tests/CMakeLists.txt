@@ -44,6 +44,10 @@ add_executable( test_grid3d grid3d.cpp )
 target_link_libraries( test_grid3d asagi ${MPI_C_LIBRARIES} )
 add_dependencies( test_grid3d test_prepare )
 
+add_executable( test_largegrid1d largegrid1d.cpp )
+target_link_libraries( test_largegrid1d asagi ${MPI_C_LIBRARIES} )
+add_dependencies( test_largegrid1d test_prepare )
+
 # Unit Tests
 add_subdirectory( unittest )
 
@@ -52,6 +56,8 @@ add_mpi_test( Grid1D test_grid1d 2 )
 add_mpi_test( Grid1DPseudo test_grid1dpseudo 2 )
 add_mpi_test( Grid2D test_grid2d 2 )
 add_mpi_test( Grid3D test_grid3d 2 )
+
+add_mpi_test( LargeGrid1D test_largegrid1d 2 )
 
 # Performance tests
 # if ( CMAKE_BUILD_TYPE STREQUAL "Release" )

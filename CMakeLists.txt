@@ -10,6 +10,7 @@ set( LibSources
 	asagi_f90.cpp
 	grid.cpp
 	gridcontainer.cpp
+	largegrid.cpp
 	simplegrid.cpp )
 
 # Include files for other programs
@@ -23,6 +24,7 @@ option( THREADSAFETY "Enable support for multiple threads on each node" ON )
 option( FORTRAN_SUPPORT "Enable Fortran support" ON )
 option( EXAMPLES "Compile examples" OFF )
 option( TESTS "Test library" OFF )
+option( ROUND_ROBIN "Distribute blocks round robin on nodes (internal use)" ON )
 
 ##### Default build type #####
 if( NOT CMAKE_BUILD_TYPE )
@@ -53,6 +55,11 @@ endif()
 if( THREADSAFETY )
 	add_definitions( -DTHREADSAFETY )
 endif()
+
+# Round robin
+if( ROUND_ROBIN )
+	add_definitions( -DROUND_ROBIN )
+endif( ROUND_ROBIN )
 
 # Find MPI
 find_package( MPI REQUIRED )
@@ -117,6 +124,6 @@ else()
 		${LibSources} )
 endif()
 target_link_libraries( asagi
-	comm
+	blocks
 	io
 	types )

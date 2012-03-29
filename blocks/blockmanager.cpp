@@ -42,22 +42,26 @@ bool BlockManager::getIndex(unsigned long &block)
 }
 
 /**
- * @param block The id of the new block
- * @return The index, where the new block should be saved
+ * @param[in,out] block In: the id of the new block; out: the index, where the
+ *  block should be saved
+ * @return The id of the block that was deleted
  */
-unsigned long BlockManager::getFreeIndex(unsigned long block)
+long BlockManager::getFreeIndex(unsigned long &block)
 {
 	unsigned long index = m_lru.getFree();
+	long oldBlock = m_indexToBlock[index];
 	
-	if (m_indexToBlock[index] >= 0) {
+	if (oldBlock >= 0) {
 		// This block is not empty
 		// -> delete the old block
 		
-		m_blockToIndex.erase(m_indexToBlock[index]);
+		m_blockToIndex.erase(oldBlock);
 	}
 	
 	m_indexToBlock[index] = block;
 	m_blockToIndex[block] = index;
 	
-	return index;
+	block = index;
+	
+	return oldBlock;
 }

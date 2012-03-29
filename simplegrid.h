@@ -16,9 +16,6 @@ private:
 	/** Blocks we are the master */
 	unsigned char *masterData;
 	
-	/** Number of master blocks on each process */
-	unsigned long masterBlockCount;
-	
 	/** Data we hold only temporary */
 	unsigned char *slaveData;
 	
@@ -45,3 +42,4 @@ protected:
 };
 
 #endif // SIMPLEGRID_H
+

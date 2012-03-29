@@ -1,6 +1,7 @@
 #include "gridcontainer.h"
 
 #include "simplegrid.h"
+#include "largegrid.h"
 
 #include "types/arraytype.h"
 #include "types/basictype.h"
@@ -71,8 +72,13 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	m_valuePos = CELL_CENTERED;
 	
 	m_grids = new ::Grid*[levels];
-	for (unsigned int i = 0; i < levels; i++)
-		m_grids[i] = new SimpleGrid(*this);
+	if (hint & asagi::LARGE_GRID) {
+		for (unsigned int i = 0; i < levels; i++)
+			m_grids[i] = new LargeGrid(*this);
+	} else {
+		for (unsigned int i = 0; i < levels; i++)
+			m_grids[i] = new SimpleGrid(*this);
+	}
 }
 
 

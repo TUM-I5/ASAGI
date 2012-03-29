@@ -4,7 +4,7 @@ using namespace types;
 
 template<> MPI_Datatype BasicType<char>::getMPIType()
 {
-	return MPI_SIGNED_CHAR;
+	return MPI_BYTE;
 }
 
 template<> MPI_Datatype BasicType<int>::getMPIType()

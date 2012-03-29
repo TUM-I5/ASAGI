@@ -15,8 +15,6 @@ class ArrayTypeTest : public CxxTest::TestSuite
 public:
 	void setUp(void)
 	{
-		MPIHelper::setUp();
-		
 		file = new io::NetCdf("../../"NC_1D, 0);
 		file->open();
 	}
@@ -24,8 +22,6 @@ public:
 	void tearDown(void)
 	{
 		delete file;
-		
-		MPIHelper::tearDown();
 	}
 	
 	void testGetSize(void)

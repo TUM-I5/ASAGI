@@ -27,23 +27,27 @@ SimpleGrid::~SimpleGrid()
 
 asagi::Grid::Error SimpleGrid::init()
 {
-	unsigned long blockSize = getXBlockSize() * getYBlockSize()
-		* getZBlockSize();
+	unsigned long blockSize = getBlockSize();
 	unsigned long blockX, blockY, blockZ;
+	unsigned long masterBlockCount = getLocalBlockCount();
 	
-	masterBlockCount = (getBlockCount() + getMPISize() - 1) / getMPISize();
+	// Allocate memory for slave blocks
+	slaveData = static_cast<unsigned char*>(
+		malloc(getType().getSize() * blockSize * getBlocksPerNode()));
+	blockManager.init(getBlocksPerNode());
 
-	MPI_Alloc_mem(getType().getSize() * blockSize * masterBlockCount,
-		MPI_INFO_NULL, &masterData);
+	if (MPI_Alloc_mem(getType().getSize() * blockSize * masterBlockCount,
+		MPI_INFO_NULL, &masterData) != MPI_SUCCESS)
+		return asagi::Grid::MPI_ERROR;
 	
 	// Load the blocks from the file, which we control
 	for (unsigned long i = 0; i < masterBlockCount; i++) {
-		if (i + getMPIRank() * masterBlockCount >= getBlockCount())
-			// Last process may controll less blocks
+		if (getGlobalBlock(i) >= getBlockCount())
+			// Last process(es) may controll less blocks
 			break;
 		
 		// Get x, y and z coordinates of the block
-		getBlockPos(i + getMPIRank() * masterBlockCount,
+		getBlockPos(getGlobalBlock(i),
 			blockX, blockY, blockZ);
 		
 		// Get x, y and z coordinates of the first value in the block
@@ -66,22 +70,16 @@ asagi::Grid::Error SimpleGrid::init()
 		&window) != MPI_SUCCESS)
 		return asagi::Grid::MPI_ERROR;
 	
-	// Allocate memory for slave blocks
-	slaveData = static_cast<unsigned char*>(
-		malloc(getType().getSize() * blockSize * getBlocksPerNode()));
-	blockManager.init(getBlocksPerNode());
-	
 	return asagi::Grid::SUCCESS;
 }
 
 void SimpleGrid::getAt(void* buf, types::Type::converter_t converter,
 	unsigned long x, unsigned long y, unsigned long z)
 {
-	unsigned long blockSize = getXBlockSize() * getYBlockSize()
-		* getZBlockSize();
+	unsigned long blockSize = getBlockSize();
 	unsigned long block = getBlockByCoords(x, y, z);
-	int remoteRank;
-	unsigned long remoteOffset;
+	int remoteRank = getBlockRank(block);
+	unsigned long offset = getBlockOffset(block);
 	int mpiResult; NDBG_UNUSED(mpiResult);
 	
 	// Offset inside the block
@@ -89,14 +87,11 @@ void SimpleGrid::getAt(void* buf, types::Type::converter_t converter,
 	y %= getYBlockSize();
 	z %= getZBlockSize();
 	
-	if ((block >= getMPIRank() * masterBlockCount)
-		&& (block < (getMPIRank() + 1) * masterBlockCount)) {
+	if (remoteRank == getMPIRank()) {
 		// Nice, this is a block where we are the master
 		
-		block -= getMPIRank() * masterBlockCount;
-		
 		(getType().*converter)(&masterData[getType().getSize() *
-			(blockSize * block // jump to the correct block
+			(blockSize * offset // jump to the correct block
 			+ (z * getYBlockSize() + y) * getXBlockSize() + x) // correct value inside the block
 			],
 			buf);
@@ -109,13 +104,9 @@ void SimpleGrid::getAt(void* buf, types::Type::converter_t converter,
 	
 	if (!blockManager.getIndex(block)) {
 		// We do not have this block, transfer it first
-	
-		// Where do we find the block?
-		remoteRank = block / masterBlockCount;
-		remoteOffset = block % masterBlockCount;
 		
-		// Index where we store the block
-		block = blockManager.getFreeIndex(block);
+		// Get index where we store the block
+		blockManager.getFreeIndex(block);
 		
 		// Transfer data
 		
@@ -130,7 +121,7 @@ void SimpleGrid::getAt(void* buf, types::Type::converter_t converter,
 			blockSize,
 			getType().getMPIType(),
 			remoteRank,
-			remoteOffset * blockSize,
+			offset * blockSize,
 			blockSize,
 			getType().getMPIType(),
 			window);

@@ -5,40 +5,49 @@
  */
 
 #include "globaltest.h"
+#include "tests.h"
 
 #include "grid.h"
 
 class GridTest : public CxxTest::TestSuite
 {
+	GridContainer* c;
+	Grid* grid;
 public:
 	void setUp(void)
 	{
-		// We do not need MPI for the tests at the moment
-		//MPIHelper::setUp();
+		// Set up a 1d grid
+		c = new GridContainer(asagi::Grid::FLOAT);
+		c->open("../"NC_1D);
+		grid = c->m_grids[0];
 	}
 	
 	void tearDown(void)
 	{
-		// We do not need MPI for the tests at the moment
-		//MPIHelper::tearDown();
+		delete c;
 	}
 	
 	void testSetParam(void)
 	{
-		GridContainer c(asagi::Grid::FLOAT);
-		
-		TS_ASSERT_EQUALS(c.setParam("x-block-size", "5"),
+		TS_ASSERT_EQUALS(grid->setParam("x-block-size", "5"),
 			asagi::Grid::SUCCESS);
-		TS_ASSERT_EQUALS(c.m_grids[0]->m_blockSize[0], 5u);
+		TS_ASSERT_EQUALS(grid->m_blockSize[0], 5u);
 		
-		c.setParam("y-block-size", "7");
-		TS_ASSERT_EQUALS(c.m_grids[0]->m_blockSize[1], 7u);
+		grid->setParam("y-block-size", "7");
+		TS_ASSERT_EQUALS(grid->m_blockSize[1], 7u);
 		
-		c.setParam("z-block-size", "42");
-		TS_ASSERT_EQUALS(c.m_grids[0]->m_blockSize[2], 42u);
+		grid->setParam("z-block-size", "42");
+		TS_ASSERT_EQUALS(grid->m_blockSize[2], 42u);
 		
-		TS_ASSERT_EQUALS(c.setParam("block-cache-size", "100"),
+		TS_ASSERT_EQUALS(grid->setParam("block-cache-size", "100"),
 			asagi::Grid::SUCCESS);
-		TS_ASSERT_EQUALS(c.m_grids[0]->m_blocksPerNode, 100);
+		TS_ASSERT_EQUALS(grid->m_blocksPerNode, 100);
+	}
+	
+	void testGetXMax(void)
+	{
+		TS_ASSERT_LESS_THAN(
+			Grid::round(grid->getXMax() - grid->offsetX) * grid->scalingInvX,
+			grid->getXDim());
 	}
 };

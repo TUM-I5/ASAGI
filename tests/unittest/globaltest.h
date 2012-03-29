@@ -13,25 +13,28 @@
 
 #include <mpi.h>
 #include <cxxtest/TestSuite.h>
+#include <cxxtest/GlobalFixture.h>
 
 /**
  * This currently only works with MPI versions that do not depend on mpiexec
  * (like openmpi).
  */
-class MPIHelper
+class MPIHelper : public CxxTest::GlobalFixture
 {
 public:
-	static void setUp(void)
+	bool setUpWorld(void)
 	{
 		// TODO run with MPI an get args
-		MPI_Init(0, 0);
+		return (MPI_Init(0, 0) == MPI_SUCCESS);
 	}
 	
-	static void tearDown(void)
+	bool tearDownWorld(void)
 	{
-		MPI_Finalize();
+		return (MPI_Finalize() == MPI_SUCCESS);
 	}
 };
+
+static MPIHelper mpiHelper;
 
 // We want to access private and protected members in asagi classes
 #define private public

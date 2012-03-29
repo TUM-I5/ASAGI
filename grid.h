@@ -165,6 +165,14 @@ protected:
 	}
 	
 	/**
+	 * @return The number of values in each block
+	 */
+	unsigned long getBlockSize()
+	{
+		return m_blockSize[0] * m_blockSize[1] * m_blockSize[2];
+	}
+	
+	/**
 	 * @return The number of blocks in the grid
 	 */
 	unsigned long getBlockCount()
@@ -173,7 +181,17 @@ protected:
 	}
 	
 	/**
+	 * @return The of blocks that are stored on this node
+	 */
+	unsigned long getLocalBlockCount()
+	{
+		return (getBlockCount() + getMPISize() - 1) / getMPISize();
+	}
+	
+	/**
 	 * Calculates the position of <code>block</code> in the grid
+	 * 
+	 * @param block The global block id
 	 */
 	void getBlockPos(unsigned long block,
 		unsigned long &x, unsigned long &y, unsigned long &z)
@@ -183,9 +201,8 @@ protected:
 		z = block / (blocks[0] * blocks[1]);
 	}
 	
-
 	/**
-	 * @return The block that stores the value at (x, y)
+	 * @return The global block id that stores the value at (x, y, z)
 	 */
 	unsigned long getBlockByCoords(unsigned long x, unsigned long y,
 		unsigned long z)
@@ -196,16 +213,70 @@ protected:
 	}
 	
 	/**
+	 * @param id Global block id
+	 * @return The rank, that stores the block
+	 */
+	int getBlockRank(unsigned long id)
+	{
+#ifdef ROUND_ROBIN
+		return id % getMPISize();
+#else // ROUND_ROBIN
+		return id / getLocalBlockCount();
+#endif // ROUND_ROBIN
+	}
+	
+	/**
+	 * @param id Global block id
+	 * @return The offset of the block on the rank
+	 */
+	unsigned long getBlockOffset(unsigned long id)
+	{
+#ifdef ROUND_ROBIN
+		return id / getMPISize();
+#else // ROUND_ROBIN
+		return id % getLocalBlockCount();
+#endif // ROUND_ROBIN
+	}
+	
+	/**
+	 * @param id Local block id
+	 * @return The corresponding global id
+	 */
+	unsigned long getGlobalBlock(unsigned long id)
+	{
+#ifdef ROUND_ROBIN
+		return id * getMPISize() + getMPIRank();
+#else // ROUND_ROBIN
+		return id + getMPIRank() * getLocalBlockCount();
+#endif // ROUND_ROBIN
+	}
+	
+	/**
 	 * This function is called after opening the NetCDF file. Subclasses
 	 * should override it to initialize the grid.
 	 */
 	virtual asagi::Grid::Error init() = 0;
+	
+	/**
+	 * Subclasses should override this and return false, if they still need
+	 * to access the input file after initialization.
+	 * 
+	 * @return True if the input file should be accessable after
+	 * {@link #init()} was called.
+	 */
+	virtual bool keepFileOpen()
+	{
+		return false;
+	}
 	
 	virtual void getAt(void* buf, types::Type::converter_t converter,
 		unsigned long x, unsigned long y = 0, unsigned long z = 0) = 0;
 private:
 	/** Name of the dimensions: "x", "y" and "z" */
 	static const char* DIMENSION_NAMES[3];
+	
+	/** The smallest number we can represent in a double */
+	static const double NUMERIC_PRECISION;
 private:
 	static void h2rgb(float h, unsigned char &red, unsigned char &green,
 		unsigned char &blue);

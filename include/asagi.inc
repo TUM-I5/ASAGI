@@ -10,6 +10,7 @@ module ASAGI
 
   integer, parameter :: GRID_NO_HINT = 0
   integer, parameter :: GRID_HAS_TIME = 1
+  integer, parameter :: GRID_LARGE_GRID = 2
 
   ! grid types
   enum, bind( c )

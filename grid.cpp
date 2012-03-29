@@ -178,7 +178,15 @@ asagi::Grid::Error Grid::open(const char* filename)
 		return error;
 	
 	// Init subclass
-	return init();
+	error = init();
+	
+	if (!keepFileOpen()) {
+		// input file no longer needed, so we close
+		delete m_inputFile;
+		m_inputFile = 0L;
+	}
+	
+	return error;
 }
 
 double Grid::getXMin()
@@ -224,7 +232,8 @@ double Grid::getXMax()
 	
 	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
 		return offsetX + std::max(scalingX * (0. - 0.5),
-			scalingX * (getXDim() - 1 + 0.5));
+			scalingX * (getXDim() - 1 + 0.5))
+			- NUMERIC_PRECISION;
 	
 	return offsetX + std::max(0., (getXDim() - 1) * scalingX);
 }
@@ -236,7 +245,8 @@ double Grid::getYMax()
 	
 	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
 		return offsetY + std::max(scalingY * (0. - 0.5),
-			scalingY * (getYDim() - 1 + 0.5));
+			scalingY * (getYDim() - 1 + 0.5))
+			- NUMERIC_PRECISION;
 	
 	return offsetY + std::max(0., (getYDim() - 1) * scalingY);
 }
@@ -248,7 +258,8 @@ double Grid::getZMax()
 	
 	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
 		return offsetZ + std::max(scalingZ * (0. - 0.5),
-			scalingZ * (getZDim() - 1 + 0.5));
+			scalingZ * (getZDim() - 1 + 0.5))
+			- NUMERIC_PRECISION;
 	
 	return offsetZ + std::max(0., (getZDim() - 1) * scalingZ);
 }
@@ -361,6 +372,8 @@ float Grid::getAtFloat(unsigned long x, unsigned long y)
 }
 
 const char* Grid::DIMENSION_NAMES[] = {"x", "y", "z"};
+
+const double Grid::NUMERIC_PRECISION = 1e-10;
 
 void Grid::h2rgb(float h, unsigned char &red, unsigned char &green,
 	unsigned char &blue)

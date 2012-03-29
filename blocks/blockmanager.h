@@ -28,7 +28,7 @@ namespace blocks
 		
 		bool getIndex(unsigned long &block);
 		
-		unsigned long getFreeIndex(unsigned long block);
+		long getFreeIndex(unsigned long &block);
 	};
 }
 

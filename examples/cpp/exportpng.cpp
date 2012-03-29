@@ -12,7 +12,7 @@ int main (int argc, char **argv)
 	
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	
-	grid = Grid::create(Grid::FLOAT);
+	grid = Grid::create(Grid::FLOAT, LARGE_GRID);
 	
 	if (grid->open("../data/noise.nc") != Grid::SUCCESS) {
 		printf("Could not load file\n");
@@ -28,7 +28,7 @@ int main (int argc, char **argv)
 	
 	delete grid;
 	
-	grid = Grid::create(Grid::FLOAT);
+	grid = Grid::create(Grid::FLOAT, LARGE_GRID);
 	
 	if (grid->open("../data/1dgrid.nc") != Grid::SUCCESS) {
 		printf("Could not load file\n");
@@ -44,7 +44,7 @@ int main (int argc, char **argv)
 	
 	delete grid;
 	
-	grid = Grid::create();
+	grid = Grid::create(Grid::FLOAT, LARGE_GRID);
 	
 	if (grid->open("../data/tohoku_1850m_bath.nc") != Grid::SUCCESS) {
 	//if (!grid->open("../data/noise.nc")) {

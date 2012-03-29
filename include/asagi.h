@@ -26,6 +26,7 @@ namespace asagi {
 	
 	const unsigned int NO_HINT = 0;
 	const unsigned int HAS_TIME = 1;
+	const unsigned int LARGE_GRID = 2;
 }
 
 /**
@@ -219,6 +220,7 @@ typedef asagi::Grid::Error grid_error;
 #else
 const unsigned int GRID_NO_HINT = 0;
 const unsigned int GRID_HAS_TIME = 1;
+const unsigned int GRID_LARGE_GRID = 2;
 
 typedef struct grid_handle grid_handle;
 typedef enum { GRID_BYTE, GRID_INT, GRID_LONG, GRID_FLOAT, GRID_DOUBLE } grid_type;
