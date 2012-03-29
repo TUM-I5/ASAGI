@@ -268,8 +268,6 @@ void LargeGrid::getAt(void* buf, types::Type::converter_t converter,
 			0, m_dataWin);
 		assert(mpiResult == MPI_SUCCESS);
 		
-		dbgDebug() << getMPIRank() << "load from" << dataRank << dataOffset;
-		
 		if (dataRank < 0) {
 			// Load the block form the netcdf file
 			
@@ -285,12 +283,10 @@ void LargeGrid::getAt(void* buf, types::Type::converter_t converter,
 		} else {
 			// Transfer the block from the other rank
 			
-			dbgDebug() << getMPIRank() << "lock";
 			// Lock remote window
 			mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dataRank,
 				0, m_dataWin);
 			assert(mpiResult == MPI_SUCCESS);
-			dbgDebug() << "lock aquired";
 		
 			// Transfer data
 			mpiResult = MPI_Get(&m_data[getType().getSize() * blockSize * block],
