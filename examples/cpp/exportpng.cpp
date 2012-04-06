@@ -24,6 +24,11 @@ int main (int argc, char **argv)
 			printf("Could not write png file\n");
 			return 1;
 		}
+	} else {
+		if (!grid->exportPng("../data/noice2.png")) {
+			printf("Could not write png file\n");
+			return 1;
+		}
 	}
 	
 	delete grid;

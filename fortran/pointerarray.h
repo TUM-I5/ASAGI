@@ -2,7 +2,7 @@
 #define FORTRAN_POINTERARRAY_H
 
 #include <assert.h>
-#ifndef THREADSAFETY
+#ifdef THREADSAFETY
 #include <mutex>
 #endif // THREADSAFETY
 #include <vector>
@@ -15,13 +15,13 @@ namespace fortran
 	{
 	private:
 		std::vector<T*> vec;
-#ifndef THREADSAFETY
+#ifdef THREADSAFETY
 		std::mutex vec_mutex;
 #endif // THREADSAFETY
 	public:
 		int add(T* const p)
 		{
-#ifndef THREADSAFETY
+#ifdef THREADSAFETY
 			// Lock vector, otherwise the id (return value)
 			// gets messed up
 			std::lock_guard<std::mutex> lock(vec_mutex);

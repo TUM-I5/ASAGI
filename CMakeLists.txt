@@ -98,6 +98,7 @@ add_subdirectory( blocks )
 add_subdirectory( debug )
 add_subdirectory( fortran )
 add_subdirectory( io )
+add_subdirectory( mpi )
 add_subdirectory( types )
 
 # Documentation
@@ -126,4 +127,5 @@ endif()
 target_link_libraries( asagi
 	blocks
 	io
+	sync
 	types )

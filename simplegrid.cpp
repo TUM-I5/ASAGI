@@ -98,7 +98,7 @@ void SimpleGrid::getAt(void* buf, types::Type::converter_t converter,
 		return;
 	}
 	
-#ifndef THREADSAFETY
+#ifdef THREADSAFETY
 	std::lock_guard<std::mutex> lock(slave_mutex);
 #endif // THREADSAFETY
 	

@@ -104,6 +104,11 @@ namespace debug
 			return  maybeSpace();
 		}
 		
+		// Pointers
+		Dbg &operator<<(const void* t) {
+			stream->buffer << t;
+			return maybeSpace();
+		}
 	};
 	
 	/**

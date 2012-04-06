@@ -4,6 +4,7 @@
 #include "grid.h"
 
 #include "blocks/blockmanager.h"
+#include "mpi/mutex.h"
 
 class LargeGrid : public Grid
 {
@@ -38,12 +39,12 @@ private:
 	/** The window is used to load dictionary information from other ranks */
 	MPI_Win m_dictWin;
 	
-	/** The window is only used for synchronization */
-	MPI_Win m_dictLockWin;
-	
 	blocks::BlockManager m_blockManager;
 	
-#ifndef THREADSAFETY
+	/** Prevent access to the same block from multiple processes */
+	mpi::Mutex m_globalMutex;
+	
+#ifdef THREADSAFETY
 	/**
 	 * Lock blockmanager
 	 * @todo Use a shared mutex, to allow multiple readers

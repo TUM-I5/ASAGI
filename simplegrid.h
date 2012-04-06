@@ -23,7 +23,7 @@ private:
 	
 	MPI_Win window;
 	
-#ifndef THREADSAFETY
+#ifdef THREADSAFETY
 	/**
 	 * Lock slave memory
 	 * @todo Use a shared mutex, to allow multiple readers
