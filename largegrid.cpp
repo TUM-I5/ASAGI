@@ -127,7 +127,7 @@ void LargeGrid::getAt(void* buf, types::Type::converter_t converter,
 			} else {
 				
 				mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, oldDictRank,
-					0, m_dictWin);
+					MPI_MODE_NOCHECK, m_dictWin);
 				assert(mpiResult == MPI_SUCCESS);
 				
 				mpiResult = MPI_Get(dictEntry,
@@ -145,8 +145,8 @@ void LargeGrid::getAt(void* buf, types::Type::converter_t converter,
 				
 				deleteBlockInfo(dictEntry);
 				
-				mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, oldDictRank,
-					0, m_dictWin);
+				mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, oldDictRank,
+					MPI_MODE_NOCHECK, m_dictWin);
 				assert(mpiResult == MPI_SUCCESS);
 				
 				mpiResult = MPI_Put(dictEntry,
@@ -190,8 +190,8 @@ void LargeGrid::getAt(void* buf, types::Type::converter_t converter,
 			
 			getBlockInfo(dictEntry, blockIndex, dataRank, dataOffset);
 			
-			mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, dictRank,
-				0, m_dictWin);
+			mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,
+				MPI_MODE_NOCHECK, m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
 		
 			mpiResult = MPI_Put(dictEntry,
