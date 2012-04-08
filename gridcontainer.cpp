@@ -74,10 +74,10 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	m_grids = new ::Grid*[levels];
 	if (hint & asagi::LARGE_GRID) {
 		for (unsigned int i = 0; i < levels; i++)
-			m_grids[i] = new LargeGrid(*this);
+			m_grids[i] = new LargeGrid(*this, hint, i);
 	} else {
 		for (unsigned int i = 0; i < levels; i++)
-			m_grids[i] = new SimpleGrid(*this);
+			m_grids[i] = new SimpleGrid(*this, hint);
 	}
 }
 

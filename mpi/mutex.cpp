@@ -1,3 +1,9 @@
+/**
+ * @file
+ * 
+ * @author Sebastian Rettenberger <rettenbs@in.tum.de>
+ */
+
 #include "mutex.h"
 
 #include "debug/dbg.h"
@@ -6,7 +12,13 @@
 
 using namespace mpi;
 
-Mutex::Mutex()
+/**
+ * @param tag The tag, we should use for send and recv operations. Make sure
+ *  the tag is unique within the communicator. For performance reason, the
+ *  communicator set in {@link #init(MPI_Comm)} is not duplicated!
+ */
+Mutex::Mutex(int tag)
+	: m_tag(tag)
 {
 	m_window = MPI_WIN_NULL;
 	m_lock = 0L;
@@ -58,16 +70,8 @@ asagi::Grid::Error Mutex::init(MPI_Comm comm)
 	if (MPI_Type_commit(&m_otherRanksType) != MPI_SUCCESS)
 		return asagi::Grid::MPI_ERROR;
 	
-	// Initialization for send/recv
+	// Safe communicator for send/recv
 	m_comm = comm;
-#ifdef THREADSAFETY
-	// Lock m_nextTag
-	std::lock_guard<std::mutex> lock(m_tagMutex);
-#endif // THREADSAFETY
-	if (MPI_Allreduce(&m_nextTag, &m_tag, 1, MPI_INT,
-		MPI_MAX, comm) != MPI_SUCCESS)
-		return asagi::Grid::MPI_ERROR;
-	m_nextTag = m_tag + 1;
 	
 	return asagi::Grid::SUCCESS;
 }
@@ -173,8 +177,3 @@ void Mutex::release(unsigned long block)
 		}
 	}
 }
-
-int Mutex::m_nextTag = 0;
-#ifdef THREADSAFETY
-std::mutex Mutex::m_tagMutex;
-#endif // THREADSAFETY

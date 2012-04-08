@@ -10,8 +10,13 @@
 #include <cstdlib>
 #include <time.h>
 
-LargeGrid::LargeGrid(GridContainer& container, unsigned int hint)
-	: Grid(container, hint)
+/**
+ * Each {@link GridContainer} has it own communicator. Therefore, we can use
+ * the level for send/recv operations within the mutex.
+ */
+LargeGrid::LargeGrid(GridContainer& container, unsigned int hint,
+	unsigned int level)
+	: Grid(container, hint), m_globalMutex(level)
 {
 	m_data = 0L;
 	m_dictionary = 0L;

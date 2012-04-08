@@ -38,9 +38,9 @@ private:
 	MPI_Datatype m_otherRanksType;
 	
 	/** The tag we use for send/recv */
-	int m_tag;
+	const int m_tag;
 public:
-	Mutex();
+	Mutex(int tag);
 	virtual ~Mutex();
 	
 	asagi::Grid::Error init(MPI_Comm comm);
@@ -48,17 +48,6 @@ public:
 	void acquire(unsigned long block);
 	
 	void release(unsigned long block);
-private:
-	/**
-	 * Use a new tag for each mutex to distiguish between them.
-	 * 
-	 * @Warning This only works as long as were the only one in the
-	 *  communicator using send/recv.
-	 */
-	static int m_nextTag;
-#ifdef THREADSAFETY
-	static std::mutex m_tagMutex;
-#endif // THREADSAFETY
 };
 
 }
