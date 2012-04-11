@@ -12,7 +12,16 @@ oldfile = sys.argv[1]
 newfile = sys.argv[2]
 
 ncOld = Dataset(oldfile, 'r')
-ncNew = Dataset(newfile, 'w')
+ncNew = Dataset(newfile, 'w', format=ncOld.file_format)
+
+# Copy attributes
+def copyAttributes(old, new):
+	for name in old.ncattrs():
+		if name == '_FillValue':
+			continue
+		new.__setattr__(name, old.__getattr__(name))
+
+copyAttributes(ncOld, ncNew)
 
 # Create dimensions
 for name in ncOld.dimensions:
@@ -25,8 +34,12 @@ for name in ncOld.variables:
 		# A dimension variable
 		oldVariable = ncOld.variables[name]
 		newVariable = ncNew.createVariable(name, oldVariable.dtype, (name,))
+		copyAttributes(oldVariable, newVariable)
 		newVariable[:] = oldVariable[:]
 newVariable = ncNew.createVariable('time', 'f4', ('time',))
+newVariable.long_name = 'time'
+newVariable.actual_range = [0., TIME_STEPS]
+newVariable.units = 'seconds since 0000-1-1 0:0:0'
 newVariable[:] = numpy.arange(0, 300, 300/float(TIME_STEPS))
 
 # Create variables
@@ -35,6 +48,7 @@ for name in ncOld.variables:
 		# A real variable
 		oldVariable = ncOld.variables[name]
 		newVariable = ncNew.createVariable(name, oldVariable.dtype, ('time',) + oldVariable.dimensions)
+		copyAttributes(oldVariable, newVariable)
 		oldValues = oldVariable[:]
 		for i in range(TIME_STEPS):
 			print "Iteration: "+str(i)
