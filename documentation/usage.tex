@@ -57,4 +57,8 @@ All NetCDF files opened with ASAGI should respect the COARDS conventions\footnot
 
 It is possible to open a NetCDF file by different grids or levels at the same time. This allows you, for example, to store all levels of one grid in a single NetCDF file. In this case the levels must be distinguished by the variable names.
 
+\subsection{Multi-thread support}
+
+When compiled with \texttt{THREADSAFTY=ON} (see section \ref{sec:compilation}) all functions are thread-safe. However, there are some restrictions due to MPI implementations. To receive values from a grid with different threads MPI must support at least \texttt{MPI\_THREAD\_SERIALIZED}. If you want to \texttt{open} or \texttt{close} several grids at the same time, support for \texttt{MPI\_THREAD\_MULTIPLE} is required.
+
 \input{interface}
