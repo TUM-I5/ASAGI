@@ -21,11 +21,13 @@ endif( NOT CMAKE_BUILD_TYPE )
 ##### Files #####
 # Lib Sources
 set( LibSources
+	adaptivegridcontainer.cpp
 	asagi.cpp
 	asagi_f90.cpp
 	grid.cpp
 	gridcontainer.cpp
-	nompigrid.cpp )
+	nompigrid.cpp
+	simplegridcontainer.cpp )
 if( NOT NO_MPI )
 	set( LibSources ${LibSources}
 		largegrid.cpp

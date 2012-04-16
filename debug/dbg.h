@@ -102,6 +102,30 @@ namespace debug
 			return  maybeSpace();
 		}
 		
+		Dbg &operator<<(unsigned int t)
+		{
+			stream->buffer << t;
+			return  maybeSpace();
+		}
+		
+		Dbg &operator<<(long t)
+		{
+			stream->buffer << t;
+			return maybeSpace();
+		}
+		
+		Dbg &operator<<(unsigned long t)
+		{
+			stream->buffer << t;
+			return maybeSpace();
+		}
+		
+		Dbg &operator<<(double t)
+		{
+			stream->buffer << t;
+			return maybeSpace();
+		}
+		
 		// Pointers
 		Dbg &operator<<(const void* t) {
 			stream->buffer << t;

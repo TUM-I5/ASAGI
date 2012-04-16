@@ -11,6 +11,7 @@ module ASAGI
   integer, parameter :: GRID_NO_HINT = 0
   integer, parameter :: GRID_HAS_TIME = 1
   integer, parameter :: GRID_LARGE_GRID = 2
+  integer, parameter :: GRID_ADAPTIVE = 4
 
   ! grid types
   enum, bind( c )
@@ -21,7 +22,8 @@ module ASAGI
   enum, bind( c )
     enumerator :: GRID_SUCCESS = 0, GRID_MPI_ERROR, GRID_UNKNOWN_PARAM, &
       GRID_INVALID_VALUE, GRID_NOT_OPEN, GRID_VAR_NOT_FOUND, &
-      GRID_UNSUPPORTED_DIMENSIONS, GRID_INVALID_VAR_SIZE
+      GRID_UNSUPPORTED_DIMENSIONS, GRID_MULTIPLE_TOPGRIDS, &
+      GRID_INVALID_VAR_SIZE
   end enum
   
   !> @cond ingore

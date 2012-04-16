@@ -54,7 +54,7 @@ private:
 public:
 	LargeGrid(GridContainer& container,
 		unsigned int hint = asagi::NO_HINT,
-		unsigned int level = 0);
+		unsigned int id = 0);
 	virtual ~LargeGrid();
 protected:
 	asagi::Grid::Error init();

@@ -1,6 +1,7 @@
 #include <asagi.h>
 
-#include "gridcontainer.h"
+#include "simplegridcontainer.h"
+#include "adaptivegridcontainer.h"
 
 // Empty destructor
 asagi::Grid::~Grid()
@@ -11,13 +12,17 @@ asagi::Grid::~Grid()
 asagi::Grid* asagi::Grid::create(Type type, unsigned int hint,
 	unsigned int levels)
 {
-	return new GridContainer(type, false, hint, levels);
+	if (hint & asagi::ADAPTIVE)
+		return new AdaptiveGridContainer(type, false, hint, levels);
+	return new SimpleGridContainer(type, false, hint, levels);
 }
 
 asagi::Grid* asagi::Grid::createArray(Type basicType, unsigned int hint,
 	unsigned int levels)
 {
-	return new GridContainer(basicType, true, hint, levels);
+	if (hint & asagi::ADAPTIVE)
+		return new AdaptiveGridContainer(basicType, false, hint, levels);
+	return new SimpleGridContainer(basicType, true, hint, levels);
 }
 
 // C interfae

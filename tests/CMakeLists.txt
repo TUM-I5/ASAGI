@@ -50,7 +50,11 @@ add_dependencies( test_largegrid1d test_prepare )
 
 add_executable( test_largegrid2d largegrid2d.cpp )
 target_link_libraries( test_largegrid2d asagi ${MPI_C_LIBRARIES} )
-add_dependencies( test_largegrid1d test_prepare )
+add_dependencies( test_largegrid2d test_prepare )
+
+add_executable( test_adaptivegrid2d adaptivegrid2d.cpp )
+target_link_libraries( test_adaptivegrid2d asagi ${MPI_C_LIBRARIES} )
+add_dependencies( test_adaptivegrid2d test_prepare )
 
 
 # Unit Tests
@@ -64,6 +68,8 @@ add_mpi_test( Grid3D test_grid3d 2 )
 
 add_mpi_test( LargeGrid1D test_largegrid1d 2 )
 add_mpi_test( LargeGrid2D test_largegrid2d 2 )
+
+add_mpi_test( AdaptiveGrid2D test_adaptivegrid2d 2 )
 
 # Performance tests
 # if ( CMAKE_BUILD_TYPE STREQUAL "Release" )

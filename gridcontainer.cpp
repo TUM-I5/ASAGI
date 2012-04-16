@@ -1,11 +1,5 @@
 #include "gridcontainer.h"
 
-#include "nompigrid.h"
-#ifndef ASAGI_NOMPI
-#include "simplegrid.h"
-#include "largegrid.h"
-#endif // ASAGI_NOMPI
-
 #include "types/arraytype.h"
 #include "types/basictype.h"
 
@@ -15,13 +9,12 @@
 
 GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	unsigned int levels)
+	: m_levels(levels)
 {
 	assert(levels > 0); // 0 levels don't make sense
 	
 	// Prepare for fortran <-> c translation
 	m_id = m_pointers.add(this);
-	
-	m_levels = levels;
 	
 #ifndef ASAGI_NOMPI
 	m_communicator = MPI_COMM_NULL;
@@ -76,20 +69,6 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	
 	m_valuePos = CELL_CENTERED;
 	
-	m_grids = new ::Grid*[levels];
-#ifdef ASAGI_NOMPI
-	for (unsigned int i = 0; i < levels; i++)
-		m_grids[i] = new NoMPIGrid(*this, hint);
-#else // ASAGI_NOMPI
-	if (hint & asagi::LARGE_GRID) {
-		for (unsigned int i = 0; i < levels; i++)
-			m_grids[i] = new LargeGrid(*this, hint, i);
-	} else {
-		for (unsigned int i = 0; i < levels; i++)
-			m_grids[i] = new SimpleGrid(*this, hint);
-	}
-#endif // ASAGI_NOMPI
-	
 	// Default values (probably only useful when compiled without MPI support)
 	m_mpiRank = 0;
 	m_mpiSize = 1;
@@ -98,9 +77,6 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 
 GridContainer::~GridContainer()
 {
-	for (unsigned int i = 0; i < m_levels; i++)
-		delete m_grids[i];
-	delete [] m_grids;
 	delete m_type;
 	
 #ifndef ASAGI_NOMPI
@@ -146,88 +122,18 @@ asagi::Grid::Error GridContainer::setParam(const char* name, const char* value,
 		return INVALID_VALUE;
 	}
 	
-	assert(level < m_levels);
-	return m_grids[level]->setParam(name, value);
+	return UNKNOWN_PARAM;
 }
 
 asagi::Grid::Error GridContainer::open(const char* filename, unsigned int level)
 {
-	Error result;
-	
 	assert(level < m_levels);
 	
-#ifndef ASAGI_NOMPI
-	result = setComm(); // Make sure we have our own communicator
-	if (result != SUCCESS)
-		return result;
+#ifdef ASAGI_NOMPI
+	return SUCCESS;
+#else // ASAGI_NOMPI
+	return setComm(); // Make sure we have our own communicator
 #endif // ASAGI_NOMPI
-	
-	result = m_grids[level]->open(filename);
-	if (result != SUCCESS)
-		return result;
-	
-	m_minX = std::max(m_minX, m_grids[level]->getXMin());
-	m_minY = std::max(m_minY, m_grids[level]->getYMin());
-	m_minZ = std::max(m_minZ, m_grids[level]->getZMin());
-	
-	m_maxX = std::min(m_maxX, m_grids[level]->getXMax());
-	m_maxY = std::min(m_maxY, m_grids[level]->getYMax());
-	m_maxZ = std::min(m_maxZ, m_grids[level]->getZMax());
-	
-	return result;
-}
-
-char GridContainer::getByte3D(double x, double y, double z, unsigned int level)
-{
-	assert(level < m_levels);
-	
-	return m_grids[level]->getByte(x, y, z);
-}
-
-int GridContainer::getInt3D(double x, double y, double z, unsigned int level)
-{
-	assert(level < m_levels);
-	
-	return m_grids[level]->getInt(x, y, z);
-}
-
-long GridContainer::getLong3D(double x, double y, double z,
-	unsigned int level)
-{
-	assert(level < m_levels);
-	
-	return m_grids[level]->getLong(x, y, z);
-}
-
-float GridContainer::getFloat3D(double x, double y, double z,
-	unsigned int level)
-{
-	assert(level < m_levels);
-	
-	return m_grids[level]->getFloat(x, y, z);
-}
-
-double GridContainer::getDouble3D(double x, double y, double z,
-	unsigned int level)
-{
-	assert(level < m_levels);
-	
-	return m_grids[level]->getDouble(x, y, z);
-}
-
-void GridContainer::getBuf3D(void* buf, double x, double y, double z,
-	unsigned int level)
-{
-	assert(level < m_levels);
-	
-	m_grids[level]->getBuf(buf, x, y, z);
-}
-
-bool GridContainer::exportPng(const char* filename, unsigned int level)
-{
-	assert(level < m_levels);
-	
-	return m_grids[level]->exportPng(filename);
 }
 
 // Fortran <-> c translation array

@@ -11,12 +11,11 @@
 #include <time.h>
 
 /**
- * Each {@link GridContainer} has it own communicator. Therefore, we can use
- * the level for send/recv operations within the mutex.
+ * @param id A unique id within the communicator
  */
 LargeGrid::LargeGrid(GridContainer& container, unsigned int hint,
-	unsigned int level)
-	: Grid(container, hint), m_globalMutex(level)
+	unsigned int id)
+	: Grid(container, hint), m_globalMutex(id)
 {
 	m_data = 0L;
 	m_dictionary = 0L;

@@ -9,15 +9,17 @@
 
 #include "grid.h"
 
+#include "simplegridcontainer.h"
+
 class GridTest : public CxxTest::TestSuite
 {
-	GridContainer* c;
+	SimpleGridContainer* c;
 	Grid* grid;
 public:
 	void setUp(void)
 	{
 		// Set up a 1d grid
-		c = new GridContainer(asagi::Grid::FLOAT);
+		c = new SimpleGridContainer(asagi::Grid::FLOAT);
 		c->open("../"NC_1D);
 		grid = c->m_grids[0];
 	}
@@ -47,7 +49,7 @@ public:
 	void testGetXMax(void)
 	{
 		TS_ASSERT_LESS_THAN(
-			Grid::round(grid->getXMax() - grid->offsetX) * grid->scalingInvX,
+			Grid::round(grid->getXMax() - grid->offset[0]) * grid->scalingInv[0],
 			grid->getXDim());
 	}
 };

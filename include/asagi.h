@@ -29,6 +29,7 @@ namespace asagi {
 	const unsigned int NO_HINT = 0;
 	const unsigned int HAS_TIME = 1;
 	const unsigned int LARGE_GRID = 2;
+	const unsigned int ADAPTIVE = 4;
 }
 
 /**
@@ -40,6 +41,7 @@ public:
 	enum Type { BYTE, INT, LONG, FLOAT, DOUBLE };
 	enum Error { SUCCESS = 0, MPI_ERROR, UNKNOWN_PARAM, INVALID_VALUE,
 		NOT_OPEN, VAR_NOT_FOUND, UNSUPPORTED_DIMENSIONS,
+		MULTIPLE_TOPGRIDS,
 		INVALID_VAR_SIZE };
 public:
 	/**
@@ -225,12 +227,14 @@ typedef asagi::Grid::Error grid_error;
 const unsigned int GRID_NO_HINT = 0;
 const unsigned int GRID_HAS_TIME = 1;
 const unsigned int GRID_LARGE_GRID = 2;
+const unsigned int GRID_ADAPTIVE = 4;
 
 typedef struct grid_handle grid_handle;
 typedef enum { GRID_BYTE, GRID_INT, GRID_LONG, GRID_FLOAT, GRID_DOUBLE } grid_type;
 typedef enum { GRID_SUCCESS = 0, GRID_MPI_ERROR, GRID_UNKNOWN_PARAM,
 	GRID_INVALID_VALUE, GRID_NOT_OPEN, GRID_VAR_NOT_FOUND,
-	GRID_UNSUPPORTED_DIMENSIONS, GRID_INVALID_VAR_SIZE } grid_error;
+	GRID_UNSUPPORTED_DIMENSIONS, GRID_MULTIPLE_TOPGRIDS,
+	GRID_INVALID_VAR_SIZE } grid_error;
 #endif
 
 

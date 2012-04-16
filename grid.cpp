@@ -107,6 +107,7 @@ asagi::Grid::Error Grid::setParam(const char* name, const char* value)
 asagi::Grid::Error Grid::open(const char* filename)
 {
 	asagi::Grid::Error error;
+	double scaling[3];
 	
 	// Open NetCDF file
 	m_inputFile = new NetCdf(filename, getMPIRank());
@@ -118,6 +119,15 @@ asagi::Grid::Error Grid::open(const char* filename)
 	m_dim[0] = m_inputFile->getXDim();
 	m_dim[1] = m_inputFile->getYDim();
 	m_dim[2] = m_inputFile->getZDim();
+	
+	// Get offset and scaling
+	offset[0] = m_inputFile->getXOffset();
+	offset[1] = m_inputFile->getYOffset();
+	offset[2] = m_inputFile->getZOffset();
+	
+	scaling[0] = m_inputFile->getXScaling();
+	scaling[1] = m_inputFile->getYScaling();
+	scaling[2] = m_inputFile->getZScaling();
 	
 	// Set time dimension
 	if (m_timeDimension == -1) {
@@ -152,26 +162,35 @@ asagi::Grid::Error Grid::open(const char* filename)
 		
 		// Integer way of rounding up
 		blocks[i] = (m_dim[i] + m_blockSize[i] - 1) / m_blockSize[i];
+		
+		scalingInv[i] = getInvScaling(scaling[i]);
+		
+		// Set min/max
+		if (isinf(scaling[i])) {
+			m_min[i] = -std::numeric_limits<double>::infinity();
+			m_max[i] = std::numeric_limits<double>::infinity();
+		} else if (m_container.getValuePos() == GridContainer::CELL_CENTERED) {
+			m_min[i] = offset[i] + std::min(scaling[i] * (0. - 0.5),
+				scaling[i] * (m_dim[i] - 1 - 0.5));
+			m_max[i] =  offset[i] + std::max(scaling[i] * (0. - 0.5),
+				scaling[i] * (m_dim[i] - 1 + 0.5))
+				- NUMERIC_PRECISION;
+		} else {
+			m_min[i] = offset[i] + std::min(0.,
+				(m_dim[i] - 1) * scaling[i]);
+			m_max[i] = offset[i] + std::max(0.,
+				(m_dim[i] - 1) * scaling[i]);
+		}
+		
+		if (m_max[i] < m_min[i])
+			// Can happen because of NUMERIC_PRECISION
+			m_max[i] = m_min[i];
 	}
 	
 	// Set default cache size
 	if (m_blocksPerNode < 0)
 		// Default value
 		m_blocksPerNode = 80;
-	
-	// Get values for min/max
-	offsetX = m_inputFile->getXOffset();
-	offsetY = m_inputFile->getYOffset();
-	offsetZ = m_inputFile->getZOffset();
-	
-	scalingX = m_inputFile->getXScaling();
-	scalingY = m_inputFile->getYScaling();
-	scalingZ = m_inputFile->getZScaling();
-	
-	// Set scaling for coordinate -> index mapping
-	scalingInvX = getInvScaling(scalingX);
-	scalingInvY = getInvScaling(scalingY);
-	scalingInvZ = getInvScaling(scalingZ);
 	
 	// Init type
 	if ((error = getType().check(*m_inputFile)) != asagi::Grid::SUCCESS)
@@ -187,81 +206,6 @@ asagi::Grid::Error Grid::open(const char* filename)
 	}
 	
 	return error;
-}
-
-double Grid::getXMin()
-{
-	if (isinf(scalingX))
-		return -std::numeric_limits<double>::infinity();
-	
-	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
-		return offsetX + std::min(scalingX * (0. - 0.5),
-			scalingX * (getXDim() - 1 - 0.5));
-	
-	return offsetX + std::min(0., (getXDim() - 1) * scalingX);
-}
-
-double Grid::getYMin()
-{
-	if (isinf(scalingY))
-		return -std::numeric_limits<double>::infinity();
-	
-	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
-		return offsetY + std::min(scalingY * (0. - 0.5),
-			scalingY * (getYDim() - 1 - 0.5));
-	
-	return offsetY + std::min(0., (getYDim() - 1) * scalingY);
-}
-
-double Grid::getZMin()
-{
-	if (isinf(scalingZ))
-		return -std::numeric_limits<double>::infinity();
-	
-	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
-		return offsetZ + std::min(scalingZ * (0. - 0.5),
-			scalingZ * (getZDim() - 1 - 0.5));
-	
-	return offsetZ + std::min(0., (getZDim() - 1) * scalingZ);
-}
-
-double Grid::getXMax()
-{
-	if (isinf(scalingX))
-		return std::numeric_limits<double>::infinity();
-	
-	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
-		return offsetX + std::max(scalingX * (0. - 0.5),
-			scalingX * (getXDim() - 1 + 0.5))
-			- NUMERIC_PRECISION;
-	
-	return offsetX + std::max(0., (getXDim() - 1) * scalingX);
-}
-
-double Grid::getYMax()
-{
-	if (isinf(scalingY))
-		return std::numeric_limits<double>::infinity();
-	
-	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
-		return offsetY + std::max(scalingY * (0. - 0.5),
-			scalingY * (getYDim() - 1 + 0.5))
-			- NUMERIC_PRECISION;
-	
-	return offsetY + std::max(0., (getYDim() - 1) * scalingY);
-}
-
-double Grid::getZMax()
-{
-	if (isinf(scalingZ))
-		return std::numeric_limits<double>::infinity();
-	
-	if (m_container.getValuePos() == GridContainer::CELL_CENTERED)
-		return offsetZ + std::max(scalingZ * (0. - 0.5),
-			scalingZ * (getZDim() - 1 + 0.5))
-			- NUMERIC_PRECISION;
-	
-	return offsetZ + std::max(0., (getZDim() - 1) * scalingZ);
 }
 
 char Grid::getByte(double x, double y, double z)
@@ -350,9 +294,9 @@ bool Grid::exportPng(const char* filename)
 void Grid::getAt(void* buf, types::Type::converter_t converter,
 	double x, double y, double z)
 {
-	x = round((x - offsetX) * scalingInvX);
-	y = round((y - offsetY) * scalingInvY);
-	z = round((z - offsetZ) * scalingInvZ);
+	x = round((x - offset[0]) * scalingInv[0]);
+	y = round((y - offset[1]) * scalingInv[1]);
+	z = round((z - offset[2]) * scalingInv[2]);
 
 	assert(x >= 0 && x < getXDim()
 		&& y >= 0 && y < getYDim()

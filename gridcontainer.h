@@ -16,12 +16,6 @@ private:
 	/** Id of the grid, used for the fortran <-> c interface */
 	int m_id;
 	
-	/** Number of levels this grid container has */
-	unsigned int m_levels;
-	
-	/** All grids we control */
-	::Grid **m_grids;
-	
 #ifndef ASAGI_NOMPI
 	/** The communicator we use */
 	MPI_Comm m_communicator;
@@ -37,6 +31,11 @@ private:
 	 */
 	types::Type *m_type;
 	
+protected:
+	/** Number of levels this grid container has */
+	const unsigned int m_levels;
+	
+	/** Subclasses should set this */
 	double m_minX;
 	double m_minY;
 	double m_minZ;
@@ -54,9 +53,15 @@ public:
 #ifndef ASAGI_NOMPI
 	Error setComm(MPI_Comm comm = MPI_COMM_WORLD);
 #endif // ASAGI_NOMPI
-	Error setParam(const char* name, const char* value,
+	virtual Error setParam(const char* name, const char* value,
 		unsigned int level = 0);
-	Error open(const char* filename, unsigned int level = 0);
+	/**
+	 * The default implementation make sure a communicator is set.
+	 * <br>
+	 * Subclasses should override this function and call open from the 
+	 * parent class before doing anythin.
+	 */
+	virtual Error open(const char* filename, unsigned int level = 0);
 	
 	double getXMin()
 	{
@@ -138,20 +143,20 @@ public:
 		getBuf3D(buf, x, y, 0, level);
 	}
 	
-	char getByte3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	int getInt3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	long getLong3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	float getFloat3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	double getDouble3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	void getBuf3D(void* buf, double x, double y = 0, double z = 0,
-		unsigned int level = 0);
+	virtual char getByte3D(double x, double y = 0, double z = 0,
+		unsigned int level = 0) = 0;
+	virtual int getInt3D(double x, double y = 0, double z = 0,
+		unsigned int level = 0) = 0;
+	virtual long getLong3D(double x, double y = 0, double z = 0,
+		unsigned int level = 0) = 0;
+	virtual float getFloat3D(double x, double y = 0, double z = 0,
+		unsigned int level = 0) = 0;
+	virtual double getDouble3D(double x, double y = 0, double z = 0,
+		unsigned int level = 0) = 0;
+	virtual void getBuf3D(void* buf, double x, double y = 0, double z = 0,
+		unsigned int level = 0) = 0;
 	
-	bool exportPng(const char* filename, unsigned int level = 0);
+	virtual bool exportPng(const char* filename, unsigned int level = 0) = 0;
 	
 #ifndef ASAGI_NOMPI
 	MPI_Comm getMPICommunicator()

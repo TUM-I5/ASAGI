@@ -27,24 +27,19 @@ private:
 	/** Total number of elements in x, y and z dimension */
 	unsigned long m_dim[3];
 	
-	double offsetX;
-	double offsetY;
-	double offsetZ;
+	double offset[3];
 	
 	/**
 	 * used to calculate {@link getXMin()} and {@link getXMax()}
 	 */
-	double scalingX;
-	double scalingY;
-	double scalingZ;
+	double m_min[3];
+	double m_max[3];
 	
 	/**
-	 * 1/{@link scalingX} in most cases (exceptions: {@link scalingX} = 0
-	 * and {@link scalingX = inf}), used to convert coordinates to indices
+	 * 1/scaling in most cases (exceptions: scaling = 0
+	 * and scaling = inf), used to convert coordinates to indices
 	 */
-	double scalingInvX;
-	double scalingInvY;
-	double scalingInvZ;
+	double scalingInv[3];
 	
 	/** Number of blocks in x, y and z dimension */
 	unsigned long blocks[3];
@@ -72,12 +67,30 @@ public:
 	
 	asagi::Grid::Error open(const char* filename);
 	
-	double getXMin();
-	double getYMin();
-	double getZMin();
-	double getXMax();
-	double getYMax();
-	double getZMax();
+	double getXMin()
+	{
+		return m_min[0];
+	}
+	double getYMin()
+	{
+		return m_min[1];
+	}
+	double getZMin()
+	{
+		return m_min[2];
+	}
+	double getXMax()
+	{
+		return m_max[0];
+	}
+	double getYMax()
+	{
+		return m_max[1];
+	}
+	double getZMax()
+	{
+		return m_max[2];
+	}
 	
 	char getByte(double x, double y = 0, double z = 0);
 	int getInt(double x, double y = 0, double z = 0);
