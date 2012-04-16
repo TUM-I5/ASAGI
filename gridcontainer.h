@@ -22,8 +22,10 @@ private:
 	/** All grids we control */
 	::Grid **m_grids;
 	
+#ifndef ASAGI_NOMPI
 	/** The communicator we use */
 	MPI_Comm m_communicator;
+#endif // ASAGI_NOMPI
 	/** Rank of this process */
 	int m_mpiRank;
 	/** Size of the MPI communicator */
@@ -48,8 +50,10 @@ public:
 		unsigned int hint = asagi::NO_HINT,
 		unsigned int level = 1);
 	virtual ~GridContainer();
-		
+	
+#ifndef ASAGI_NOMPI
 	Error setComm(MPI_Comm comm = MPI_COMM_WORLD);
+#endif // ASAGI_NOMPI
 	Error setParam(const char* name, const char* value,
 		unsigned int level = 0);
 	Error open(const char* filename, unsigned int level = 0);
@@ -149,10 +153,12 @@ public:
 	
 	bool exportPng(const char* filename, unsigned int level = 0);
 	
+#ifndef ASAGI_NOMPI
 	MPI_Comm getMPICommunicator()
 	{
 		return m_communicator;
 	}
+#endif // ASAGI_NOMPI
 	
 	int getMPIRank()
 	{

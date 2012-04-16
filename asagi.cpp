@@ -34,10 +34,12 @@ grid_handle* grid_create_array(grid_type basic_type, unsigned int hint, unsigned
 	return asagi::Grid::createArray(basic_type, hint, levels);
 }
 
+#ifndef ASAGI_NOMPI
 grid_error grid_set_comm(grid_handle* handle, MPI_Comm comm)
 {
 	return handle->setComm(comm);
 }
+#endif // ASAIG_NOMPI
 
 grid_error grid_set_param(grid_handle* handle, const char* name,
 	const char* value, unsigned int level)

@@ -1,8 +1,6 @@
 #ifndef DEBUG_DBG_H
 #define DEBUG_DBG_H
 
-#include <mpi.h>
-
 #include <algorithm>
 #include <iostream>
 #include <sstream>

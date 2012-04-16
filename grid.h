@@ -98,10 +98,12 @@ private:
 	 */
 	float getAtFloat(unsigned long x, unsigned long y);
 protected:
+#ifndef ASAGI_NOMPI
 	MPI_Comm getMPICommunicator()
 	{
 		return m_container.getMPICommunicator();
 	}
+#endif // ASAGI_NOMPI
 	int getMPIRank()
 	{
 		return m_container.getMPIRank();

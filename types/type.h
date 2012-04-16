@@ -46,7 +46,9 @@ public:
 		unsigned long xsize, unsigned long ysize, unsigned long zsize,
 		void *buf) = 0;
 	
+#ifndef ASAGI_NOMPI
 	virtual MPI_Datatype getMPIType() = 0;
+#endif // ASAGI_NOMPI
 	
 	/**
 	 * Conversation functions:

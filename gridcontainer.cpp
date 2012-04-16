@@ -1,7 +1,10 @@
 #include "gridcontainer.h"
 
+#include "nompigrid.h"
+#ifndef ASAGI_NOMPI
 #include "simplegrid.h"
 #include "largegrid.h"
+#endif // ASAGI_NOMPI
 
 #include "types/arraytype.h"
 #include "types/basictype.h"
@@ -20,7 +23,9 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	
 	m_levels = levels;
 	
+#ifndef ASAGI_NOMPI
 	m_communicator = MPI_COMM_NULL;
+#endif // ASAGI_NOMPI
 	
 	if (isArray) {
 		switch (type) {
@@ -72,6 +77,10 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	m_valuePos = CELL_CENTERED;
 	
 	m_grids = new ::Grid*[levels];
+#ifdef ASAGI_NOMPI
+	for (unsigned int i = 0; i < levels; i++)
+		m_grids[i] = new NoMPIGrid(*this, hint);
+#else // ASAGI_NOMPI
 	if (hint & asagi::LARGE_GRID) {
 		for (unsigned int i = 0; i < levels; i++)
 			m_grids[i] = new LargeGrid(*this, hint, i);
@@ -79,6 +88,11 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 		for (unsigned int i = 0; i < levels; i++)
 			m_grids[i] = new SimpleGrid(*this, hint);
 	}
+#endif // ASAGI_NOMPI
+	
+	// Default values (probably only useful when compiled without MPI support)
+	m_mpiRank = 0;
+	m_mpiSize = 1;
 }
 
 
@@ -89,13 +103,16 @@ GridContainer::~GridContainer()
 	delete [] m_grids;
 	delete m_type;
 	
+#ifndef ASAGI_NOMPI
 	if (m_communicator != MPI_COMM_NULL)
 		MPI_Comm_free(&m_communicator);
+#endif // ASAGI_NOMPI
 	
 	// Remove from fortran <-> c translation
 	m_pointers.remove(m_id);
 }
 
+#ifndef ASAGI_NOMPI
 asagi::Grid::Error GridContainer::setComm(MPI_Comm comm)
 {
 	if (m_communicator != MPI_COMM_NULL)
@@ -110,6 +127,7 @@ asagi::Grid::Error GridContainer::setComm(MPI_Comm comm)
 	
 	return SUCCESS;
 }
+#endif // ASAGI_NOMPI
 
 asagi::Grid::Error GridContainer::setParam(const char* name, const char* value,
 	unsigned int level)
@@ -138,9 +156,11 @@ asagi::Grid::Error GridContainer::open(const char* filename, unsigned int level)
 	
 	assert(level < m_levels);
 	
+#ifndef ASAGI_NOMPI
 	result = setComm(); // Make sure we have our own communicator
 	if (result != SUCCESS)
 		return result;
+#endif // ASAGI_NOMPI
 	
 	result = m_grids[level]->open(filename);
 	if (result != SUCCESS)

@@ -18,15 +18,24 @@ private:
 	/** Number of elements in the array */
 	unsigned int m_arraySize;
 	
+#ifndef ASAGI_NOMPI
 	/** The MPI_Datatype representing this type*/
 	MPI_Datatype m_mpiType;
+#endif // ASAGI_NOMPI
 	
 public:
-	ArrayType() : m_mpiType(MPI_DATATYPE_NULL) { }
+	ArrayType()
+#ifndef ASAGI_NOMPI
+		: m_mpiType(MPI_DATATYPE_NULL)
+#endif // ASAGI_NOMPI
+	{
+	}
 	
 	virtual ~ArrayType()
 	{
+#ifndef ASAGI_NOMPI
 		MPI_Type_free(&m_mpiType);
+#endif // ASAGI_NOMPI
 	}
 	
 	asagi::Grid::Error check(io::NetCdf& file)
@@ -36,12 +45,14 @@ public:
 		
 		m_arraySize = file.getVarSize() / sizeof(T);
 		
+#ifndef ASAGI_NOMPI
 		// Create the mpi datatype
 		if (MPI_Type_contiguous(m_arraySize, BasicType<T>::getMPIType(),
 			&m_mpiType) != MPI_SUCCESS)
 			return asagi::Grid::MPI_ERROR;
 		if (MPI_Type_commit(&m_mpiType) != MPI_SUCCESS)
 			return asagi::Grid::MPI_ERROR;
+#endif // ASAGI_NOMPI
 		
 		return asagi::Grid::SUCCESS;
 	}
@@ -59,10 +70,12 @@ public:
 		file.getVar<void>(buf, xoffset, yoffset, zoffset, xsize, ysize, zsize);
 	}
 	
+#ifndef ASAGI_NOMPI
 	MPI_Datatype getMPIType()
 	{
 		return m_mpiType;
 	}
+#endif // ASAGI_NOMPI
 };
 
 }

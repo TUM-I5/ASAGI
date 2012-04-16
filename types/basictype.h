@@ -23,7 +23,9 @@ public:
 		file.getVar<T>(buf, xoffset, yoffset, zoffset, xsize, ysize, zsize);
 	}
 	
+#ifndef ASAGI_NOMPI
 	virtual MPI_Datatype getMPIType();
+#endif // ASAGI_NOMPI
 	
 	void convertByte(void* data, void* buf)
 	{
@@ -51,11 +53,13 @@ public:
 	}
 };
 
+#ifndef ASAGI_NOMPI
 template<> MPI_Datatype BasicType<char>::getMPIType();
 template<> MPI_Datatype BasicType<int>::getMPIType();
 template<> MPI_Datatype BasicType<long>::getMPIType();
 template<> MPI_Datatype BasicType<float>::getMPIType();
 template<> MPI_Datatype BasicType<double>::getMPIType();
+#endif // ASAGI_NOMPI
 
 }
 

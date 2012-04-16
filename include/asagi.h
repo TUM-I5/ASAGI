@@ -11,7 +11,9 @@
 #ifndef _ASAGI_H
 #define _ASAGI_H
 
+#ifndef ASAGI_NOMPI
 #include <mpi.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,7 +51,9 @@ public:
 				// child classes are only called if we have it
 				// here
 	
+#ifndef ASAGI_NOMPI
 	virtual Error setComm(MPI_Comm comm) = 0;
+#endif
 	/**
 	 * @ingroup cxx_interface
 	 * 
@@ -235,7 +239,9 @@ grid_handle* grid_create(grid_type type, unsigned int hint,
 grid_handle* grid_create_array(grid_type basic_type, unsigned int hint,
 	unsigned int levels);
 
+#ifndef ASAGI_NOMPI
 grid_error grid_set_comm(grid_handle* handle, MPI_Comm comm);
+#endif
 grid_error grid_set_param(grid_handle* handle, const char* name,
 	const char* value, unsigned int level);
 grid_error grid_open(grid_handle* handle, const char* filename,

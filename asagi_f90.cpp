@@ -18,9 +18,15 @@ int f90grid_create_array(grid_type basic_type, int hint, int levels)
 
 grid_error f90grid_set_comm(int grid_id, int comm)
 {
+#ifdef ASAGI_NOMPI
+	// We do not use a preprocessor in the fortran include file to disable
+	// this completly. Instead this function always return an error.
+	return asagi::Grid::MPI_ERROR;
+#else // ASAGI_NOMPI
 	// MPI_Comm_f2c expects an MPI_Fint, however iso_c_bindings
 	// already converts this parameter into c integer
 	return GridContainer::f2c(grid_id)->setComm(MPI_Comm_f2c(comm));
+#endif // ASAGI_NOMPI
 }
 
 grid_error f90grid_set_param(int grid_id, const char* name,

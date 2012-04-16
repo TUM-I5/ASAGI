@@ -2,6 +2,7 @@
 
 using namespace types;
 
+#ifndef ASAGI_NOMPI
 template<> MPI_Datatype BasicType<char>::getMPIType()
 {
 	return MPI_BYTE;
@@ -26,3 +27,4 @@ template<> MPI_Datatype BasicType<double>::getMPIType()
 {
 	return MPI_DOUBLE;
 }
+#endif // ASAGI_NOMPI
