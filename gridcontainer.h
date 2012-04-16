@@ -143,21 +143,6 @@ public:
 		getBuf3D(buf, x, y, 0, level);
 	}
 	
-	virtual char getByte3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0) = 0;
-	virtual int getInt3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0) = 0;
-	virtual long getLong3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0) = 0;
-	virtual float getFloat3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0) = 0;
-	virtual double getDouble3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0) = 0;
-	virtual void getBuf3D(void* buf, double x, double y = 0, double z = 0,
-		unsigned int level = 0) = 0;
-	
-	virtual bool exportPng(const char* filename, unsigned int level = 0) = 0;
-	
 #ifndef ASAGI_NOMPI
 	MPI_Comm getMPICommunicator()
 	{
