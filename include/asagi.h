@@ -238,16 +238,41 @@ typedef enum { GRID_SUCCESS = 0, GRID_MPI_ERROR, GRID_UNKNOWN_PARAM,
 #endif
 
 
+/**
+ * @ingroup c_interface
+ * 
+ * @see asagi::Grid#create()
+ */
 grid_handle* grid_create(grid_type type, unsigned int hint,
 	unsigned int levels);
+/**
+ * @ingroup c_interface
+ * 
+ * @see asagi::Grid#createArray()
+ */
 grid_handle* grid_create_array(grid_type basic_type, unsigned int hint,
 	unsigned int levels);
 
 #ifndef ASAGI_NOMPI
+/**
+ * @ingroup c_interface
+ * 
+ * @see asagi::Grid#setComm()
+ */
 grid_error grid_set_comm(grid_handle* handle, MPI_Comm comm);
 #endif
+/**
+ * @ingroup c_interface
+ * 
+ * @see asagi::Grid#setParam()
+ */
 grid_error grid_set_param(grid_handle* handle, const char* name,
 	const char* value, unsigned int level);
+/**
+ * @ingroup c_interface
+ * 
+ * @see asagi::Grid#open()
+ */
 grid_error grid_open(grid_handle* handle, const char* filename,
 	unsigned int level);
 
@@ -257,6 +282,11 @@ grid_error grid_open(grid_handle* handle, const char* filename,
  * @see asagi::Grid#getXMin()
  */
 double grid_min_x(grid_handle* handle);
+/**
+ * @ingroup c_interface
+ *
+ * @see asagi::Grid#getXMax()
+ */
 double grid_min_y(grid_handle* handle);
 double grid_min_z(grid_handle* handle);
 double grid_max_x(grid_handle* handle);
@@ -294,8 +324,8 @@ float grid_get_float_3d(grid_handle* handle, double x, double y, double z,
 	unsigned int level);
 double grid_get_double_3d(grid_handle* handle, double x, double y, double z,
 	unsigned int level);
-void grid_get_buf_3d(grid_handle* handle,void* buf, double x, double y, double z,
-	unsigned int level);
+void grid_get_buf_3d(grid_handle* handle,void* buf, double x, double y,
+	double z, unsigned int level);
 
 /**
  * @ingroup c_interface
