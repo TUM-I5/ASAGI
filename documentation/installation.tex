@@ -34,7 +34,7 @@ cmake <path/to/asagi_sources>
 Several environment variables affect the behavior of CMake. They must be set before running ``cmake''.
 
 \begin{description}
- \item[Compiler] The compiler can be selected by setting \texttt{CC} (C compiler), \texttt{CXX} (C++ compiler) and \texttt{FC} (FORTRAN compiler) environment variables. C and FORTRAN compiler are only required for C and FORTRAN examples.
+ \item[Compiler] The compiler can be selected by setting \texttt{CC} (C compiler), \texttt{CXX} (C++ compiler) and \texttt{FC} (Fortran compiler) environment variables. C and Fortran compiler are only required for C and Fortran examples.
  \item[Libraries] The \texttt{CMAKE\_PREFIX\_PATH} is used when searching for the MPI, Net\-CDF and PNG library. If NetCDF was configured with \texttt{--prefix=<in\-stall\_dir>} for example, set \texttt{CMAKE\_PREFIX\_PATH=<install\_dir>}.
 \end{description}
 
@@ -49,7 +49,7 @@ The important variables are listed below. Most of the variables are ASAGI specif
  \item[CMAKE\_BUILD\_TYPE = Debug\textbar Release] When set to ``Debug'', addi\-tion\-al run-time checks are enabled as well as debug messages. \texttt{[Release]}
  \item[CMAKE\_INSTALL\_PREFIX] Installation directory for ASAGI.\\ \texttt{[/usr/local/]}
  \item[EXAMPLES = ON\textbar OFF] Compile example programs. \texttt{[OFF]}
- \item[FORTRAN\_SUPPORT = ON\textbar OFF] Compile with FORTRAN support.\\ \texttt{[ON]}
+ \item[FORTRAN\_SUPPORT = ON\textbar OFF] Compile with Fortran support.\\ \texttt{[ON]}
  \item[STATIC\_LIB = ON\textbar OFF] Compile ASAGI as a static library. \texttt{[OFF]}
  \item[TESTS = ON\textbar OFF] Compile tests. \texttt{[OFF]}
  \item[THREADSAFETY = ON\textbar OFF] If enabled all ASAGI functions are thread-safe. This is required, for example, if ASAGI is used in hybrid MPI/""OpenMP programs. \texttt{[ON]}
