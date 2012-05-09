@@ -41,7 +41,7 @@ asagi::Grid::Error LargeGrid::init()
 	unsigned long blockSize = getBlockSize();
 	unsigned long dictCount = getLocalBlockCount();
 	
-	m_blockManager.init(getBlocksPerNode());
+	m_blockManager.init(getBlocksPerNode(), getHandsDiff());
 	
 	// Dictionary
 	if (MPI_Alloc_mem(sizeof(unsigned long) * getDictLength() *

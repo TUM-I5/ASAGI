@@ -80,6 +80,8 @@ public:
 	 * 1 if it is an 1- or 2-dimensional grid)
 	 * @li @b block-cache-size Number of blocks cached on each node
 	 * (Default: 80)
+	 * @li @b cache-hand-difference The difference between the hands of the
+	 * 2-handed clock algorithm (Default: block-cache-size/2)
 	 * 
 	 * @param name The name of the parameter
 	 * @param value The new value for the parameter

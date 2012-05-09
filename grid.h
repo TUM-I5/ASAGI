@@ -51,6 +51,13 @@ private:
 	long m_blocksPerNode;
 	
 	/**
+	 * Difference between the hands of the 2-handed clock algorithm.
+	 * Subclasses my require this to initialize the
+	 * {@link blocks::Blockmanager}.
+	 */
+	long m_handDiff;
+	
+	/**
 	 * 0, 1 or 2 if x, y or z is a time dimension (z is default if
 	 * the HAS_TIME hint is specified);
 	 * -2 if we don't have any time dimension;
@@ -155,6 +162,15 @@ protected:
 	unsigned long getBlocksPerNode()
 	{
 		return m_blocksPerNode;
+	}
+	
+	/**
+	 * @return The difference of the 2 hands in the clock algorithm
+	 *  configured by the user
+	 */
+	long getHandsDiff()
+	{
+		return m_handDiff;
 	}
 	
 	/**

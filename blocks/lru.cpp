@@ -12,13 +12,15 @@ LRU::~LRU()
 	delete [] m_referenced;
 }
 
-void LRU::init(unsigned long size)
+void LRU::init(unsigned long size, long handDiff)
 {
 	m_size = size;
 	m_nextPage = size - 1; // Some magic so getFree() works
-	// At the moment this is fixed at 2/3 of the size, maybe the user
-	// should control this
-	m_nextClear = size * 2 / 3;
+	if (handDiff < 0)
+		// Some default value
+		m_nextClear = size / 2;
+	else
+		m_nextClear = handDiff;
 	
 	m_referenced = new bool[size];
 	for (unsigned long i = 0; i < m_nextClear; i++)

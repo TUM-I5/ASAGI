@@ -45,11 +45,4 @@ public:
 			asagi::Grid::SUCCESS);
 		TS_ASSERT_EQUALS(grid->m_blocksPerNode, 100);
 	}
-	
-	void testGetXMax(void)
-	{
-		TS_ASSERT_LESS_THAN(
-			Grid::round(grid->getXMax() - grid->offset[0]) * grid->scalingInv[0],
-			grid->getXDim());
-	}
 };

@@ -24,7 +24,12 @@ namespace blocks
 		BlockManager();
 		virtual ~BlockManager();
 		
-		void init(unsigned long maxBlocksPerNode);
+		/**
+		 * @param handDiff Difference between the two hands in the
+		 *  2-handed clock algorithm
+		 */
+		void init(unsigned long maxBlocksPerNode,
+			long handDiff = -1);
 		
 		bool getIndex(unsigned long &block);
 		

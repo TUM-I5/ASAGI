@@ -34,7 +34,7 @@ asagi::Grid::Error SimpleGrid::init()
 	// Allocate memory for slave blocks
 	slaveData = static_cast<unsigned char*>(
 		malloc(getType().getSize() * blockSize * getBlocksPerNode()));
-	blockManager.init(getBlocksPerNode());
+	blockManager.init(getBlocksPerNode(), getHandsDiff());
 
 	if (MPI_Alloc_mem(getType().getSize() * blockSize * masterBlockCount,
 		MPI_INFO_NULL, &masterData) != MPI_SUCCESS)

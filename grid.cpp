@@ -101,6 +101,12 @@ asagi::Grid::Error Grid::setParam(const char* name, const char* value)
 		return asagi::Grid::SUCCESS;
 	}
 	
+	if (strcmp(name, "cache-hand-difference") == 0) {
+		m_handDiff = atol(value);
+		
+		return asagi::Grid::SUCCESS;
+	}
+	
 	return asagi::Grid::UNKNOWN_PARAM;
 }
 

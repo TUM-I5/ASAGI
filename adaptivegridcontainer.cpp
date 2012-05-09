@@ -130,8 +130,6 @@ bool AdaptiveGridContainer::exportPng(const char* filename, unsigned int level)
 	std::vector< ::Grid*>::const_iterator grid;
 	
 	assert(level < m_levels);
-	dbgDebug() << m_minX << m_maxX << m_minY << m_maxY << m_minZ
-		<< m_maxZ << x << y << z;
 	assert(m_minX <= x && m_maxX >= x && m_minY <= y && m_maxY >= y
 		&& m_minZ <= z && m_maxZ >= z);
 	

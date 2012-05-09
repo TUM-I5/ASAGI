@@ -13,13 +13,14 @@ BlockManager::~BlockManager()
 	delete [] m_indexToBlock;
 }
 
-void BlockManager::init(unsigned long maxBlocksPerNode)
+void BlockManager::init(unsigned long maxBlocksPerNode,
+	long handDiff)
 {
 	m_indexToBlock = new long[maxBlocksPerNode];
 	for (unsigned long i = 0; i < maxBlocksPerNode; i++)
 		m_indexToBlock[i] = -1;
 	
-	m_lru.init(maxBlocksPerNode);
+	m_lru.init(maxBlocksPerNode, handDiff);
 }
 
 /**

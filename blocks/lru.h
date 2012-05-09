@@ -4,7 +4,8 @@
 namespace blocks
 {
 	/**
-	 * Implements the Last-recently-used page replacement algorithm
+	 * Implements the clock page replacement algorithm with 2 hands.
+	 * This is a simplification of least-recently-used.
 	 */
 	class LRU
 	{
@@ -24,7 +25,7 @@ namespace blocks
 		LRU();
 		virtual ~LRU();
 		
-		void init(unsigned long size);
+		void init(unsigned long size, long handDiff = 0);
 		
 		void access(unsigned long index);
 		unsigned long getFree();
