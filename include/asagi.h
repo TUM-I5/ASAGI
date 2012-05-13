@@ -34,6 +34,8 @@ namespace asagi {
 
 /**
  * @ingroup cxx_interface
+ * 
+ * @brief C++ Interface for ASAGI
  */
 class asagi::Grid
 {
@@ -80,7 +82,7 @@ public:
 	 * 1 if it is an 1- or 2-dimensional grid)
 	 * @li @b block-cache-size Number of blocks cached on each node
 	 * (Default: 80)
-	 * @li @b cache-hand-difference The difference between the hands of the
+	 * @li @b cache-hand-spread The difference between the hands of the
 	 * 2-handed clock algorithm (Default: block-cache-size/2)
 	 * 
 	 * @param name The name of the parameter

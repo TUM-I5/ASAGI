@@ -101,7 +101,8 @@ asagi::Grid::Error Grid::setParam(const char* name, const char* value)
 		return asagi::Grid::SUCCESS;
 	}
 	
-	if (strcmp(name, "cache-hand-difference") == 0) {
+	if ((strcmp(name, "cache-hand-spread") == 0)
+		|| (strcmp(name, "cache-hand-difference") == 0)) { // Obsolete name
 		m_handDiff = atol(value);
 		
 		return asagi::Grid::SUCCESS;

@@ -12,6 +12,8 @@ namespace mpi {
  * See "Implementing Byte-Range Locks Using MPI One-Sided Communication" for
  * details about this algorithm.
  * 
+ * This class only works with at least 2 MPI processes.
+ * 
  * @Warning Aquire and release are notthreadsafe at the moment. We do not need
  * this since the {@link blocks::BlockManager} is not threadsafe either.
  */
