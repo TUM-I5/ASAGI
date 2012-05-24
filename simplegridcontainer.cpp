@@ -30,8 +30,8 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @author Sebastian Rettenberger
- * @version $Id$
+ * @author Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @version \$Id$
  * @copyright GPL
  */
 
