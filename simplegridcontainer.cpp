@@ -31,6 +31,7 @@
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
  * @author Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @date 2012
  * @version \$Id$
  * @copyright GPL
  */
