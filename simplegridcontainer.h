@@ -30,10 +30,8 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @author Sebastian Rettenberger <rettenbs@in.tum.de>
- * @date 2012
+ * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  * @version \$Id$
- * @copyright GPL
  */
 
 #ifndef SIMPLEGRIDCONTAINER_H
@@ -41,6 +39,10 @@
 
 #include "gridcontainer.h"
 
+/**
+ * Simple grid container that stores one grid for each level. Each grid has to
+ * cover the hole domain.
+ */
 class SimpleGridContainer : public GridContainer
 {
 private:

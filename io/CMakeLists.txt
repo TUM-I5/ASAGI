@@ -1,10 +1,10 @@
 ##### Files #####
 set( ioSources
-	netcdf.cpp )
+	netcdfreader.cpp )
 
 if( PNG_FOUND )
 	set( ioSources
-		${ioSources} png.cpp )
+		${ioSources} pngwriter.cpp )
 endif()
 
 ##### Library #####

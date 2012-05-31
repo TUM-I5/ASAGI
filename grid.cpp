@@ -1,3 +1,39 @@
+/**
+ * @file
+ *  This file is part of ASAGI.
+ * 
+ *  ASAGI is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  ASAGI is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with ASAGI.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Diese Datei ist Teil von ASAGI.
+ *
+ *  ASAGI ist Freie Software: Sie koennen es unter den Bedingungen
+ *  der GNU General Public License, wie von der Free Software Foundation,
+ *  Version 3 der Lizenz oder (nach Ihrer Option) jeder spaeteren
+ *  veroeffentlichten Version, weiterverbreiten und/oder modifizieren.
+ *
+ *  ASAGI wird in der Hoffnung, dass es nuetzlich sein wird, aber
+ *  OHNE JEDE GEWAEHELEISTUNG, bereitgestellt; sogar ohne die implizite
+ *  Gewaehrleistung der MARKTFAEHIGKEIT oder EIGNUNG FUER EINEN BESTIMMTEN
+ *  ZWECK. Siehe die GNU General Public License fuer weitere Details.
+ *
+ *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
+ *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
+ * 
+ * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @version \$Id$
+ */
+
 #include "grid.h"
 #include "gridcontainer.h"
 
@@ -5,7 +41,7 @@
 #include <limits>
 
 #ifdef PNG_ENABLED
-#include "io/png.h"
+#include "io/pngwriter.h"
 #endif
 
 #include "types/basictype.h"
@@ -15,6 +51,10 @@
 
 using namespace io;
 
+/**
+ * @param container The container, this grid belongs to
+ * @param hint Optimization hints
+ */
 Grid::Grid(GridContainer &container, unsigned int hint)
 	: m_container(container), m_variableName("z")
 {
@@ -43,6 +83,7 @@ Grid::~Grid()
  * @li @b y-block-size
  * @li @b z-block-size
  * @li @b block-cache-size
+ * @li @b cache-hand-spread
  * 
  * @see asagi::Grid::setParam(const char*, const char*, unsigned int)
  */
@@ -103,7 +144,7 @@ asagi::Grid::Error Grid::setParam(const char* name, const char* value)
 	
 	if ((strcmp(name, "cache-hand-spread") == 0)
 		|| (strcmp(name, "cache-hand-difference") == 0)) { // Obsolete name
-		m_handDiff = atol(value);
+		m_handSpread = atol(value);
 		
 		return asagi::Grid::SUCCESS;
 	}
@@ -111,13 +152,16 @@ asagi::Grid::Error Grid::setParam(const char* name, const char* value)
 	return asagi::Grid::UNKNOWN_PARAM;
 }
 
+/**
+ * Reads a grid form the file and initilizes all variables
+ */
 asagi::Grid::Error Grid::open(const char* filename)
 {
 	asagi::Grid::Error error;
 	double scaling[3];
 	
 	// Open NetCDF file
-	m_inputFile = new NetCdf(filename, getMPIRank());
+	m_inputFile = new NetCdfReader(filename, getMPIRank());
 	if ((error = m_inputFile->open(m_variableName.c_str()))
 		!= asagi::Grid::SUCCESS)
 		return error;
@@ -128,9 +172,9 @@ asagi::Grid::Error Grid::open(const char* filename)
 	m_dim[2] = m_inputFile->getZDim();
 	
 	// Get offset and scaling
-	offset[0] = m_inputFile->getXOffset();
-	offset[1] = m_inputFile->getYOffset();
-	offset[2] = m_inputFile->getZOffset();
+	m_offset[0] = m_inputFile->getXOffset();
+	m_offset[1] = m_inputFile->getYOffset();
+	m_offset[2] = m_inputFile->getZOffset();
 	
 	scaling[0] = m_inputFile->getXScaling();
 	scaling[1] = m_inputFile->getYScaling();
@@ -168,24 +212,24 @@ asagi::Grid::Error Grid::open(const char* filename)
 		}
 		
 		// Integer way of rounding up
-		blocks[i] = (m_dim[i] + m_blockSize[i] - 1) / m_blockSize[i];
+		m_blocks[i] = (m_dim[i] + m_blockSize[i] - 1) / m_blockSize[i];
 		
-		scalingInv[i] = getInvScaling(scaling[i]);
+		m_scalingInv[i] = getInvScaling(scaling[i]);
 		
 		// Set min/max
 		if (isinf(scaling[i])) {
 			m_min[i] = -std::numeric_limits<double>::infinity();
 			m_max[i] = std::numeric_limits<double>::infinity();
 		} else if (m_container.getValuePos() == GridContainer::CELL_CENTERED) {
-			m_min[i] = offset[i] + std::min(scaling[i] * (0. - 0.5),
+			m_min[i] = m_offset[i] + std::min(scaling[i] * (0. - 0.5),
 				scaling[i] * (m_dim[i] - 1 - 0.5));
-			m_max[i] =  offset[i] + std::max(scaling[i] * (0. - 0.5),
+			m_max[i] =  m_offset[i] + std::max(scaling[i] * (0. - 0.5),
 				scaling[i] * (m_dim[i] - 1 + 0.5))
 				- NUMERIC_PRECISION;
 		} else {
-			m_min[i] = offset[i] + std::min(0.,
+			m_min[i] = m_offset[i] + std::min(0.,
 				(m_dim[i] - 1) * scaling[i]);
-			m_max[i] = offset[i] + std::max(0.,
+			m_max[i] = m_offset[i] + std::max(0.,
 				(m_dim[i] - 1) * scaling[i]);
 		}
 		
@@ -215,6 +259,9 @@ asagi::Grid::Error Grid::open(const char* filename)
 	return error;
 }
 
+/**
+ * @return The value at (x,y,z) as a byte
+ */
 char Grid::getByte(double x, double y, double z)
 {
 	char buf;
@@ -223,6 +270,9 @@ char Grid::getByte(double x, double y, double z)
 	return buf;
 }
 
+/**
+ * @return The value at (x,y,z) as an integer
+ */
 int Grid::getInt(double x, double y, double z)
 {
 	int buf;
@@ -231,6 +281,9 @@ int Grid::getInt(double x, double y, double z)
 	return buf;
 }
 
+/**
+ * @return The value at (x,y,z) as a long
+ */
 long Grid::getLong(double x, double y, double z)
 {
 	long buf;
@@ -239,6 +292,9 @@ long Grid::getLong(double x, double y, double z)
 	return buf;
 }
 
+/**
+ * @return The value at (x,y,z) as a float
+ */
 float Grid::getFloat(double x, double y, double z)
 {
 	float buf;
@@ -247,6 +303,9 @@ float Grid::getFloat(double x, double y, double z)
 	return buf;
 }
 
+/**
+ * @return The value at (x,y,z) as a double
+ */
 double Grid::getDouble(double x, double y, double z)
 {
 	double buf;
@@ -255,11 +314,17 @@ double Grid::getDouble(double x, double y, double z)
 	return buf;
 }
 
+/**
+ * Copys the value at (x,y,z) into the buffer
+ */
 void Grid::getBuf(void* buf, double x, double y, double z)
 {
 	getAt(buf, &types::Type::convertBuffer, x, y, z);
 }
 
+/**
+ * @see asagi::Grid::exportPng()
+ */
 bool Grid::exportPng(const char* filename)
 {
 #ifdef PNG_ENABLED
@@ -277,7 +342,7 @@ bool Grid::exportPng(const char* filename)
 		}
 	}
 	
-	Png png(getXDim(), getYDim());
+	PngWriter png(getXDim(), getYDim());
 	if (!png.create(filename))
 		return false;
 	
@@ -298,12 +363,16 @@ bool Grid::exportPng(const char* filename)
 #endif // PNG_ENABLED
 }
 
+/**
+ * Converts the coordinates to indices and writes the value at the position
+ * into the buffer
+ */
 void Grid::getAt(void* buf, types::Type::converter_t converter,
 	double x, double y, double z)
 {
-	x = round((x - offset[0]) * scalingInv[0]);
-	y = round((y - offset[1]) * scalingInv[1]);
-	z = round((z - offset[2]) * scalingInv[2]);
+	x = round((x - m_offset[0]) * m_scalingInv[0]);
+	y = round((y - m_offset[1]) * m_scalingInv[1]);
+	z = round((z - m_offset[2]) * m_scalingInv[2]);
 
 	assert(x >= 0 && x < getXDim()
 		&& y >= 0 && y < getYDim()
@@ -326,6 +395,9 @@ const char* Grid::DIMENSION_NAMES[] = {"x", "y", "z"};
 
 const double Grid::NUMERIC_PRECISION = 1e-10;
 
+/**
+ * Calculates a nice rgb representation for a value between 0 and 1
+ */
 void Grid::h2rgb(float h, unsigned char &red, unsigned char &green,
 	unsigned char &blue)
 {
@@ -338,7 +410,7 @@ void Grid::h2rgb(float h, unsigned char &red, unsigned char &green,
 	x = 1 - x;
 	
 	// <= checks are not 100% correct, it should be <
-	// but it solves the "larges-value" issue
+	// but it solves the "largest-value" issue
 	if (h <= 1) {
 		red = 255;
 		green = x * 255;
@@ -386,6 +458,9 @@ double Grid::getInvScaling(double scaling)
 	return 1/scaling;
 }
 
+/**
+ * Implementation for round-to-nearst
+ */
 double Grid::round(double value)
 {
 	return floor(value + 0.5);

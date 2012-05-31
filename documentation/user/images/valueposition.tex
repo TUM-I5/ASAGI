@@ -1,0 +1,64 @@
+\documentclass{standalone}
+
+% TODO newer version supports subfig somehow ...
+%\standaloneconfig{float=true}
+
+%\usepackage{subfig}
+\usepackage{tikz}
+
+\begin{document}
+
+%\begin{figure}[h]
+ \def\xwidth{7}
+ \def\ywidth{5}
+ \def\scale{0.7}
+ \centering
+% \subfloat[Cell-centered]{
+\begin{tikzpicture}[scale=\scale]
+ % x coordinates
+ \pgfmathparse{\xwidth-1}
+ \foreach \x in {0,...,\pgfmathresult}
+  \node at (\x+.5,\ywidth+.5) {\x};
+ % y coordinates
+ \pgfmathparse{\ywidth-1}
+ \foreach \y in {0,...,\pgfmathresult}
+  \node at (-.5,\ywidth-\y-.5) {\y};
+ % Vertical lines
+ \foreach \x in {0,...,\xwidth}
+  \draw (\x,0) -- (\x,\ywidth);
+ % Horizontal lines
+ \foreach \y in {0,...,\ywidth}
+  \draw (0,\y) -- (\xwidth,\y);
+ % "Values"
+ \foreach \x in {1,...,\xwidth}
+  \foreach \y in {1,...,\ywidth}
+   \draw[fill=black] (\x-.5,\y-.5) circle (.15);
+\end{tikzpicture}
+%}
+ \qquad
+% \subfloat[Vertex-centered]{
+\begin{tikzpicture}[scale=\scale]
+ % x coordinates
+ \pgfmathparse{\xwidth-1}
+ \foreach \x in {0,...,\pgfmathresult}
+  \node at (\x,\ywidth-.5) {\x};
+ % Vertical lines
+ \foreach \x in {0,...,\pgfmathresult}
+  \draw (\x,0) -- (\x,\ywidth-1);
+ % y coordinates
+ \pgfmathparse{\ywidth-1}
+ \foreach \y in {0,...,\pgfmathresult}
+  \node at (-.5,\pgfmathresult-\y) {\y};
+ % Horizontal lines
+ \foreach \y in {0,...,\pgfmathresult}
+  \draw (0,\y) -- (\xwidth-1,\y);
+ % "Values"
+ \foreach \x in {1,...,\xwidth}
+  \foreach \y in {1,...,\ywidth}
+   \draw[fill=black] (\x-1,\y-1) circle (.15);
+\end{tikzpicture}
+%}
+
+%\end{figure}
+
+\end{document}

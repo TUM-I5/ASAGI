@@ -34,45 +34,52 @@
  * @version \$Id$
  */
 
-#include <asagi.h>
-#include <mpi.h>
+#ifndef IO_PNGWRITER_H
+#define IO_PNGWRITER_H
 
-#include "debug/dbg.h"
+#include <png.h>
 
-#include "tests.h"
-
-using namespace asagi;
-
-int main(int argc, char** argv)
+namespace io
 {
-	int rank;
+
+/**
+ * C++ wrapper to generate PNG files
+ */
+class PngWriter
+{
+private:
+	/** Width of the png */
+	const unsigned long width;
+	/** Height of the png */
+	const unsigned long height;
 	
-	MPI_Init(&argc, &argv);
+	/** Filehandle we will use to write the png file */
+	FILE* fp;
+	/** Pointer to the png write struct */
+	png_structp png_ptr;
+	/** Pointer to the png info struct */
+	png_infop info_ptr;
 	
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	
-	Grid* grid = Grid::create(Grid::FLOAT, ADAPTIVE);
-	
-	if (grid->open(NC_2D) != Grid::SUCCESS)
-		return 1;
-	
-	int value;
-	
-	for (int i = 0; i < NC_WIDTH; i++) {
-		for (int j = 0; j < NC_LENGTH; j++) {
-			value = j * NC_WIDTH + i;
-			if (grid->getInt2D(i, j) != value) {
-				dbgDebug() << "Test failed on rank" << rank;
-				dbgDebug() << "Value at" << i << j << "should be"
-					<< value << "but is" << grid->getInt2D(i, j);
-				return 1;
-			}
-		}
+	/** Stores the pixels of the picture */
+	png_byte** row_pointers;
+public:
+	PngWriter(unsigned long width, unsigned long height);
+	virtual ~PngWriter()
+	{
+		free();
 	}
 	
-	delete grid;
-	
-	MPI_Finalize();
-	
-	return 0;
+	bool create(const char* filename);
+	void write(unsigned long x, unsigned long y, unsigned char red,
+		unsigned char gree, unsigned char blue);
+	void close();
+private:
+	void free();
+private:
+	/** Number of bytes for each pixel; RGB -> 3 */
+	static const char PIXEL_SIZE = 3;
+};
+
 }
+
+#endif // IO_PNGWRITER_H

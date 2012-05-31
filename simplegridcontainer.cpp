@@ -30,10 +30,8 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @author Sebastian Rettenberger <rettenbs@in.tum.de>
- * @date 2012
+ * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  * @version \$Id$
- * @copyright GPL
  */
 
 #include "simplegridcontainer.h"
@@ -46,6 +44,9 @@
 
 #include <algorithm>
 
+/**
+ * @see GridContainer::GridContainer()
+ */
 SimpleGridContainer::SimpleGridContainer(asagi::Grid::Type type, bool isArray,
 	unsigned int hint, unsigned int levels)
 	: GridContainer(type, isArray, hint, levels)

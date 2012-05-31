@@ -1,3 +1,39 @@
+/**
+ * @file
+ *  This file is part of ASAGI.
+ * 
+ *  ASAGI is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  ASAGI is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with ASAGI.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Diese Datei ist Teil von ASAGI.
+ *
+ *  ASAGI ist Freie Software: Sie koennen es unter den Bedingungen
+ *  der GNU General Public License, wie von der Free Software Foundation,
+ *  Version 3 der Lizenz oder (nach Ihrer Option) jeder spaeteren
+ *  veroeffentlichten Version, weiterverbreiten und/oder modifizieren.
+ *
+ *  ASAGI wird in der Hoffnung, dass es nuetzlich sein wird, aber
+ *  OHNE JEDE GEWAEHELEISTUNG, bereitgestellt; sogar ohne die implizite
+ *  Gewaehrleistung der MARKTFAEHIGKEIT oder EIGNUNG FUER EINEN BESTIMMTEN
+ *  ZWECK. Siehe die GNU General Public License fuer weitere Details.
+ *
+ *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
+ *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
+ * 
+ * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @version \$Id$
+ */
+
 #ifndef GRIDCONTAINER_H
 #define GRIDCONTAINER_H
 
@@ -8,9 +44,13 @@
 
 class Grid;
 
+/**
+ * A container that stores multiple levels of a grid
+ */
 class GridContainer : public asagi::Grid
 {
 public:
+	/** Possible positions of the values in a grid */
 	enum ValuePos { CELL_CENTERED, VERTEX_CENTERED };
 private:
 	/** Id of the grid, used for the fortran <-> c interface */
@@ -35,19 +75,25 @@ protected:
 	/** Number of levels this grid container has */
 	const unsigned int m_levels;
 	
-	/** Subclasses should set this */
+	/** Minimum in x dimension (set by subclasses) */
 	double m_minX;
+	/** Minimum in y dimension (set by subclasses) */
 	double m_minY;
+	/** Minimum in z dimension (set by subclasses) */
 	double m_minZ;
+	/** Maximum in x dimension (set by subclasses) */
 	double m_maxX;
+	/** Maximum in y dimension (set by subclasses) */
 	double m_maxY;
+	/** Maximum in z dimension (set by subclasses) */
 	double m_maxZ;
 	
+	/** Value Position (cell-centered || vertex-centered) */
 	ValuePos m_valuePos;
 public:
 	GridContainer(Type type, bool isArray = false,
 		unsigned int hint = asagi::NO_HINT,
-		unsigned int level = 1);
+		unsigned int levels = 1);
 	virtual ~GridContainer();
 	
 #ifndef ASAGI_NOMPI
@@ -63,32 +109,32 @@ public:
 	 */
 	virtual Error open(const char* filename, unsigned int level = 0);
 	
-	double getXMin()
+	double getXMin() const
 	{
 		return m_minX;
 	}
-	double getYMin()
+	double getYMin() const
 	{
 		return m_minY;
 	}
-	double getZMin()
+	double getZMin() const
 	{
 		return m_minZ;
 	}
-	double getXMax()
+	double getXMax() const
 	{
 		return m_maxX;
 	}
-	double getYMax()
+	double getYMax() const
 	{
 		return m_maxY;
 	}
-	double getZMax()
+	double getZMax() const
 	{
 		return m_maxZ;
 	}
 	
-	unsigned int getVarSize()
+	unsigned int getVarSize() const
 	{
 		return m_type->getSize();
 	}
@@ -144,28 +190,43 @@ public:
 	}
 	
 #ifndef ASAGI_NOMPI
-	MPI_Comm getMPICommunicator()
+	/**
+	 * @return The commicator used for all grids of this container
+	 */
+	MPI_Comm getMPICommunicator() const
 	{
 		return m_communicator;
 	}
 #endif // ASAGI_NOMPI
 	
-	int getMPIRank()
+	/**
+	 * @return The current MPI rank
+	 */
+	int getMPIRank() const
 	{
 		return m_mpiRank;
 	}
 	
-	int getMPISize()
+	/**
+	 * @return The size of the MPI communicator
+	 */
+	int getMPISize() const
 	{
 		return m_mpiSize;
 	}
 	
-	types::Type& getType()
+	/**
+	 * @return The type assosiated with this grid
+	 */
+	types::Type& getType() const
 	{
 		return *m_type;
 	}
 	
-	ValuePos getValuePos()
+	/**
+	 * @return The position of values in the grid
+	 */
+	ValuePos getValuePos() const
 	{
 		return m_valuePos;
 	}
@@ -175,13 +236,17 @@ public:
 	 * 
 	 * @return The unique index of the grid container
 	 */
-	int c2f()
+	int c2f() const
 	{
 		return m_id;
 	}
 private:
+	/** The index -> pointer translation array */
 	static fortran::PointerArray<GridContainer> m_pointers;
 public:
+	/**
+	 * Converts a Fortran index to a c/c++ pointer
+	 */
 	static GridContainer* f2c(int i)
 	{
 		return m_pointers.get(i);

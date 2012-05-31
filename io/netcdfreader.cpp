@@ -34,45 +34,80 @@
  * @version \$Id$
  */
 
-#include <asagi.h>
-#include <mpi.h>
+#include "netcdfreader.h"
 
 #include "debug/dbg.h"
 
-#include "tests.h"
+#define DIM_NOT_MAPPED "<not mapped>"
 
 using namespace asagi;
 
-int main(int argc, char** argv)
+using namespace netCDF;
+using namespace netCDF::exceptions;
+
+/**
+ * @param filename The name of the netcdf file
+ * @param rank The rank of this MPI process
+ */
+io::NetCdfReader::NetCdfReader(const char* filename, int rank)
+	: m_filename(filename),
+	m_rank(rank)
 {
-	int rank;
-	
-	MPI_Init(&argc, &argv);
-	
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	
-	Grid* grid = Grid::create(Grid::FLOAT, ADAPTIVE);
-	
-	if (grid->open(NC_2D) != Grid::SUCCESS)
-		return 1;
-	
-	int value;
-	
-	for (int i = 0; i < NC_WIDTH; i++) {
-		for (int j = 0; j < NC_LENGTH; j++) {
-			value = j * NC_WIDTH + i;
-			if (grid->getInt2D(i, j) != value) {
-				dbgDebug() << "Test failed on rank" << rank;
-				dbgDebug() << "Value at" << i << j << "should be"
-					<< value << "but is" << grid->getInt2D(i, j);
-				return 1;
-			}
-		}
+	m_file = 0L;
+}
+
+io::NetCdfReader::~NetCdfReader()
+{
+	delete m_file;
+}
+
+/**
+ * Opens the netcdf file and reads the header information
+ * 
+ * @param varname The name of the netcdf variable that should be read
+ *  later
+ */
+Grid::Error io::NetCdfReader::open(const char* varname)
+{
+	try {
+		m_file = new NcFile(m_filename.c_str(), NcFile::read);
+	} catch (NcException& e) {
+		// Could not open file
+		
+		m_file = 0L;
+		return Grid::NOT_OPEN;
 	}
 	
-	delete grid;
+	m_variable = m_file->getVar(varname);
+		
+	if (m_variable.isNull())
+		return Grid::VAR_NOT_FOUND;
 	
-	MPI_Finalize();
+	m_dimensions = m_variable.getDimCount();
+	switch (m_dimensions) {
+	case 1:
+		m_nameX = m_variable.getDim(0).getName();
+		m_nameY = DIM_NOT_MAPPED;
+		m_nameZ = DIM_NOT_MAPPED;
+		break;
+	case 2:
+		m_nameX = m_variable.getDim(1).getName();
+		m_nameY = m_variable.getDim(0).getName();
+		m_nameZ = DIM_NOT_MAPPED;
+		break;
+	case 3:
+		m_nameX = m_variable.getDim(2).getName();
+		m_nameY = m_variable.getDim(1).getName();
+		m_nameZ = m_variable.getDim(0).getName();
+		break;
+	default:
+		dbgDebug(m_rank) << "Unsupported number of variable dimensions:"
+			<< m_dimensions;
+		return Grid::UNSUPPORTED_DIMENSIONS;
+	}
 	
-	return 0;
+	dbgDebug(m_rank) << "Dimension mapping: x :=" << m_nameX << "y :="
+		<< m_nameY << "z :=" << m_nameZ;
+	
+	return Grid::SUCCESS;
 }

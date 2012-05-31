@@ -1,7 +1,10 @@
+cmake_minimum_required( VERSION 2.8 )
+
+# ASAGI
 project( ASAGI )
 
-# Version
-cmake_minimum_required( VERSION 2.8 )
+set( ASAGI_VERSION_MAJOR 0 )
+set( ASAGI_VERSION_MINOR 2 )
 
 ##### User configuration #####
 option( STATIC_LIB "Compile asagi as static library" OFF )
@@ -149,3 +152,31 @@ target_link_libraries( asagi
 if( NOT NO_MPI )
 	target_link_libraries( asagi mpi )
 endif( NOT NO_MPI )
+
+##### Installation #####
+install( TARGETS asagi
+	DESTINATION lib )
+install( FILES include/asagi.h include/asagi.inc
+	DESTINATION include )
+
+
+##### Packaging #####
+INCLUDE(InstallRequiredSystemLibraries)
+
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${CMAKE_PROJECT_NAME})
+SET(CPACK_PACKAGE_VENDOR "Sebastian Rettenberger")
+#SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+SET(CPACK_PACKAGE_VERSION_MAJOR ${ASAGI_VERSION_MAJOR})
+SET(CPACK_PACKAGE_VERSION_MINOR ${ASAGI_VERSION_MINOR})
+SET(CPACK_PACKAGE_VERSION_PATCH "0")
+set(CPACK_SOURCE_IGNORE_FILES
+	"\\\\.svn/"
+	"\\\\.kdev4"
+	"~$"
+	"/preprocess/"
+	"/test_progs/"
+)
+
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
+INCLUDE(CPack)

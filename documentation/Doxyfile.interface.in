@@ -26,13 +26,13 @@ DOXYFILE_ENCODING      = UTF-8
 # identify the project. Note that if you do not use Doxywizard you need
 # to put quotes around the project name if it contains spaces.
 
-PROJECT_NAME           = @CMAKE_PROJECT_NAME@
+PROJECT_NAME           = "@CMAKE_PROJECT_NAME@ User Manual"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number.
 # This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
-PROJECT_NUMBER         =
+PROJECT_NUMBER         = @ASAGI_VERSION_MAJOR@.@ASAGI_VERSION_MINOR@
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer
@@ -256,7 +256,7 @@ MARKDOWN_SUPPORT       = YES
 # func(std::string) {}). This also makes the inheritance and collaboration
 # diagrams that involve STL classes more complete and accurate.
 
-BUILTIN_STL_SUPPORT    = NO
+BUILTIN_STL_SUPPORT    = YES
 
 # If you use Microsoft's C++/CLI language, you should set this option to YES to
 # enable parsing support.
@@ -362,7 +362,8 @@ EXTRACT_ALL            = NO
 
 EXTRACT_PRIVATE        = NO
 
-# If the EXTRACT_PACKAGE tag is set to YES all members with package or internal scope will be included in the documentation.
+# If the EXTRACT_PACKAGE tag is set to YES all members with package or internal
+# scope will be included in the documentation.
 
 EXTRACT_PACKAGE        = NO
 
@@ -497,7 +498,7 @@ SORT_GROUP_NAMES       = NO
 # Note: This option applies only to the class list, not to the
 # alphabetical list.
 
-SORT_BY_SCOPE_NAME     = YES
+SORT_BY_SCOPE_NAME     = NO
 
 # If the STRICT_PROTO_MATCHING option is enabled and doxygen fails to
 # do proper type resolution of all parameters of a function it will reject a
@@ -530,7 +531,7 @@ GENERATE_BUGLIST       = NO
 # disable (NO) the deprecated list. This list is created by putting
 # \deprecated commands in the documentation.
 
-GENERATE_DEPRECATEDLIST= YES
+GENERATE_DEPRECATEDLIST= NO
 
 # The ENABLED_SECTIONS tag can be used to enable conditional
 # documentation sections, marked by \if sectionname ... \endif.
@@ -655,7 +656,8 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = @CMAKE_SOURCE_DIR@/include
+INPUT                  = @CMAKE_SOURCE_DIR@/documentation/user \
+                         @CMAKE_SOURCE_DIR@/include
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -716,7 +718,7 @@ EXCLUDE_SYMBOLS        =
 # directories that contain example code fragments that are included (see
 # the \include command).
 
-EXAMPLE_PATH           =
+EXAMPLE_PATH           = @CMAKE_SOURCE_DIR@/documentation/user/examples
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp
@@ -736,7 +738,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             =
+IMAGE_PATH             = @CMAKE_SOURCE_DIR@/documentation/user/images
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -838,7 +840,7 @@ VERBATIM_HEADERS       = YES
 # of all compounds will be generated. Enable this if the project
 # contains a lot of classes, structs, unions or interfaces.
 
-ALPHABETICAL_INDEX     = YES
+ALPHABETICAL_INDEX     = NO
 
 # If the alphabetical index is enabled (see ALPHABETICAL_INDEX) then
 # the COLS_IN_ALPHA_INDEX tag can be used to specify the number of columns
@@ -1223,7 +1225,7 @@ GENERATE_LATEX         = YES
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
 # put in front of it. If left blank `latex' will be used as the default path.
 
-LATEX_OUTPUT           = interfacedoc
+LATEX_OUTPUT           = @CMAKE_CURRENT_BINARY_DIR@/doc
 
 # The LATEX_CMD_NAME tag can be used to specify the LaTeX command name to be
 # invoked. If left blank `latex' will be used as the default command name.
@@ -1393,7 +1395,7 @@ GENERATE_XML           = NO
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
 # put in front of it. If left blank `xml' will be used as the default path.
 
-XML_OUTPUT             = xml
+XML_OUTPUT             = @CMAKE_CURRENT_BINARY_DIR@/xml
 
 # The XML_SCHEMA tag can be used to specify an XML schema,
 # which can be used by a validating XML parser to check the
