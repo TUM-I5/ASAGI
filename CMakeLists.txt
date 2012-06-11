@@ -104,7 +104,7 @@ if( PNG_FOUND )
 endif()
 
 # Add library include files for all exectuables
-include_directories( SYSTEM ${CMAKE_SOURCE_DIR}/include )
+include_directories( ${CMAKE_SOURCE_DIR}/include )
 
 # For sub directories
 include_directories( ${CMAKE_SOURCE_DIR} )

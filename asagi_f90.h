@@ -68,6 +68,8 @@ double f90grid_max_x(int grid_id);
 double f90grid_max_y(int grid_id);
 double f90grid_max_z(int grid_id);
 
+int f90grid_var_size(int grid_id);
+
 char f90grid_get_byte_1d(int grid_id, double x, int level);
 int f90grid_get_int_1d(int grid_id, double x, int level);
 long f90grid_get_long_1d(int grid_id, double x, int level);

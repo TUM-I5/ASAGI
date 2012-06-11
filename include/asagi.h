@@ -593,6 +593,13 @@ double grid_max_z(grid_handle* handle);
 /**
  * @ingroup c_interface
  * 
+ * @see asagi::Grid::getVarSize()
+ */
+unsigned int grid_var_size(grid_handle* handle);
+
+/**
+ * @ingroup c_interface
+ * 
  * @see asagi::Grid::getByte1D()
  */
 char grid_get_byte_1d(grid_handle* handle, double x, unsigned int level);

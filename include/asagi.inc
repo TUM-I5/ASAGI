@@ -193,6 +193,15 @@ module asagi
       integer( kind=c_int ), value :: grid_id
       real( kind=c_double )        :: grid_max_z
     end function grid_max_z
+
+    !> @ingroup f_interface
+    !!
+    !! @see asagi::Grid::getVarSize()
+    function grid_var_size( grid_id ) bind( c, name="f90grid_var_size" )
+      use, intrinsic :: iso_c_binding
+      integer( kind=c_int ), value :: grid_id
+      integer( kind=c_int )        :: grid_var_size
+    end function grid_var_size
     
     !> @internal
     function grid_get_byte_1d_c( grid_id, x, level ) bind( c, name="f90grid_get_byte_1d" )

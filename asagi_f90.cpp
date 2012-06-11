@@ -102,6 +102,10 @@ double f90grid_min_y(int grid_id)
 {
 	return GridContainer::f2c(grid_id)->getYMin();
 }
+double f90grid_min_z ( int grid_id )
+{
+	return GridContainer::f2c(grid_id)->getZMin();
+}
 double f90grid_max_x(int grid_id)
 {
 	return GridContainer::f2c(grid_id)->getXMax();
@@ -109,6 +113,15 @@ double f90grid_max_x(int grid_id)
 double f90grid_max_y(int grid_id)
 {
 	return GridContainer::f2c(grid_id)->getYMax();
+}
+double f90grid_max_z ( int grid_id )
+{
+	return GridContainer::f2c(grid_id)->getZMax();
+}
+
+int f90grid_var_size ( int grid_id )
+{
+	return GridContainer::f2c(grid_id)->getVarSize();
 }
 
 // 1d functions

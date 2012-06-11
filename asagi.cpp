@@ -132,6 +132,11 @@ double grid_max_y(grid_handle* handle)
 	return handle->getYMax();
 }
 
+unsigned int grid_var_size(grid_handle* handle)
+{
+	return handle->getVarSize();
+}
+
 // 1d functions
 
 char grid_get_byte_1d(grid_handle* handle, double x, unsigned int level)
