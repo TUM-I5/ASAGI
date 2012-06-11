@@ -79,12 +79,12 @@ if( NOT NO_MPI )
 	# Find MPI
 	find_package( MPI REQUIRED )
 	if( MPI_LIBRARY )
-		include_directories( ${MPI_C_INCLUDE_PATH} SYSTEM )
+		include_directories( SYSTEM ${MPI_C_INCLUDE_PATH} )
 	else()
 		#Workaround for stupid mpicc/mpicxx
 		get_filename_component( MPI_BASE ${MPI_C_COMPILER} PATH )
 		set( MPI_BASE ${MPI_BASE}/.. )
-		include_directories( ${MPI_BASE}/include SYSTEM )
+		include_directories( SYSTEM ${MPI_BASE}/include )
 		link_directories( ${MPI_BASE}/lib )
 	endif()
 	set( CMAKE_C_COMPILER ${MPI_C_COMPILER} )
@@ -95,7 +95,7 @@ endif( NOT NO_MPI )
 # Find netcdf
 set( NETCDF_CXX4 "YES" )
 find_package( NetCDF REQUIRED )
-include_directories( ${NETCDF_INCLUDES} SYSTEM )
+include_directories( SYSTEM ${NETCDF_INCLUDES} )
 
 # Find png
 find_package( PNG )
@@ -104,7 +104,7 @@ if( PNG_FOUND )
 endif()
 
 # Add library include files for all exectuables
-include_directories( ${CMAKE_SOURCE_DIR}/include SYSTEM )
+include_directories( SYSTEM ${CMAKE_SOURCE_DIR}/include )
 
 # For sub directories
 include_directories( ${CMAKE_SOURCE_DIR} )
