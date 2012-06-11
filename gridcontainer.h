@@ -94,6 +94,11 @@ public:
 	GridContainer(Type type, bool isArray = false,
 		unsigned int hint = asagi::NO_HINT,
 		unsigned int levels = 1);
+	GridContainer(unsigned int count,
+		unsigned int blockLength[],
+		unsigned long displacements[],
+		asagi::Grid::Type types[],
+		unsigned int hint = NO_HINT, unsigned int levels = 1);
 	virtual ~GridContainer();
 	
 #ifndef ASAGI_NOMPI

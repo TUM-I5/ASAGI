@@ -52,6 +52,21 @@ int f90grid_create_array(grid_type basic_type, int hint, int levels)
 		asagi::Grid::createArray(basic_type, hint, levels))->c2f();
 }
 
+int f90grid_create_struct(int count,
+	int blockLength[],
+	long displacements[],
+	grid_type types[],
+	int hint, int levels)
+{
+	// Not sure of reinterpret_cast is save here
+	return static_cast<GridContainer*>(
+		asagi::Grid::createStruct(count,
+			reinterpret_cast<unsigned int*>(blockLength),
+			reinterpret_cast<unsigned long*>(displacements),
+			types,
+			hint, levels))->c2f();
+}
+
 grid_error f90grid_set_comm(int grid_id, int comm)
 {
 #ifdef ASAGI_NOMPI

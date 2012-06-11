@@ -67,6 +67,11 @@ public:
 	AdaptiveGridContainer(Type type, bool isArray = false,
 		unsigned int hint = asagi::NO_HINT,
 		unsigned int level = 1);
+	AdaptiveGridContainer(unsigned int count,
+		unsigned int blockLength[],
+		unsigned long displacements[],
+		asagi::Grid::Type types[],
+		unsigned int hint = NO_HINT, unsigned int levels = 1);
 	virtual ~AdaptiveGridContainer();
 	
 	Error open(const char* filename, unsigned int level = 0);

@@ -55,6 +55,19 @@ AdaptiveGridContainer::AdaptiveGridContainer(asagi::Grid::Type type,
 	m_ids = 0;
 }
 
+AdaptiveGridContainer::AdaptiveGridContainer(unsigned int count,
+		unsigned int blockLength[],
+		unsigned long displacements[],
+		asagi::Grid::Type types[],
+		unsigned int hint, unsigned int levels)
+	: GridContainer(count, blockLength, displacements, types, hint, levels),
+	m_hint(hint)
+{
+	m_grids = new std::vector< ::Grid*>[m_levels];
+	
+	m_ids = 0;
+}
+
 
 AdaptiveGridContainer::~AdaptiveGridContainer()
 {

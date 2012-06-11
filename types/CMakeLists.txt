@@ -2,6 +2,7 @@
 set( typesSources
 	arraytype.cpp
 	basictype.cpp
+	structtype.cpp
 	type.cpp )
 
 ##### Library #####

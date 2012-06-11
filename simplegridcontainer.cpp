@@ -66,6 +66,31 @@ SimpleGridContainer::SimpleGridContainer(asagi::Grid::Type type, bool isArray,
 #endif // ASAGI_NOMPI
 }
 
+/**
+ * @see GridContainer::GridContainer()
+ */
+SimpleGridContainer::SimpleGridContainer(unsigned int count,
+		unsigned int blockLength[],
+		unsigned long displacements[],
+		asagi::Grid::Type types[],
+		unsigned int hint, unsigned int levels)
+	: GridContainer(count, blockLength, displacements, types, hint, levels)
+{
+	m_grids = new ::Grid*[m_levels];
+#ifdef ASAGI_NOMPI
+	for (unsigned int i = 0; i < levels; i++)
+		m_grids[i] = new NoMPIGrid(*this, hint);
+#else // ASAGI_NOMPI
+	if (hint & asagi::LARGE_GRID) {
+		for (unsigned int i = 0; i < levels; i++)
+			m_grids[i] = new LargeGrid(*this, hint, i);
+	} else {
+		for (unsigned int i = 0; i < levels; i++)
+			m_grids[i] = new SimpleGrid(*this, hint);
+	}
+#endif // ASAGI_NOMPI
+}
+
 SimpleGridContainer::~SimpleGridContainer()
 {
 	for (unsigned int i = 0; i < m_levels; i++)

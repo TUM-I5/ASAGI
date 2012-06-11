@@ -56,6 +56,20 @@ asagi::Grid* asagi::Grid::createArray(Type basicType, unsigned int hint,
 	return new SimpleGridContainer(basicType, true, hint, levels);
 }
 
+asagi::Grid* asagi::Grid::createStruct(unsigned int count,
+	unsigned int blockLength[],
+	unsigned long displacements[],
+	asagi::Grid::Type types[],
+	unsigned int hint,
+	unsigned int levels)
+{
+	if (hint & asagi::ADAPTIVE)
+		return new AdaptiveGridContainer(count, blockLength,
+			displacements, types, hint, levels);
+	return new SimpleGridContainer(count, blockLength,
+		displacements, types, hint, levels);
+}
+
 // C interfae
 
 // Init functions
@@ -68,6 +82,16 @@ grid_handle* grid_create(grid_type type, unsigned int hint, unsigned int levels)
 grid_handle* grid_create_array(grid_type basic_type, unsigned int hint, unsigned int levels)
 {
 	return asagi::Grid::createArray(basic_type, hint, levels);
+}
+
+grid_handle* grid_create_struct(unsigned int count,
+	unsigned int blockLength[],
+	unsigned long displacements[],
+	grid_type types[],
+	unsigned int hint, unsigned int levels)
+{
+	return asagi::Grid::createStruct(count, blockLength, displacements,
+		types, hint, levels);
 }
 
 #ifndef ASAGI_NOMPI

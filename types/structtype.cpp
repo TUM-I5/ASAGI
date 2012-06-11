@@ -34,49 +34,41 @@
  * @version \$Id$
  */
 
-#ifndef SIMPLEGRIDCONTAINER_H
-#define SIMPLEGRIDCONTAINER_H
-
-#include "gridcontainer.h"
+#include "structtype.h"
 
 /**
- * Simple grid container that stores one grid for each level. Each grid has to
- * cover the hole domain.
+ * Creates a struct type
+ * 
+ * @relates types::StructType
  */
-class SimpleGridContainer : public GridContainer
+types::Type* types::createStruct(
+	unsigned int count,
+	unsigned int blockLength[],
+	unsigned long displacements[],
+	asagi::Grid::Type types[])
 {
-private:
-	/** All grids we control */
-	::Grid **m_grids;
-public:
-	SimpleGridContainer(Type type, bool isArray = false,
-		unsigned int hint = asagi::NO_HINT,
-		unsigned int levels = 1);
-	SimpleGridContainer(unsigned int count,
-		unsigned int blockLength[],
-		unsigned long displacements[],
-		asagi::Grid::Type types[],
-		unsigned int hint = NO_HINT, unsigned int levels = 1);
-	virtual ~SimpleGridContainer();
+	assert(count >= 1);
+	assert(displacements[0] == 0);
 	
-	Error setParam(const char* name, const char* value,
-		unsigned int level = 0);
-	Error open(const char* filename, unsigned int level = 0);
+	switch (types[0]) {
+	case asagi::Grid::BYTE:
+		return new types::StructType<char>(count, blockLength,
+			displacements, types);
+	case asagi::Grid::INT:
+		return new types::StructType<int>(count, blockLength,
+			displacements, types);
+	case asagi::Grid::LONG:
+		return new types::StructType<long>(count, blockLength,
+			displacements, types);
+	case asagi::Grid::FLOAT:
+		return new types::StructType<float>(count, blockLength,
+			displacements, types);
+	case asagi::Grid::DOUBLE:
+		return new types::StructType<double>(count, blockLength,
+			displacements, types);
+	}
 	
-	char getByte3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	int getInt3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	long getLong3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	float getFloat3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	double getDouble3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	void getBuf3D(void* buf, double x, double y = 0, double z = 0,
-		unsigned int level = 0);
+	assert(false);
 	
-	bool exportPng(const char* filename, unsigned int level = 0);
-};
-
-#endif // SIMPLEGRIDCONTAINER_H
+	return 0L;
+}

@@ -38,6 +38,7 @@
 
 #include "types/arraytype.h"
 #include "types/basictype.h"
+#include "types/structtype.h"
 
 #include <cassert>
 #include <cstring>
@@ -106,6 +107,35 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 			assert(false);
 		}
 	}
+	
+	m_minX = m_minY = m_minZ = -std::numeric_limits<double>::infinity();
+	m_maxX = m_maxY = m_maxZ = std::numeric_limits<double>::infinity();
+	
+	m_valuePos = CELL_CENTERED;
+	
+	// Default values (probably only useful when compiled without MPI support)
+	m_mpiRank = 0;
+	m_mpiSize = 1;
+}
+
+GridContainer::GridContainer(unsigned int count,
+		unsigned int blockLength[],
+		unsigned long displacements[],
+		asagi::Grid::Type types[],
+		unsigned int hint, unsigned int levels)
+	: m_levels(levels)
+{
+	assert(levels > 0); // 0 levels don't make sense
+	
+	// Prepare for fortran <-> c translation
+	m_id = m_pointers.add(this);
+	
+#ifndef ASAGI_NOMPI
+	m_communicator = MPI_COMM_NULL;
+#endif // ASAGI_NOMPI
+	
+	m_type = types::createStruct(count, blockLength,
+		displacements, types);
 	
 	m_minX = m_minY = m_minZ = -std::numeric_limits<double>::infinity();
 	m_maxX = m_maxY = m_maxZ = std::numeric_limits<double>::infinity();

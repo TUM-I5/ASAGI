@@ -49,6 +49,12 @@ int f90grid_create(grid_type type, int hint,
 int f90grid_create_array(grid_type basic_type, int hint,
 	int levels);
 
+int f90grid_create_struct(int count,
+	int blockLength[],
+	long displacements[],
+	grid_type types[],
+	int hint, int levels);
+
 grid_error f90grid_set_comm(int grid_id, int comm);
 grid_error f90grid_set_param(int grid_id, const char* name,
 	const char* value, int level);

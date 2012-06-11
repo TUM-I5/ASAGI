@@ -404,6 +404,25 @@ public:
 	/**
 	 * @ingroup cxx_interface
 	 * 
+	 * Creates a new grid with a struct, very similar to
+	 * MPI_Type_create_struct
+	 * 
+	 * @param count Number of blocks in the struct
+	 * @param blockLength Number of elements in each block
+	 * @param displacements Displacement of each block
+	 * @param types Block type
+	 * @param hint A combination of hints
+	 * @param levels The number of levels this grid should have
+	 */
+	static asagi::Grid* createStruct(unsigned int count,
+		unsigned int blockLength[],
+		unsigned long displacements[],
+		asagi::Grid::Type types[],
+		unsigned int hint = NO_HINT, unsigned int levels = 1);
+	
+	/**
+	 * @ingroup cxx_interface
+	 * 
 	 * Frees all memory resources assciated with @c grid. After a grid is
 	 * closed you cannot access any values and you can not reopen another
 	 * NetCDF file.
@@ -500,6 +519,16 @@ grid_handle* grid_create(grid_type type, unsigned int hint,
  */
 grid_handle* grid_create_array(grid_type basic_type, unsigned int hint,
 	unsigned int levels);
+/**
+ * @ingroup c_interface
+ * 
+ * @see asagi::Grid::createStruct()
+ */
+grid_handle* grid_create_struct(unsigned int count,
+	unsigned int blockLength[],
+	unsigned long displacements[],
+	grid_type types[],
+	unsigned int hint, unsigned int levels);
 
 #ifndef ASAGI_NOMPI
 /**

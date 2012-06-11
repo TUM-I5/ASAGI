@@ -99,6 +99,18 @@ module asagi
       integer( kind=c_int )        :: grid_create_array_c
     end function grid_create_array_c
 
+    !> @internal
+    function grid_create_struct_c( count, block_length, displacments, types, hint, levels ) bind( c, name="f90grid_create_struct" )
+      use, intrinsic :: iso_c_binding
+      integer( kind=c_int ), value                     :: count
+      integer( kind=c_int ), dimension(*), intent(in)  :: block_length
+      integer( kind=c_long ), dimension(*), intent(in) :: displacments
+      integer( kind=c_int ), dimension(*), intent(in)  :: types
+      integer( kind=c_int ), value                     :: hint
+      integer( kind=c_int ), value                     :: levels
+      integer( kind=c_int )                            :: grid_create_struct_c
+    end function grid_create_struct_c
+
     !> @ingroup f_interface
     !!
     !! @see asagi::Grid::setComm()
@@ -490,6 +502,35 @@ module asagi
 
       grid_create_array = grid_create_array_c( g, h, l )
     end function grid_create_array
+
+    !> @ingroup f_interface
+    !!
+    !! @see asagi::Grid::createStruct()
+    function grid_create_struct( count, block_length, displacments, types, hint, levels )
+      use, intrinsic :: iso_c_binding
+      integer, intent(in)                              :: count
+      integer, dimension(*), intent(in)                :: block_length
+      integer( kind=c_long ), dimension(*), intent(in) :: displacments
+      integer, dimension(*), intent(in)                :: types
+      integer, optional, intent(in)                    :: hint
+      integer, optional, intent(in)                    :: levels
+      integer                                          :: grid_create_struct
+
+      integer :: h, l
+
+      if( present( hint ) ) then
+        h = hint
+      else
+        h = GRID_NO_HINT
+      endif
+      if( present( levels ) ) then
+        l = levels
+      else
+        l = 1
+      endif
+
+      grid_create_struct = grid_create_struct_c( count, block_length, displacments, types, h, l )
+    end function grid_create_struct
 
     !> @ingroup f_interface
     !!
