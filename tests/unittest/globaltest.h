@@ -31,7 +31,6 @@
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
- * @version \$Id$
  * 
  * @brief Contains some useful macros for unit tests
  * 
