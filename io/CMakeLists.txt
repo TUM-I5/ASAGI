@@ -11,8 +11,11 @@ endif()
 add_library( io
 	${ioSources} )
 target_link_libraries( io
-	${NETCDF_LIBRARIES}
-	${PNG_LIBRARY} )
+	${NETCDF_LIBRARIES} )
+if( PNG_FOUND )
+	target_link_libraries( io
+		${PNG_LIBRARY} )
+endif( PNG_FOUND )
 if( NOT STATIC_LIB )
 	set_target_properties( io PROPERTIES
 		COMPILE_FLAGS -fPIC )
