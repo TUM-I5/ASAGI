@@ -8,10 +8,14 @@
  * to transfer data. An MPI library that supports the new standard is required.
  *
  * @subsection NetCDF
+ * 
  * ASAGI uses the NetCDF library (http://www.unidata.ucar.edu/software/netcdf/)
- * to load data files. Since most standard NetCDF packages do not support the
- * new NetCDF-4 C++ interface, you may need to compile the NetCDF library
- * yourself.
+ * to load data files. 
+ * 
+ * <b>Version <= 4.1.3</b>
+ * 
+ * Since most standard NetCDF packages do not support the new NetCDF-4 C++
+ * interface, you may need to compile the NetCDF library yourself.
  *
  * To enable the NetCDF-4 C++ support, make sure to add the option
  * "enable-cxx-4" to the Configure script:
@@ -20,6 +24,11 @@
  * make
  * make install
  * @endcode
+ * 
+ * <b>Version >= 4.2</b>
+ * 
+ * The C++ interface is no longer part of the main package. You need the
+ * standard C library as well as the <i>new</i> C++ library.
  *
  * @section Compilation
  *
