@@ -66,8 +66,8 @@ NetCDF_check_interface (CXX4 netcdf netcdf_c++4)
 NetCDF_check_interface (F77 netcdf.inc  netcdff)
 NetCDF_check_interface (F90 netcdf.mod  netcdff)
 
-set (NETCDF_INCLUDES "${NetCDF_incs}" CACHE STRING "All NetCDF include directories required for interface level")
-set (NETCDF_LIBRARIES "${NetCDF_libs}" CACHE STRING "All NetCDF libraries required for interface level")
+set (NETCDF_INCLUDES "${NetCDF_incs}")
+set (NETCDF_LIBRARIES "${NetCDF_libs}")
 
 # handle the QUIETLY and REQUIRED arguments and set NETCDF_FOUND to TRUE if
 # all listed variables are TRUE
