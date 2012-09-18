@@ -49,7 +49,7 @@ public:
 	{
 		// Set up a 1d grid
 		c = new SimpleGridContainer(asagi::Grid::FLOAT);
-		c->open("../"NC_1D);
+		c->open("../" NC_1D);
 		grid = c->m_grids[0];
 	}
 	

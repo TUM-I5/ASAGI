@@ -44,7 +44,7 @@ class ArrayTypeTest : public CxxTest::TestSuite
 public:
 	void setUp(void)
 	{
-		file = new io::NetCdfReader("../../"NC_1D, 0);
+		file = new io::NetCdfReader("../../" NC_1D, 0);
 		file->open();
 	}
 	
