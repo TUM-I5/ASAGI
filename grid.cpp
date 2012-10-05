@@ -75,7 +75,7 @@ Grid::~Grid()
 }
 
 /**
- * Accpets the following parameters:
+ * Accepts the following parameters:
  * @li @b variable-name
  * @li @b time-dimension
  * @li @b x-block-size
@@ -152,7 +152,7 @@ asagi::Grid::Error Grid::setParam(const char* name, const char* value)
 }
 
 /**
- * Reads a grid form the file and initilizes all variables
+ * Reads a grid form the file and initializes all variables
  */
 asagi::Grid::Error Grid::open(const char* filename)
 {
@@ -181,7 +181,7 @@ asagi::Grid::Error Grid::open(const char* filename)
 	
 	// Set time dimension
 	if (m_timeDimension == -1) {
-		// Time grid, but time dimension not sepecified
+		// Time grid, but time dimension not specified
 		m_timeDimension = m_inputFile->getDimensions() - 1;
 		dbgDebug(getMPIRank()) << "Assuming time dimension"
 			<< DIMENSION_NAMES[m_timeDimension];
@@ -458,7 +458,7 @@ double Grid::getInvScaling(double scaling)
 }
 
 /**
- * Implementation for round-to-nearst
+ * Implementation for round-to-nearest
  */
 double Grid::round(double value)
 {
