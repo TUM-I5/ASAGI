@@ -222,9 +222,9 @@ asagi::Grid::Error Grid::open(const char* filename)
 		} else if (m_container.getValuePos() == GridContainer::CELL_CENTERED) {
 			m_min[i] = m_offset[i] + std::min(scaling[i] * (0. - 0.5),
 				scaling[i] * (m_dim[i] - 1 - 0.5));
-			m_max[i] =  m_offset[i] + std::max(scaling[i] * (0. - 0.5),
-				scaling[i] * (m_dim[i] - 1 + 0.5))
-				- NUMERIC_PRECISION;
+			m_max[i] =  (m_offset[i] + std::max(scaling[i] * (0. - 0.5),
+				scaling[i] * (m_dim[i] - 1 + 0.5)))
+				* (1 - NUMERIC_PRECISION);
 		} else {
 			m_min[i] = m_offset[i] + std::min(0.,
 				(m_dim[i] - 1) * scaling[i]);
