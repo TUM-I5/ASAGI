@@ -63,6 +63,8 @@ Grid::Grid(GridContainer &container, unsigned int hint)
 	
 	m_blocksPerNode = -1;
 	
+	m_handSpread = -1;
+
 	if (hint & asagi::HAS_TIME)
 		m_timeDimension = -1;
 	else
