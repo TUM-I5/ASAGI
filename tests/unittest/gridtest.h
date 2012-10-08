@@ -74,4 +74,9 @@ public:
 			asagi::Grid::SUCCESS);
 		TS_ASSERT_EQUALS(grid->m_blocksPerNode, 100);
 	}
+
+	void testGetXMax(void)
+	{
+		TS_ASSERT_EQUALS(c->getFloat1D(c->getXMax()), NC_WIDTH-1);
+	}
 };
