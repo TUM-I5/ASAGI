@@ -58,7 +58,10 @@ public:
 		unsigned long xsize, unsigned long ysize, unsigned long zsize,
 		void *buf)
 	{
-		file.getVar<T>(buf, xoffset, yoffset, zoffset, xsize, ysize, zsize);
+		// TODO
+		size_t offset[] = {xoffset, yoffset, zoffset};
+		size_t size[] = {xsize, ysize, zsize};
+		file.getBlock<T>(buf, offset, size);
 	}
 	
 #ifndef ASAGI_NOMPI

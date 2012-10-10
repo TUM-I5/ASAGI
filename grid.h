@@ -393,9 +393,6 @@ protected:
 	virtual void getAt(void* buf, types::Type::converter_t converter,
 		unsigned long x, unsigned long y = 0, unsigned long z = 0) = 0;
 private:
-	/** Name of the dimensions: "x", "y" and "z" */
-	static const char* DIMENSION_NAMES[3];
-	
 	/** The smallest number we can represent in a double */
 	static const double NUMERIC_PRECISION;
 private:

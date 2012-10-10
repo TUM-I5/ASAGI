@@ -81,7 +81,7 @@ asagi::Grid::Error SimpleGrid::init()
 	// Load the blocks from the file, which we control
 	for (unsigned long i = 0; i < masterBlockCount; i++) {
 		if (getGlobalBlock(i) >= getBlockCount())
-			// Last process(es) may controll less blocks
+			// Last process(es) may control less blocks
 			break;
 		
 		// Get x, y and z coordinates of the block

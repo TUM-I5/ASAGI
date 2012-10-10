@@ -167,20 +167,19 @@ asagi::Grid::Error Grid::open(const char* filename)
 		!= asagi::Grid::SUCCESS)
 		return error;
 	
-	// Get dimension size
-	m_dim[0] = m_inputFile->getXDim();
-	m_dim[1] = m_inputFile->getYDim();
-	m_dim[2] = m_inputFile->getZDim();
+#ifdef __INTEL_COMPILER
+	#pragma unroll(3)
+#endif // __INTEL_COMPILER
+	for (unsigned char i = 0; i < 3; i++) {
+		// Get dimension size
+		m_dim[i] = m_inputFile->getSize(i);
 	
-	// Get offset and scaling
-	m_offset[0] = m_inputFile->getXOffset();
-	m_offset[1] = m_inputFile->getYOffset();
-	m_offset[2] = m_inputFile->getZOffset();
+		// Get offset and scaling
+		m_offset[i] = m_inputFile->getOffset(i);
 	
-	scaling[0] = m_inputFile->getXScaling();
-	scaling[1] = m_inputFile->getYScaling();
-	scaling[2] = m_inputFile->getZScaling();
-	
+		scaling[i] = m_inputFile->getScaling(i);
+	}
+
 	// Set time dimension
 	if (m_timeDimension == -1) {
 		// Time grid, but time dimension not specified
@@ -391,8 +390,6 @@ float Grid::getAtFloat(unsigned long x, unsigned long y)
 	
 	return buf;
 }
-
-const char* Grid::DIMENSION_NAMES[] = {"x", "y", "z"};
 
 const double Grid::NUMERIC_PRECISION = 1e-10;
 

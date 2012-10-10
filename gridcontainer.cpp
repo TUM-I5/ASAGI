@@ -83,6 +83,7 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 		default:
 			m_type = 0L;
 			assert(false);
+			break;
 		}
 	} else {
 		switch (type) {
@@ -104,6 +105,7 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 		default:
 			m_type = 0L;
 			assert(false);
+			break;
 		}
 	}
 	

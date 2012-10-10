@@ -41,8 +41,11 @@
 #include <cassert>
 #include <limits>
 #include <vector>
+#include <algorithm>
 #include <netcdf>
-#include <debug/dbg.h>
+
+#include "gridconstants.h"
+#include "debug/dbg.h"
 
 /**
  * @brief Classes for read/writing files
@@ -68,15 +71,11 @@ private:
 	/** The variable we read */
 	netCDF::NcVar m_variable;
 	
-	/** Number of dimension (1, 2 or 3) */
+	/** Number of dimension in the netCDF file */
 	int m_dimensions;
 	
-	/** The name of the x dimension in the netcdf file */
-	std::string m_nameX;
-	/** The name of the y dimension in the netcdf file */
-	std::string m_nameY;
-	/** The name of the z dimension in the netcdf file */
-	std::string m_nameZ;
+	/** The name of the dimensions in the netcdf file */
+	std::vector<std::string> m_names;
 public:
 	NetCdfReader(const char* filename, int rank);
 	virtual ~NetCdfReader();
@@ -87,6 +86,7 @@ public:
 	 * @return <code>True</code> if the netcdf file is opened,
 	 *  <code>false</code> otherwise
 	 */
+	inline
 	bool isOpen() const
 	{
 		return m_file != 0L;
@@ -95,199 +95,90 @@ public:
 	/**
 	 * @return The number of dimensions
 	 */
+	inline
 	int getDimensions() const
 	{
 		return m_dimensions;
 	}
 	
 	/**
-	 * @return The size of the grid in x direction
+	 * @return The size of the grid in i-th direction
 	 */
-	unsigned long getXDim() const
+	inline
+	unsigned long getSize(int i) const
 	{
-		return m_file->getDim(m_nameX).getSize();
-	}
-	/**
-	 * @return The size of the grid in y direction
-	 */
-	unsigned long getYDim() const
-	{
-		if (m_dimensions < 2)
+		if (i >= m_dimensions)
 			return 1;
-		return m_file->getDim(m_nameY).getSize();
-	}
-	/**
-	 * @return The size of the grid in z direction
-	 */
-	unsigned long getZDim() const
-	{
-		if (m_dimensions < 3)
-			return 1;
-		return m_file->getDim(m_nameZ).getSize();
+		return m_file->getDim(m_names[i]).getSize();
 	}
 	
 	/**
-	 * @return The offset of the grid in x direction
+	 * @return The offset of the grid in i-th direction
 	 */
-	double getXOffset() const
+	double getOffset(int i) const
 	{
-		double result;
-		netCDF::NcVar x = m_file->getVar(m_nameX);
+		if (i >= getDimensions())
+			return 0;
+
+		netCDF::NcVar x = m_file->getVar(m_names[i]);
 	
 		if (x.isNull())
 			return 0;
-	
+
+		double result;
 		x.getVar(std::vector<size_t>(1, 0), &result);
-		return result;
-	}
-	/**
-	 * @return The offset of the grid in y direction
-	 */
-	double getYOffset() const
-	{
-		double result;
-		netCDF::NcVar y = m_file->getVar(m_nameY);
-	
-		if (y.isNull())
-			return 0;
-	
-		y.getVar(std::vector<size_t>(1, 0), &result);
-		return result;
-	}
-	/**
-	 * @return The offset of the grid in z direction
-	 */
-	double getZOffset() const
-	{
-		double result;
-		netCDF::NcVar z = m_file->getVar(m_nameZ);
-	
-		if (z.isNull())
-			return 0;
-	
-		z.getVar(std::vector<size_t>(1, 0), &result);
 		return result;
 	}
 	
 	/**
 	 * @return The scaling (the real distance between two cells)
-	 *  in x direction
+	 *  in i-th direction
 	 */
-	double getXScaling() const
+	double getScaling(int i) const
 	{
 		double first, last;
 		std::vector<size_t> index(1);
 		netCDF::NcVar x;
-		unsigned long dim;
 	
-		dim = getXDim();
-		if (dim == 1)
+		if (i >= m_dimensions)
+			return 0.;
+	
+		unsigned long size = getSize(i);
+		if (size == 1)
 			return std::numeric_limits<double>::infinity();
 		
-		x = m_file->getVar(m_nameX);
+		x = m_file->getVar(m_names[i]);
 		if (x.isNull())
 			return 1;
 	
 		index[0] = 0;
 		x.getVar(index, &first);
-		index[0] = dim - 1;
+		index[0] = size - 1;
 		x.getVar(index, &last);
 	
-		return (last - first) / (dim - 1);
-	}
-	/**
-	 * @return The scaling (the real distance between two cells)
-	 *  in y direction
-	 */
-	double getYScaling() const
-	{
-		double first, last;
-		std::vector<size_t> index(1);
-		netCDF::NcVar y;
-		unsigned long dim;
-	
-		if (m_dimensions < 2)
-			return 0.;
-		
-		dim = getYDim();
-	
-		if (dim == 1)
-			return std::numeric_limits<double>::infinity();
-	
-		y = m_file->getVar(m_nameY);
-		if (y.isNull())
-			return 1;
-	
-		index[0] = 0;
-		y.getVar(index, &first);
-		index[0] = dim - 1;
-		y.getVar(index, &last);
-	
-		return (last - first) / (dim - 1);
-	}
-	/**
-	 * @return The scaling (the real distance between two cells)
-	 *  in y direction
-	 */
-	double getZScaling() const
-	{
-		double first, last;
-		std::vector<size_t> index(1);
-		netCDF::NcVar z;
-		unsigned long dim;
-	
-		if (m_dimensions < 3)
-			return 0.;
-	
-		dim = getZDim();
-		if (dim == 1)
-			return std::numeric_limits<double>::infinity();
-	
-		z = m_file->getVar(m_nameZ);
-		if (z.isNull())
-			return 1;
-	
-		index[0] = 0;
-		z.getVar(index, &first);
-		index[0] = dim - 1;
-		z.getVar(index, &last);
-	
-		return (last - first) / (dim - 1);
+		return (last - first) / (size - 1);
 	}
 	
 	/**
 	 * Reads a block of cells from the netcdf file. The type is converted to
 	 * T.
 	 * 
-	 * @param var The buffer where the values are written to
-	 * @param xoffset Offset in x direction
-	 * @param yoffset Offset in y direction
-	 * @param zoffset Offset in z direction
-	 * @param xsize Size of the block in x direction
-	 * @param ysize Size of the block in y direction
-	 * @param zsize Size of the block in z direction
+	 * @param block The buffer where the values are written to
+	 * @param offset Offset of the block (at least {@link getDim()}
+	 *  values)
+	 * @param size Size of the block (at least {@link getDim()} values)
 	 */
-	template<typename T> void getVar(void *var,
-		size_t xoffset = 0, size_t yoffset = 0, size_t zoffset = 0,
-		size_t xsize = 0, size_t ysize = 0, size_t zsize = 0)
+	template<typename T>
+	void getBlock(void *block,
+		const size_t *offset,
+		const size_t *size)
 	{
-		size_t y;
-		std::vector<size_t> start(m_dimensions);
-		std::vector<size_t> count(m_dimensions);
-		
-		// Convert to char, so we can do pointer arthmetic
-		unsigned char* const buffer = static_cast<unsigned char*>(var);
-		
-		if (xsize == 0)
-			xsize = getXDim();
-		
-		if (ysize == 0)
-			ysize = getYDim();
-		
-		if (zsize == 0)
-			zsize = getZDim();
-		
 		switch (m_dimensions) {
+		default:
+			getXDimBlock<T>(block, offset, size);
+			break;
+		}
+		/*switch (m_dimensions) {
 		case 1:
 			if (xoffset + xsize > getXDim())
 				xsize = getXDim() - xoffset;
@@ -390,15 +281,107 @@ public:
 			assert(false);
 		}
 		
-		m_variable.getVar(start, count, static_cast<T*>(var));
+		m_variable.getVar(start, count, static_cast<T*>(var));*/
 	}
 	
 	/**
 	 * @return The size of one cell in bytes
 	 */
+	inline
 	unsigned int getVarSize() const
 	{
 		return m_variable.getType().getSize();
+	}
+	
+private:
+	/**
+	 * This is the dimension depended version of {@link getXDimBlock}
+	 * 
+	 * @param revOffset Offset ordered from x to z (reverse compared to the
+	 *  order, the netcdf library needs)
+	 * @param revSize Size ordered from x to z (same order as revOffset)
+	 *
+	 * @tparam N The number of dimension, use default for arbitrary
+	 *  dimensions
+	 */
+	template<typename T, int N = std::numeric_limits<int>::max()>
+	void getXDimBlock(void *block,
+		const size_t *revOffset,
+		const size_t *revSize)
+	{
+		/*
+		 * Original values (ordered x, y, z, ...)
+		 * revOffset The offset of the block
+		 * revSize   The size of the block, the caller wants
+		 *
+		 * Local values (ordered z, y, x, ...)
+		 * offset    The offset of the block
+		 * size      The size of the block, the caller wants
+		 * actOffset The actual offset we use for the next netcdf call
+		 * actSize   The number of elements we read from netcdf in one call
+		 * maxSize   The number of elements we have to read in each direction
+		 */
+
+		std::vector<size_t> offset;
+		offset.resize(m_dimensions);
+		reverse_copy(revOffset, revOffset + m_dimensions, offset.begin());
+		std::vector<size_t> size;
+		size.resize(m_dimensions);
+		reverse_copy(revSize, revSize + m_dimensions, size.begin());
+		std::vector<size_t> actOffset(offset.begin(), offset.end());
+		std::vector<size_t> actSize(size.begin(), size.end());
+		std::vector<size_t> maxSize(size.begin(), size.end());
+		
+		// Convert to char, so we can do pointer arithmetic
+		unsigned char* const buffer = static_cast<unsigned char*>(block);
+
+		for (int i = m_dimensions-1; i >= 0; i--) {
+			if (offset[i] + size[i] > getSize(m_dimensions-i-1)) {
+				// We do not have enough elements left in
+				// dimension i
+				actSize[i] = getSize(m_dimensions-i-1) - offset[i];
+				maxSize[i] = actSize[i];
+				
+				// For all dimension before i, this means we
+				// can only load 1 row add a time
+				for (int j = 0; j < i; j++) {
+					actSize[j] = 1;
+					maxSize[j] = std::min(size[j], getSize(m_dimensions-j-1)-offset[j]);
+				}
+
+				break;
+			}
+		}
+
+		// totalSize[i] = product(size[j]) for (j in [i:n-2])
+		// -> The offset between to elements in dimension i is totalSize[i]
+		std::vector<size_t> totalSize(m_dimensions);
+		totalSize.back() = 1;
+		for (int i = m_dimensions-2; i >= 0; i--)
+			totalSize[i] = size[i+1] * totalSize[i+1];
+
+		size_t bOffset = 0; // offset in the buffer
+		while (actOffset[0] < offset[0] + maxSize[0]) {
+			m_variable.getVar(actOffset, actSize,
+				reinterpret_cast<T*>(&buffer[bOffset * getVarSize()]));
+			
+			actOffset.back() += actSize.back();
+			bOffset += actSize.back();
+			
+			int i;
+			for (i = m_dimensions-1; i > 0; i--) {
+				if (actOffset[i] < offset[i] + maxSize[i])
+					break;
+				
+				// Reset current dimension
+				actOffset[i] = offset[i];
+				bOffset -= maxSize[i] * totalSize[i];
+
+				// Increment next dimension
+				actOffset[i-1] += actSize[i-1];
+				bOffset += actSize[i-1] * totalSize[i-1];
+			}
+		}
 	}
 };
 

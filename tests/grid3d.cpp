@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 		for (int j = 0; j < NC_LENGTH; j++) {
 			for (int k = 0; k < NC_HEIGHT; k++) {
 				value = (k * NC_LENGTH + j) * NC_WIDTH + i;
-				if (grid->getLong3D(i, j, k) != value) {
+				if (grid->getFloat3D(i, j, k) != value) {
 					dbgDebug() << "Test failed on rank" << rank;
 					dbgDebug() << "Value at" << i << j << k << "should be"
 						<< value << "but is" << grid->getInt3D(i, j, k);

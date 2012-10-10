@@ -25,4 +25,5 @@ if( CXXTEST_FOUND )
 
 	add_subdirectory( blocks )
 	add_subdirectory( types )
+	add_subdirectory( io )
 endif( CXXTEST_FOUND )

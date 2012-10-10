@@ -156,7 +156,7 @@ public:
 		return *this;
 	}
 	
-	/********** Const Char ***********/
+	/********** Char(s) ***********/
 	
 	/**
 	 * Add a text to the message
@@ -167,6 +167,15 @@ public:
 		return maybeSpace();
 	}
 	
+	/**
+	 * Add a single char
+	 */
+	Dbg &operator<<(char t)
+	{
+		stream->buffer << t;
+		return maybeSpace();
+	}
+
 	/********** Strings ***********/
 	
 	/**
@@ -253,6 +262,20 @@ public:
 		return *this;
 	}
 };
+
+template <typename T>
+inline Dbg &operator<<(Dbg debug, const std::vector<T> &list)
+{
+	debug.nospace() << '(';
+	for (size_t i = 0; i < list.size(); i++) {
+		if (i)
+			debug << ", ";
+		debug << list[i];
+	}
+	debug << ')';
+	
+	return debug.space();
+}
 
 }
 
