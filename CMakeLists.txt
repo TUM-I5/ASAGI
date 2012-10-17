@@ -164,9 +164,12 @@ target_link_libraries( asagi
 	blocks
 	io
 	types )
-if( NOT NO_MPI )
+if( NO_MPI )
+	set_target_properties( asagi
+		PROPERTIES OUTPUT_NAME asagi_nompi )
+else( NO_MPI )
 	target_link_libraries( asagi mpi )
-endif( NOT NO_MPI )
+endif( NO_MPI )
 
 ##### Installation #####
 install( TARGETS asagi
