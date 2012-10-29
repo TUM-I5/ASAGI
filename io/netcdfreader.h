@@ -86,7 +86,6 @@ public:
 	 * @return <code>True</code> if the netcdf file is opened,
 	 *  <code>false</code> otherwise
 	 */
-	inline
 	bool isOpen() const
 	{
 		return m_file != 0L;
@@ -95,7 +94,6 @@ public:
 	/**
 	 * @return The number of dimensions
 	 */
-	inline
 	int getDimensions() const
 	{
 		return m_dimensions;
@@ -104,7 +102,6 @@ public:
 	/**
 	 * @return The size of the grid in i-th direction
 	 */
-	inline
 	unsigned long getSize(int i) const
 	{
 		if (i >= m_dimensions)
@@ -160,8 +157,8 @@ public:
 	}
 	
 	/**
-	 * Reads a block of cells from the netcdf file. The type is converted to
-	 * T.
+	 * \brief Reads a block of cells from the netcdf file. The type is converted
+	 *  to T.
 	 * 
 	 * @param block The buffer where the values are written to
 	 * @param offset Offset of the block (at least {@link getDim()}
@@ -173,9 +170,15 @@ public:
 		const size_t *offset,
 		const size_t *size)
 	{
+		// Convert to char, so we can do pointer arithmetic
+		unsigned char* const buffer = static_cast<unsigned char*>(block);
+
 		switch (m_dimensions) {
+		case 1:
+			get1DimBlock<T>(buffer, offset, size);
+			break;
 		default:
-			getXDimBlock<T>(block, offset, size);
+			getNDimBlock<T>(buffer, offset, size);
 			break;
 		}
 		/*switch (m_dimensions) {
@@ -287,7 +290,6 @@ public:
 	/**
 	 * @return The size of one cell in bytes
 	 */
-	inline
 	unsigned int getVarSize() const
 	{
 		return m_variable.getType().getSize();
@@ -295,17 +297,46 @@ public:
 	
 private:
 	/**
-	 * This is the dimension depended version of {@link getXDimBlock}
+	 * @copybrief getBlock
+	 *
+	 * This function works for 1D.
+	 *
+	 * @see getBlock
+	 */
+	template<typename T>
+	void get1DimBlock(unsigned char *buffer,
+		const size_t *offset,
+		const size_t *size)
+	{
+		// The offset in the netcdf file (always same as offset)
+		std::vector<size_t> actOffset(offset, offset+1);
+		// Number of elements we read from the netcdf file
+		std::vector<size_t> actSize(1);
+
+		if (offset[0] + size[0] > getSize(0))
+			actSize[0] = getSize(0) - offset[0];
+		else
+			actSize[0] = size[0];
+
+		m_variable.getVar(actOffset, actSize,
+			reinterpret_cast<T*>(buffer));
+
+
+	}
+
+	/**
+	 * @copybrief getBlock
+	 *
+	 * This function works for arbitrary dimensions.
 	 * 
 	 * @param revOffset Offset ordered from x to z (reverse compared to the
 	 *  order, the netcdf library needs)
 	 * @param revSize Size ordered from x to z (same order as revOffset)
 	 *
-	 * @tparam N The number of dimension, use default for arbitrary
-	 *  dimensions
+	 * @see getBlock
 	 */
-	template<typename T, int N = std::numeric_limits<int>::max()>
-	void getXDimBlock(void *block,
+	template<typename T>
+	void getNDimBlock(unsigned char *buffer,
 		const size_t *revOffset,
 		const size_t *revSize)
 	{
@@ -331,9 +362,6 @@ private:
 		std::vector<size_t> actOffset(offset.begin(), offset.end());
 		std::vector<size_t> actSize(size.begin(), size.end());
 		std::vector<size_t> maxSize(size.begin(), size.end());
-		
-		// Convert to char, so we can do pointer arithmetic
-		unsigned char* const buffer = static_cast<unsigned char*>(block);
 
 		for (int i = m_dimensions-1; i >= 0; i--) {
 			if (offset[i] + size[i] > getSize(m_dimensions-i-1)) {
