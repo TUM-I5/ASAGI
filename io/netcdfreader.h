@@ -164,11 +164,14 @@ public:
 	 * @param offset Offset of the block (at least {@link getDim()}
 	 *  values)
 	 * @param size Size of the block (at least {@link getDim()} values)
+	 * @param internalSize Number of bytes used for one value,
+	 *  can be different from size in the netcdf file
 	 */
 	template<typename T>
 	void getBlock(void *block,
 		const size_t *offset,
-		const size_t *size)
+		const size_t *size,
+		unsigned int internalSize)
 	{
 		// Convert to char, so we can do pointer arithmetic
 		unsigned char* const buffer = static_cast<unsigned char*>(block);
@@ -178,7 +181,7 @@ public:
 			get1DimBlock<T>(buffer, offset, size);
 			break;
 		default:
-			getNDimBlock<T>(buffer, offset, size);
+			getNDimBlock<T>(buffer, offset, size, internalSize);
 			break;
 		}
 		/*switch (m_dimensions) {
@@ -338,7 +341,8 @@ private:
 	template<typename T>
 	void getNDimBlock(unsigned char *buffer,
 		const size_t *revOffset,
-		const size_t *revSize)
+		const size_t *revSize,
+		unsigned int internalSize)
 	{
 		/*
 		 * Original values (ordered x, y, z, ...)
@@ -374,7 +378,8 @@ private:
 				// can only load 1 row add a time
 				for (int j = 0; j < i; j++) {
 					actSize[j] = 1;
-					maxSize[j] = std::min(size[j], getSize(m_dimensions-j-1)-offset[j]);
+					maxSize[j] = std::min(size[j],
+						static_cast<size_t>(getSize(m_dimensions-j-1))-offset[j]);
 				}
 
 				break;
@@ -391,7 +396,7 @@ private:
 		size_t bOffset = 0; // offset in the buffer
 		while (actOffset[0] < offset[0] + maxSize[0]) {
 			m_variable.getVar(actOffset, actSize,
-				reinterpret_cast<T*>(&buffer[bOffset * getVarSize()]));
+				reinterpret_cast<T*>(&buffer[bOffset * internalSize]));
 			
 			actOffset.back() += actSize.back();
 			bOffset += actSize.back();

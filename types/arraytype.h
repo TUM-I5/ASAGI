@@ -105,7 +105,7 @@ public:
 		// TODO
 		size_t offset[] = {xoffset, yoffset, zoffset};
 		size_t size[] = {xsize, ysize, zsize};
-		file.getBlock<void>(buf, offset, size);
+		file.getBlock<void>(buf, offset, size, getSize());
 	}
 	
 #ifndef ASAGI_NOMPI

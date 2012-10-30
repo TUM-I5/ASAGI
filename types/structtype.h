@@ -155,7 +155,7 @@ public:
 		const size_t *size,
 		void *buf)
 	{
-		file.getBlock<void>(buf, offset, size);
+		file.getBlock<void>(buf, offset, size, getSize());
 	}
 	
 #ifndef ASAGI_NOMPI
