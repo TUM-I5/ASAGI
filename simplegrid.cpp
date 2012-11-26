@@ -65,8 +65,8 @@ SimpleGrid::~SimpleGrid()
 
 asagi::Grid::Error SimpleGrid::init()
 {
-	unsigned long blockSize = getBlockSize();
-	unsigned long blockX, blockY, blockZ;
+	unsigned long blockSize = getTotalBlockSize();
+	size_t block[3];
 	unsigned long masterBlockCount = getLocalBlockCount();
 	
 	// Allocate memory for slave blocks
@@ -85,17 +85,14 @@ asagi::Grid::Error SimpleGrid::init()
 			break;
 		
 		// Get x, y and z coordinates of the block
-		getBlockPos(getGlobalBlock(i),
-			blockX, blockY, blockZ);
+		getBlockPos(getGlobalBlock(i), block);
 		
 		// Get x, y and z coordinates of the first value in the block
-		blockX = blockX * getXBlockSize();
-		blockY = blockY * getYBlockSize();
-		blockZ = blockZ * getZBlockSize();
+		for (unsigned char i = 0; i < 3; i++)
+			block[i] *= getBlockSize(i);
 		
 		getType().load(getInputFile(),
-			blockX, blockY, blockZ,
-			getXBlockSize(), getYBlockSize(), getZBlockSize(),
+			block, getBlockSize(),
 			&m_masterData[getType().getSize() * blockSize * i]);
 	}
 	
@@ -114,23 +111,23 @@ asagi::Grid::Error SimpleGrid::init()
 void SimpleGrid::getAt(void* buf, types::Type::converter_t converter,
 	unsigned long x, unsigned long y, unsigned long z)
 {
-	unsigned long blockSize = getBlockSize();
+	unsigned long blockSize = getTotalBlockSize();
 	unsigned long block = getBlockByCoords(x, y, z);
 	int remoteRank = getBlockRank(block);
 	unsigned long offset = getBlockOffset(block);
 	int mpiResult; NDBG_UNUSED(mpiResult);
 	
 	// Offset inside the block
-	x %= getXBlockSize();
-	y %= getYBlockSize();
-	z %= getZBlockSize();
+	x %= getBlockSize(0);
+	y %= getBlockSize(1);
+	z %= getBlockSize(2);
 	
 	if (remoteRank == getMPIRank()) {
 		// Nice, this is a block where we are the master
 		
 		(getType().*converter)(&m_masterData[getType().getSize() *
 			(blockSize * offset // jump to the correct block
-			+ (z * getYBlockSize() + y) * getXBlockSize() + x) // correct value inside the block
+			+ (z * getBlockSize(1) + y) * getBlockSize(0) + x) // correct value inside the block
 			],
 			buf);
 		return;
@@ -171,7 +168,7 @@ void SimpleGrid::getAt(void* buf, types::Type::converter_t converter,
 		
 	(getType().*converter)(&m_slaveData[getType().getSize() *
 		(blockSize * block // correct block
-		+ (z * getYBlockSize() + y) * getXBlockSize() + x) // correct value inside the block
+		+ (z * getBlockSize(1) + y) * getBlockSize(0) + x) // correct value inside the block
 		],
 		buf);
 }

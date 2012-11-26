@@ -86,7 +86,7 @@ private:
 	unsigned long m_blocks[3];
 	
 	/** Number of values in x, y and z dimension in one block */
-	unsigned long m_blockSize[3];
+	size_t m_blockSize[3];
 	
 	/** Number of cached blocks on each node */
 	long m_blocksPerNode;
@@ -257,31 +257,25 @@ protected:
 	}
 	
 	/**
-	 * @return The number of values in x direction in each block
+	 * @return The number of values in each direction in a block
 	 */
-	unsigned long getXBlockSize() const
+	const size_t* getBlockSize() const
 	{
-		return m_blockSize[0];
-	}
-	/**
-	 * @return The number of values in y direction in each block
-	 */
-	unsigned long getYBlockSize() const
-	{
-		return m_blockSize[1];
-	}
-	/**
-	 * @return The number of values in z direction in each block
-	 */
-	unsigned long getZBlockSize() const
-	{
-		return m_blockSize[2];
+		return m_blockSize;
 	}
 	
 	/**
+	 * @return The number of values in direction i in a block
+	 */
+	size_t getBlockSize(unsigned int i) const
+	{
+		return m_blockSize[i];
+	}
+
+	/**
 	 * @return The number of values in each block
 	 */
-	unsigned long getBlockSize() const
+	unsigned long getTotalBlockSize() const
 	{
 		return m_blockSize[0] * m_blockSize[1] * m_blockSize[2];
 	}
@@ -306,16 +300,14 @@ protected:
 	 * Calculates the position of <code>block</code> in the grid
 	 * 
 	 * @param block The global block id
-	 * @param[out] x Position in x dimension
-	 * @param[out] y Position in y dimension
-	 * @param[out] z Position in z dimension
+	 * @param[out] pos Position (offset) of the block in each dimension
 	 */
 	void getBlockPos(unsigned long block,
-		unsigned long &x, unsigned long &y, unsigned long &z) const
+		size_t *pos) const
 	{
-		x = block % m_blocks[0];
-		y = (block / m_blocks[0]) % m_blocks[1];
-		z = block / (m_blocks[0] * m_blocks[1]);
+		pos[0] = block % m_blocks[0];
+		pos[1] = (block / m_blocks[0]) % m_blocks[1];
+		pos[2] = block / (m_blocks[0] * m_blocks[1]);
 	}
 	
 	/**
@@ -324,9 +316,9 @@ protected:
 	unsigned long getBlockByCoords(unsigned long x, unsigned long y,
 		unsigned long z) const
 	{
-		return (((z / getZBlockSize()) * m_blocks[1]
-			+ (y / getYBlockSize())) * m_blocks[0])
-			+ (x / getXBlockSize());
+		return (((z / m_blockSize[2]) * m_blocks[1]
+			+ (y / m_blockSize[1])) * m_blocks[0])
+			+ (x / m_blockSize[0]);
 	}
 	
 	/**

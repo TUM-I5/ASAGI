@@ -71,7 +71,7 @@ LargeGrid::~LargeGrid()
 
 asagi::Grid::Error LargeGrid::init()
 {
-	unsigned long blockSize = getBlockSize();
+	unsigned long blockSize = getTotalBlockSize();
 	unsigned long dictCount = getLocalBlockCount();
 	
 	m_blockManager.init(getBlocksPerNode(), getHandsDiff());
@@ -116,7 +116,7 @@ asagi::Grid::Error LargeGrid::init()
 void LargeGrid::getAt(void* buf, types::Type::converter_t converter,
 	unsigned long x, unsigned long y, unsigned long z)
 {
-	unsigned long blockSize = getBlockSize();
+	unsigned long blockSize = getTotalBlockSize();
 	unsigned long block = getBlockByCoords(x, y, z);
 	unsigned long blockIndex = block; // will later hold the local index
 	long oldBlock;
@@ -127,9 +127,9 @@ void LargeGrid::getAt(void* buf, types::Type::converter_t converter,
 	int mpiResult; NDBG_UNUSED(mpiResult);
 
 	// Offset inside the block
-	unsigned long offX = x % getXBlockSize();
-	unsigned long offY = y % getYBlockSize();
-	unsigned long offZ = z % getZBlockSize();
+	unsigned long offX = x % getBlockSize(0);
+	unsigned long offY = y % getBlockSize(1);
+	unsigned long offZ = z % getBlockSize(2);
 	
 #ifdef THREADSAFETY
 	std::lock_guard<std::mutex> lock(m_slave_mutex);
@@ -248,9 +248,9 @@ void LargeGrid::getAt(void* buf, types::Type::converter_t converter,
 		if (dataRank < 0) {
 			// Load the block form the netcdf file
 			
+			size_t pos[] = {x, y, z};
 			getType().load(getInputFile(),
-				x, y, z,
-				getXBlockSize(), getYBlockSize(), getZBlockSize(),
+				pos, getBlockSize(),
 				&m_data[getType().getSize() * blockSize * blockIndex]);
 		} else {
 			// Transfer the block from the other rank
@@ -283,7 +283,7 @@ void LargeGrid::getAt(void* buf, types::Type::converter_t converter,
 	
 	(getType().*converter)(&m_data[getType().getSize() *
 		(blockSize * blockIndex // correct block
-		+ (offZ * getYBlockSize() + offY) * getXBlockSize() + offX) // correct value inside the block
+		+ (offZ * getBlockSize(1) + offY) * getBlockSize(0) + offX) // correct value inside the block
 		],
 		buf);
 }

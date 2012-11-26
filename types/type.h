@@ -94,8 +94,8 @@ public:
 	 * Loads a block form the netcdf file into the buffer
 	 */
 	virtual void load(io::NetCdfReader &file,
-		unsigned long xoffset, unsigned long yoffset, unsigned long zoffset,
-		unsigned long xsize, unsigned long ysize, unsigned long zsize,
+		const size_t *offset,
+		const size_t *size,
 		void *buf) = 0;
 	
 #ifndef ASAGI_NOMPI

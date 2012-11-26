@@ -170,8 +170,7 @@ public:
 	template<typename T>
 	void getBlock(void *block,
 		const size_t *offset,
-		const size_t *size,
-		unsigned int internalSize)
+		const size_t *size)
 	{
 		// Convert to char, so we can do pointer arithmetic
 		unsigned char* const buffer = static_cast<unsigned char*>(block);

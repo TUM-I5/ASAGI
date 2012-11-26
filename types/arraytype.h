@@ -98,14 +98,11 @@ public:
 	}
 	
 	void load(io::NetCdfReader &file,
-		unsigned long xoffset, unsigned long yoffset, unsigned long zoffset,
-		unsigned long xsize, unsigned long ysize, unsigned long zsize,
+		const size_t *offset,
+		const size_t *size,
 		void *buf)
 	{
-		// TODO
-		size_t offset[] = {xoffset, yoffset, zoffset};
-		size_t size[] = {xsize, ysize, zsize};
-		file.getBlock<void>(buf, offset, size, getSize());
+		file.getBlock<void>(buf, offset, size);
 	}
 	
 #ifndef ASAGI_NOMPI

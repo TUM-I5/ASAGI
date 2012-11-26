@@ -79,28 +79,28 @@ public:
 
 		size_t offsets[3] = {0, 0, 0};
 		size_t sizes[3] = {10, 10, 10};
-		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values, offsets, sizes, sizeof(float)));
+		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values, offsets, sizes));
 		for (int i = 0; i < 10; i++)
 			for (int j = 0; j < 10; j++)
 				for (int k = 0; k < 10; k++)
 					TS_ASSERT_EQUALS(values[i][j][k], calcValueAt(i, j, k));
 		
 		size_t offsets2[3] = {9, 4, 45};
-		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values, offsets2, sizes, sizeof(float)));
+		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values, offsets2, sizes));
 		for (int i = 0; i < NC_HEIGHT-45; i++)
 			for (int j = 0; j < 10; j++)
 				for (int k = 0; k < 10; k++)
 					TS_ASSERT_EQUALS(values[i][j][k], calcValueAt(i+45, j+4, k+9));
 
 		size_t offsets3[3] = {0, 46, 21};
-		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values, offsets3, sizes, sizeof(float)));
+		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values, offsets3, sizes));
 		for (int i = 0; i < 10; i++)
 			for (int j = 0; j < NC_LENGTH-46; j++)
 				for (int k = 0; k < 10; k++)
 					TS_ASSERT_EQUALS(values[i][j][k], calcValueAt(i+21, j+46, k+0));
 
 		size_t offsets4[3] = {47, 10, 0};
-		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values, offsets4, sizes, sizeof(float)));
+		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values, offsets4, sizes));
 		for (int i = 0; i < 10; i++)
 			for (int j = 0; j < 10; j++)
 				for (int k = 0; k < NC_LENGTH-47; k++)
@@ -109,7 +109,7 @@ public:
 		float values2[50][50][50];
 		size_t offsets5[3] = {50, 50, 0};
 		size_t sizes2[3] = {50, 50, 50};
-		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values2, offsets5, sizes2, sizeof(float)));
+		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values2, offsets5, sizes2));
 		for (int i = 0; i < 50; i++)
 			for (int j = 0; j < NC_LENGTH-50; j++)
 				for (int k = 0; k < NC_WIDTH-50; k++)
@@ -117,14 +117,14 @@ public:
 
 		// Test float to double conversion
 		double values3[10][10][10];
-		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<double>(values3, offsets3, sizes, sizeof(double)));
+		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<double>(values3, offsets3, sizes));
 		for (int i = 0; i < 10; i++)
 			for (int j = 0; j < NC_LENGTH-46; j++)
 				for (int k = 0; k < 10; k++)
 					TS_ASSERT_EQUALS(values3[i][j][k], calcValueAt(i+21, j+46, k+0));
 
 		// Test void
-		/*TS_ASSERT_THROWS_NOTHING*/(file3d->getBlock<void>(values2, offsets5, sizes2, sizeof(float)));
+		/*TS_ASSERT_THROWS_NOTHING*/(file3d->getBlock<void>(values2, offsets5, sizes2));
 		for (int i = 0; i < 50; i++)
 			for (int j = 0; j < NC_LENGTH-50; j++)
 				for (int k = 0; k < NC_WIDTH-50; k++)
