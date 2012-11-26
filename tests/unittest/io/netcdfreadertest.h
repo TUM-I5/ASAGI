@@ -122,6 +122,13 @@ public:
 			for (int j = 0; j < NC_LENGTH-46; j++)
 				for (int k = 0; k < 10; k++)
 					TS_ASSERT_EQUALS(values3[i][j][k], calcValueAt(i+21, j+46, k+0));
+
+		// Test void
+		/*TS_ASSERT_THROWS_NOTHING*/(file3d->getBlock<void>(values2, offsets5, sizes2, sizeof(float)));
+		for (int i = 0; i < 50; i++)
+			for (int j = 0; j < NC_LENGTH-50; j++)
+				for (int k = 0; k < NC_WIDTH-50; k++)
+					TS_ASSERT_EQUALS(values2[i][j][k], calcValueAt(i, j+50, k+50));
 	}
 
 private:

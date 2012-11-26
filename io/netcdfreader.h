@@ -70,7 +70,7 @@ private:
 	
 	/** The variable we read */
 	netCDF::NcVar m_variable;
-	
+
 	/** Number of dimension in the netCDF file */
 	int m_dimensions;
 	
@@ -176,118 +176,33 @@ public:
 		// Convert to char, so we can do pointer arithmetic
 		unsigned char* const buffer = static_cast<unsigned char*>(block);
 
-		switch (m_dimensions) {
-		case 1:
-			get1DimBlock<T>(buffer, offset, size);
-			break;
-		default:
-			getNDimBlock<T>(buffer, offset, size, internalSize);
-			break;
+		// The netCDF standard (Coords convention) uses Fortran
+		// dimension ordering -> reverse offset and size arrays
+		std::vector<size_t> actOffset;
+		actOffset.resize(m_dimensions);
+		reverse_copy(offset, offset+m_dimensions, actOffset.begin());
+		std::vector<size_t> actSize;
+		actSize.resize(m_dimensions);
+		reverse_copy(size, size+m_dimensions, actSize.begin());
+
+		// Make sure we do not read moe than the available data
+		// in each dimension
+		for (int i = 0; i < m_dimensions; i++) {
+			if (actOffset[i] + actSize[i] > getSize(m_dimensions-i-1))
+				actSize[i] = getSize(m_dimensions-i-1) - actOffset[i];
 		}
-		/*switch (m_dimensions) {
-		case 1:
-			if (xoffset + xsize > getXDim())
-				xsize = getXDim() - xoffset;
-			
-			start[0] = xoffset;
-			
-			count[0] = xsize;
-			break;
-		case 2:
-			if (yoffset + ysize > getYDim())
-				ysize = getYDim() - yoffset;
-		
-			start[0] = yoffset;
-			start[1] = xoffset;
-		
-			count[0] = ysize;
-			count[1] = xsize;
-		
-			if (xoffset + xsize > getXDim()) {
-				// we have to load data row by row
-			
-				count[0] = 1;
-				count[1] = getXDim() - xoffset;
-			
-				for (size_t i = 0; i < ysize; i++) {
-					m_variable.getVar(start, count,
-						reinterpret_cast<T*>(&buffer[i * xsize
-							* getVarSize()]));
-				
-					// Add 1 to the yoffset
-					start[0]++;
-				}
-			
-				return;
-			}
-			
-			break;
-		case 3:
-			if (zoffset + zsize > getZDim())
-				zsize = getZDim() - zoffset;
-			
-			start[0] = zoffset;
-			start[1] = yoffset;
-			start[2] = xoffset;
-			
-			count[0] = zsize;
-			count[1] = ysize;
-			count[2] = xsize;
-			
-			if (xoffset + xsize > getXDim()) {
-				// we have to load data row by row
-				
-				count[0] = 1;
-				count[1] = 1;
-				count[2] = getXDim() - xoffset;
-				
-				y = ysize;
-				if (yoffset + ysize > getYDim())
-					y = getYDim() - yoffset;
-				
-				for (size_t i = 0; i < zsize; i++) {
-					// loop through z dimension
-					for (size_t j = 0; j < y; j++) {
-						// loop through y dimension
-						m_variable.getVar(start, count,
-							reinterpret_cast<T*>(&buffer[(i * ysize + j) * xsize
-								* getVarSize()]));
-						
-						// Add 1 to yoffset
-						start[1]++;
-					}
-					
-					// Add 1 to zoffset
-					start[0]++;
-					start[1] = yoffset;
-				}
-				return;
-			}
-			
-			if (yoffset + ysize > getYDim()) {
-				// we can do this slice by slice at least
-				
-				count[0] = 1;
-				count[1] = getYDim() - yoffset;
-				
-				for (size_t i = 0; i < zsize; i++) {
-					m_variable.getVar(start, count,
-						reinterpret_cast<T*>(&buffer[i * ysize * xsize
-							* getVarSize()]));
-					
-					// Add 1 to zoffset
-					start[0]++;
-				}
-				
-				return;
-			}
-			
-			break;
-		default:
-			assert(false);
-		}
-		
-		m_variable.getVar(start, count, static_cast<T*>(var));*/
+
+		// Stride is always 1
+		std::vector<ptrdiff_t> stride(m_dimensions, 1);
+
+		// The distance between 2 values in the internal representation
+		std::vector<ptrdiff_t> imap(m_dimensions);
+		imap[m_dimensions-1] = getBasicSize<T>();
+		for (int i = m_dimensions-2; i >= 0; i--)
+			imap[i] = imap[i+1] * size[m_dimensions-i-1];
+
+		m_variable.getVar(actOffset, actSize, stride, imap,
+				reinterpret_cast<T*>(buffer));
 	}
 	
 	/**
@@ -300,123 +215,20 @@ public:
 	
 private:
 	/**
-	 * @copybrief getBlock
-	 *
-	 * This function works for 1D.
-	 *
-	 * @see getBlock
+	 * @return The size of one value in a hyperslab
 	 */
 	template<typename T>
-	void get1DimBlock(unsigned char *buffer,
-		const size_t *offset,
-		const size_t *size)
+	size_t getBasicSize()
 	{
-		// The offset in the netcdf file (always same as offset)
-		std::vector<size_t> actOffset(offset, offset+1);
-		// Number of elements we read from the netcdf file
-		std::vector<size_t> actSize(1);
-
-		if (offset[0] + size[0] > getSize(0))
-			actSize[0] = getSize(0) - offset[0];
-		else
-			actSize[0] = size[0];
-
-		m_variable.getVar(actOffset, actSize,
-			reinterpret_cast<T*>(buffer));
-
-
-	}
-
-	/**
-	 * @copybrief getBlock
-	 *
-	 * This function works for arbitrary dimensions.
-	 * 
-	 * @param revOffset Offset ordered from x to z (reverse compared to the
-	 *  order, the netcdf library needs)
-	 * @param revSize Size ordered from x to z (same order as revOffset)
-	 *
-	 * @see getBlock
-	 */
-	template<typename T>
-	void getNDimBlock(unsigned char *buffer,
-		const size_t *revOffset,
-		const size_t *revSize,
-		unsigned int internalSize)
-	{
-		/*
-		 * Original values (ordered x, y, z, ...)
-		 * revOffset The offset of the block
-		 * revSize   The size of the block, the caller wants
-		 *
-		 * Local values (ordered z, y, x, ...)
-		 * offset    The offset of the block
-		 * size      The size of the block, the caller wants
-		 * actOffset The actual offset we use for the next netcdf call
-		 * actSize   The number of elements we read from netcdf in one call
-		 * maxSize   The number of elements we have to read in each direction
-		 */
-
-		std::vector<size_t> offset;
-		offset.resize(m_dimensions);
-		reverse_copy(revOffset, revOffset + m_dimensions, offset.begin());
-		std::vector<size_t> size;
-		size.resize(m_dimensions);
-		reverse_copy(revSize, revSize + m_dimensions, size.begin());
-		std::vector<size_t> actOffset(offset.begin(), offset.end());
-		std::vector<size_t> actSize(size.begin(), size.end());
-		std::vector<size_t> maxSize(size.begin(), size.end());
-
-		for (int i = m_dimensions-1; i >= 0; i--) {
-			if (offset[i] + size[i] > getSize(m_dimensions-i-1)) {
-				// We do not have enough elements left in
-				// dimension i
-				actSize[i] = getSize(m_dimensions-i-1) - offset[i];
-				maxSize[i] = actSize[i];
-				
-				// For all dimension before i, this means we
-				// can only load 1 row add a time
-				for (int j = 0; j < i; j++) {
-					actSize[j] = 1;
-					maxSize[j] = std::min(size[j],
-						static_cast<size_t>(getSize(m_dimensions-j-1))-offset[j]);
-				}
-
-				break;
-			}
-		}
-
-		// totalSize[i] = product(size[j]) for (j in [i:n-2])
-		// -> The offset between to elements in dimension i is totalSize[i]
-		std::vector<size_t> totalSize(m_dimensions);
-		totalSize.back() = 1;
-		for (int i = m_dimensions-2; i >= 0; i--)
-			totalSize[i] = size[i+1] * totalSize[i+1];
-
-		size_t bOffset = 0; // offset in the buffer
-		while (actOffset[0] < offset[0] + maxSize[0]) {
-			m_variable.getVar(actOffset, actSize,
-				reinterpret_cast<T*>(&buffer[bOffset * internalSize]));
-			
-			actOffset.back() += actSize.back();
-			bOffset += actSize.back();
-			
-			int i;
-			for (i = m_dimensions-1; i > 0; i--) {
-				if (actOffset[i] < offset[i] + maxSize[i])
-					break;
-				
-				// Reset current dimension
-				actOffset[i] = offset[i];
-				bOffset -= maxSize[i] * totalSize[i];
-
-				// Increment next dimension
-				actOffset[i-1] += actSize[i-1];
-				bOffset += actSize[i-1] * totalSize[i-1];
-			}
-		}
+		return 1;
 	}
 };
+
+template<> inline
+size_t NetCdfReader::getBasicSize<void>()
+{
+	return getVarSize();
+}
 
 }
 

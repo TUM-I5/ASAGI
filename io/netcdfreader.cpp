@@ -83,7 +83,7 @@ Grid::Error io::NetCdfReader::open(const char* varname)
 		
 	if (m_variable.isNull())
 		return Grid::VAR_NOT_FOUND;
-	
+
 	m_dimensions = m_variable.getDimCount();
 	
 	if (m_dimensions > MAX_DIMENSIONS) {
