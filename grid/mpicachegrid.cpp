@@ -33,7 +33,7 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "simplegrid.h"
+#include "mpicachegrid.h"
 
 #include <cassert>
 #include <malloc.h>
@@ -43,61 +43,41 @@
 #include "debug/dbg.h"
 
 /**
- * @see Grid::Grid()
+ * @see StaticGrid::StaticGrid()
  */
-SimpleGrid::SimpleGrid(GridContainer &container, unsigned int hint)
-	: Grid(container, hint)
+grid::MPICacheGrid::MPICacheGrid(const GridContainer &container,
+	unsigned int hint)
+	: StaticGrid(container, hint)
 {
-	m_masterData = 0L;
 	m_slaveData = 0L;
 	
 	m_window = MPI_WIN_NULL;
 }
 
-SimpleGrid::~SimpleGrid()
+grid::MPICacheGrid::~MPICacheGrid()
 {
 	if (m_window != MPI_WIN_NULL)
 		MPI_Win_free(&m_window);
 	
-	MPI_Free_mem(m_masterData);
-	free(m_slaveData);
+	delete [] m_slaveData;
 }
 
-asagi::Grid::Error SimpleGrid::init()
+asagi::Grid::Error grid::MPICacheGrid::init()
 {
 	unsigned long blockSize = getTotalBlockSize();
-	size_t block[3];
 	unsigned long masterBlockCount = getLocalBlockCount();
+	asagi::Grid::Error error;
 	
 	// Allocate memory for slave blocks
-	m_slaveData = static_cast<unsigned char*>(
-		malloc(getType().getSize() * blockSize * getBlocksPerNode()));
+	m_slaveData = new unsigned char[getType().getSize() * blockSize * getBlocksPerNode()];
 	m_blockManager.init(getBlocksPerNode(), getHandsDiff());
 
-	if (MPI_Alloc_mem(getType().getSize() * blockSize * masterBlockCount,
-		MPI_INFO_NULL, &m_masterData) != MPI_SUCCESS)
-		return asagi::Grid::MPI_ERROR;
-	
-	// Load the blocks from the file, which we control
-	for (unsigned long i = 0; i < masterBlockCount; i++) {
-		if (getGlobalBlock(i) >= getBlockCount())
-			// Last process(es) may control less blocks
-			break;
-		
-		// Get x, y and z coordinates of the block
-		getBlockPos(getGlobalBlock(i), block);
-		
-		// Get x, y and z coordinates of the first value in the block
-		for (unsigned char i = 0; i < 3; i++)
-			block[i] *= getBlockSize(i);
-		
-		getType().load(getInputFile(),
-			block, getBlockSize(),
-			&m_masterData[getType().getSize() * blockSize * i]);
-	}
+	error = StaticGrid::init();
+	if (error != asagi::Grid::SUCCESS)
+		return error;
 	
 	// Create the mpi window for the master data
-	if (MPI_Win_create(m_masterData,
+	if (MPI_Win_create(getData(),
 		getType().getSize() * blockSize * masterBlockCount,
 		getType().getSize(),
 		MPI_INFO_NULL,
@@ -108,7 +88,7 @@ asagi::Grid::Error SimpleGrid::init()
 	return asagi::Grid::SUCCESS;
 }
 
-void SimpleGrid::getAt(void* buf, types::Type::converter_t converter,
+void grid::MPICacheGrid::getAt(void* buf, types::Type::converter_t converter,
 	unsigned long x, unsigned long y, unsigned long z)
 {
 	unsigned long blockSize = getTotalBlockSize();
@@ -117,22 +97,17 @@ void SimpleGrid::getAt(void* buf, types::Type::converter_t converter,
 	unsigned long offset = getBlockOffset(block);
 	int mpiResult; NDBG_UNUSED(mpiResult);
 	
+	if (remoteRank == getMPIRank()) {
+		// Nice, this is a block where we are the master
+		StaticGrid::getAt(buf, converter, x, y, z);
+		return;
+	}
+	
 	// Offset inside the block
 	x %= getBlockSize(0);
 	y %= getBlockSize(1);
 	z %= getBlockSize(2);
-	
-	if (remoteRank == getMPIRank()) {
-		// Nice, this is a block where we are the master
-		
-		(getType().*converter)(&m_masterData[getType().getSize() *
-			(blockSize * offset // jump to the correct block
-			+ (z * getBlockSize(1) + y) * getBlockSize(0) + x) // correct value inside the block
-			],
-			buf);
-		return;
-	}
-	
+
 #ifdef THREADSAFETY
 	std::lock_guard<std::mutex> lock(slave_mutex);
 #endif // THREADSAFETY

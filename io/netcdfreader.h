@@ -44,7 +44,6 @@
 #include <algorithm>
 #include <netcdf>
 
-#include "gridconstants.h"
 #include "debug/dbg.h"
 
 /**

@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 	
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	
-	Grid* grid = Grid::create(Grid::FLOAT, LARGE_GRID);
+	Grid* grid = Grid::create(Grid::FLOAT, Grid::LARGE_GRID);
 	
 	if (grid->open(NC_2D) != Grid::SUCCESS)
 		return 1;

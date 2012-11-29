@@ -12,7 +12,7 @@ option( THREADSAFETY "Enable support for multiple threads on each node" ON )
 option( FORTRAN_SUPPORT "Enable Fortran support" ON )
 option( EXAMPLES "Compile examples" OFF )
 option( TESTS "Test library" OFF )
-option( NO_MPI "Compile without MPI" OFF )
+option( NOMPI "Compile without MPI" OFF )
 option( ROUND_ROBIN "Distribute blocks round robin on nodes (internal use)" ON )
 
 ##### Default build type #####
@@ -24,18 +24,8 @@ endif( NOT CMAKE_BUILD_TYPE )
 ##### Files #####
 # Lib Sources
 set( LibSources
-	adaptivegridcontainer.cpp
 	asagi.cpp
-	asagi_f90.cpp
-	grid.cpp
-	gridcontainer.cpp
-	nompigrid.cpp
-	simplegridcontainer.cpp )
-if( NOT NO_MPI )
-	set( LibSources ${LibSources}
-		largegrid.cpp
-		simplegrid.cpp )
-endif( NOT NO_MPI )
+	asagi_f90.cpp )
 
 # Include files for other programs
 set( InterfaceHeaders
@@ -66,16 +56,16 @@ if( THREADSAFETY )
 endif()
 
 # Use MPI
-if( NO_MPI )
+if( NOMPI )
 	add_definitions( -DASAGI_NOMPI )
-endif( NO_MPI )
+endif( NOMPI )
 
 # Round robin
 if( ROUND_ROBIN )
 	add_definitions( -DROUND_ROBIN )
 endif( ROUND_ROBIN )
 
-if( NOT NO_MPI )
+if( NOT NOMPI )
 	# Find MPI
 	find_package( MPI REQUIRED )
 	if( MPI_LIBRARY )
@@ -90,7 +80,7 @@ if( NOT NO_MPI )
 	set( CMAKE_C_COMPILER ${MPI_C_COMPILER} )
 	set( CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER} )
 	set( CMAKE_Fortran_COMPILER ${MPI_Fortran_COMPILER} )
-endif( NOT NO_MPI )
+endif( NOT NOMPI )
 
 # Find netcdf
 set( NETCDF_CXX4 "YES" )
@@ -113,10 +103,12 @@ include_directories( ${CMAKE_SOURCE_DIR} )
 add_subdirectory( blocks )
 add_subdirectory( debug )
 add_subdirectory( fortran )
+add_subdirectory( grid )
 add_subdirectory( io )
-if( NOT NO_MPI )
+add_subdirectory( utils )
+if( NOT NOMPI )
 	add_subdirectory( mpi )
-endif( NOT NO_MPI )
+endif( NOT NOMPI )
 add_subdirectory( types )
 
 # Set rpath
@@ -137,19 +129,19 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Documentation
 add_subdirectory( documentation )
 
-# Test and examples do not yet work without MPI
-if( NOT NO_MPI )
-	if( TESTS )
-		# Add tests
-		enable_testing()
-		add_subdirectory( tests )
-	endif()
+# Tests
+if( TESTS )
+	enable_testing()
+	add_subdirectory( tests )
+endif( TESTS )
 
+# Examples (only with MPI)
+if( NOT NOMPI )
 	if( EXAMPLES )
 		# Add examples
 		add_subdirectory( examples )
 	endif()
-endif( NOT NO_MPI )
+endif( NOT NOMPI )
 
 ##### Excecutables #####
 # Library
@@ -161,15 +153,18 @@ else()
 		${LibSources} )
 endif()
 target_link_libraries( asagi
+	grid
 	blocks
 	io
 	types )
-if( NO_MPI )
+if( NOMPI )
 	set_target_properties( asagi
 		PROPERTIES OUTPUT_NAME asagi_nompi )
-else( NO_MPI )
-	target_link_libraries( asagi mpi )
-endif( NO_MPI )
+else( NOMPI )
+	target_link_libraries( asagi
+	    mpi
+	    ${MPI_C_LIBRARIES} )
+endif( NOMPI )
 
 ##### Installation #####
 install( TARGETS asagi

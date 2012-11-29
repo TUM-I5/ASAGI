@@ -33,13 +33,16 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRIDCONTAINER_H
-#define GRIDCONTAINER_H
+#ifndef GRID_GRIDCONTAINER_H
+#define GRID_GRIDCONTAINER_H
 
 #include <asagi.h>
 
 #include "fortran/pointerarray.h"
 #include "types/type.h"
+
+namespace grid
+{
 
 class Grid;
 
@@ -70,6 +73,9 @@ private:
 	 */
 	types::Type *m_type;
 	
+	/** True if the container should skip MPI calls like MPI_Comm_dup */
+	bool m_noMPI;
+
 protected:
 	/** Number of levels this grid container has */
 	const unsigned int m_levels;
@@ -91,7 +97,7 @@ protected:
 	ValuePos m_valuePos;
 public:
 	GridContainer(Type type, bool isArray = false,
-		unsigned int hint = asagi::NO_HINT,
+		unsigned int hint = NO_HINT,
 		unsigned int levels = 1);
 	GridContainer(unsigned int count,
 		unsigned int blockLength[],
@@ -244,9 +250,14 @@ public:
 	{
 		return m_id;
 	}
+
+protected:
+	grid::Grid* createGrid(unsigned int hint, unsigned int id) const;
+
 private:
 	/** The index -> pointer translation array */
 	static fortran::PointerArray<GridContainer> m_pointers;
+
 public:
 	/**
 	 * Converts a Fortran index to a c/c++ pointer
@@ -257,4 +268,6 @@ public:
 	}
 };
 
-#endif // GRIDCONTAINER_H
+}
+
+#endif // GRID_CONTAINER_GRIDCONTAINER_H

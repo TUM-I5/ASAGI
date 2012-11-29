@@ -1,12 +1,38 @@
 # Tests may want to include more header files
 include_directories( ${CMAKE_SOURCE_DIR} )
 
+# Add test executable
+function( add_test_executable name )
+	if( ARGV1 AND NOMPI )
+		# MPI test without MPI?
+		return()
+	endif( ARGV1 AND NOMPI )
+
+	# Create the executable
+	add_executable( test_${name} ${name}.cpp )
+	# Link with asagi
+	target_link_libraries( test_${name} asagi )
+	if( ARGV1 )
+		# Link with mpi library
+		target_link_libraries( test_${name} ${MPI_C_LIBRARIES} )
+	endif( ARGV1 )
+	# Tests require test_prepare
+	add_dependencies( test_${name} test_prepare )
+endfunction( add_test_executable )
+
 # Adds an MPI test
-function( add_mpi_test name command numproc )
-	add_test( NAME ${name} COMMAND ${MPIEXEC} ${MPIEXEC_PREFLAGS}
-		${MPIEXEC_NUMPROC_FLAG} ${numproc} ${command}
-		${MPIEXEC_POSTFLAGS} )
-endfunction( add_mpi_test )
+function( add_test_run name command )
+    if( ARGV2 )
+        # MPI run
+        if ( NOT NOMPI )
+	        add_test( NAME ${name} COMMAND ${MPIEXEC} ${MPIEXEC_PREFLAGS}
+		        ${MPIEXEC_NUMPROC_FLAG} ${ARGV2} ${command}
+		        ${MPIEXEC_POSTFLAGS} )
+		endif( NOT NOMPI )
+	else( ARGV2 )
+	    add_test( NAME ${name} COMMAND ${command} )
+	endif( ARGV2 )
+endfunction( add_test_run )
 
 ##### Prepare tests #####
 # Files
@@ -28,52 +54,27 @@ add_custom_command( TARGET test_prepare
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 # Create test executables
-add_executable( test_grid1d grid1d.cpp )
-target_link_libraries( test_grid1d asagi ${MPI_C_LIBRARIES} )
-add_dependencies( test_grid1d test_prepare )
+add_test_executable( grid1d YES )
+add_test_executable( grid1dpseudo YES )
+add_test_executable( grid2d YES )
+add_test_executable( grid3d YES )
+add_test_executable( largegrid1d YES )
+add_test_executable( largegrid2d YES )
+add_test_executable( adaptivegrid2d YES )
 
-add_executable( test_grid1dpseudo grid1dpseudo.cpp )
-target_link_libraries( test_grid1dpseudo asagi ${MPI_C_LIBRARIES} )
-add_dependencies( test_grid1dpseudo test_prepare )
-
-add_executable( test_grid2d grid2d.cpp )
-target_link_libraries( test_grid2d asagi ${MPI_C_LIBRARIES} )
-add_dependencies( test_grid2d test_prepare )
-
-add_executable( test_grid3d grid3d.cpp )
-target_link_libraries( test_grid3d asagi ${MPI_C_LIBRARIES} )
-add_dependencies( test_grid3d test_prepare )
-
-add_executable( test_largegrid1d largegrid1d.cpp )
-target_link_libraries( test_largegrid1d asagi ${MPI_C_LIBRARIES} )
-add_dependencies( test_largegrid1d test_prepare )
-
-add_executable( test_largegrid2d largegrid2d.cpp )
-target_link_libraries( test_largegrid2d asagi ${MPI_C_LIBRARIES} )
-add_dependencies( test_largegrid2d test_prepare )
-
-add_executable( test_adaptivegrid2d adaptivegrid2d.cpp )
-target_link_libraries( test_adaptivegrid2d asagi ${MPI_C_LIBRARIES} )
-add_dependencies( test_adaptivegrid2d test_prepare )
+add_test_executable( staticgrid2d )
 
 
 # Unit Tests
 add_subdirectory( unittest )
 
 # Tests
-add_mpi_test( Grid1D test_grid1d 2 )
-add_mpi_test( Grid1DPseudo test_grid1dpseudo 2 )
-add_mpi_test( Grid2D test_grid2d 2 )
-add_mpi_test( Grid3D test_grid3d 2 )
+add_test_run( Grid1D test_grid1d 2 )
+add_test_run( Grid1DPseudo test_grid1dpseudo 2 )
+add_test_run( Grid2D test_grid2d 2 )
+add_test_run( Grid3D test_grid3d 2 )
+add_test_run( LargeGrid1D test_largegrid1d 2 )
+add_test_run( LargeGrid2D test_largegrid2d 2 )
+add_test_run( AdaptiveGrid2D test_adaptivegrid2d 2 )
 
-add_mpi_test( LargeGrid1D test_largegrid1d 2 )
-add_mpi_test( LargeGrid2D test_largegrid2d 2 )
-
-add_mpi_test( AdaptiveGrid2D test_adaptivegrid2d 2 )
-
-# Performance tests
-# if ( CMAKE_BUILD_TYPE STREQUAL "Release" )
-# 	add_subdirectory( performance )
-# else()
-# 	message( WARNING "Performance tests are only enable in release build!" )
-# endif()
+add_test_run( StaticGrid2D test_staticgrid2d ) 

@@ -109,19 +109,25 @@ public:
 		/** More than one topmost grid specified */
 		MULTIPLE_TOPGRIDS,
 		/** Variable size in the input file does not match the type */
-		INVALID_VAR_SIZE };
+		INVALID_VAR_SIZE
+	};
 	
 	/** Does not provide any hint for ASAGI (default) */
 	static const unsigned int NO_HINT = 0;
 	/** One dimension in the grid is a time dimension */
 	static const unsigned int HAS_TIME = 1;
+	/**
+	 * Don't use any MPI, even when compiled with MPI support
+	 * (MPI_Init may not be called before creating the grid)
+	 */
+	static const unsigned int NOMPI = 2;
 	/** Use this, if you are going to load a large grid with ASAGI */
-	static const unsigned int LARGE_GRID = 2;
+	static const unsigned int LARGE_GRID = 4;
 	/**
 	 * Use an adaptive container. Allows you to load multiple grids with
 	 * the same level of detail. Not fully tested yet.
 	 */
-	static const unsigned int ADAPTIVE = 4;
+	static const unsigned int ADAPTIVE = 8;
 public:
 	/**
 	 * @ingroup cxx_interface
@@ -151,22 +157,24 @@ public:
 	 * 
 	 * The following parameters are supported:
 	 * @li @b value-position The value should be either @c cell-centered
-	 * (default) or @c vertex-centered. <br> Note: This parameter does not
-	 * depend on the level.
+	 *  (default) or @c vertex-centered. <br> Note: This parameter does not
+	 *  depend on the level.
 	 * @li @b variable-name The name of the variable in the NetCDF file
-	 * (default: "z")
+	 *  (default: "z")
 	 * @li @b time-dimension The dimension that holds the time. Only useful
-	 * with the hint HAS_TIME. Should be either "x", "y" or "z". (Default:
-	 * the last dimension of the grid)
+	 *  with the hint HAS_TIME. Should be either "x", "y" or "z". (Default:
+	 *  the last dimension of the grid)
 	 * @li @b x-block-size The block size in x dimension (Default: 50)
 	 * @li @b y-block-size The block size in y dimension (Default: 50 or
-	 * 1 if it is an 1-dimensional grid)
+	 *  1 if it is an 1-dimensional grid)
 	 * @li @b z-block-size The block size in z dimension (Default: 50 or
-	 * 1 if it is an 1- or 2-dimensional grid)
+	 *  1 if it is an 1- or 2-dimensional grid)
 	 * @li @b block-cache-size Number of blocks cached on each node
-	 * (Default: 80)
+	 *  (Default: 80)
 	 * @li @b cache-hand-spread The difference between the hands of the
-	 * 2-handed clock algorithm (Default: block-cache-size/2)
+	 *  2-handed clock algorithm (Default: block-cache-size/2)
+	 * @li @b multigrid-size Sets the number of grids for the level.
+	 *  Call this before setting any other parameter. (Default 1)
 	 * 
 	 * @param name The name of the parameter
 	 * @param value The new value for the parameter
@@ -438,19 +446,6 @@ public:
 	}
 };
 
-/// @cond deprecated_interface
-namespace asagi {
-	/**
-	 * @deprecated Will be removed in further versions
-	 *  use {@link asagi::Grid::NO_HINT}
-	 */
-	const unsigned int NO_HINT = Grid::NO_HINT;
-	const unsigned int HAS_TIME = Grid::HAS_TIME;
-	const unsigned int LARGE_GRID = Grid::LARGE_GRID;
-	const unsigned int ADAPTIVE = Grid::ADAPTIVE;
-}
-/// @endcond
-
 typedef asagi::Grid grid_handle;
 typedef asagi::Grid::Type grid_type;
 typedef asagi::Grid::Error grid_error;
@@ -458,6 +453,29 @@ typedef asagi::Grid::Error grid_error;
 /**
  * @ingroup c_interface
  * 
+ * A handle for a grid
+ */
+typedef struct grid_handle grid_handle;
+/**
+ * @ingroup c_interface
+ *
+ * @see asagi::Grid::Type
+ */
+typedef enum { GRID_BYTE, GRID_INT, GRID_LONG, GRID_FLOAT, GRID_DOUBLE } grid_type;
+/**
+ * @ingroup c_interface
+ *
+ * @see asagi::Grid::Error
+ */
+typedef enum { GRID_SUCCESS = 0, GRID_MPI_ERROR, GRID_UNKNOWN_PARAM,
+	GRID_INVALID_VALUE, GRID_NOT_OPEN, GRID_VAR_NOT_FOUND,
+	GRID_UNSUPPORTED_DIMENSIONS, GRID_MULTIPLE_TOPGRIDS,
+	GRID_INVALID_VAR_SIZE } grid_error;
+#endif
+
+/**
+ * @ingroup c_interface
+ *
  * @see asagi::Grid::NO_HINT
  */
 const unsigned int GRID_NO_HINT = 0;
@@ -470,39 +488,21 @@ const unsigned int GRID_HAS_TIME = 1;
 /**
  * @ingroup c_interface
  * 
+ * @see asagi::Grid::NOMPI
+ */
+const unsigned int GRID_NOMPI = 2;
+/**
+ * @ingroup c_interface
+ *
  * @see asagi::Grid::LARGE_GRID
  */
-const unsigned int GRID_LARGE_GRID = 2;
+const unsigned int GRID_LARGE_GRID = 4;
 /**
  * @ingroup c_interface
  * 
  * @see asagi::Grid::ADAPTIVE
  */
-const unsigned int GRID_ADAPTIVE = 4;
-
-/**
- * @ingroup c_interface
- * 
- * A handle for a grid
- */
-typedef struct grid_handle grid_handle;
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::Type
- */
-typedef enum { GRID_BYTE, GRID_INT, GRID_LONG, GRID_FLOAT, GRID_DOUBLE } grid_type;
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::Error
- */
-typedef enum { GRID_SUCCESS = 0, GRID_MPI_ERROR, GRID_UNKNOWN_PARAM,
-	GRID_INVALID_VALUE, GRID_NOT_OPEN, GRID_VAR_NOT_FOUND,
-	GRID_UNSUPPORTED_DIMENSIONS, GRID_MULTIPLE_TOPGRIDS,
-	GRID_INVALID_VAR_SIZE } grid_error;
-#endif
-
+const unsigned int GRID_ADAPTIVE = 8;
 
 /**
  * @ingroup c_interface

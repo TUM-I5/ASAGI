@@ -33,20 +33,26 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_H
-#define GRID_H
+#ifndef GRID_GRID_H
+#define GRID_GRID_H
 
-#include "gridcontainer.h"
+#include "grid/gridcontainer.h"
 
 #include "types/type.h"
+
 #include "debug/dbg.h"
 
-class GridContainer;
+#include <string>
 
 namespace io
 {
 	class NetCdfReader;
 }
+
+namespace grid
+{
+
+class GridContainer;
 
 /**
  * @brief Base class for a grid
@@ -108,7 +114,8 @@ private:
 	 */
 	signed char m_timeDimension;
 public:
-	Grid(GridContainer &container, unsigned int hint = asagi::NO_HINT);
+	Grid(const GridContainer &container,
+		unsigned int hint = asagi::Grid::NO_HINT);
 	virtual ~Grid();
 	
 	asagi::Grid::Error setParam(const char* name, const char* value);
@@ -384,9 +391,10 @@ protected:
 	 */
 	virtual void getAt(void* buf, types::Type::converter_t converter,
 		unsigned long x, unsigned long y = 0, unsigned long z = 0) = 0;
+
 private:
 	/** The smallest number we can represent in a double */
-	static const double NUMERIC_PRECISION;
+	static constexpr double NUMERIC_PRECISION = 1e-10;
 private:
 	static void h2rgb(float h, unsigned char &red, unsigned char &green,
 		unsigned char &blue);
@@ -394,5 +402,7 @@ private:
 	static double round(double value);
 };
 
-#endif // GRID_H
+}
+
+#endif // GRID_GRID_H
 

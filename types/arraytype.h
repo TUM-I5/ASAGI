@@ -60,8 +60,9 @@ private:
 	
 public:
 	ArrayType()
+		: m_arraySize(0) // provide default value to silence compiler
 #ifndef ASAGI_NOMPI
-		: m_mpiType(MPI_DATATYPE_NULL)
+		, m_mpiType(MPI_DATATYPE_NULL)
 #endif // ASAGI_NOMPI
 	{
 	}

@@ -35,24 +35,24 @@
 
 #include <asagi.h>
 
-#include "simplegridcontainer.h"
-#include "adaptivegridcontainer.h"
+#include "grid/simplegridcontainer.h"
+#include "grid/adaptivegridcontainer.h"
 
 // Static c++ functions
 asagi::Grid* asagi::Grid::create(Type type, unsigned int hint,
 	unsigned int levels)
 {
-	if (hint & asagi::ADAPTIVE)
-		return new AdaptiveGridContainer(type, false, hint, levels);
-	return new SimpleGridContainer(type, false, hint, levels);
+	if (hint & ADAPTIVE)
+		return new grid::AdaptiveGridContainer(type, false, hint, levels);
+	return new grid::SimpleGridContainer(type, false, hint, levels);
 }
 
 asagi::Grid* asagi::Grid::createArray(Type basicType, unsigned int hint,
 	unsigned int levels)
 {
-	if (hint & asagi::ADAPTIVE)
-		return new AdaptiveGridContainer(basicType, false, hint, levels);
-	return new SimpleGridContainer(basicType, true, hint, levels);
+	if (hint & ADAPTIVE)
+		return new grid::AdaptiveGridContainer(basicType, false, hint, levels);
+	return new grid::SimpleGridContainer(basicType, true, hint, levels);
 }
 
 asagi::Grid* asagi::Grid::createStruct(unsigned int count,
@@ -62,10 +62,10 @@ asagi::Grid* asagi::Grid::createStruct(unsigned int count,
 	unsigned int hint,
 	unsigned int levels)
 {
-	if (hint & asagi::ADAPTIVE)
-		return new AdaptiveGridContainer(count, blockLength,
+	if (hint & ADAPTIVE)
+		return new grid::AdaptiveGridContainer(count, blockLength,
 			displacements, types, hint, levels);
-	return new SimpleGridContainer(count, blockLength,
+	return new grid::SimpleGridContainer(count, blockLength,
 		displacements, types, hint, levels);
 }
 

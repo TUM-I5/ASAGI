@@ -35,26 +35,26 @@
 
 #include "adaptivegridcontainer.h"
 
-#include "nompigrid.h"
-#ifndef ASAGI_NOMPI
-#include "simplegrid.h"
-#include "largegrid.h"
-#endif // ASAGI_NOMPI
+#include "grid/grid.h"
 
 /**
  * @see GridContainer::GridContainer()
  */
-AdaptiveGridContainer::AdaptiveGridContainer(asagi::Grid::Type type,
+grid::AdaptiveGridContainer::AdaptiveGridContainer(asagi::Grid::Type type,
 	bool isArray, unsigned int hint, unsigned int levels)
 	: GridContainer(type, isArray, hint, levels),
 	m_hint(hint)
 {
-	m_grids = new std::vector< ::Grid*>[m_levels];
+	// Fancy way to allocate an array without default constructor
+	m_grids = multiGridAllocator.allocate(m_levels);
+	for (unsigned int i = 0; i < m_levels; i++)
+		new(m_grids+i) MultiGrid(*this);
+	m_grids[0].setTopLevel();
 	
 	m_ids = 0;
 }
 
-AdaptiveGridContainer::AdaptiveGridContainer(unsigned int count,
+grid::AdaptiveGridContainer::AdaptiveGridContainer(unsigned int count,
 		unsigned int blockLength[],
 		unsigned long displacements[],
 		asagi::Grid::Type types[],
@@ -62,106 +62,97 @@ AdaptiveGridContainer::AdaptiveGridContainer(unsigned int count,
 	: GridContainer(count, blockLength, displacements, types, hint, levels),
 	m_hint(hint)
 {
-	m_grids = new std::vector< ::Grid*>[m_levels];
+	m_grids = multiGridAllocator.allocate(m_levels);
+	for (unsigned int i = 0; i < m_levels; i++)
+		new(m_grids+i) MultiGrid(*this);
+	m_grids[0].setTopLevel();
 	
 	m_ids = 0;
 }
 
 
-AdaptiveGridContainer::~AdaptiveGridContainer()
+grid::AdaptiveGridContainer::~AdaptiveGridContainer()
 {
-	std::vector< ::Grid*>::const_iterator grid;
-	
-	for (unsigned int i = 0; i < m_levels; i++) {
-		for (grid = m_grids[i].begin(); grid < m_grids[i].end(); grid++)
-			delete *grid;
-	}
-	delete [] m_grids;
+	for (unsigned int i = 0; i < m_levels; i++)
+		multiGridAllocator.destroy(&m_grids[i]);
+	multiGridAllocator.deallocate(m_grids, m_levels);
 }
 
-asagi::Grid::Error AdaptiveGridContainer::open(const char* filename,
+asagi::Grid::Error grid::AdaptiveGridContainer::setParam(const char* name,
+	const char* value, unsigned int level)
+{
+	Error result;
+
+	result = GridContainer::setParam(name, value, level);
+	if (result != UNKNOWN_PARAM)
+		return result;
+
+	assert(level < m_levels);
+	return m_grids[level].setParam(name, value);
+}
+
+asagi::Grid::Error grid::AdaptiveGridContainer::open(const char* filename,
 	unsigned int level)
 {
 	Error result;
-	::Grid* grid;
 	
 	result = GridContainer::open(filename, level);
 	if (result != SUCCESS)
 		return result;
-	
-#ifdef THREADSAFETY
-	std::lock_guard<std::mutex> lock(m_mutex);
-#endif // THREADSAFETY
-	
-	if (level == 0 && !m_grids[0].empty())
-		// There must not be more than one level 0 grid
-		return MULTIPLE_TOPGRIDS;
-	
-#ifdef ASAGI_NOMPI
-	grid = new NoMPIGrid(*this, m_hint);
-#else // ASAGI_NOMPI
-	if (m_hint & asagi::LARGE_GRID) {
-		grid = new LargeGrid(*this, m_hint, m_ids++);
-	} else {
-		grid = new SimpleGrid(*this, m_hint);
-	}
-#endif // ASAGI_NOMPI
 
-	result = grid->open(filename);
+	result = m_grids[level].open(filename);
 	if (result != SUCCESS)
 		return result;
-
-	m_grids[level].push_back(grid);
 	
 	if (level == 0) {
 		// Set min/max from level 0 grid
-		m_minX = grid->getXMin();
-		m_minY = grid->getYMin();
-		m_minZ = grid->getZMin();
+		m_minX = m_grids[0].getGrid(0)->getXMin();
+		m_minY = m_grids[0].getGrid(0)->getYMin();
+		m_minZ = m_grids[0].getGrid(0)->getZMin();
 		
-		m_maxX = grid->getXMax();
-		m_maxY = grid->getYMax();
-		m_maxZ = grid->getZMax();
+		m_maxX = m_grids[0].getGrid(0)->getXMax();
+		m_maxY = m_grids[0].getGrid(0)->getYMax();
+		m_maxZ = m_grids[0].getGrid(0)->getZMax();
 	}
 	
 	return SUCCESS;
 }
 
-char AdaptiveGridContainer::getByte3D(double x, double y, double z, unsigned int level)
+char grid::AdaptiveGridContainer::getByte3D(double x, double y, double z, unsigned int level)
 {
 	return getGrid(x, y, z, level)->getByte(x, y, z);
 }
 
-int AdaptiveGridContainer::getInt3D(double x, double y, double z, unsigned int level)
+int grid::AdaptiveGridContainer::getInt3D(double x, double y, double z, unsigned int level)
 {
 	return getGrid(x, y, z, level)->getInt(x, y, z);
 }
 
-long AdaptiveGridContainer::getLong3D(double x, double y, double z,
+long grid::AdaptiveGridContainer::getLong3D(double x, double y, double z,
 	unsigned int level)
 {
 	return getGrid(x, y, z, level)->getLong(x, y, z);
 }
 
-float AdaptiveGridContainer::getFloat3D(double x, double y, double z,
+float grid::AdaptiveGridContainer::getFloat3D(double x, double y, double z,
 	unsigned int level)
 {
 	return getGrid(x, y, z, level)->getFloat(x, y, z);
 }
 
-double AdaptiveGridContainer::getDouble3D(double x, double y, double z,
+double grid::AdaptiveGridContainer::getDouble3D(double x, double y, double z,
 	unsigned int level)
 {
 	return getGrid(x, y, z, level)->getDouble(x, y, z);
 }
 
-void AdaptiveGridContainer::getBuf3D(void* buf, double x, double y, double z,
+void grid::AdaptiveGridContainer::getBuf3D(void* buf, double x, double y, double z,
 	unsigned int level)
 {
 	getGrid(x, y, z, level)->getBuf(buf, x, y, z);
 }
 
-bool AdaptiveGridContainer::exportPng(const char* filename, unsigned int level)
+bool grid::AdaptiveGridContainer::exportPng(const char* filename, unsigned int level)
 {
 	assert(level < m_levels);
 	
@@ -169,17 +160,17 @@ bool AdaptiveGridContainer::exportPng(const char* filename, unsigned int level)
 		// Sry, but we can not export subgrids ...
 		return false;
 	
-	return m_grids[0][0]->exportPng(filename);
+	return m_grids[0].getGrid(0)->exportPng(filename);
 }
 
 /**
  * Get the grid with the best level of detail (but not better than level) for
  * (x,y,z).
  */
-::Grid* AdaptiveGridContainer::getGrid(double x, double y, double z,
+grid::Grid* grid::AdaptiveGridContainer::getGrid(double x, double y, double z,
 	unsigned int level)
 {
-	std::vector< ::Grid*>::const_iterator grid;
+	std::vector<grid::Grid*>::const_iterator grid;
 	
 	assert(level < m_levels);
 	assert(m_minX <= x && m_maxX >= x && m_minY <= y && m_maxY >= y
@@ -194,5 +185,12 @@ bool AdaptiveGridContainer::exportPng(const char* filename, unsigned int level)
 		}
 	}
 	
-	return m_grids[0][0];
+	return m_grids[0].getGrid(0);
 }
+
+/**
+ * This allocator is used to (de)allocate any MultiGrid memory. This is a
+ * workaround because MultiGrid does not have a default constructor.
+ */
+std::allocator<grid::MultiGrid>
+	grid::AdaptiveGridContainer::multiGridAllocator;

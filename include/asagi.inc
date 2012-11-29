@@ -52,12 +52,16 @@ module asagi
   integer, parameter :: GRID_HAS_TIME = 1
   !> @ingroup f_interface
   !!
+  !! @see asagi::Grid::NOMPI
+  integer, parameter :: GRID_NOMPI = 2
+  !> @ingroup f_interface
+  !!
   !! @see asagi::Grid::LARGE_GRID
-  integer, parameter :: GRID_LARGE_GRID = 2
+  integer, parameter :: GRID_LARGE_GRID = 4
   !> @ingroup f_interface
   !!
   !! @see asagi::Grid::ADAPTIVE
-  integer, parameter :: GRID_ADAPTIVE = 4
+  integer, parameter :: GRID_ADAPTIVE = 8
 
   !> @ingroup f_interface
   !!

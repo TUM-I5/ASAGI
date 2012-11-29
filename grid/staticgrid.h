@@ -33,31 +33,68 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef NOMPIGRID_H
-#define NOMPIGRID_H
+#ifndef GRID_STATICGRID_H
+#define GRID_STATICGRID_H
 
 #include "grid.h"
 
+namespace grid
+{
+
 /**
- * This grid used when compiled without MPI support.
+ * This grid loads all (local) blocks into memory at initialization.
+ * Neither does this class change the blocks nor does it fetch new blocks.
+ * If you try to access values of a non-local block, the behavior is
+ * undefined.
  * 
- * @todo This grid and {@link SimpleGrid} could share some functions.
+ * If compiled without MPI, all blocks are local.
  */
-class NoMPIGrid : public Grid
+class StaticGrid : public Grid
 {
 private:
 	/** Local data cache */
 	unsigned char* m_data;
 
 public:
-	NoMPIGrid(GridContainer &container, unsigned int hint = asagi::NO_HINT);
-	virtual ~NoMPIGrid();
+	StaticGrid(const GridContainer &container,
+		unsigned int hint = asagi::Grid::NO_HINT);
+	virtual ~StaticGrid();
 	
 protected:
-	asagi::Grid::Error init();
+	virtual asagi::Grid::Error init();
 	
-	void getAt(void* buf, types::Type::converter_t converter,
+	virtual void getAt(void* buf, types::Type::converter_t converter,
 		unsigned long x, unsigned long y = 0, unsigned long z = 0);
+
+	/**
+	 * Allocate the memory that holds the local data.
+	 * Can be overwritten to use special allocation.
+	 */
+	virtual asagi::Grid::Error allocLocalMem(size_t size, unsigned char *&data)
+	{
+		data = new unsigned char[size];
+		return asagi::Grid::SUCCESS;
+	}
+
+	/**
+	 * Frees local data.
+	 *
+	 * @see allocLocalMem
+	 */
+	virtual void freeLocalMem(unsigned char *data)
+	{
+		delete [] data;
+	}
+
+	/**
+	 * @return A pointer to the blocks
+	 */
+	unsigned char* getData()
+	{
+		return m_data;
+	}
 };
 
-#endif // NOMPIGRID_H
+}
+
+#endif // GRID_STATICGRID_H

@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -29,54 +29,15 @@
  *
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
- * 
+ *
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @brief Workaround for own main function
+ *
+ * The old CxxTest version does not allow to change the name of the main
+ * function. However, we need our own main, get MPI working.
+ * The main function is defined in {@link globaltest.h}.
  */
 
-#include "globaltest.h"
-#include "tests.h"
-
-#include "grid.h"
-
-#include "simplegridcontainer.h"
-
-class GridTest : public CxxTest::TestSuite
-{
-	SimpleGridContainer* c;
-	Grid* grid;
-public:
-	void setUp(void)
-	{
-		// Set up a 1d grid
-		c = new SimpleGridContainer(asagi::Grid::FLOAT);
-		c->open("../" NC_1D);
-		grid = c->m_grids[0];
-	}
-	
-	void tearDown(void)
-	{
-		delete c;
-	}
-	
-	void testSetParam(void)
-	{
-		TS_ASSERT_EQUALS(grid->setParam("x-block-size", "5"),
-			asagi::Grid::SUCCESS);
-		TS_ASSERT_EQUALS(grid->m_blockSize[0], 5u);
-		
-		grid->setParam("y-block-size", "7");
-		TS_ASSERT_EQUALS(grid->m_blockSize[1], 7u);
-		
-		grid->setParam("z-block-size", "42");
-		TS_ASSERT_EQUALS(grid->m_blockSize[2], 42u);
-		
-		TS_ASSERT_EQUALS(grid->setParam("block-cache-size", "100"),
-			asagi::Grid::SUCCESS);
-		TS_ASSERT_EQUALS(grid->m_blocksPerNode, 100);
-	}
-
-	void testGetXMax(void)
-	{
-		TS_ASSERT_EQUALS(c->getFloat1D(c->getXMax()), NC_WIDTH-1);
-	}
-};
+<CxxTest preamble>
+<CxxTest world>

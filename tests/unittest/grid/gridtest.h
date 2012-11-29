@@ -33,39 +33,50 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include <asagi.h>
-#include <mpi.h>
-
-#include "debug/dbg.h"
-
+#include "globaltest.h"
 #include "tests.h"
 
-using namespace asagi;
+#include "grid/grid.h"
 
-int main(int argc, char** argv)
+#include "grid/simplegridcontainer.h"
+
+class GridTest : public CxxTest::TestSuite
 {
-	int rank;
+	grid::SimpleGridContainer* c;
+	grid::Grid* grid;
+public:
+	void setUp(void)
+	{
+		// Set up a 1d grid
+		c = new grid::SimpleGridContainer(asagi::Grid::FLOAT);
+		c->open("../../" NC_1D);
+		grid = c->m_grids[0];
+	}
 	
-	MPI_Init(&argc, &argv);
+	void tearDown(void)
+	{
+		delete c;
+	}
 	
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	
-	Grid* grid = Grid::create(Grid::FLOAT, Grid::LARGE_GRID);
-	
-	if (grid->open(NC_1D) != Grid::SUCCESS)
-		return 1;
-	
-	for (int i = 0; i < NC_WIDTH; i++) 
-		if (grid->getInt1D(i) != i) {
-			dbgDebug() << "Test failed on rank" << rank;
-			dbgDebug() << "Value at" << i << "should be"
-				<< i << "but is" << grid->getInt1D(i);
-			return 1;
-		}
-	
-	delete grid;
-	
-	MPI_Finalize();
-	
-	return 0;
-}
+	void testSetParam(void)
+	{
+		TS_ASSERT_EQUALS(grid->setParam("x-block-size", "5"),
+			asagi::Grid::SUCCESS);
+		TS_ASSERT_EQUALS(grid->m_blockSize[0], 5u);
+		
+		grid->setParam("y-block-size", "7");
+		TS_ASSERT_EQUALS(grid->m_blockSize[1], 7u);
+		
+		grid->setParam("z-block-size", "42");
+		TS_ASSERT_EQUALS(grid->m_blockSize[2], 42u);
+		
+		TS_ASSERT_EQUALS(grid->setParam("block-cache-size", "100"),
+			asagi::Grid::SUCCESS);
+		TS_ASSERT_EQUALS(grid->m_blocksPerNode, 100);
+	}
+
+	void testGetXMax(void)
+	{
+		TS_ASSERT_EQUALS(c->getFloat1D(c->getXMax()), NC_WIDTH-1);
+	}
+};

@@ -33,32 +33,33 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "nompigrid.h"
-
-#include <cstdlib>
+#include "staticgrid.h"
 
 /**
  * @see Grid::Grid()
  */
-NoMPIGrid::NoMPIGrid(GridContainer &container, unsigned int hint)
+grid::StaticGrid::StaticGrid(const GridContainer &container,
+	unsigned int hint)
 	: Grid(container, hint)
 {
 	m_data = 0L;
 }
 
-NoMPIGrid::~NoMPIGrid()
+grid::StaticGrid::~StaticGrid()
 {
-	free(m_data);
+	freeLocalMem(m_data);
 }
 
-asagi::Grid::Error NoMPIGrid::init()
+asagi::Grid::Error grid::StaticGrid::init()
 {
 	unsigned long blockSize = getTotalBlockSize();
 	size_t block[3];
 	unsigned long masterBlockCount = getLocalBlockCount();
+	asagi::Grid::Error error;
 	
-	m_data = static_cast<unsigned char*>(
-		malloc(getType().getSize() * blockSize * masterBlockCount));
+	error = allocLocalMem(getType().getSize() * blockSize * masterBlockCount, m_data);
+	if (error != asagi::Grid::SUCCESS)
+		return error;
 	
 	// Load the blocks from the file, which we control
 	for (unsigned long i = 0; i < masterBlockCount; i++) {
@@ -81,7 +82,7 @@ asagi::Grid::Error NoMPIGrid::init()
 	return asagi::Grid::SUCCESS;
 }
 
-void NoMPIGrid::getAt(void* buf, types::Type::converter_t converter,
+void grid::StaticGrid::getAt(void* buf, types::Type::converter_t converter,
 	long unsigned int x, long unsigned int y, long unsigned int z)
 {
 	unsigned long blockSize = getTotalBlockSize();

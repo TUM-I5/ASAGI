@@ -35,7 +35,7 @@
 
 #include "netcdfreader.h"
 
-#include "gridconstants.h"
+#include "grid/constants.h"
 
 #include "debug/dbg.h"
 
@@ -86,7 +86,7 @@ Grid::Error io::NetCdfReader::open(const char* varname)
 
 	m_dimensions = m_variable.getDimCount();
 	
-	if (m_dimensions > MAX_DIMENSIONS) {
+	if (m_dimensions > grid::MAX_DIMENSIONS) {
 		dbgDebug(m_rank) << "Unsupported number of variable dimensions:"
 			<< m_dimensions;
 		return Grid::UNSUPPORTED_DIMENSIONS;
@@ -98,7 +98,7 @@ Grid::Error io::NetCdfReader::open(const char* varname)
 		m_names.push_back(m_variable.getDim(m_dimensions - i - 1)
 			.getName());
 		
-		dbgDebug(m_rank) << "\t" << DIMENSION_NAMES[i] << ":="
+		dbgDebug(m_rank) << "\t" << grid::DIMENSION_NAMES[i] << ":="
 			<< m_names[i];
 	}
 	

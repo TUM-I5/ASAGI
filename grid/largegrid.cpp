@@ -46,8 +46,8 @@
  * 
  * @see Grid::Grid()
  */
-LargeGrid::LargeGrid(GridContainer& container, unsigned int hint,
-	unsigned int id)
+grid::LargeGrid::LargeGrid(const GridContainer& container,
+	unsigned int hint, unsigned int id)
 	: Grid(container, hint), m_globalMutex(id)
 {
 	m_data = 0L;
@@ -58,7 +58,7 @@ LargeGrid::LargeGrid(GridContainer& container, unsigned int hint,
 	m_dictWin = MPI_WIN_NULL;
 }
 
-LargeGrid::~LargeGrid()
+grid::LargeGrid::~LargeGrid()
 {
 	if (m_dataWin != MPI_WIN_NULL)
 		MPI_Win_free(&m_dataWin);
@@ -69,7 +69,7 @@ LargeGrid::~LargeGrid()
 	MPI_Free_mem(m_dictionary);
 }
 
-asagi::Grid::Error LargeGrid::init()
+asagi::Grid::Error grid::LargeGrid::init()
 {
 	unsigned long blockSize = getTotalBlockSize();
 	unsigned long dictCount = getLocalBlockCount();
@@ -113,7 +113,7 @@ asagi::Grid::Error LargeGrid::init()
 	return asagi::Grid::SUCCESS;
 }
 
-void LargeGrid::getAt(void* buf, types::Type::converter_t converter,
+void grid::LargeGrid::getAt(void* buf, types::Type::converter_t converter,
 	unsigned long x, unsigned long y, unsigned long z)
 {
 	unsigned long blockSize = getTotalBlockSize();
@@ -297,7 +297,7 @@ void LargeGrid::getAt(void* buf, types::Type::converter_t converter,
  * @param[out] rank The rank that contains the block
  * @param[out] offset The index  of the block in the data window
  */
-void LargeGrid::getBlockInfo(unsigned long* dictEntry, unsigned long localOffset,
+void grid::LargeGrid::getBlockInfo(unsigned long* dictEntry, unsigned long localOffset,
 	int &rank, unsigned long &offset)
 {
 	unsigned long pos; // Position in the list, we will use
@@ -328,7 +328,7 @@ void LargeGrid::getBlockInfo(unsigned long* dictEntry, unsigned long localOffset
 /**
  * Remove the the current rank form the entry
  */
-void LargeGrid::deleteBlockInfo(unsigned long* dictEntry)
+void grid::LargeGrid::deleteBlockInfo(unsigned long* dictEntry)
 {
 	unsigned int i;
 	
@@ -348,7 +348,7 @@ void LargeGrid::deleteBlockInfo(unsigned long* dictEntry)
 /**
  * @return The actual number of elements of single list
  */
-unsigned long LargeGrid::getDictLength()
+unsigned long grid::LargeGrid::getDictLength()
 {
 	return m_dictEntries * 2 + 1;
 }

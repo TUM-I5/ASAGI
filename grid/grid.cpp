@@ -34,27 +34,27 @@
  */
 
 #include "grid.h"
-#include "gridcontainer.h"
 
-#include <math.h>
-#include <limits>
+#include "constants.h"
 
 #ifdef PNG_ENABLED
 #include "io/pngwriter.h"
 #endif
 
 #include "types/basictype.h"
+
 #include "debug/dbg.h"
 
 #include <cstdlib>
-
-using namespace io;
+#include <cmath>
+#include <limits>
 
 /**
  * @param container The container, this grid belongs to
  * @param hint Optimization hints
  */
-Grid::Grid(GridContainer &container, unsigned int hint)
+grid::Grid::Grid(const GridContainer &container,
+	unsigned int hint)
 	: m_container(container), m_variableName("z")
 {
 	m_inputFile = 0L;
@@ -65,13 +65,13 @@ Grid::Grid(GridContainer &container, unsigned int hint)
 	
 	m_handSpread = -1;
 
-	if (hint & asagi::HAS_TIME)
+	if (hint & asagi::Grid::HAS_TIME)
 		m_timeDimension = -1;
 	else
 		m_timeDimension = -2;
 }
 
-Grid::~Grid()
+grid::Grid::~Grid()
 {
 	delete m_inputFile;
 }
@@ -88,7 +88,7 @@ Grid::~Grid()
  * 
  * @see asagi::Grid::setParam(const char*, const char*, unsigned int)
  */
-asagi::Grid::Error Grid::setParam(const char* name, const char* value)
+asagi::Grid::Error grid::Grid::setParam(const char* name, const char* value)
 {
 	long blockSize;
 	
@@ -156,13 +156,13 @@ asagi::Grid::Error Grid::setParam(const char* name, const char* value)
 /**
  * Reads a grid form the file and initializes all variables
  */
-asagi::Grid::Error Grid::open(const char* filename)
+asagi::Grid::Error grid::Grid::open(const char* filename)
 {
 	asagi::Grid::Error error;
 	double scaling[3];
 	
 	// Open NetCDF file
-	m_inputFile = new NetCdfReader(filename, getMPIRank());
+	m_inputFile = new io::NetCdfReader(filename, getMPIRank());
 	if ((error = m_inputFile->open(m_variableName.c_str()))
 		!= asagi::Grid::SUCCESS)
 		return error;
@@ -220,7 +220,8 @@ asagi::Grid::Error Grid::open(const char* filename)
 		if (isinf(scaling[i])) {
 			m_min[i] = -std::numeric_limits<double>::infinity();
 			m_max[i] = std::numeric_limits<double>::infinity();
-		} else if (m_container.getValuePos() == GridContainer::CELL_CENTERED) {
+		} else if (m_container.getValuePos()
+				== GridContainer::CELL_CENTERED) {
 			m_min[i] = m_offset[i] + std::min(scaling[i] * (0. - 0.5),
 				scaling[i] * (m_dim[i] - 1 - 0.5));
 			m_max[i] =  (m_offset[i] + std::max(scaling[i] * (0. - 0.5),
@@ -262,7 +263,7 @@ asagi::Grid::Error Grid::open(const char* filename)
 /**
  * @return The value at (x,y,z) as a byte
  */
-char Grid::getByte(double x, double y, double z)
+char grid::Grid::getByte(double x, double y, double z)
 {
 	char buf;
 	getAt(&buf, &types::Type::convertByte, x, y, z);
@@ -273,7 +274,7 @@ char Grid::getByte(double x, double y, double z)
 /**
  * @return The value at (x,y,z) as an integer
  */
-int Grid::getInt(double x, double y, double z)
+int grid::Grid::getInt(double x, double y, double z)
 {
 	int buf;
 	getAt(&buf, &types::Type::convertInt, x, y, z);
@@ -284,7 +285,7 @@ int Grid::getInt(double x, double y, double z)
 /**
  * @return The value at (x,y,z) as a long
  */
-long Grid::getLong(double x, double y, double z)
+long grid::Grid::getLong(double x, double y, double z)
 {
 	long buf;
 	getAt(&buf, &types::Type::convertLong, x, y, z);
@@ -295,7 +296,7 @@ long Grid::getLong(double x, double y, double z)
 /**
  * @return The value at (x,y,z) as a float
  */
-float Grid::getFloat(double x, double y, double z)
+float grid::Grid::getFloat(double x, double y, double z)
 {
 	float buf;
 	getAt(&buf, &types::Type::convertFloat, x, y, z);
@@ -306,7 +307,7 @@ float Grid::getFloat(double x, double y, double z)
 /**
  * @return The value at (x,y,z) as a double
  */
-double Grid::getDouble(double x, double y, double z)
+double grid::Grid::getDouble(double x, double y, double z)
 {
 	double buf;
 	getAt(&buf, &types::Type::convertDouble, x, y, z);
@@ -317,7 +318,7 @@ double Grid::getDouble(double x, double y, double z)
 /**
  * Copys the value at (x,y,z) into the buffer
  */
-void Grid::getBuf(void* buf, double x, double y, double z)
+void grid::Grid::getBuf(void* buf, double x, double y, double z)
 {
 	getAt(buf, &types::Type::convertBuffer, x, y, z);
 }
@@ -325,7 +326,7 @@ void Grid::getBuf(void* buf, double x, double y, double z)
 /**
  * @see asagi::Grid::exportPng()
  */
-bool Grid::exportPng(const char* filename)
+bool grid::Grid::exportPng(const char* filename)
 {
 #ifdef PNG_ENABLED
 	float min, max, value;
@@ -342,7 +343,7 @@ bool Grid::exportPng(const char* filename)
 		}
 	}
 	
-	PngWriter png(getXDim(), getYDim());
+	io::PngWriter png(getXDim(), getYDim());
 	if (!png.create(filename))
 		return false;
 	
@@ -367,7 +368,7 @@ bool Grid::exportPng(const char* filename)
  * Converts the coordinates to indices and writes the value at the position
  * into the buffer
  */
-void Grid::getAt(void* buf, types::Type::converter_t converter,
+void grid::Grid::getAt(void* buf, types::Type::converter_t converter,
 	double x, double y, double z)
 {
 	x = round((x - m_offset[0]) * m_scalingInv[0]);
@@ -382,7 +383,7 @@ void Grid::getAt(void* buf, types::Type::converter_t converter,
 		static_cast<unsigned long>(y), static_cast<unsigned long>(z));
 }
 
-float Grid::getAtFloat(unsigned long x, unsigned long y)
+float grid::Grid::getAtFloat(unsigned long x, unsigned long y)
 {
 	float buf;
 	
@@ -391,12 +392,10 @@ float Grid::getAtFloat(unsigned long x, unsigned long y)
 	return buf;
 }
 
-const double Grid::NUMERIC_PRECISION = 1e-10;
-
 /**
  * Calculates a nice rgb representation for a value between 0 and 1
  */
-void Grid::h2rgb(float h, unsigned char &red, unsigned char &green,
+void grid::Grid::h2rgb(float h, unsigned char &red, unsigned char &green,
 	unsigned char &blue)
 {
 	// h from 0..1
@@ -448,7 +447,7 @@ void Grid::h2rgb(float h, unsigned char &red, unsigned char &green,
  * Calculates 1/scaling, except for scaling = 0 and scaling = inf. In this
  * case it returns 0
  */
-double Grid::getInvScaling(double scaling)
+double grid::Grid::getInvScaling(double scaling)
 {
 	if ((scaling == 0) || isinf(scaling))
 		return 0;
@@ -459,7 +458,7 @@ double Grid::getInvScaling(double scaling)
 /**
  * Implementation for round-to-nearest
  */
-double Grid::round(double value)
+double grid::Grid::round(double value)
 {
 	return floor(value + 0.5);
 }

@@ -33,31 +33,53 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef SIMPLEGRIDCONTAINER_H
-#define SIMPLEGRIDCONTAINER_H
+#ifndef GRID_ADAPTIVEGRIDCONTAINER_H
+#define GRID_ADAPTIVEGRIDCONTAINER_H
 
 #include "gridcontainer.h"
 
+#include "grid/multigrid.h"
+
+#include <memory>
+
+namespace grid
+{
+
+class Grid;
+
 /**
- * Simple grid container that stores one grid for each level. Each grid has to
- * cover the hole domain.
+ * @brief An adaptive container that can store multiple grids of the same level
+ * 
+ * The container allows to store (a few) large blocks of each level.
  */
-class SimpleGridContainer : public GridContainer
+class AdaptiveGridContainer : public GridContainer, GridCreator
 {
 private:
-	/** All grids we control */
-	::Grid **m_grids;
+	/** Optimization hint */
+	const int m_hint;
+	
+	/** Grid(-parts) */
+	MultiGrid* m_grids;
+	
+	/** Next unique id for a grid */
+	unsigned int m_ids;
+	
+#ifdef THREADSAFETY
+	/** Lock the createGrid function (only one thread can change m_ids) */
+	std::mutex m_mutex;
+#endif // THREADSAFETY
+	
 public:
-	SimpleGridContainer(Type type, bool isArray = false,
-		unsigned int hint = asagi::NO_HINT,
-		unsigned int levels = 1);
-	SimpleGridContainer(unsigned int count,
+	AdaptiveGridContainer(Type type, bool isArray = false,
+		unsigned int hint = NO_HINT,
+		unsigned int level = 1);
+	AdaptiveGridContainer(unsigned int count,
 		unsigned int blockLength[],
 		unsigned long displacements[],
 		asagi::Grid::Type types[],
 		unsigned int hint = NO_HINT, unsigned int levels = 1);
-	virtual ~SimpleGridContainer();
-	
+	virtual ~AdaptiveGridContainer();
+
 	Error setParam(const char* name, const char* value,
 		unsigned int level = 0);
 	Error open(const char* filename, unsigned int level = 0);
@@ -76,6 +98,24 @@ public:
 		unsigned int level = 0);
 	
 	bool exportPng(const char* filename, unsigned int level = 0);
+
+public:
+	grid::Grid* createGrid()
+	{
+#ifdef THREADSAFETY
+		std::lock_guard<std::mutex> lock(m_mutex);
+#endif // THREADSAFETY
+		return GridContainer::createGrid(m_hint, m_ids++);
+	}
+		
+private:
+	grid::Grid* getGrid(double x, double y = 0, double z = 0,
+		unsigned int level = 0);
+
+private:
+	static std::allocator<MultiGrid> multiGridAllocator;
 };
 
-#endif // SIMPLEGRIDCONTAINER_H
+}
+
+#endif // GRID_CONTAINER_ADAPTIVEGRIDCONTAINER_H

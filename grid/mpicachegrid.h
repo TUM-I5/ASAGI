@@ -33,85 +33,71 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef LARGEGRID_H
-#define LARGEGRID_H
+#ifndef GRID_MPICACHEGRID_H
+#define GRID_MPICACHEGRID_H
 
-#include "grid.h"
+#include "staticgrid.h"
+
+#ifndef THREADSAFETY
+#include <mutex>
+#endif // THREADSAFETY
+#include <unordered_map>
 
 #include "blocks/blockmanager.h"
-#include "mpi/mutex.h"
+
+namespace grid
+{
 
 /**
- * Stores one grid. It maintains a directory where the current location
- * of blocks is stored. Blocks are only loaded dynamically when required.
+ * Simple grid implementation, that distributes the grid at the beginning
+ * across all MPI tasks. If a block is not available, it is transfered via
+ * MPI and stored in a cache.
  */
-class LargeGrid : public Grid
+class MPICacheGrid : public StaticGrid
 {
 private:
-	/** All blocks we currently store */
-	unsigned char* m_data;
+	/** Data we hold only temporary */
+	unsigned char *m_slaveData;
 	
-	/** The window that holds the blocks */
-	MPI_Win m_dataWin;
-	
-	/**
-	 * Information about which blocks are currently stored on which node.
-	 * <br>
-	 * Structure: <br>
-	 * This array consists of {@link m_dictCount} elements.
-	 * Each element stores information about one block. It is a list of
-	 * node/offset pairs which indicate where the block is currently stored.
-	 * The length of the list is determind by {@link m_dictEntries}. The
-	 * actual length of the list is stored in the element before the list.
-	 */
-	unsigned long* m_dictionary;
-	
-	/** The number of lists */
-	unsigned long m_dictCount;
-	
-	/**
-	 * The number entries (rank/offset pairs) in a single list in the
-	 * directory
-	 */
-	unsigned long m_dictEntries;
-	
-	/** The window is used to load dictionary information from other ranks */
-	MPI_Win m_dictWin;
-	
-	/** The block manager used to handle the local cache */
+	/** BlockManager used to control the slave memory */
 	blocks::BlockManager m_blockManager;
 	
-	/** Prevent access to the same block from multiple processes */
-	mpi::Mutex m_globalMutex;
+	/** MPI window for communication */
+	MPI_Win m_window;
 	
 #ifdef THREADSAFETY
 	/**
-	 * Lock blockmanager
+	 * Lock slave memory
 	 * @todo Use a shared mutex, to allow multiple readers
 	 */
-	std::mutex m_slave_mutex;
+	std::mutex slave_mutex;
 #endif // THREADSAFETY
 public:
-	LargeGrid(GridContainer& container,
-		unsigned int hint = asagi::NO_HINT,
-		unsigned int id = 0);
-	virtual ~LargeGrid();
+	MPICacheGrid(const GridContainer &container,
+		unsigned int hint = asagi::Grid::NO_HINT);
+	virtual ~MPICacheGrid();
+	
 protected:
 	asagi::Grid::Error init();
 	
-	bool keepFileOpen() const
-	{
-		return true;
-	}
-    
 	void getAt(void* buf, types::Type::converter_t converter,
 		unsigned long x, unsigned long y = 0, unsigned long z = 0);
-	
-private:
-	void getBlockInfo(unsigned long* dictEntry, unsigned long localOffset,
-		int &rank, unsigned long &offset);
-	void deleteBlockInfo(unsigned long* dictEntry);
-	unsigned long getDictLength();
+
+	asagi::Grid::Error allocLocalMem(size_t size, unsigned char *&data)
+	{
+		if (MPI_Alloc_mem(size,	MPI_INFO_NULL, &data) != MPI_SUCCESS)
+			return asagi::Grid::MPI_ERROR;
+
+		return asagi::Grid::SUCCESS;
+	}
+
+	void freeLocalMem(unsigned char *data)
+	{
+		MPI_Free_mem(data);
+	}
 };
 
-#endif // LARGEGRID_H
+}
+
+#endif // GRID_MPICACHEGRID_H
+

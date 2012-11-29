@@ -35,74 +35,51 @@
 
 #include "simplegridcontainer.h"
 
-#include "nompigrid.h"
-#ifndef ASAGI_NOMPI
-#include "simplegrid.h"
-#include "largegrid.h"
-#endif // ASAGI_NOMPI
+#include "grid/grid.h"
 
 #include <algorithm>
 
 /**
  * @see GridContainer::GridContainer()
  */
-SimpleGridContainer::SimpleGridContainer(asagi::Grid::Type type, bool isArray,
+grid::SimpleGridContainer::SimpleGridContainer(asagi::Grid::Type type, bool isArray,
 	unsigned int hint, unsigned int levels)
 	: GridContainer(type, isArray, hint, levels)
 {
-	m_grids = new ::Grid*[m_levels];
-#ifdef ASAGI_NOMPI
+	m_grids = new grid::Grid*[m_levels];
+
 	for (unsigned int i = 0; i < levels; i++)
-		m_grids[i] = new NoMPIGrid(*this, hint);
-#else // ASAGI_NOMPI
-	if (hint & asagi::LARGE_GRID) {
-		for (unsigned int i = 0; i < levels; i++)
-			m_grids[i] = new LargeGrid(*this, hint, i);
-	} else {
-		for (unsigned int i = 0; i < levels; i++)
-			m_grids[i] = new SimpleGrid(*this, hint);
-	}
-#endif // ASAGI_NOMPI
+		m_grids[i] = createGrid(hint, i);
 }
 
 /**
  * @see GridContainer::GridContainer()
  */
-SimpleGridContainer::SimpleGridContainer(unsigned int count,
+grid::SimpleGridContainer::SimpleGridContainer(unsigned int count,
 		unsigned int blockLength[],
 		unsigned long displacements[],
 		asagi::Grid::Type types[],
 		unsigned int hint, unsigned int levels)
 	: GridContainer(count, blockLength, displacements, types, hint, levels)
 {
-	m_grids = new ::Grid*[m_levels];
-#ifdef ASAGI_NOMPI
+	m_grids = new grid::Grid*[m_levels];
 	for (unsigned int i = 0; i < levels; i++)
-		m_grids[i] = new NoMPIGrid(*this, hint);
-#else // ASAGI_NOMPI
-	if (hint & asagi::LARGE_GRID) {
-		for (unsigned int i = 0; i < levels; i++)
-			m_grids[i] = new LargeGrid(*this, hint, i);
-	} else {
-		for (unsigned int i = 0; i < levels; i++)
-			m_grids[i] = new SimpleGrid(*this, hint);
-	}
-#endif // ASAGI_NOMPI
+		m_grids[i] = createGrid(hint, i);
 }
 
-SimpleGridContainer::~SimpleGridContainer()
+grid::SimpleGridContainer::~SimpleGridContainer()
 {
 	for (unsigned int i = 0; i < m_levels; i++)
 		delete m_grids[i];
 	delete [] m_grids;
 }
 
-asagi::Grid::Error SimpleGridContainer::setParam(const char* name,
+asagi::Grid::Error grid::SimpleGridContainer::setParam(const char* name,
 	const char* value, unsigned int level)
 {
 	Error result;
 	
-	result = GridContainer::setParam( name, value, level);
+	result = GridContainer::setParam(name, value, level);
 	if (result != UNKNOWN_PARAM)
 		return result;
 	
@@ -110,7 +87,7 @@ asagi::Grid::Error SimpleGridContainer::setParam(const char* name,
 	return m_grids[level]->setParam(name, value);
 }
 
-asagi::Grid::Error SimpleGridContainer::open(const char* filename,
+asagi::Grid::Error grid::SimpleGridContainer::open(const char* filename,
 	unsigned int level)
 {
 	Error result;
@@ -134,37 +111,39 @@ asagi::Grid::Error SimpleGridContainer::open(const char* filename,
 	return result;
 }
 
-char SimpleGridContainer::getByte3D(double x, double y, double z, unsigned int level)
+char grid::SimpleGridContainer::getByte3D(double x, double y,
+	double z, unsigned int level)
 {
 	assert(level < m_levels);
 	
 	return m_grids[level]->getByte(x, y, z);
 }
 
-int SimpleGridContainer::getInt3D(double x, double y, double z, unsigned int level)
+int grid::SimpleGridContainer::getInt3D(double x, double y,
+	double z, unsigned int level)
 {
 	assert(level < m_levels);
 	
 	return m_grids[level]->getInt(x, y, z);
 }
 
-long SimpleGridContainer::getLong3D(double x, double y, double z,
-	unsigned int level)
+long grid::SimpleGridContainer::getLong3D(double x, double y,
+	double z, unsigned int level)
 {
 	assert(level < m_levels);
 	
 	return m_grids[level]->getLong(x, y, z);
 }
 
-float SimpleGridContainer::getFloat3D(double x, double y, double z,
-	unsigned int level)
+float grid::SimpleGridContainer::getFloat3D(double x, double y,
+	double z, unsigned int level)
 {
 	assert(level < m_levels);
 	
 	return m_grids[level]->getFloat(x, y, z);
 }
 
-double SimpleGridContainer::getDouble3D(double x, double y, double z,
+double grid::SimpleGridContainer::getDouble3D(double x, double y, double z,
 	unsigned int level)
 {
 	assert(level < m_levels);
@@ -172,7 +151,7 @@ double SimpleGridContainer::getDouble3D(double x, double y, double z,
 	return m_grids[level]->getDouble(x, y, z);
 }
 
-void SimpleGridContainer::getBuf3D(void* buf, double x, double y, double z,
+void grid::SimpleGridContainer::getBuf3D(void* buf, double x, double y, double z,
 	unsigned int level)
 {
 	assert(level < m_levels);
@@ -180,7 +159,7 @@ void SimpleGridContainer::getBuf3D(void* buf, double x, double y, double z,
 	m_grids[level]->getBuf(buf, x, y, z);
 }
 
-bool SimpleGridContainer::exportPng(const char* filename, unsigned int level)
+bool grid::SimpleGridContainer::exportPng(const char* filename, unsigned int level)
 {
 	assert(level < m_levels);
 	

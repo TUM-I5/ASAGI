@@ -36,6 +36,9 @@
 #ifndef GRIDCONSTANTS_H
 #define GRIDCONSTANTS_H
 
+namespace grid
+{
+
 const int MAX_DIMENSIONS = 4;
 
 const char* const DIMENSION_NAMES[MAX_DIMENSIONS] = {
@@ -43,5 +46,7 @@ const char* const DIMENSION_NAMES[MAX_DIMENSIONS] = {
 	"y",
 	"z",
 	"t"};
+
+}
 
 #endif // GRIDCONSTANTS_H

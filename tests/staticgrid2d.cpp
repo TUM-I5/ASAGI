@@ -34,7 +34,6 @@
  */
 
 #include <asagi.h>
-#include <mpi.h>
 
 #include "debug/dbg.h"
 
@@ -44,28 +43,25 @@ using namespace asagi;
 
 int main(int argc, char** argv)
 {
-	int rank;
+	Grid* grid = Grid::create(Grid::FLOAT, Grid::NOMPI);
 	
-	MPI_Init(&argc, &argv);
-	
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	
-	Grid* grid = Grid::create(Grid::FLOAT, Grid::LARGE_GRID);
-	
-	if (grid->open(NC_1D) != Grid::SUCCESS)
+	if (grid->open(NC_2D) != Grid::SUCCESS)
 		return 1;
 	
-	for (int i = 0; i < NC_WIDTH; i++) 
-		if (grid->getInt1D(i) != i) {
-			dbgDebug() << "Test failed on rank" << rank;
-			dbgDebug() << "Value at" << i << "should be"
-				<< i << "but is" << grid->getInt1D(i);
-			return 1;
+	int value;
+	
+	for (int i = 0; i < NC_WIDTH; i++) {
+		for (int j = 0; j < NC_LENGTH; j++) {
+			value = j * NC_WIDTH + i;
+			if (grid->getInt2D(i, j) != value) {
+				dbgDebug() << "Value at" << i << j << "should be"
+					<< value << "but is" << grid->getInt2D(i, j);
+				return 1;
+			}
 		}
+	}
 	
 	delete grid;
-	
-	MPI_Finalize();
 	
 	return 0;
 }

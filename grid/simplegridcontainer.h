@@ -33,54 +33,54 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef SIMPLEGRID_H
-#define SIMPLEGRID_H
+#ifndef GRID_SIMPLEGRIDCONTAINER_H
+#define GRID_SIMPLEGRIDCONTAINER_H
 
-#include "grid.h"
+#include "gridcontainer.h"
 
-#ifndef THREADSAFETY
-#include <mutex>
-#endif // THREADSAFETY
-#include <unordered_map>
-
-#include "blocks/blockmanager.h"
+namespace grid
+{
 
 /**
- * Simple grid implentation, that distributes the grid at the beginning 
- * across all MPI tasks.
+ * Simple grid container that stores one grid for each level. Each grid has to
+ * cover the hole domain.
  */
-class SimpleGrid : public Grid
+class SimpleGridContainer : public GridContainer
 {
 private:
-	/** Blocks we are the master */
-	unsigned char *m_masterData;
-	
-	/** Data we hold only temporary */
-	unsigned char *m_slaveData;
-	
-	/** BlockManager used to control the slave memory */
-	blocks::BlockManager m_blockManager;
-	
-	/** MPI window for communication */
-	MPI_Win m_window;
-	
-#ifdef THREADSAFETY
-	/**
-	 * Lock slave memory
-	 * @todo Use a shared mutex, to allow multiple readers
-	 */
-	std::mutex slave_mutex;
-#endif // THREADSAFETY
+	/** All grids we control */
+	grid::Grid **m_grids;
 public:
-	SimpleGrid(GridContainer &container, unsigned int hint = asagi::NO_HINT);
-	virtual ~SimpleGrid();
+	SimpleGridContainer(Type type, bool isArray = false,
+		unsigned int hint = NO_HINT,
+		unsigned int levels = 1);
+	SimpleGridContainer(unsigned int count,
+		unsigned int blockLength[],
+		unsigned long displacements[],
+		asagi::Grid::Type types[],
+		unsigned int hint = NO_HINT, unsigned int levels = 1);
+	virtual ~SimpleGridContainer();
 	
-protected:
-	asagi::Grid::Error init();
+	Error setParam(const char* name, const char* value,
+		unsigned int level = 0);
+	Error open(const char* filename, unsigned int level = 0);
 	
-	void getAt(void* buf, types::Type::converter_t converter,
-		unsigned long x, unsigned long y = 0, unsigned long z = 0);
+	char getByte3D(double x, double y = 0, double z = 0,
+		unsigned int level = 0);
+	int getInt3D(double x, double y = 0, double z = 0,
+		unsigned int level = 0);
+	long getLong3D(double x, double y = 0, double z = 0,
+		unsigned int level = 0);
+	float getFloat3D(double x, double y = 0, double z = 0,
+		unsigned int level = 0);
+	double getDouble3D(double x, double y = 0, double z = 0,
+		unsigned int level = 0);
+	void getBuf3D(void* buf, double x, double y = 0, double z = 0,
+		unsigned int level = 0);
+	
+	bool exportPng(const char* filename, unsigned int level = 0);
 };
 
-#endif // SIMPLEGRID_H
+}
 
+#endif // GRID_SIMPLEGRIDCONTAINER_H

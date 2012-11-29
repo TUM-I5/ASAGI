@@ -40,26 +40,43 @@
 #ifndef TESTS_UNITTEST_GLOBALTEST_H
 #define TESTS_UNITTEST_GLOBALTEST_H
 
+#ifndef ASAGI_NOMPI
 #include <mpi.h>
+#endif
 #include <cxxtest/TestSuite.h>
 #include <cxxtest/GlobalFixture.h>
 
+static bool mainInitSuccess = true;
+
+int main(int argc, char** argv)
+{
+#ifndef ASAGI_NOMPI
+	if (MPI_Init(&argc, &argv) != MPI_SUCCESS)
+		mainInitSuccess = false;
+#endif
+
+	return CxxTest::ErrorPrinter().run();
+}
+
 /**
- * This currently only works with MPI versions that do not depend on mpiexec
- * (like openmpi).
+ * The MPIHelper works together with {@link main} to setup
+ * and free MPI resources.
  */
 class MPIHelper : public CxxTest::GlobalFixture
 {
 public:
 	bool setUpWorld(void)
 	{
-		// TODO run with MPI an get args
-		return (MPI_Init(0, 0) == MPI_SUCCESS);
+		return mainInitSuccess;
 	}
 	
 	bool tearDownWorld(void)
 	{
+#ifndef ASAGI_NOMPI
 		return (MPI_Finalize() == MPI_SUCCESS);
+#endif
+
+		return true;
 	}
 };
 

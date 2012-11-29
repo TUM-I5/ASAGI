@@ -35,6 +35,12 @@
 
 #include "gridcontainer.h"
 
+#include "grid/staticgrid.h"
+#ifndef ASAGI_NOMPI
+#include "grid/mpicachegrid.h"
+#include "grid/largegrid.h"
+#endif // ASAGI_NOMPI
+
 #include "types/arraytype.h"
 #include "types/basictype.h"
 #include "types/structtype.h"
@@ -50,7 +56,7 @@
  * @param hint Any performance hints
  * @param levels The number of levels
  */
-GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
+grid::GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	unsigned int levels)
 	: m_levels(levels)
 {
@@ -59,7 +65,10 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	// Prepare for fortran <-> c translation
 	m_id = m_pointers.add(this);
 	
-#ifndef ASAGI_NOMPI
+#ifdef ASAGI_NOMPI
+	m_noMPI = true;
+#else // ASAGI_NOMPI
+	m_noMPI = hint & NOMPI;
 	m_communicator = MPI_COMM_NULL;
 #endif // ASAGI_NOMPI
 	
@@ -119,7 +128,7 @@ GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	m_mpiSize = 1;
 }
 
-GridContainer::GridContainer(unsigned int count,
+grid::GridContainer::GridContainer(unsigned int count,
 		unsigned int blockLength[],
 		unsigned long displacements[],
 		asagi::Grid::Type types[],
@@ -131,7 +140,10 @@ GridContainer::GridContainer(unsigned int count,
 	// Prepare for fortran <-> c translation
 	m_id = m_pointers.add(this);
 	
-#ifndef ASAGI_NOMPI
+#ifdef ASAGI_NOMPI
+	m_noMPI = true;
+#else // ASAGI_NOMPI
+	m_noMPI = hint & NOMPI;
 	m_communicator = MPI_COMM_NULL;
 #endif // ASAGI_NOMPI
 	
@@ -149,7 +161,7 @@ GridContainer::GridContainer(unsigned int count,
 }
 
 
-GridContainer::~GridContainer()
+grid::GridContainer::~GridContainer()
 {
 	delete m_type;
 	
@@ -163,23 +175,24 @@ GridContainer::~GridContainer()
 }
 
 #ifndef ASAGI_NOMPI
-asagi::Grid::Error GridContainer::setComm(MPI_Comm comm)
+asagi::Grid::Error grid::GridContainer::setComm(MPI_Comm comm)
 {
 	if (m_communicator != MPI_COMM_NULL)
 		// set communicator only once
 		return SUCCESS;
-	
+
 	if (MPI_Comm_dup(comm, &m_communicator) != MPI_SUCCESS)
 		return MPI_ERROR;
-	
+
 	MPI_Comm_rank(m_communicator, &m_mpiRank);
 	MPI_Comm_size(m_communicator, &m_mpiSize);
-	
+
 	return SUCCESS;
 }
 #endif // ASAGI_NOMPI
 
-asagi::Grid::Error GridContainer::setParam(const char* name, const char* value,
+asagi::Grid::Error grid::GridContainer::setParam(const char* name,
+	const char* value,
 	unsigned int level)
 {
 	if (strcmp(name, "value-position") == 0) {
@@ -199,16 +212,40 @@ asagi::Grid::Error GridContainer::setParam(const char* name, const char* value,
 	return UNKNOWN_PARAM;
 }
 
-asagi::Grid::Error GridContainer::open(const char* filename, unsigned int level)
+asagi::Grid::Error grid::GridContainer::open(const char* filename,
+	unsigned int level)
 {
 	assert(level < m_levels);
 	
 #ifdef ASAGI_NOMPI
 	return SUCCESS;
 #else // ASAGI_NOMPI
-	return setComm(); // Make sure we have our own communicator
+	// Make sure we have our own communicator
+	if (m_noMPI)
+		return SUCCESS;
+	return setComm();
+#endif // ASAGI_NOMPI
+}
+
+/**
+ * Creates a new grid according to the hints
+ */
+grid::Grid* grid::GridContainer::createGrid(unsigned int hint,
+	unsigned int id) const
+{
+#ifndef ASAGI_NOMPI
+	if (hint & NOMPI)
+#endif // ASAGI_NOMPI
+		return new StaticGrid(*this, hint);
+
+#ifndef ASAGI_NOMPI
+	if (hint & LARGE_GRID)
+		return new LargeGrid(*this, hint, id);
+
+	return new MPICacheGrid(*this, hint);
 #endif // ASAGI_NOMPI
 }
 
 // Fortran <-> c translation array
-fortran::PointerArray<GridContainer> GridContainer::m_pointers;
+fortran::PointerArray<grid::GridContainer>
+	grid::GridContainer::m_pointers;
