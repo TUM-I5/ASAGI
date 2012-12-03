@@ -41,7 +41,6 @@
 #ifndef THREADSAFETY
 #include <mutex>
 #endif // THREADSAFETY
-#include <unordered_map>
 
 #include "blocks/blockmanager.h"
 
