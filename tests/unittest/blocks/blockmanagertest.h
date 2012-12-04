@@ -58,29 +58,29 @@ public:
 		unsigned long block;
 		
 		block = 5;
-		TS_ASSERT(!manager->getIndex(block));
+		TS_ASSERT(!manager->getIndex(block, block));
 		TS_ASSERT_EQUALS(block, 5u);
 		
-		manager->getFreeIndex(block);
+		manager->getFreeIndex(block, block);
 		block = 6;
-		manager->getFreeIndex(block);
+		manager->getFreeIndex(block, block);
 		block = 7;
-		manager->getFreeIndex(block);
+		manager->getFreeIndex(block, block);
 		
 		block = 6;
-		TS_ASSERT(manager->getIndex(block));
+		TS_ASSERT(manager->getIndex(block, block));
 		TS_ASSERT_EQUALS(block, 1u);
 		
 		// Override first entry
 		block = 8;
-		manager->getFreeIndex(block);
+		manager->getFreeIndex(block, block);
 		
 		block = 8;
-		TS_ASSERT(manager->getIndex(block));
+		TS_ASSERT(manager->getIndex(block, block));
 		TS_ASSERT_EQUALS(block, 0u);
 		
 		block = 5;
-		TS_ASSERT(!manager->getIndex(block));
+		TS_ASSERT(!manager->getIndex(block, block));
 		TS_ASSERT_EQUALS(block, 5u);
 	}
 	
@@ -89,26 +89,25 @@ public:
 		unsigned long block;
 		
 		block = 5;
-		TS_ASSERT_LESS_THAN(manager->getFreeIndex(block), 0);
+		TS_ASSERT_LESS_THAN(manager->getFreeIndex(block, block), 0);
 		TS_ASSERT_EQUALS(block, 0u);
 		
 		block = 6;
-		TS_ASSERT_LESS_THAN(manager->getFreeIndex(block), 0);
+		TS_ASSERT_LESS_THAN(manager->getFreeIndex(block, block), 0);
 		TS_ASSERT_EQUALS(block, 1u);
 		
 		block = 7;
-		TS_ASSERT_LESS_THAN(manager->getFreeIndex(block), 0);
+		TS_ASSERT_LESS_THAN(manager->getFreeIndex(block, block), 0);
 		TS_ASSERT_EQUALS(block, 2u);
 		
 		// BlockManager with size 3 -> this should override the first
 		// block
 		block = 8;
-		TS_ASSERT_EQUALS(manager->getFreeIndex(block), 5);
+		TS_ASSERT_EQUALS(manager->getFreeIndex(block, block), 5);
 		TS_ASSERT_EQUALS(block, 0u);
 		
 		block = 7;
-		TS_ASSERT_EQUALS(manager->getFreeIndex(block), 6);
+		TS_ASSERT_EQUALS(manager->getFreeIndex(block, block), 6);
 		TS_ASSERT_EQUALS(block, 1u);
-		
 	}
 };

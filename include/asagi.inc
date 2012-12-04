@@ -45,23 +45,27 @@ module asagi
   !> @ingroup f_interface
   !!
   !! @see asagi::Grid::NO_HINT
-  integer, parameter :: GRID_NO_HINT = 0
+  integer, parameter :: GRID_NO_HINT = z'0'
   !> @ingroup f_interface
   !!
   !! @see asagi::Grid::HAS_TIME
-  integer, parameter :: GRID_HAS_TIME = 1
+  integer, parameter :: GRID_HAS_TIME = z'1'
   !> @ingroup f_interface
   !!
   !! @see asagi::Grid::NOMPI
-  integer, parameter :: GRID_NOMPI = 2
+  integer, parameter :: GRID_NOMPI = z'2'
+  !> @ingroup f_interface
+  !!
+  !! @see asagi::Grid::SMALL_CACHE
+  integer, parameter :: SMALL_CACHE = z'4'
   !> @ingroup f_interface
   !!
   !! @see asagi::Grid::LARGE_GRID
-  integer, parameter :: GRID_LARGE_GRID = 4
+  integer, parameter :: GRID_LARGE_GRID = z'8'
   !> @ingroup f_interface
   !!
   !! @see asagi::Grid::ADAPTIVE
-  integer, parameter :: GRID_ADAPTIVE = 8
+  integer, parameter :: GRID_ADAPTIVE = z'A'
 
   !> @ingroup f_interface
   !!

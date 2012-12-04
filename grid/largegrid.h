@@ -36,9 +36,8 @@
 #ifndef GRID_LARGEGRID_H
 #define GRID_LARGEGRID_H
 
-#include "grid.h"
+#include "localcachegrid.h"
 
-#include "blocks/blockmanager.h"
 #include "mpi/mutex.h"
 
 namespace grid
@@ -48,12 +47,9 @@ namespace grid
  * Stores one grid. It maintains a directory where the current location
  * of blocks is stored. Blocks are only loaded dynamically when required.
  */
-class LargeGrid : public Grid
+class LargeGrid : public LocalCacheGrid
 {
 private:
-	/** All blocks we currently store */
-	unsigned char* m_data;
-	
 	/** The window that holds the blocks */
 	MPI_Win m_dataWin;
 	
@@ -78,19 +74,9 @@ private:
 	/** The window is used to load dictionary information from other ranks */
 	MPI_Win m_dictWin;
 	
-	/** The block manager used to handle the local cache */
-	blocks::BlockManager m_blockManager;
-	
 	/** Prevent access to the same block from multiple processes */
 	mpi::Mutex m_globalMutex;
 	
-#ifdef THREADSAFETY
-	/**
-	 * Lock blockmanager
-	 * @todo Use a shared mutex, to allow multiple readers
-	 */
-	std::mutex m_slave_mutex;
-#endif // THREADSAFETY
 public:
 	LargeGrid(const GridContainer& container,
 		unsigned int hint = asagi::Grid::NO_HINT,
@@ -98,14 +84,24 @@ public:
 	virtual ~LargeGrid();
 protected:
 	asagi::Grid::Error init();
-	
-	bool keepFileOpen() const
+
+	void getBlock(unsigned long block,
+		long oldBlock,
+		unsigned long cacheIndex,
+		unsigned char* cache);
+
+	virtual asagi::Grid::Error allocCache(size_t size, unsigned char *&cache)
 	{
-		return true;
+		if (MPI_Alloc_mem(size,	MPI_INFO_NULL, &cache) != MPI_SUCCESS)
+			return asagi::Grid::MPI_ERROR;
+
+		return asagi::Grid::SUCCESS;
 	}
-    
-	void getAt(void* buf, types::Type::converter_t converter,
-		unsigned long x, unsigned long y = 0, unsigned long z = 0);
+
+	virtual void freeCache(unsigned char *cache)
+	{
+		MPI_Free_mem(cache);
+	}
 	
 private:
 	void getBlockInfo(unsigned long* dictEntry, unsigned long localOffset,

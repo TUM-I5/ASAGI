@@ -49,7 +49,7 @@ namespace grid
  * 
  * If compiled without MPI, all blocks are local.
  */
-class StaticGrid : public Grid
+class StaticGrid : virtual public Grid
 {
 private:
 	/** Local data cache */

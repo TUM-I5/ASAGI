@@ -1,7 +1,7 @@
 /**
  * @file
- *  This file is part of ASAGI.
- * 
+ *  This file is part of ASAGI
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,73 +33,96 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "staticgrid.h"
+#include "localcachegrid.h"
 
 /**
  * @see Grid::Grid()
  */
-grid::StaticGrid::StaticGrid(const GridContainer &container,
-	unsigned int hint)
-	: Grid(container, hint)
+grid::LocalCacheGrid::LocalCacheGrid(const GridContainer &container,
+		unsigned int hint)
+	: Grid(container, hint),
+	  m_cache(0L)
 {
-	m_data = 0L;
+
 }
 
-grid::StaticGrid::~StaticGrid()
+grid::LocalCacheGrid::~LocalCacheGrid()
 {
-	freeLocalMem(m_data);
+	freeCache(m_cache);
 }
 
-asagi::Grid::Error grid::StaticGrid::init()
+asagi::Grid::Error grid::LocalCacheGrid::init()
 {
 	unsigned long blockSize = getTotalBlockSize();
-	size_t block[3];
-	unsigned long masterBlockCount = getLocalBlockCount();
 	asagi::Grid::Error error;
-	
-	error = allocLocalMem(getType().getSize() * blockSize * masterBlockCount, m_data);
+
+	// Allocate memory for cache
+	error = allocCache(getType().getSize() * blockSize * getBlocksPerNode(), m_cache);
 	if (error != asagi::Grid::SUCCESS)
 		return error;
-	
-	// Load the blocks from the file, which we control
-	for (unsigned long i = 0; i < masterBlockCount; i++) {
-		if (getGlobalBlock(i) >= getBlockCount())
-			// Last process(es) may control less blocks
-			break;
-		
-		// Get x, y and z coordinates of the block
-		getBlockPos(getGlobalBlock(i), block);
-		
-		// Get x, y and z coordinates of the first value in the block
-		for (unsigned char i = 0; i < 3; i++)
-			block[i] *= getBlockSize(i);
-		
-		getType().load(getInputFile(),
-			block, getBlockSize(),
-			&m_data[getType().getSize() * blockSize * i]);
-	}
-	
+
+	m_blockManager.init(getBlocksPerNode(), getHandsDiff());
+
 	return asagi::Grid::SUCCESS;
 }
 
-void grid::StaticGrid::getAt(void* buf, types::Type::converter_t converter,
-	long unsigned int x, long unsigned int y, long unsigned int z)
+void grid::LocalCacheGrid::getAt(void* buf, types::Type::converter_t converter,
+	unsigned long x, unsigned long y, unsigned long z)
 {
 	unsigned long blockSize = getTotalBlockSize();
 	unsigned long block = getBlockByCoords(x, y, z);
-	int remoteRank = getBlockRank(block); NDBG_UNUSED(remoteRank);
-	unsigned long offset = getBlockOffset(block);
-	
+	unsigned long index;
+
+#ifdef THREADSAFETY
+	std::lock_guard<std::mutex> lock(m_slaveMutex);
+#endif // THREADSAFETY
+
+	if (!m_blockManager.getIndex(block, index)) {
+		// We do not have this block, transfer it first
+
+		// Get index where we store the block
+		long oldBlock = m_blockManager.getFreeIndex(block, index);
+
+		// Get the block
+		getBlock(block, oldBlock, index,
+			&m_cache[getType().getSize() * blockSize * index]);
+
+	}
+
 	// Offset inside the block
 	x %= getBlockSize(0);
 	y %= getBlockSize(1);
 	z %= getBlockSize(2);
-	
-	assert(remoteRank == getMPIRank());
-		
-	(getType().*converter)(&m_data[getType().getSize() *
-		(blockSize * offset // jump to the correct block
+
+	(getType().*converter)(&m_cache[getType().getSize() *
+		(blockSize * index // correct block
 		+ (z * getBlockSize(1) + y) * getBlockSize(0) + x) // correct value inside the block
 		],
 		buf);
+}
+
+/**
+ * Gets a block and puts it in the cache
+ *
+ * @param block The block id
+ * @param oldBlock If greater 0, the id of the block that was deleted
+ * @param cacheIndex The position of the block inside the cache
+ * @param cache The memory location where the block should be stored
+ */
+void grid::LocalCacheGrid::getBlock(unsigned long block,
+	long oldBlock,
+	unsigned long cacheIndex,
+	unsigned char *cache)
+{
+	// TODO change this function so it does not get the block id
+	// but the block coordinates
+	size_t pos[MAX_DIMENSIONS];
+	getBlockPos(block, pos);
+
+	for (int i = 0; i < MAX_DIMENSIONS; i++)
+		pos[i] *= getBlockSize(i);
+
+	getType().load(getInputFile(),
+		pos, getBlockSize(),
+		cache);
 }

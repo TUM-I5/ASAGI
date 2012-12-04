@@ -79,9 +79,9 @@ public:
 	void init(unsigned long maxBlocksPerNode,
 		long handDiff = -1);
 	
-	bool getIndex(unsigned long &block);
+	bool getIndex(unsigned long block, unsigned long &index);
 	
-	long getFreeIndex(unsigned long &block);
+	long getFreeIndex(unsigned long block, unsigned long &index);
 };
 
 }

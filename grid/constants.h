@@ -33,20 +33,20 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRIDCONSTANTS_H
-#define GRIDCONSTANTS_H
+#ifndef GRID_CONSTANTS_H
+#define GRID_CONSTANTS_H
 
 namespace grid
 {
 
-const int MAX_DIMENSIONS = 4;
+const int MAX_DIMENSIONS = 3;
 
 const char* const DIMENSION_NAMES[MAX_DIMENSIONS] = {
 	"x",
 	"y",
 	"z",
-	"t"};
+	/*"t"*/};
 
 }
 
-#endif // GRIDCONSTANTS_H
+#endif // GRID_CONSTANTS_H

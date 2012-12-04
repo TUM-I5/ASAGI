@@ -36,6 +36,7 @@
 #ifndef GRID_GRID_H
 #define GRID_GRID_H
 
+#include "grid/constants.h"
 #include "grid/gridcontainer.h"
 
 #include "types/type.h"
@@ -51,8 +52,6 @@ namespace io
 
 namespace grid
 {
-
-class GridContainer;
 
 /**
  * @brief Base class for a grid

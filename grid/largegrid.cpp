@@ -48,9 +48,10 @@
  */
 grid::LargeGrid::LargeGrid(const GridContainer& container,
 	unsigned int hint, unsigned int id)
-	: Grid(container, hint), m_globalMutex(id)
+	: Grid(container, hint),
+	  LocalCacheGrid(container, hint),
+	  m_globalMutex(id)
 {
-	m_data = 0L;
 	m_dictionary = 0L;
 	m_dictEntries = 2; // default
 	
@@ -65,7 +66,6 @@ grid::LargeGrid::~LargeGrid()
 	if (m_dictWin != MPI_WIN_NULL)
 		MPI_Win_free(&m_dictWin);
 	
-	MPI_Free_mem(m_data);
 	MPI_Free_mem(m_dictionary);
 }
 
@@ -73,8 +73,7 @@ asagi::Grid::Error grid::LargeGrid::init()
 {
 	unsigned long blockSize = getTotalBlockSize();
 	unsigned long dictCount = getLocalBlockCount();
-	
-	m_blockManager.init(getBlocksPerNode(), getHandsDiff());
+	asagi::Grid::Error error;
 	
 	// Dictionary
 	if (MPI_Alloc_mem(sizeof(unsigned long) * getDictLength() *
@@ -92,12 +91,12 @@ asagi::Grid::Error grid::LargeGrid::init()
 		&m_dictWin) != MPI_SUCCESS)
 		return asagi::Grid::MPI_ERROR;
 	
-	// Data
-	if (MPI_Alloc_mem(getType().getSize() * blockSize * getBlocksPerNode(),
-		MPI_INFO_NULL, &m_data) != MPI_SUCCESS)
-		return asagi::Grid::MPI_ERROR;
+	// Initialize the cache
+	error = LocalCacheGrid::init();
+	if (error != asagi::Grid::SUCCESS)
+		return error;
 	
-	if (MPI_Win_create(m_data,
+	if (MPI_Win_create(getCache(),
 		getType().getSize() * blockSize * getBlocksPerNode(),
 		getType().getSize(),
 		MPI_INFO_NULL,
@@ -105,187 +104,160 @@ asagi::Grid::Error grid::LargeGrid::init()
 		&m_dataWin) != MPI_SUCCESS)
 		return asagi::Grid::MPI_ERROR;
 	
-	srand(time(0));
+	srand(time(0L));
 	
 	// Init the global mutex
-	m_globalMutex.init(getMPICommunicator());
-	
-	return asagi::Grid::SUCCESS;
+	return m_globalMutex.init(getMPICommunicator());
 }
 
-void grid::LargeGrid::getAt(void* buf, types::Type::converter_t converter,
-	unsigned long x, unsigned long y, unsigned long z)
+void grid::LargeGrid::getBlock(unsigned long block,
+	long oldBlock,
+	unsigned long cacheIndex,
+	unsigned char *cache)
 {
-	unsigned long blockSize = getTotalBlockSize();
-	unsigned long block = getBlockByCoords(x, y, z);
-	unsigned long blockIndex = block; // will later hold the local index
-	long oldBlock;
-	int dictRank = getBlockRank(block), oldDictRank, dataRank;
-	unsigned long dictOffset = getBlockOffset(block), oldDictOffset,
-		dataOffset;
-	unsigned long* dictEntry = 0L;
 	int mpiResult; NDBG_UNUSED(mpiResult);
 
-	// Offset inside the block
-	unsigned long offX = x % getBlockSize(0);
-	unsigned long offY = y % getBlockSize(1);
-	unsigned long offZ = z % getBlockSize(2);
-	
-#ifdef THREADSAFETY
-	std::lock_guard<std::mutex> lock(m_slave_mutex);
-#endif // THREADSAFETY
-	
-	if (!m_blockManager.getIndex(blockIndex)) {
-		// We do not have this block, transfer it first
+	// Local buffer for a dict entry
+	unsigned long *dictEntry = new unsigned long[getDictLength()];
+
+	// TODO Since we use the global mutex, it should be save to
+	// access all windows in shared mode. The global mutex makes
+	// sure we do not access the same block from different ranks
+	// at the same time. However, I'm not sure about this.
+
+	if (oldBlock >= 0) {
+		// We need to propagate the information that we
+		// no longer have the old block
 		
-		// Index where we store the block
-		oldBlock = m_blockManager.getFreeIndex(blockIndex);
+		int oldDictRank = getBlockRank(oldBlock);
+		unsigned long oldDictOffset = getBlockOffset(oldBlock);
 		
-		// Local buffer for a dict entry
-		dictEntry = new unsigned long[getDictLength()];
+		m_globalMutex.acquire(oldBlock);
 		
-		// TODO Since we use the global mutex, it should be save to
-		// access all windows in shared mode. The global mutex makes
-		// sure we do not access the same block from different ranks
-		// at the same time. However, I'm not sure about this.
-		
-		if (oldBlock >= 0) {
-			// We also need to propagete the information that we
-			// no longer have the old block
-			
-			oldDictRank = getBlockRank(oldBlock);
-			oldDictOffset = getBlockOffset(oldBlock);
-			
-			m_globalMutex.acquire(oldBlock);
-			
-			if (oldDictRank == getMPIRank()) {
-				deleteBlockInfo(&m_dictionary[oldDictOffset
-					* getDictLength()]);
-			} else {
-				
-				mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, oldDictRank,
-					MPI_MODE_NOCHECK, m_dictWin);
-				assert(mpiResult == MPI_SUCCESS);
-				
-				mpiResult = MPI_Get(dictEntry,
-					getDictLength(),
-					MPI_UNSIGNED_LONG,
-					oldDictRank,
-					oldDictOffset * getDictLength(),
-					getDictLength(),
-					MPI_UNSIGNED_LONG,
-					m_dictWin);
-				assert(mpiResult == MPI_SUCCESS);
-			
-				mpiResult = MPI_Win_unlock(oldDictRank, m_dictWin);
-				assert(mpiResult == MPI_SUCCESS);
-				
-				deleteBlockInfo(dictEntry);
-				
-				mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, oldDictRank,
-					MPI_MODE_NOCHECK, m_dictWin);
-				assert(mpiResult == MPI_SUCCESS);
-				
-				mpiResult = MPI_Put(dictEntry,
-					getDictLength(),
-					MPI_UNSIGNED_LONG,
-					oldDictRank,
-					oldDictOffset * getDictLength(),
-					getDictLength(),
-					MPI_UNSIGNED_LONG,
-					m_dictWin);
-				
-				mpiResult = MPI_Win_unlock(oldDictRank, m_dictWin);
-				assert(mpiResult == MPI_SUCCESS);
-			}
-			
-			m_globalMutex.release(oldBlock);
-		}
-		
-		m_globalMutex.acquire(block);
-			
-		if (dictRank == getMPIRank()) {
-			getBlockInfo(&m_dictionary[dictOffset * getDictLength()],
-				blockIndex, dataRank, dataOffset);
+		if (oldDictRank == getMPIRank()) {
+			deleteBlockInfo(&m_dictionary[oldDictOffset
+				* getDictLength()]);
 		} else {
-			mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,
+			
+			mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, oldDictRank,
 				MPI_MODE_NOCHECK, m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
 			
 			mpiResult = MPI_Get(dictEntry,
 				getDictLength(),
 				MPI_UNSIGNED_LONG,
-				dictRank,
-				dictOffset * getDictLength(),
+				oldDictRank,
+				oldDictOffset * getDictLength(),
 				getDictLength(),
 				MPI_UNSIGNED_LONG,
 				m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
-			
-			mpiResult = MPI_Win_unlock(dictRank, m_dictWin);
+
+			mpiResult = MPI_Win_unlock(oldDictRank, m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
 			
-			getBlockInfo(dictEntry, blockIndex, dataRank, dataOffset);
+			deleteBlockInfo(dictEntry);
 			
-			mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,
+			mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, oldDictRank,
 				MPI_MODE_NOCHECK, m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
-		
+
 			mpiResult = MPI_Put(dictEntry,
 				getDictLength(),
 				MPI_UNSIGNED_LONG,
-				dictRank,
-				dictOffset * getDictLength(),
+				oldDictRank,
+				oldDictOffset * getDictLength(),
 				getDictLength(),
 				MPI_UNSIGNED_LONG,
 				m_dictWin);
-			assert(mpiResult == MPI_SUCCESS);
 			
-			mpiResult = MPI_Win_unlock(dictRank, m_dictWin);
+			mpiResult = MPI_Win_unlock(oldDictRank, m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
 		}
 		
-		if (dataRank < 0) {
-			// Load the block form the netcdf file
-			
-			size_t pos[] = {x, y, z};
-			getType().load(getInputFile(),
-				pos, getBlockSize(),
-				&m_data[getType().getSize() * blockSize * blockIndex]);
-		} else {
-			// Transfer the block from the other rank
-			
-			// Lock remote window
-			mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dataRank,
-				MPI_MODE_NOCHECK, m_dataWin);
-			assert(mpiResult == MPI_SUCCESS);
+		m_globalMutex.release(oldBlock);
+	}
+
+	// Transfer the block and update the dictionary
+	int dictRank = getBlockRank(block), dataRank;
+	unsigned long dictOffset = getBlockOffset(block), dataOffset;
+
+	m_globalMutex.acquire(block);
+
+	if (dictRank == getMPIRank()) {
+		getBlockInfo(&m_dictionary[dictOffset * getDictLength()],
+			cacheIndex, dataRank, dataOffset);
+	} else {
+		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,
+			MPI_MODE_NOCHECK, m_dictWin);
+		assert(mpiResult == MPI_SUCCESS);
+
+		mpiResult = MPI_Get(dictEntry,
+			getDictLength(),
+			MPI_UNSIGNED_LONG,
+			dictRank,
+			dictOffset * getDictLength(),
+			getDictLength(),
+			MPI_UNSIGNED_LONG,
+			m_dictWin);
+		assert(mpiResult == MPI_SUCCESS);
+
+		mpiResult = MPI_Win_unlock(dictRank, m_dictWin);
+		assert(mpiResult == MPI_SUCCESS);
+
+		getBlockInfo(dictEntry, cacheIndex, dataRank, dataOffset);
 		
-			// Transfer data
-			mpiResult = MPI_Get(&m_data[getType().getSize() * blockSize * blockIndex],
-				blockSize,
-				getType().getMPIType(),
-				dataRank,
-				dataOffset * blockSize,
-				blockSize,
-				getType().getMPIType(),
-				m_dataWin);
-			assert(mpiResult == MPI_SUCCESS);
+		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,
+			MPI_MODE_NOCHECK, m_dictWin);
+		assert(mpiResult == MPI_SUCCESS);
+
+		mpiResult = MPI_Put(dictEntry,
+			getDictLength(),
+			MPI_UNSIGNED_LONG,
+			dictRank,
+			dictOffset * getDictLength(),
+			getDictLength(),
+			MPI_UNSIGNED_LONG,
+			m_dictWin);
+		assert(mpiResult == MPI_SUCCESS);
 		
-			// Unlock remote window
-			mpiResult = MPI_Win_unlock(dataRank, m_dataWin);
-			assert(mpiResult == MPI_SUCCESS);
-		}
+		mpiResult = MPI_Win_unlock(dictRank, m_dictWin);
+		assert(mpiResult == MPI_SUCCESS);
+	}
+
+	if (dataRank < 0) {
+		// Load the block form the netcdf file
 		
-		m_globalMutex.release(block);
+		LocalCacheGrid::getBlock(block, oldBlock, cacheIndex, cache);
+	} else {
+		unsigned long blockSize = getTotalBlockSize();
+
+		// Transfer the block from the other rank
 		
-		delete dictEntry;
+		// Lock remote window
+		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dataRank,
+			MPI_MODE_NOCHECK, m_dataWin);
+		assert(mpiResult == MPI_SUCCESS);
+
+		// Transfer data
+		mpiResult = MPI_Get(cache,
+			blockSize,
+			getType().getMPIType(),
+			dataRank,
+			dataOffset * blockSize,
+			blockSize,
+			getType().getMPIType(),
+			m_dataWin);
+		assert(mpiResult == MPI_SUCCESS);
+
+		// Unlock remote window
+		mpiResult = MPI_Win_unlock(dataRank, m_dataWin);
+		assert(mpiResult == MPI_SUCCESS);
 	}
 	
-	(getType().*converter)(&m_data[getType().getSize() *
-		(blockSize * blockIndex // correct block
-		+ (offZ * getBlockSize(1) + offY) * getBlockSize(0) + offX) // correct value inside the block
-		],
-		buf);
+	m_globalMutex.release(block);
+
+	delete dictEntry;
 }
 
 /**
@@ -312,7 +284,7 @@ void grid::LargeGrid::getBlockInfo(unsigned long* dictEntry, unsigned long local
 	}
 	
 	if (dictEntry[0] >= m_dictEntries) {
-		// Dictionary full, delete oldest and shuffel the rest up
+		// Dictionary full, delete oldest and shuffle the rest up
 		
 		memcpy(&dictEntry[1], &dictEntry[3],
 			sizeof(unsigned long) * 2 * (m_dictEntries - 1));

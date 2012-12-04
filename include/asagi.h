@@ -113,21 +113,26 @@ public:
 	};
 	
 	/** Does not provide any hint for ASAGI (default) */
-	static const unsigned int NO_HINT = 0;
+	static const unsigned int NO_HINT = 0x0;
 	/** One dimension in the grid is a time dimension */
-	static const unsigned int HAS_TIME = 1;
+	static const unsigned int HAS_TIME = 0x1;
 	/**
 	 * Don't use any MPI, even when compiled with MPI support
 	 * (MPI_Init may not be called before creating the grid)
 	 */
-	static const unsigned int NOMPI = 2;
+	static const unsigned int NOMPI = 0x2;
+	/**
+	 * ASAGI should use a small cache. Less memory is used, but
+	 * more cache misses occur.
+	 */
+	static const unsigned int SMALL_CACHE = 0x4;
 	/** Use this, if you are going to load a large grid with ASAGI */
-	static const unsigned int LARGE_GRID = 4;
+	static const unsigned int LARGE_GRID = 0x8;
 	/**
 	 * Use an adaptive container. Allows you to load multiple grids with
 	 * the same level of detail. Not fully tested yet.
 	 */
-	static const unsigned int ADAPTIVE = 8;
+	static const unsigned int ADAPTIVE = 0xA;
 public:
 	/**
 	 * @ingroup cxx_interface
@@ -478,31 +483,37 @@ typedef enum { GRID_SUCCESS = 0, GRID_MPI_ERROR, GRID_UNKNOWN_PARAM,
  *
  * @see asagi::Grid::NO_HINT
  */
-const unsigned int GRID_NO_HINT = 0;
+const unsigned int GRID_NO_HINT = 0x0;
 /**
  * @ingroup c_interface
  * 
  * @see asagi::Grid::HAS_TIME
  */
-const unsigned int GRID_HAS_TIME = 1;
+const unsigned int GRID_HAS_TIME = 0x1;
 /**
  * @ingroup c_interface
  * 
  * @see asagi::Grid::NOMPI
  */
-const unsigned int GRID_NOMPI = 2;
+const unsigned int GRID_NOMPI = 0x2;
+/**
+ * @ingroup c_interface
+ *
+ * @see asagi::Grid::SMALL_CACHE
+ */
+const unsigned int SMALL_CACHE = 0x4;
 /**
  * @ingroup c_interface
  *
  * @see asagi::Grid::LARGE_GRID
  */
-const unsigned int GRID_LARGE_GRID = 4;
+const unsigned int GRID_LARGE_GRID = 0x8;
 /**
  * @ingroup c_interface
  * 
  * @see asagi::Grid::ADAPTIVE
  */
-const unsigned int GRID_ADAPTIVE = 8;
+const unsigned int GRID_ADAPTIVE = 0xA;
 
 /**
  * @ingroup c_interface

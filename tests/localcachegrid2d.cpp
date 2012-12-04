@@ -33,71 +33,35 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_MPICACHEGRID_H
-#define GRID_MPICACHEGRID_H
+#include <asagi.h>
 
-#include "localcachegrid.h"
-#include "staticgrid.h"
+#include "debug/dbg.h"
 
-#ifndef THREADSAFETY
-#include <mutex>
-#endif // THREADSAFETY
+#include "tests.h"
 
-#include "blocks/blockmanager.h"
+using namespace asagi;
 
-namespace grid
+int main(int argc, char** argv)
 {
-
-/**
- * Simple grid implementation, that distributes the grid at the beginning
- * across all MPI tasks. If a block is not available, it is transfered via
- * MPI and stored in a cache.
- */
-class MPICacheGrid : public StaticGrid, public LocalCacheGrid
-{
-private:
-	/** MPI window for communication */
-	MPI_Win m_window;
-public:
-	MPICacheGrid(const GridContainer &container,
-		unsigned int hint = asagi::Grid::NO_HINT);
-	virtual ~MPICacheGrid();
+	Grid* grid = Grid::create(Grid::FLOAT, Grid::NOMPI | Grid::SMALL_CACHE);
 	
-protected:
-	asagi::Grid::Error init();
+	if (grid->open(NC_2D) != Grid::SUCCESS)
+		return 1;
 	
-	void getAt(void* buf, types::Type::converter_t converter,
-		unsigned long x, unsigned long y = 0, unsigned long z = 0);
-
-	void getBlock(unsigned long block,
-		long oldBlock,
-		unsigned long cacheIndex,
-		unsigned char* cache);
-
-	asagi::Grid::Error allocLocalMem(size_t size, unsigned char *&data)
-	{
-		if (MPI_Alloc_mem(size,	MPI_INFO_NULL, &data) != MPI_SUCCESS)
-			return asagi::Grid::MPI_ERROR;
-
-		return asagi::Grid::SUCCESS;
+	int value;
+	
+	for (int i = 0; i < NC_WIDTH; i++) {
+		for (int j = 0; j < NC_LENGTH; j++) {
+			value = j * NC_WIDTH + i;
+			if (grid->getInt2D(i, j) != value) {
+				dbgDebug() << "Value at" << i << j << "should be"
+					<< value << "but is" << grid->getInt2D(i, j);
+				return 1;
+			}
+		}
 	}
-
-	void freeLocalMem(unsigned char *data)
-	{
-		MPI_Free_mem(data);
-	}
-
-	/**
-	 * We can free all netCDF related resources, because we use MPI to
-	 * transfer blocks
-	 */
-	bool keepFileOpen() const
-	{
-		return false;
-	}
-};
-
+	
+	delete grid;
+	
+	return 0;
 }
-
-#endif // GRID_MPICACHEGRID_H
-

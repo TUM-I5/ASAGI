@@ -59,11 +59,12 @@ void BlockManager::init(unsigned long maxBlocksPerNode,
 }
 
 /**
- * @param[in,out] block In: The global block id, Out, if true: the local index
- *  of this block. If false is returned, the variable is not changed
+ * @param block The global block id
+ * @param[out] index If true, the local index of this block,
+ *  otherwise the value is undefined
  * @return True if this block is stored, false otherwise
  */
-bool BlockManager::getIndex(unsigned long &block)
+bool BlockManager::getIndex(unsigned long block, unsigned long &index)
 {
 	unordered_map<unsigned long, unsigned long>::const_iterator value
 		= m_blockToIndex.find(block);
@@ -71,20 +72,20 @@ bool BlockManager::getIndex(unsigned long &block)
 	if (value == m_blockToIndex.end())
 		return false;
 	
-	block = (*value).second;
-	m_lru.access(block);
+	index = (*value).second;
+	m_lru.access(index);
 	
 	return true;
 }
 
 /**
- * @param[in,out] block In: the id of the new block; out: the index, where the
- *  block should be saved
+ * @param block The id of the new block
+ * @param index The index, where the block should be saved
  * @return The id of the block that was deleted
  */
-long BlockManager::getFreeIndex(unsigned long &block)
+long BlockManager::getFreeIndex(unsigned long block, unsigned long &index)
 {
-	unsigned long index = m_lru.getFree();
+	index = m_lru.getFree();
 	long oldBlock = m_indexToBlock[index];
 	
 	if (oldBlock >= 0) {
@@ -96,8 +97,6 @@ long BlockManager::getFreeIndex(unsigned long &block)
 	
 	m_indexToBlock[index] = block;
 	m_blockToIndex[block] = index;
-	
-	block = index;
 	
 	return oldBlock;
 }

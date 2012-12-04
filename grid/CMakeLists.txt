@@ -3,6 +3,7 @@ set( gridSources
     adaptivegridcontainer.cpp
 	grid.cpp
     gridcontainer.cpp
+    localcachegrid.cpp
 	multigrid.cpp
 	simplegridcontainer.cpp
 	staticgrid.cpp )

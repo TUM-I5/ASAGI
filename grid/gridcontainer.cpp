@@ -35,6 +35,7 @@
 
 #include "gridcontainer.h"
 
+#include "grid/localcachegrid.h"
 #include "grid/staticgrid.h"
 #ifndef ASAGI_NOMPI
 #include "grid/mpicachegrid.h"
@@ -234,9 +235,15 @@ grid::Grid* grid::GridContainer::createGrid(unsigned int hint,
 	unsigned int id) const
 {
 #ifndef ASAGI_NOMPI
-	if (hint & NOMPI)
+	if (hint & NOMPI) {
 #endif // ASAGI_NOMPI
+		if (hint & SMALL_CACHE)
+			return new LocalCacheGrid(*this, hint);
+
 		return new StaticGrid(*this, hint);
+#ifndef ASAGI_NOMPI
+	}
+#endif // ASAGI_NOMPI
 
 #ifndef ASAGI_NOMPI
 	if (hint & LARGE_GRID)

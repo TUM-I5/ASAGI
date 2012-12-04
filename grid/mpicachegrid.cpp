@@ -47,10 +47,10 @@
  */
 grid::MPICacheGrid::MPICacheGrid(const GridContainer &container,
 	unsigned int hint)
-	: StaticGrid(container, hint)
+	: Grid(container, hint),
+	  StaticGrid(container, hint),
+	  LocalCacheGrid(container, hint)
 {
-	m_slaveData = 0L;
-	
 	m_window = MPI_WIN_NULL;
 }
 
@@ -58,8 +58,6 @@ grid::MPICacheGrid::~MPICacheGrid()
 {
 	if (m_window != MPI_WIN_NULL)
 		MPI_Win_free(&m_window);
-	
-	delete [] m_slaveData;
 }
 
 asagi::Grid::Error grid::MPICacheGrid::init()
@@ -68,15 +66,17 @@ asagi::Grid::Error grid::MPICacheGrid::init()
 	unsigned long masterBlockCount = getLocalBlockCount();
 	asagi::Grid::Error error;
 	
-	// Allocate memory for slave blocks
-	m_slaveData = new unsigned char[getType().getSize() * blockSize * getBlocksPerNode()];
-	m_blockManager.init(getBlocksPerNode(), getHandsDiff());
+	// Create the local cache
+	error = LocalCacheGrid::init();
+	if (error != asagi::Grid::SUCCESS)
+		return error;
 
+	// Distribute the blocks
 	error = StaticGrid::init();
 	if (error != asagi::Grid::SUCCESS)
 		return error;
 	
-	// Create the mpi window for the master data
+	// Create the mpi window for distributed blocks
 	if (MPI_Win_create(getData(),
 		getType().getSize() * blockSize * masterBlockCount,
 		getType().getSize(),
@@ -91,11 +91,8 @@ asagi::Grid::Error grid::MPICacheGrid::init()
 void grid::MPICacheGrid::getAt(void* buf, types::Type::converter_t converter,
 	unsigned long x, unsigned long y, unsigned long z)
 {
-	unsigned long blockSize = getTotalBlockSize();
 	unsigned long block = getBlockByCoords(x, y, z);
 	int remoteRank = getBlockRank(block);
-	unsigned long offset = getBlockOffset(block);
-	int mpiResult; NDBG_UNUSED(mpiResult);
 	
 	if (remoteRank == getMPIRank()) {
 		// Nice, this is a block where we are the master
@@ -103,47 +100,37 @@ void grid::MPICacheGrid::getAt(void* buf, types::Type::converter_t converter,
 		return;
 	}
 	
-	// Offset inside the block
-	x %= getBlockSize(0);
-	y %= getBlockSize(1);
-	z %= getBlockSize(2);
+	// This function will call getBlock, if we need to transfer the block
+	LocalCacheGrid::getAt(buf, converter, x, y, z);
+}
 
-#ifdef THREADSAFETY
-	std::lock_guard<std::mutex> lock(slave_mutex);
-#endif // THREADSAFETY
-	
-	if (!m_blockManager.getIndex(block)) {
-		// We do not have this block, transfer it first
-		
-		// Get index where we store the block
-		m_blockManager.getFreeIndex(block);
-		
-		// Transfer data
-		
-		// I think we can use nocheck, because we only read
-		// -> no conflicting locks
-		// TODO check this
-		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, remoteRank,
-			MPI_MODE_NOCHECK, m_window);
-		assert(mpiResult == MPI_SUCCESS);
-		
-		mpiResult = MPI_Get(&m_slaveData[getType().getSize() * blockSize * block],
-			blockSize,
-			getType().getMPIType(),
-			remoteRank,
-			offset * blockSize,
-			blockSize,
-			getType().getMPIType(),
-			m_window);
-		assert(mpiResult == MPI_SUCCESS);
-		
-		mpiResult = MPI_Win_unlock(remoteRank, m_window);
-		assert(mpiResult == MPI_SUCCESS);
-	}
-		
-	(getType().*converter)(&m_slaveData[getType().getSize() *
-		(blockSize * block // correct block
-		+ (z * getBlockSize(1) + y) * getBlockSize(0) + x) // correct value inside the block
-		],
-		buf);
+/**
+ * Transfer the block form the remote rank, that holds it
+ */
+void grid::MPICacheGrid::getBlock(unsigned long block,
+	long oldBlock,
+	unsigned long cacheIndex,
+	unsigned char *cache)
+{
+	unsigned long blockSize = getTotalBlockSize();
+	int remoteRank = getBlockRank(block);
+	unsigned long offset = getBlockOffset(block);
+	int mpiResult; NDBG_UNUSED(mpiResult);
+
+	mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, remoteRank,
+		MPI_MODE_NOCHECK, m_window);
+	assert(mpiResult == MPI_SUCCESS);
+
+	mpiResult = MPI_Get(cache,
+		blockSize,
+		getType().getMPIType(),
+		remoteRank,
+		offset * blockSize,
+		blockSize,
+		getType().getMPIType(),
+		m_window);
+	assert(mpiResult == MPI_SUCCESS);
+
+	mpiResult = MPI_Win_unlock(remoteRank, m_window);
+	assert(mpiResult == MPI_SUCCESS);
 }

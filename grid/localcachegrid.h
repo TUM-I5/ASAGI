@@ -1,7 +1,7 @@
 /**
  * @file
- *  This file is part of ASAGI.
- * 
+ *  This file is part of ASAGI
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,71 +33,93 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_MPICACHEGRID_H
-#define GRID_MPICACHEGRID_H
+#ifndef GRID_LOCALCACHEGRID_H
+#define GRID_LOCALCACHEGRID_H
 
-#include "localcachegrid.h"
-#include "staticgrid.h"
+#include "grid.h"
+
+#include "blocks/blockmanager.h"
 
 #ifndef THREADSAFETY
 #include <mutex>
 #endif // THREADSAFETY
 
-#include "blocks/blockmanager.h"
-
 namespace grid
 {
 
-/**
- * Simple grid implementation, that distributes the grid at the beginning
- * across all MPI tasks. If a block is not available, it is transfered via
- * MPI and stored in a cache.
- */
-class MPICacheGrid : public StaticGrid, public LocalCacheGrid
+class LocalCacheGrid : virtual public Grid
 {
 private:
-	/** MPI window for communication */
-	MPI_Win m_window;
-public:
-	MPICacheGrid(const GridContainer &container,
-		unsigned int hint = asagi::Grid::NO_HINT);
-	virtual ~MPICacheGrid();
-	
-protected:
-	asagi::Grid::Error init();
-	
-	void getAt(void* buf, types::Type::converter_t converter,
-		unsigned long x, unsigned long y = 0, unsigned long z = 0);
+	/** Cache memory */
+	unsigned char *m_cache;
 
-	void getBlock(unsigned long block,
+	/** BlockManager used to control the cache */
+	blocks::BlockManager m_blockManager;
+
+#ifdef THREADSAFETY
+	/**
+	 * Lock cache
+	 * @todo Use a shared mutex, to allow multiple readers
+	 */
+	std::mutex m_slaveMutex;
+#endif // THREADSAFETY
+
+public:
+	LocalCacheGrid(const GridContainer &container,
+		unsigned int hint = asagi::Grid::NO_HINT);
+	virtual ~LocalCacheGrid();
+
+protected:
+	virtual asagi::Grid::Error init();
+
+	virtual void getAt(void* buf, types::Type::converter_t converter,
+			unsigned long x, unsigned long y, unsigned long z);
+
+	virtual void getBlock(unsigned long block,
 		long oldBlock,
 		unsigned long cacheIndex,
 		unsigned char* cache);
 
-	asagi::Grid::Error allocLocalMem(size_t size, unsigned char *&data)
+	/**
+	 * Allocate the memory that holds the local cache.
+	 * Can be overwritten for special allocation
+	 */
+	virtual asagi::Grid::Error allocCache(size_t size, unsigned char *&cache)
 	{
-		if (MPI_Alloc_mem(size,	MPI_INFO_NULL, &data) != MPI_SUCCESS)
-			return asagi::Grid::MPI_ERROR;
-
+		cache = new unsigned char[size];
 		return asagi::Grid::SUCCESS;
 	}
 
-	void freeLocalMem(unsigned char *data)
+	/**
+	 * Frees local cache
+	 *
+	 * @see allocCache
+	 */
+	virtual void freeCache(unsigned char *cache)
 	{
-		MPI_Free_mem(data);
+		delete [] cache;
 	}
 
 	/**
-	 * We can free all netCDF related resources, because we use MPI to
-	 * transfer blocks
+	 * @return A pointer to the cached blocks
 	 */
-	bool keepFileOpen() const
+	unsigned char* getCache()
 	{
-		return false;
+		return m_cache;
+	}
+
+	/**
+	 * When overriding {@link getBlock}, you can also override this
+	 * function to return false.
+	 *
+	 * @see Grid::keepFileOpen()
+	 */
+	virtual bool keepFileOpen() const
+	{
+		return true;
 	}
 };
 
 }
 
-#endif // GRID_MPICACHEGRID_H
-
+#endif /* GRID_LOCALCACHEGRID_H */
