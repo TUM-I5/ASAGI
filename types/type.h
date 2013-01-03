@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TYPES_TYPE_H
@@ -67,7 +67,7 @@ public:
 	 * @see convertDouble
 	 * @see convertBuffer
 	 */
-	typedef void (Type::*converter_t)(void*, void*);
+	typedef void (Type::*converter_t)(const void*, void*);
 	
 public:
 	/**
@@ -114,28 +114,28 @@ public:
 	 * All these functions have the type "converter_t". This way it is
 	 * possible to pass them arround as pointers.
 	 */
-	virtual void convertByte(void* data, void* buf) = 0;
+	virtual void convertByte(const void* data, void* buf) = 0;
 	/**
 	 * @see convertByte
 	 */
-	virtual void convertInt(void* data, void* buf) = 0;
+	virtual void convertInt(const void* data, void* buf) = 0;
 	/**
 	 * @see convertByte
 	 */
-	virtual void convertLong(void* data, void* buf) = 0;
+	virtual void convertLong(const void* data, void* buf) = 0;
 	/**
 	 * @see convertByte
 	 */
-	virtual void convertFloat(void* data, void* buf) = 0;
+	virtual void convertFloat(const void* data, void* buf) = 0;
 	/**
 	 * @see convertByte
 	 */
-	virtual void convertDouble(void* data, void* buf) = 0;
+	virtual void convertDouble(const void* data, void* buf) = 0;
 	/**
 	 * This is the "no-conversation" function. It simple copys a whole
 	 * variable from data to buf
 	 */
-	void convertBuffer(void* data, void* buf)
+	void convertBuffer(const void* data, void* buf)
 	{
 		memcpy(buf, data, getSize());
 	}

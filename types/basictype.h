@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TYPES_BASICTYPE_H
@@ -65,29 +65,29 @@ public:
 	virtual MPI_Datatype getMPIType();
 #endif // ASAGI_NOMPI
 	
-	void convertByte(void* data, void* buf)
+	void convertByte(const void* data, void* buf)
 	{
-		*static_cast<char*>(buf) = *static_cast<T*>(data);
+		*static_cast<char*>(buf) = *static_cast<const T*>(data);
 	}
 	
-	void convertInt(void* data, void* buf)
+	void convertInt(const void* data, void* buf)
 	{
-		*static_cast<int*>(buf) = *static_cast<T*>(data);
+		*static_cast<int*>(buf) = *static_cast<const T*>(data);
 	}
 	
-	void convertLong(void* data, void* buf)
+	void convertLong(const void* data, void* buf)
 	{
-		*static_cast<long*>(buf) = *static_cast<T*>(data);
+		*static_cast<long*>(buf) = *static_cast<const T*>(data);
 	}
 	
-	void convertFloat(void* data, void* buf)
+	void convertFloat(const void* data, void* buf)
 	{
-		*static_cast<float*>(buf) = *static_cast<T*>(data);
+		*static_cast<float*>(buf) = *static_cast<const T*>(data);
 	}
 	
-	void convertDouble(void* data, void* buf)
+	void convertDouble(const void* data, void* buf)
 	{
-		*static_cast<double*>(buf) = *static_cast<T*>(data);
+		*static_cast<double*>(buf) = *static_cast<const T*>(data);
 	}
 };
 
