@@ -5,6 +5,7 @@ set( gridSources
     gridcontainer.cpp
     localcachegrid.cpp
 	multigrid.cpp
+	passthroughgrid.cpp
 	simplegridcontainer.cpp
 	staticgrid.cpp )
 if( NOT NOMPI )

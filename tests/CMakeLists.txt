@@ -63,6 +63,7 @@ add_test_executable( largegrid2d YES )
 add_test_executable( adaptivegrid2d YES )
 
 add_test_executable( localcachegrid2d )
+add_test_executable( passthroughgrid2d )
 add_test_executable( staticgrid2d )
 
 
@@ -79,4 +80,5 @@ add_test_run( LargeGrid2D test_largegrid2d 2 )
 add_test_run( AdaptiveGrid2D test_adaptivegrid2d 2 )
 
 add_test_run( LocalCacheGrid2D test_localcachegrid2d )
+add_test_run( PassThroughGrid2D test_passthroughgrid2d )
 add_test_run( StaticGrid2D test_staticgrid2d ) 

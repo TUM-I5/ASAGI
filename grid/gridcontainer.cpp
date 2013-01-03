@@ -30,12 +30,13 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "gridcontainer.h"
 
 #include "grid/localcachegrid.h"
+#include "grid/passthroughgrid.h"
 #include "grid/staticgrid.h"
 #ifndef ASAGI_NOMPI
 #include "grid/mpicachegrid.h"
@@ -234,6 +235,9 @@ asagi::Grid::Error grid::GridContainer::open(const char* filename,
 grid::Grid* grid::GridContainer::createGrid(unsigned int hint,
 	unsigned int id) const
 {
+	if (hint & PASS_THROUGH)
+		return new PassThroughGrid(*this, hint);
+
 #ifndef ASAGI_NOMPI
 	if (hint & NOMPI) {
 #endif // ASAGI_NOMPI

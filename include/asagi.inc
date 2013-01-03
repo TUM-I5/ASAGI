@@ -30,7 +30,7 @@
 !!  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
 !!  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
 !! 
-!! @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+!! @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
 !!
 !! @brief Include file for Fortran API
 !!
@@ -65,7 +65,11 @@ module asagi
   !> @ingroup f_interface
   !!
   !! @see asagi::Grid::ADAPTIVE
-  integer, parameter :: GRID_ADAPTIVE = z'A'
+  integer, parameter :: GRID_ADAPTIVE = z'10'
+  !> @ingroup f_interface
+  !!
+  !! @see asagi::Grid::PASS_THROUGH
+  integer, parameter :: GRID_PASSTHROUGH = z'20'
 
   !> @ingroup f_interface
   !!

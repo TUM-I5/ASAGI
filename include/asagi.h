@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  * 
  * @brief Include file for C and C++ API
  * 
@@ -132,7 +132,12 @@ public:
 	 * Use an adaptive container. Allows you to load multiple grids with
 	 * the same level of detail. Not fully tested yet.
 	 */
-	static const unsigned int ADAPTIVE = 0xA;
+	static const unsigned int ADAPTIVE = 0x10;
+	/**
+	 * Use ASAGI only as a wrapper for the underlying I/O library.
+	 * ASAGI does not cache any values. Works also without MPI.
+	 */
+	static const unsigned int PASS_THROUGH = 0x20;
 public:
 	/**
 	 * @ingroup cxx_interface
@@ -513,7 +518,13 @@ const unsigned int GRID_LARGE_GRID = 0x8;
  * 
  * @see asagi::Grid::ADAPTIVE
  */
-const unsigned int GRID_ADAPTIVE = 0xA;
+const unsigned int GRID_ADAPTIVE = 0x10;
+/**
+ * @ingroup c_interface
+ *
+ * @see asagi::Grid::PASS_THROUGH
+ */
+const unsigned int PASS_THROUGH = 0x20;
 
 /**
  * @ingroup c_interface
