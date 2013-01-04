@@ -81,11 +81,13 @@ unsigned long perf::Counter::get(const char* name)
 /**
  * Maps form counter names to CounterType
  */
-const std::unordered_map<std::string, perf::Counter::CounterType>
-	perf::Counter::NAME_TO_COUNTER({
-		{"accesses", ACCESS},
-		{"mpi_transfers", MPI},
-		{"file_loads", FILE},
-		{"local_hits", HIT},
-		{"local_misses", MISS}
-	});
+const perf::Counter::NameToCounterMap perf::Counter::NAME_TO_COUNTER;
+// Not yet supported by icc
+//const std::unordered_map<std::string, perf::Counter::CounterType>
+//	perf::Counter::NAME_TO_COUNTER({
+//		{"accesses", ACCESS},
+//		{"mpi_transfers", MPI},
+//		{"file_loads", FILE},
+//		{"local_hits", HIT},
+//		{"local_misses", MISS}
+//	});

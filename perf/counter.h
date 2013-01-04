@@ -73,6 +73,24 @@ public:
 	};
 
 private:
+	/**
+	 * Workaround class because icc does not fully support initializer lists (yet)
+	 */
+	class NameToCounterMap : public std::unordered_map<std::string, CounterType>
+	{
+	public:
+		NameToCounterMap()
+		{
+			(*this)["accesses"] = ACCESS;
+			(*this)["mpi_transfers"] = MPI;
+			(*this)["file_loads"] = FILE;
+			(*this)["local_hits"] = HIT;
+			(*this)["local_misses"] = MISS;
+		}
+	};
+	
+
+private:
 	/** Stores native counters */
 	unsigned long m_counter[NATIVE_COUNTER_SIZE];
 
@@ -95,7 +113,8 @@ public:
 	unsigned long get(const char* name);
 
 private:
-	static const std::unordered_map<std::string, CounterType> NAME_TO_COUNTER;
+	static const NameToCounterMap NAME_TO_COUNTER;
+	//static const std::unordered_map<std::string, CounterType> NAME_TO_COUNTER;
 };
 
 }
