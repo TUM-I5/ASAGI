@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "staticgrid.h"
@@ -71,8 +71,8 @@ asagi::Grid::Error grid::StaticGrid::init()
 		getBlockPos(getGlobalBlock(i), block);
 		
 		// Get x, y and z coordinates of the first value in the block
-		for (unsigned char i = 0; i < 3; i++)
-			block[i] *= getBlockSize(i);
+		for (unsigned char j = 0; j < 3; i++)
+			block[j] *= getBlockSize(j);
 		
 		getType().load(getInputFile(),
 			block, getBlockSize(),
