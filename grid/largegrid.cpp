@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "largegrid.h"
@@ -257,7 +257,7 @@ void grid::LargeGrid::getBlock(unsigned long block,
 	
 	m_globalMutex.release(block);
 
-	delete dictEntry;
+	delete [] dictEntry;
 }
 
 /**
