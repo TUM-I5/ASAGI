@@ -71,7 +71,7 @@ asagi::Grid::Error grid::StaticGrid::init()
 		getBlockPos(getGlobalBlock(i), block);
 		
 		// Get x, y and z coordinates of the first value in the block
-		for (unsigned char j = 0; j < 3; i++)
+		for (unsigned char j = 0; j < 3; j++)
 			block[j] *= getBlockSize(j);
 		
 		getType().load(getInputFile(),
