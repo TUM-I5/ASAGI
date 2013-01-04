@@ -393,6 +393,26 @@ public:
 	 */
 	virtual bool exportPng(const char* filename,
 		unsigned int level = 0) = 0;
+
+	/**
+	 * @ingroup cxx_interface
+	 *
+	 * Gets the current value of a counter for a grid level.
+	 *
+	 * Possible counter names:
+	 * @li @b accesses Total number of data accesses
+	 * @li @b mpi_transfers Number of blocks transfered between processes
+	 * @li @b file_load Number of blocks loaded from file
+	 *  (after initialization)
+	 * @li @b local_hits Number values that where already in local memory
+	 * @li @b local_misses Number of values that where not already in
+	 *  local memory
+	 *
+	 *  @return The current counter value or 0 if the name is not defined
+	 */
+	virtual unsigned long getCounter(const char *name,
+		unsigned int level = 0) = 0;
+
 public:
 	/**
 	 * @ingroup cxx_interface

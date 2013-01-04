@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include <asagi.h>
@@ -41,6 +41,14 @@
 #include "tests.h"
 
 using namespace asagi;
+
+/**
+ * Quick ceil integer function
+ */
+static unsigned int ceil(unsigned int a, unsigned int b)
+{
+	return (a + b - 1) / b;
+}
 
 int main(int argc, char** argv)
 {
@@ -67,6 +75,24 @@ int main(int argc, char** argv)
 				return 1;
 			}
 		}
+	}
+
+	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
+		dbgDebug() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
+				<< "but is" << grid->getCounter("accesses");
+		return 1;
+	}
+
+	// Assuming 2 MPI processes / 50 values in each dimension per block
+	if (grid->getCounter("mpi_transferes") != ceil(NC_WIDTH, 50)*ceil(NC_LENGTH, 50)) {
+		dbgDebug() << "Counter \"mpi_transfers\" should be" << (ceil(NC_WIDTH, 50)*ceil(NC_LENGTH, 50))
+				<< "but is" << grid->getCounter("mpi_transfers");
+	}
+
+	if (grid->getCounter("file_loads") != 0) {
+		dbgDebug() << "Counter \"file_loads\" should be 0"
+				<< "but is" << grid->getCounter("file_loads");
+		return 1;
 	}
 	
 	delete grid;

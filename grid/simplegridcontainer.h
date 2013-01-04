@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef GRID_SIMPLEGRIDCONTAINER_H
@@ -79,6 +79,8 @@ public:
 		unsigned int level = 0);
 	
 	bool exportPng(const char* filename, unsigned int level = 0);
+
+	unsigned long getCounter(const char* name, unsigned int level = 0);
 };
 
 }

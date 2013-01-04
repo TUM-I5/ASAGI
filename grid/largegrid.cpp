@@ -233,6 +233,7 @@ void grid::LargeGrid::getBlock(unsigned long block,
 		unsigned long blockSize = getTotalBlockSize();
 
 		// Transfer the block from the other rank
+		incCounter(perf::Counter::MPI);
 		
 		// Lock remote window
 		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dataRank,

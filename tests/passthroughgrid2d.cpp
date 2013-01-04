@@ -61,6 +61,18 @@ int main(int argc, char** argv)
 		}
 	}
 
+	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
+		dbgDebug() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
+				<< "but is" << grid->getCounter("accesses");
+		return 1;
+	}
+
+	if (grid->getCounter("file_loads") != NC_WIDTH * NC_LENGTH) {
+		dbgDebug() << "Counter \"file_loads\" should be" << (NC_WIDTH*NC_LENGTH)
+				<< "but is" << grid->getCounter("file_loads");
+		return 1;
+	}
+
 	delete grid;
 
 	return 0;

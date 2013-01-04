@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "mpicachegrid.h"
@@ -116,6 +116,8 @@ void grid::MPICacheGrid::getBlock(unsigned long block,
 	int remoteRank = getBlockRank(block);
 	unsigned long offset = getBlockOffset(block);
 	int mpiResult; NDBG_UNUSED(mpiResult);
+
+	incCounter(perf::Counter::MPI);
 
 	mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, remoteRank,
 		MPI_MODE_NOCHECK, m_window);

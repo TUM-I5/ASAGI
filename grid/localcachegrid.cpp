@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "localcachegrid.h"
@@ -114,6 +114,8 @@ void grid::LocalCacheGrid::getBlock(unsigned long block,
 	unsigned long cacheIndex,
 	unsigned char *cache)
 {
+	incCounter(perf::Counter::FILE);
+
 	// TODO change this function so it does not get the block id
 	// but the block coordinates
 	size_t pos[MAX_DIMENSIONS];

@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "adaptivegridcontainer.h"
@@ -161,6 +161,19 @@ bool grid::AdaptiveGridContainer::exportPng(const char* filename, unsigned int l
 		return false;
 	
 	return m_grids[0].getGrid(0)->exportPng(filename);
+}
+
+unsigned long grid::AdaptiveGridContainer::getCounter(const char* name, unsigned int level)
+{
+	assert(level < m_levels);
+
+	std::vector<grid::Grid*>::const_iterator grid;
+	unsigned long counter = 0;
+
+	for (grid = m_grids[level].begin(); grid < m_grids[level].end(); grid++)
+		counter += (*grid)->getCounter(name);
+
+	return counter;
 }
 
 /**

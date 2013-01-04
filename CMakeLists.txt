@@ -41,6 +41,10 @@ set( CMAKE_MODULE_PATH
 # Enable warnings
 add_definitions( -Wall )
 
+# Order include path (solves issues for developers when asagi.{h,inc}
+# is already installed)
+set( CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON )
+
 # Set c++11 standard
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" )
 
@@ -105,6 +109,7 @@ add_subdirectory( debug )
 add_subdirectory( fortran )
 add_subdirectory( grid )
 add_subdirectory( io )
+add_subdirectory( perf )
 add_subdirectory( utils )
 if( NOT NOMPI )
 	add_subdirectory( mpi )
@@ -156,6 +161,7 @@ target_link_libraries( asagi
 	grid
 	blocks
 	io
+	perf
 	types )
 if( NOMPI )
 	set_target_properties( asagi

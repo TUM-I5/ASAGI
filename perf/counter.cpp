@@ -33,45 +33,59 @@
  * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "passthroughgrid.h"
+#include "counter.h"
 
-#include <algorithm>
+#include <cstring>
 
 /**
- * @see Grid::Grid()
+ * Initializes all counters
  */
-grid::PassThroughGrid::PassThroughGrid(const GridContainer &container,
-		unsigned int hint)
-	: Grid(container, hint),
-	  m_mem(0L)
+perf::Counter::Counter()
 {
-
+	memset(m_counter, 0, sizeof(m_counter));
 }
 
-grid::PassThroughGrid::~PassThroughGrid()
+/**
+ * Get the current value of a counter
+ *
+ * @param name The name of the counter (can be a non-native type)
+ * @return The value of the counter or 0 if the name is unknown
+ *
+ * @see NAME_TO_COUNTER
+ */
+unsigned long perf::Counter::get(const char* name)
 {
-	delete [] m_mem;
+	std::unordered_map<std::string, CounterType>::const_iterator type
+		= NAME_TO_COUNTER.find(name);
+
+	if (type == NAME_TO_COUNTER.end())
+		// name not found
+		return 0;
+
+	switch (type->second) {
+	case HIT:
+		return m_counter[ACCESS] - m_counter[MPI] -  m_counter[FILE];
+		break;
+	case MISS:
+		return m_counter[MPI] + m_counter[FILE];
+		break;
+	default:
+		assert(type->second < NATIVE_COUNTER_SIZE);
+		// native counters handle after switch statement
+		break;
+	}
+
+	return m_counter[type->second];
 }
 
-asagi::Grid::Error grid::PassThroughGrid::init()
-{
-	m_mem = new unsigned char[getType().getSize()];
-
-	return asagi::Grid::SUCCESS;
-}
-
-void grid::PassThroughGrid::getAt(void* buf, types::Type::converter_t converter,
-	unsigned long x, unsigned long y, unsigned long z)
-{
-	size_t pos[] = {x, y, z};
-	size_t size[MAX_DIMENSIONS];
-
-	incCounter(perf::Counter::FILE);
-
-	// Load one value in each dimension
-	std::fill_n(size, MAX_DIMENSIONS, 1);
-
-	getType().load(getInputFile(), pos, size, m_mem);
-
-	(getType().*converter)(m_mem, buf);
-}
+/**
+ * Maps form counter names to CounterType
+ */
+const std::unordered_map<std::string, perf::Counter::CounterType>
+	perf::Counter::NAME_TO_COUNTER({
+		{"accesses", ACCESS},
+		{"mpi_transfers", MPI},
+		{"file_loads", FILE},
+		{"local_hits", HIT},
+		{"local_misses", MISS}
+	});

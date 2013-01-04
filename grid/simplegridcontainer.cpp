@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "simplegridcontainer.h"
@@ -166,3 +166,9 @@ bool grid::SimpleGridContainer::exportPng(const char* filename, unsigned int lev
 	return m_grids[level]->exportPng(filename);
 }
 
+unsigned long grid::SimpleGridContainer::getCounter(const char* name, unsigned int level)
+{
+	assert(level < m_levels);
+
+	return m_grids[level]->getCounter(name);
+}

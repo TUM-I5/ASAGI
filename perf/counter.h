@@ -33,45 +33,71 @@
  * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "passthroughgrid.h"
+#ifndef PERF_COUNTER_H
+#define PERF_COUNTER_H
 
-#include <algorithm>
+#include <cassert>
+#include <string>
+#include <unordered_map>
 
 /**
- * @see Grid::Grid()
+ * Performance messurement tools
  */
-grid::PassThroughGrid::PassThroughGrid(const GridContainer &container,
-		unsigned int hint)
-	: Grid(container, hint),
-	  m_mem(0L)
+namespace perf
 {
+
+/**
+ * Stores the performance counters for one grid level
+ */
+class Counter
+{
+private:
+	/* Number of available native counters */
+	static const unsigned int NATIVE_COUNTER_SIZE = 3;
+
+public:
+	/** Available counters */
+	enum CounterType {
+		/** Total number of accesses (native) */
+		ACCESS,
+		/** Local cache misses but remote hits (native) */
+		MPI,
+		/** Cache misses; fallback to file (native) */
+		FILE,
+		/** Total number of local hits (ACCESS - MPI - FILE) */
+		HIT,
+		/** Total number of local misses (MPI + FILE) */
+		MISS,
+		/** Unknown counter */
+		INVALID
+	};
+
+private:
+	/** Stores native counters */
+	unsigned long m_counter[NATIVE_COUNTER_SIZE];
+
+public:
+	Counter();
+
+	/**
+	 * Increment a counter
+	 *
+	 * @param type A native counter that should be incremented
+	 */
+	void inc(CounterType type)
+	{
+		// We should only increment native counters
+		assert(type < NATIVE_COUNTER_SIZE);
+
+		m_counter[type]++;
+	}
+
+	unsigned long get(const char* name);
+
+private:
+	static const std::unordered_map<std::string, CounterType> NAME_TO_COUNTER;
+};
 
 }
 
-grid::PassThroughGrid::~PassThroughGrid()
-{
-	delete [] m_mem;
-}
-
-asagi::Grid::Error grid::PassThroughGrid::init()
-{
-	m_mem = new unsigned char[getType().getSize()];
-
-	return asagi::Grid::SUCCESS;
-}
-
-void grid::PassThroughGrid::getAt(void* buf, types::Type::converter_t converter,
-	unsigned long x, unsigned long y, unsigned long z)
-{
-	size_t pos[] = {x, y, z};
-	size_t size[MAX_DIMENSIONS];
-
-	incCounter(perf::Counter::FILE);
-
-	// Load one value in each dimension
-	std::fill_n(size, MAX_DIMENSIONS, 1);
-
-	getType().load(getInputFile(), pos, size, m_mem);
-
-	(getType().*converter)(m_mem, buf);
-}
+#endif /* PERF_COUNTER_H */

@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef GRID_GRID_H
@@ -38,6 +38,8 @@
 
 #include "grid/constants.h"
 #include "grid/gridcontainer.h"
+
+#include "perf/counter.h"
 
 #include "types/type.h"
 
@@ -112,6 +114,10 @@ private:
 	 * Declare as signed, to remove compiler warning
 	 */
 	signed char m_timeDimension;
+
+	/** Access counters for this grid (level) */
+	perf::Counter m_counter;
+
 public:
 	Grid(const GridContainer &container,
 		unsigned int hint = asagi::Grid::NO_HINT);
@@ -173,6 +179,14 @@ public:
 	
 	bool exportPng(const char* filename);
 
+	/**
+	 * @return The value of a counter
+	 */
+	unsigned long getCounter(const char* name)
+	{
+		return m_counter.get(name);
+	}
+
 private:
 	void getAt(void* buf, types::Type::converter_t converter,
 		   double x, double y = 0, double z = 0);
@@ -182,6 +196,7 @@ private:
 	 * which only works on floats
 	 */
 	float getAtFloat(unsigned long x, unsigned long y);
+
 protected:
 #ifndef ASAGI_NOMPI
 	/**
@@ -390,6 +405,15 @@ protected:
 	 */
 	virtual void getAt(void* buf, types::Type::converter_t converter,
 		unsigned long x, unsigned long y = 0, unsigned long z = 0) = 0;
+
+	/**
+	 * Used by subclasses to increment counter.
+	 * perf::Counter::ACCESS is already handled by this class!
+	 */
+	void incCounter(perf::Counter::CounterType type)
+	{
+		m_counter.inc(type);
+	}
 
 private:
 	/** The smallest number we can represent in a double */

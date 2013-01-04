@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "grid.h"
@@ -378,6 +378,8 @@ void grid::Grid::getAt(void* buf, types::Type::converter_t converter,
 	assert(x >= 0 && x < getXDim()
 		&& y >= 0 && y < getYDim()
 		&& z >= 0 && z < getZDim());
+
+	m_counter.inc(perf::Counter::ACCESS);
 
 	getAt(buf, converter, static_cast<unsigned long>(x),
 		static_cast<unsigned long>(y), static_cast<unsigned long>(z));
