@@ -39,6 +39,7 @@
 #include <malloc.h>
 #include <stdlib.h>
 
+#include "allocator/mpiallocator.h"
 #include "types/type.h"
 #include "debug/dbg.h"
 
@@ -48,7 +49,8 @@
 grid::MPICacheGrid::MPICacheGrid(const GridContainer &container,
 	unsigned int hint)
 	: Grid(container, hint),
-	  StaticGrid(container, hint),
+	  StaticGrid(container, hint,
+			  allocator::MPIAllocator<unsigned char>::allocator),
 	  LocalCacheGrid(container, hint)
 {
 	m_window = MPI_WIN_NULL;

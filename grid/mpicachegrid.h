@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef GRID_MPICACHEGRID_H
@@ -73,19 +73,6 @@ protected:
 		long oldBlock,
 		unsigned long cacheIndex,
 		unsigned char* cache);
-
-	asagi::Grid::Error allocLocalMem(size_t size, unsigned char *&data)
-	{
-		if (MPI_Alloc_mem(size,	MPI_INFO_NULL, &data) != MPI_SUCCESS)
-			return asagi::Grid::MPI_ERROR;
-
-		return asagi::Grid::SUCCESS;
-	}
-
-	void freeLocalMem(unsigned char *data)
-	{
-		MPI_Free_mem(data);
-	}
 
 	/**
 	 * We can free all netCDF related resources, because we use MPI to

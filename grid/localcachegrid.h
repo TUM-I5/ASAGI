@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef GRID_LOCALCACHEGRID_H
@@ -38,6 +38,7 @@
 
 #include "grid.h"
 
+#include "allocator/defaultallocator.h"
 #include "blocks/blockmanager.h"
 
 #ifndef THREADSAFETY
@@ -56,6 +57,9 @@ private:
 	/** BlockManager used to control the cache */
 	blocks::BlockManager m_blockManager;
 
+	/** The allocator we use to allocate and free memory */
+	const allocator::Allocator<unsigned char> &m_allocator;
+
 #ifdef THREADSAFETY
 	/**
 	 * Lock cache
@@ -66,7 +70,9 @@ private:
 
 public:
 	LocalCacheGrid(const GridContainer &container,
-		unsigned int hint = asagi::Grid::NO_HINT);
+		unsigned int hint = asagi::Grid::NO_HINT,
+		const allocator::Allocator<unsigned char> &allocator
+			= allocator::DefaultAllocator<unsigned char>::allocator);
 	virtual ~LocalCacheGrid();
 
 protected:
@@ -79,26 +85,6 @@ protected:
 		long oldBlock,
 		unsigned long cacheIndex,
 		unsigned char* cache);
-
-	/**
-	 * Allocate the memory that holds the local cache.
-	 * Can be overwritten for special allocation
-	 */
-	virtual asagi::Grid::Error allocCache(size_t size, unsigned char *&cache)
-	{
-		cache = new unsigned char[size];
-		return asagi::Grid::SUCCESS;
-	}
-
-	/**
-	 * Frees local cache
-	 *
-	 * @see allocCache
-	 */
-	virtual void freeCache(unsigned char *cache)
-	{
-		delete [] cache;
-	}
 
 	/**
 	 * @return A pointer to the cached blocks

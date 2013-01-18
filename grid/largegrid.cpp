@@ -35,6 +35,8 @@
 
 #include "largegrid.h"
 
+#include "allocator/mpiallocator.h"
+
 #include <cstring>
 #include <cstdlib>
 #include <time.h>
@@ -49,7 +51,8 @@
 grid::LargeGrid::LargeGrid(const GridContainer& container,
 	unsigned int hint, unsigned int id)
 	: Grid(container, hint),
-	  LocalCacheGrid(container, hint),
+	  LocalCacheGrid(container, hint,
+			  allocator::MPIAllocator<unsigned char>::allocator),
 	  m_globalMutex(id)
 {
 	m_dictionary = 0L;

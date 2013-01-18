@@ -1,7 +1,7 @@
 /**
  * @file
- *  This file is part of ASAGI.
- * 
+ *  This file is part of ASAGI
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -29,59 +29,50 @@
  *
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_STATICGRID_H
-#define GRID_STATICGRID_H
+#ifndef ALLOCATOR_MPIALLOCATOR_H
+#define ALLOCATOR_MPIALLOCATOR_H
 
-#include "grid.h"
+#include <asagi.h>
 
-#include "allocator/defaultallocator.h"
+#include "allocator/allocator.h"
 
-namespace grid
+namespace allocator
 {
 
 /**
- * This grid loads all (local) blocks into memory at initialization.
- * Neither does this class change the blocks nor does it fetch new blocks.
- * If you try to access values of a non-local block, the behavior is
- * undefined.
- * 
- * If compiled without MPI, all blocks are local.
+ * This allocator uses MPI mechanisms to allocate/free memory
  */
-class StaticGrid : virtual public Grid
+template<typename T>
+class MPIAllocator : public Allocator<T>
 {
-private:
-	/** Local data cache */
-	unsigned char* m_data;
+public:
+	asagi::Grid::Error allocate(size_t size, T* &ptr) const
+	{
+		if (MPI_Alloc_mem(size * sizeof(T), MPI_INFO_NULL, &ptr) != MPI_SUCCESS)
+			return asagi::Grid::MPI_ERROR;
 
-	/** The allocator we use to allocate and free memory */
-	const allocator::Allocator<unsigned char> &m_allocator;
+		return asagi::Grid::SUCCESS;
+	}
+
+	void free(T *ptr) const
+	{
+		MPI_Free_mem(ptr);
+	}
 
 public:
-	StaticGrid(const GridContainer &container,
-		unsigned int hint = asagi::Grid::NO_HINT,
-		const allocator::Allocator<unsigned char> &allocator
-			= allocator::DefaultAllocator<unsigned char>::allocator);
-	virtual ~StaticGrid();
-	
-protected:
-	virtual asagi::Grid::Error init();
-	
-	virtual void getAt(void* buf, types::Type::converter_t converter,
-		unsigned long x, unsigned long y = 0, unsigned long z = 0);
-
-	/**
-	 * @return A pointer to the blocks
-	 */
-	unsigned char* getData()
-	{
-		return m_data;
-	}
+	static const MPIAllocator<T> allocator;
 };
+
+/**
+ * Provides a default instance for each type
+ */
+template<typename T>
+const MPIAllocator<T> MPIAllocator<T>::allocator;
 
 }
 
-#endif // GRID_STATICGRID_H
+#endif /* ALLOCATOR_MPIALLOCATOR_H */

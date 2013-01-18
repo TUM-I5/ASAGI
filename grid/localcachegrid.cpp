@@ -39,16 +39,18 @@
  * @see Grid::Grid()
  */
 grid::LocalCacheGrid::LocalCacheGrid(const GridContainer &container,
-		unsigned int hint)
+		unsigned int hint,
+		const allocator::Allocator<unsigned char> &allocator)
 	: Grid(container, hint),
-	  m_cache(0L)
+	  m_cache(0L),
+	  m_allocator(allocator)
 {
 
 }
 
 grid::LocalCacheGrid::~LocalCacheGrid()
 {
-	freeCache(m_cache);
+	m_allocator.free(m_cache);
 }
 
 asagi::Grid::Error grid::LocalCacheGrid::init()
@@ -57,7 +59,7 @@ asagi::Grid::Error grid::LocalCacheGrid::init()
 	asagi::Grid::Error error;
 
 	// Allocate memory for cache
-	error = allocCache(getType().getSize() * blockSize * getBlocksPerNode(), m_cache);
+	error = m_allocator.allocate(getType().getSize() * blockSize * getBlocksPerNode(), m_cache);
 	if (error != asagi::Grid::SUCCESS)
 		return error;
 

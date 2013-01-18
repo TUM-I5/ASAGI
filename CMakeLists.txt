@@ -104,6 +104,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/include )
 include_directories( ${CMAKE_SOURCE_DIR} )
 
 # Add static libaries
+add_subdirectory( allocator )
 add_subdirectory( blocks )
 add_subdirectory( debug )
 add_subdirectory( fortran )

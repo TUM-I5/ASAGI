@@ -39,15 +39,17 @@
  * @see Grid::Grid()
  */
 grid::StaticGrid::StaticGrid(const GridContainer &container,
-	unsigned int hint)
-	: Grid(container, hint)
+	unsigned int hint,
+	const allocator::Allocator<unsigned char> &allocator)
+	: Grid(container, hint),
+	  m_allocator(allocator)
 {
 	m_data = 0L;
 }
 
 grid::StaticGrid::~StaticGrid()
 {
-	freeLocalMem(m_data);
+	m_allocator.free(m_data);
 }
 
 asagi::Grid::Error grid::StaticGrid::init()
@@ -57,7 +59,7 @@ asagi::Grid::Error grid::StaticGrid::init()
 	unsigned long masterBlockCount = getLocalBlockCount();
 	asagi::Grid::Error error;
 	
-	error = allocLocalMem(getType().getSize() * blockSize * masterBlockCount, m_data);
+	error = m_allocator.allocate(getType().getSize() * blockSize * masterBlockCount, m_data);
 	if (error != asagi::Grid::SUCCESS)
 		return error;
 	
