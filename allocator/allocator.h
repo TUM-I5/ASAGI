@@ -50,17 +50,15 @@ namespace allocator
  * by allocators
  *
  * @tparam T The type that is allocated
+ *
+ * @warning Subclasses can not have a destructor, because this class
+ *  does not have a virtual one. A virtual constructor here leads to
+ *  crashes on some systems.
  */
 template<typename T>
 class Allocator
 {
 public:
-	/**
-	 * Virtual destructor (make sure destructors of inherited classes
-	 * are called)
-	 */
-	virtual ~Allocator() {}
-
 	/**
 	 * Allocates sizeof(T)*size bytes and saves the pointer in ptr.
 	 *
