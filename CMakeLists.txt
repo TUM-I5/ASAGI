@@ -176,7 +176,7 @@ endif( NOMPI )
 ##### Installation #####
 install( TARGETS asagi
 	DESTINATION lib )
-install( FILES include/asagi.h include/asagi.inc
+install( FILES include/asagi.h include/asagi.f90
 	DESTINATION include )
 
 

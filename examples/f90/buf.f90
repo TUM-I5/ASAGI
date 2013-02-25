@@ -1,5 +1,3 @@
-include 'asagi.inc'
-
 ! Simple library test
 program buf
   use asagi

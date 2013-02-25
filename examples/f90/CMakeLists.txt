@@ -1,11 +1,13 @@
 ##### Files #####
 # Simple
 set( SimpleF90Sources
-	simple.f90 )
+	simple.f90
+	${CMAKE_SOURCE_DIR}/include/asagi.f90 )
 
 # Buf
 set( BufF90Sources
-	buf.f90 )
+	buf.f90
+	${CMAKE_SOURCE_DIR}/include/asagi.f90 )
 
 # Add MPI header files to the include path
 include_directories( SYSTEM ${MPI_Fortran_INCLUDE_PATH} )
