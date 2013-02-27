@@ -89,19 +89,6 @@ protected:
 		long oldBlock,
 		unsigned long cacheIndex,
 		unsigned char* cache);
-
-	virtual asagi::Grid::Error allocCache(size_t size, unsigned char *&cache)
-	{
-		if (MPI_Alloc_mem(size,	MPI_INFO_NULL, &cache) != MPI_SUCCESS)
-			return asagi::Grid::MPI_ERROR;
-
-		return asagi::Grid::SUCCESS;
-	}
-
-	virtual void freeCache(unsigned char *cache)
-	{
-		MPI_Free_mem(cache);
-	}
 	
 private:
 	void getBlockInfo(unsigned long* dictEntry, unsigned long localOffset,
