@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef IO_NETCDF_H
@@ -38,11 +38,13 @@
 
 #include <asagi.h>
 
+#include "grid/constants.h"
+
 #include <cassert>
 #include <limits>
 #include <vector>
 #include <algorithm>
-#include <netcdf>
+#include <netcdf.h>
 
 #include "debug/dbg.h"
 
@@ -64,17 +66,20 @@ private:
 	/** MPI rank */
 	const int m_rank;
 	
-	/** the file, this class will work on */
-	const netCDF::NcFile* m_file;
+	/** The file (netCDF file id), this class will work on */
+	int m_file;
 	
 	/** The variable we read */
-	netCDF::NcVar m_variable;
+	int m_variable;
 
 	/** Number of dimension in the netCDF file */
 	int m_dimensions;
 	
-	/** The name of the dimensions in the netcdf file */
+	/** The name of the dimensions in the netCDF file */
 	std::vector<std::string> m_names;
+
+	/** The size of the dimensions in the netCDF file */
+	std::vector<size_t> m_size;
 public:
 	NetCdfReader(const char* filename, int rank);
 	virtual ~NetCdfReader();
@@ -87,7 +92,7 @@ public:
 	 */
 	bool isOpen() const
 	{
-		return m_file != 0L;
+		return m_file < 0;
 	}
 	
 	/**
@@ -105,7 +110,7 @@ public:
 	{
 		if (i >= m_dimensions)
 			return 1;
-		return m_file->getDim(m_names[i]).getSize();
+		return m_size[i];
 	}
 	
 	/**
@@ -116,13 +121,13 @@ public:
 		if (i >= getDimensions())
 			return 0;
 
-		netCDF::NcVar x = m_file->getVar(m_names[i]);
-	
-		if (x.isNull())
+		int x;
+		if (nc_inq_varid(m_file, m_names[i].c_str(), &x) != NC_NOERR)
 			return 0;
 
 		double result;
-		x.getVar(std::vector<size_t>(1, 0), &result);
+		size_t index = 0;
+		nc_get_var1_double(m_file, x, &index, &result);
 		return result;
 	}
 	
@@ -132,10 +137,6 @@ public:
 	 */
 	double getScaling(int i) const
 	{
-		double first, last;
-		std::vector<size_t> index(1);
-		netCDF::NcVar x;
-	
 		if (i >= m_dimensions)
 			return 0.;
 	
@@ -143,14 +144,15 @@ public:
 		if (size == 1)
 			return std::numeric_limits<double>::infinity();
 		
-		x = m_file->getVar(m_names[i]);
-		if (x.isNull())
+		int x;
+		if (nc_inq_varid(m_file, m_names[i].c_str(), &x) != NC_NOERR)
 			return 1;
-	
-		index[0] = 0;
-		x.getVar(index, &first);
-		index[0] = size - 1;
-		x.getVar(index, &last);
+
+		double first, last;
+		size_t index = 0;
+		nc_get_var1_double(m_file, x, &index, &first);
+		index = size - 1;
+		nc_get_var1_double(m_file, x, &index, &last);
 	
 		return (last - first) / (size - 1);
 	}
@@ -171,36 +173,28 @@ public:
 		const size_t *offset,
 		const size_t *size)
 	{
-		// Convert to char, so we can do pointer arithmetic
-		unsigned char* const buffer = static_cast<unsigned char*>(block);
-
 		// The netCDF standard (Coords convention) uses Fortran
 		// dimension ordering -> reverse offset and size arrays
-		std::vector<size_t> actOffset;
-		actOffset.resize(m_dimensions);
-		reverse_copy(offset, offset+m_dimensions, actOffset.begin());
-		std::vector<size_t> actSize;
-		actSize.resize(m_dimensions);
-		reverse_copy(size, size+m_dimensions, actSize.begin());
+		size_t actOffset[m_dimensions];
+		std::reverse_copy(offset, offset+m_dimensions, actOffset);
+		size_t actSize[m_dimensions];
+		std::reverse_copy(size, size+m_dimensions, actSize);
 
-		// Make sure we do not read moe than the available data
+		// Make sure we do not read more than the available data
 		// in each dimension
 		for (int i = 0; i < m_dimensions; i++) {
 			if (actOffset[i] + actSize[i] > getSize(m_dimensions-i-1))
 				actSize[i] = getSize(m_dimensions-i-1) - actOffset[i];
 		}
 
-		// Stride is always 1
-		std::vector<ptrdiff_t> stride(m_dimensions, 1);
-
 		// The distance between 2 values in the internal representation
-		std::vector<ptrdiff_t> imap(m_dimensions);
+		ptrdiff_t imap[m_dimensions];
 		imap[m_dimensions-1] = getBasicSize<T>();
 		for (int i = m_dimensions-2; i >= 0; i--)
 			imap[i] = imap[i+1] * size[m_dimensions-i-1];
 
-		m_variable.getVar(actOffset, actSize, stride, imap,
-				reinterpret_cast<T*>(buffer));
+		getVar(actOffset, actSize, imap,
+			static_cast<T*>(block));
 	}
 	
 	/**
@@ -208,7 +202,12 @@ public:
 	 */
 	unsigned int getVarSize() const
 	{
-		return m_variable.getType().getSize();
+		nc_type type;
+		nc_inq_vartype(m_file, m_variable, &type);
+		size_t size;
+		nc_inq_type(m_file, type, 0L, &size);
+
+		return size;
 	}
 	
 private:
@@ -220,12 +219,64 @@ private:
 	{
 		return 1;
 	}
+
+	/**
+	 * Reads a hyperslab from the netCDF file
+	 */
+	template<typename T>
+	void getVar(const size_t *offset, const size_t *size,
+		const ptrdiff_t *imap, T *buffer);
+
+private:
+	static const ptrdiff_t STRIDE[grid::MAX_DIMENSIONS];
 };
 
 template<> inline
 size_t NetCdfReader::getBasicSize<void>()
 {
 	return getVarSize();
+}
+
+template<> inline
+void NetCdfReader::getVar(const size_t *offset, const size_t *size,
+		const ptrdiff_t *imap, unsigned char *buffer)
+{
+	nc_get_varm_uchar(m_file, m_variable, offset, size, STRIDE, imap, buffer);
+}
+
+template<> inline
+void NetCdfReader::getVar(const size_t *offset, const size_t *size,
+		const ptrdiff_t *imap, int *buffer)
+{
+	nc_get_varm_int(m_file, m_variable, offset, size, STRIDE, imap, buffer);
+}
+
+template<> inline
+void NetCdfReader::getVar(const size_t *offset, const size_t *size,
+		const ptrdiff_t *imap, long *buffer)
+{
+	nc_get_varm_long(m_file, m_variable, offset, size, STRIDE, imap, buffer);
+}
+
+template<> inline
+void NetCdfReader::getVar(const size_t *offset, const size_t *size,
+		const ptrdiff_t *imap, float *buffer)
+{
+	nc_get_varm_float(m_file, m_variable, offset, size, STRIDE, imap, buffer);
+}
+
+template<> inline
+void NetCdfReader::getVar(const size_t *offset, const size_t *size,
+		const ptrdiff_t *imap, double *buffer)
+{
+	nc_get_varm_double(m_file, m_variable, offset, size, STRIDE, imap, buffer);
+}
+
+template<> inline
+void NetCdfReader::getVar(const size_t *offset, const size_t *size,
+		const ptrdiff_t *imap, void *buffer)
+{
+	nc_get_varm(m_file, m_variable, offset, size, STRIDE, imap, buffer);
 }
 
 }

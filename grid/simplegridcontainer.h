@@ -65,7 +65,7 @@ public:
 		unsigned int level = 0);
 	Error open(const char* filename, unsigned int level = 0);
 	
-	char getByte3D(double x, double y = 0, double z = 0,
+	unsigned char getByte3D(double x, double y = 0, double z = 0,
 		unsigned int level = 0);
 	int getInt3D(double x, double y = 0, double z = 0,
 		unsigned int level = 0);

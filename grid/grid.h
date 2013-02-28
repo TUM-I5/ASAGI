@@ -170,7 +170,7 @@ public:
 		return m_max[2];
 	}
 	
-	char getByte(double x, double y = 0, double z = 0);
+	unsigned char getByte(double x, double y = 0, double z = 0);
 	int getInt(double x, double y = 0, double z = 0);
 	long getLong(double x, double y = 0, double z = 0);
 	float getFloat(double x, double y = 0, double z = 0);

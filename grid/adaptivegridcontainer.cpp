@@ -118,7 +118,7 @@ asagi::Grid::Error grid::AdaptiveGridContainer::open(const char* filename,
 	return SUCCESS;
 }
 
-char grid::AdaptiveGridContainer::getByte3D(double x, double y, double z, unsigned int level)
+unsigned char grid::AdaptiveGridContainer::getByte3D(double x, double y, double z, unsigned int level)
 {
 	return getGrid(x, y, z, level)->getByte(x, y, z);
 }

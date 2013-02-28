@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef ASAGI_F95_H
@@ -69,7 +69,7 @@ double f90grid_max_z(int grid_id);
 
 int f90grid_var_size(int grid_id);
 
-char f90grid_get_byte_1d(int grid_id, double x, int level);
+unsigned char f90grid_get_byte_1d(int grid_id, double x, int level);
 int f90grid_get_int_1d(int grid_id, double x, int level);
 long f90grid_get_long_1d(int grid_id, double x, int level);
 float f90grid_get_float_1d(int grid_id, double x, int level);
@@ -77,7 +77,7 @@ double f90grid_get_double_1d(int grid_id, double x, int level);
 void f90grid_get_buf_1d(int grid_id,void* buf, double x,
 	int level);
 
-char f90grid_get_byte_2d(int grid_id, double x, double y,
+unsigned char f90grid_get_byte_2d(int grid_id, double x, double y,
 	int level);
 int f90grid_get_int_2d(int grid_id, double x, double y,
 	int level);
@@ -90,7 +90,7 @@ double f90grid_get_double_2d(int grid_id, double x, double y,
 void f90grid_get_buf_2d(int grid_id,void* buf, double x, double y,
 	int level);
 
-char f90grid_get_byte_3d(int grid_id, double x, double y, double z,
+unsigned char f90grid_get_byte_3d(int grid_id, double x, double y, double z,
 	int level);
 int f90grid_get_int_3d(int grid_id, double x, double y, double z,
 	int level);

@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include <asagi.h>
@@ -138,7 +138,7 @@ unsigned int grid_var_size(grid_handle* handle)
 
 // 1d functions
 
-char grid_get_byte_1d(grid_handle* handle, double x, unsigned int level)
+unsigned char grid_get_byte_1d(grid_handle* handle, double x, unsigned int level)
 {
 	return handle->getByte1D(x, level);
 }
@@ -166,7 +166,7 @@ void grid_get_buf_1d(grid_handle* handle, void* buf, double x,
 
 // 2d functions
 
-char grid_get_byte_2d(grid_handle* handle, double x, double y,
+unsigned char grid_get_byte_2d(grid_handle* handle, double x, double y,
 	unsigned int level)
 {
 	return handle->getByte2D(x, y, level);
@@ -198,8 +198,8 @@ void grid_get_buf_2d(grid_handle* handle, void* buf, double x, double y,
 
 // 3d functions
 
-char grid_get_byte_3d(grid_handle* handle, double x, double y, double z,
-	unsigned int level)
+unsigned char grid_get_byte_3d(grid_handle* handle, double x, double y,
+	double z, unsigned int level)
 {
 	return handle->getByte3D(x, y, z, level);
 }

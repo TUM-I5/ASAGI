@@ -263,9 +263,9 @@ asagi::Grid::Error grid::Grid::open(const char* filename)
 /**
  * @return The value at (x,y,z) as a byte
  */
-char grid::Grid::getByte(double x, double y, double z)
+unsigned char grid::Grid::getByte(double x, double y, double z)
 {
-	char buf;
+	unsigned char buf;
 	getAt(&buf, &types::Type::convertByte, x, y, z);
 	
 	return buf;

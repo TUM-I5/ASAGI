@@ -149,7 +149,7 @@ public:
 		return m_type->getSize();
 	}
 	
-	char getByte1D(double x, unsigned int level = 0)
+	unsigned char getByte1D(double x, unsigned int level = 0)
 	{
 		return getByte3D(x, 0, 0, level);
 	}
@@ -174,7 +174,7 @@ public:
 		getBuf3D(buf, x, 0, 0, level);
 	}
 	
-	char getByte2D(double x, double y, unsigned int level = 0)
+	unsigned char getByte2D(double x, double y, unsigned int level = 0)
 	{
 		return getByte3D(x, y, 0, level);
 	}

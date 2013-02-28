@@ -257,7 +257,7 @@ public:
 	 * 
 	 * @see getByte2D
 	 */
-	virtual char getByte1D(double x, unsigned int level = 0) = 0;
+	virtual unsigned char getByte1D(double x, unsigned int level = 0) = 0;
 	/**
 	 * @ingroup cxx_interface
 	 * 
@@ -299,7 +299,8 @@ public:
 	 * 
 	 * @return The element at (x,y) as a char
 	 */
-	virtual char getByte2D(double x, double y, unsigned int level = 0) = 0;
+	virtual unsigned char getByte2D(double x, double y,
+		unsigned int level = 0) = 0;
 	/**
 	 * @ingroup cxx_interface
 	 * 
@@ -350,7 +351,7 @@ public:
 	
 	/******** 3D ********/
 	
-	virtual char getByte3D(double x, double y, double z,
+	virtual unsigned char getByte3D(double x, double y, double z,
 		unsigned int level = 0) = 0;
 	/**
 	 * @ingroup cxx_interface
@@ -643,7 +644,8 @@ unsigned int grid_var_size(grid_handle* handle);
  * 
  * @see asagi::Grid::getByte1D()
  */
-char grid_get_byte_1d(grid_handle* handle, double x, unsigned int level);
+unsigned char grid_get_byte_1d(grid_handle* handle, double x,
+	unsigned int level);
 /**
  * @ingroup c_interface
  * 
@@ -681,7 +683,7 @@ void grid_get_buf_1d(grid_handle* handle,void* buf, double x,
  * 
  * @see asagi::Grid::getByte2D()
  */
-char grid_get_byte_2d(grid_handle* handle, double x, double y,
+unsigned char grid_get_byte_2d(grid_handle* handle, double x, double y,
 	unsigned int level);
 /**
  * @ingroup c_interface
@@ -724,7 +726,7 @@ void grid_get_buf_2d(grid_handle* handle,void* buf, double x, double y,
  * 
  * @see asagi::Grid::getByte3D()
  */
-char grid_get_byte_3d(grid_handle* handle, double x, double y, double z,
+unsigned char grid_get_byte_3d(grid_handle* handle, double x, double y, double z,
 	unsigned int level);
 /**
  * @ingroup c_interface

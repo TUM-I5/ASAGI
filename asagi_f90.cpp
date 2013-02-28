@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "grid/gridcontainer.h"
@@ -125,7 +125,7 @@ int f90grid_var_size ( int grid_id )
 
 // 1d functions
 
-char f90grid_get_byte_1d(int grid_id, double x, int level)
+unsigned char f90grid_get_byte_1d(int grid_id, double x, int level)
 {
 	return grid::GridContainer::f2c(grid_id)->getByte1D(x, level);
 }
@@ -153,7 +153,7 @@ void f90grid_get_buf_1d(int grid_id, void* buf, double x,
 
 // 2d functions
 
-char f90grid_get_byte_2d(int grid_id, double x, double y,
+unsigned char f90grid_get_byte_2d(int grid_id, double x, double y,
 	int level)
 {
 	return grid::GridContainer::f2c(grid_id)->getByte2D(x, y, level);
@@ -185,7 +185,7 @@ void f90grid_get_buf_2d(int grid_id, void* buf, double x, double y,
 
 // 3d functions
 
-char f90grid_get_byte_3d(int grid_id, double x, double y, double z,
+unsigned char f90grid_get_byte_3d(int grid_id, double x, double y, double z,
 	int level)
 {
 	return grid::GridContainer::f2c(grid_id)->getByte3D(x, y, z, level);

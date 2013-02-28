@@ -30,21 +30,14 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "netcdfreader.h"
 
-#include "grid/constants.h"
-
 #include "debug/dbg.h"
 
 #define DIM_NOT_MAPPED "<not mapped>"
-
-using namespace asagi;
-
-using namespace netCDF;
-using namespace netCDF::exceptions;
 
 /**
  * @param filename The name of the netcdf file
@@ -54,12 +47,13 @@ io::NetCdfReader::NetCdfReader(const char* filename, int rank)
 	: m_filename(filename),
 	m_rank(rank)
 {
-	m_file = 0L;
+	m_file = -1;
 }
 
 io::NetCdfReader::~NetCdfReader()
 {
-	delete m_file;
+	if (m_file >= 0)
+		nc_close(m_file);
 }
 
 /**
@@ -68,39 +62,53 @@ io::NetCdfReader::~NetCdfReader()
  * @param varname The name of the netcdf variable that should be read
  *  later
  */
-Grid::Error io::NetCdfReader::open(const char* varname)
+asagi::Grid::Error io::NetCdfReader::open(const char* varname)
 {
-	try {
-		m_file = new NcFile(m_filename.c_str(), NcFile::read);
-	} catch (NcException& e) {
+	if (nc_open(m_filename.c_str(), NC_NOWRITE, &m_file) != NC_NOERR) {
 		// Could not open file
 		
-		m_file = 0L;
-		return Grid::NOT_OPEN;
+		m_file = -1;
+		return asagi::Grid::NOT_OPEN;
 	}
 	
-	m_variable = m_file->getVar(varname);
+	if (nc_inq_varid(m_file, varname, &m_variable) != NC_NOERR) {
 		
-	if (m_variable.isNull())
-		return Grid::VAR_NOT_FOUND;
+		nc_close(m_file);
+		m_file = -1;
+		return asagi::Grid::VAR_NOT_FOUND;
+	}
 
-	m_dimensions = m_variable.getDimCount();
+	nc_inq_varndims(m_file, m_variable, &m_dimensions);
 	
 	if (m_dimensions > grid::MAX_DIMENSIONS) {
 		dbgDebug(m_rank) << "Unsupported number of variable dimensions:"
 			<< m_dimensions;
-		return Grid::UNSUPPORTED_DIMENSIONS;
+
+		nc_close(m_file);
+		m_file = -1;
+		return asagi::Grid::UNSUPPORTED_DIMENSIONS;
 	}
-	
+
 	dbgDebug(m_rank) << "Dimension mapping:";
+	int dimIds[m_dimensions];
+	nc_inq_vardimid(m_file, m_variable, dimIds);
 	for (int i = 0; i < m_dimensions; i++) {
 		// Translates dimension order from Fortran to C/C++
-		m_names.push_back(m_variable.getDim(m_dimensions - i - 1)
-			.getName());
+		char name[NC_MAX_NAME+1];
+		size_t size;
+
+		nc_inq_dim(m_file, dimIds[m_dimensions - i - 1], name, &size);
+		m_names.push_back(name);
+		m_size.push_back(size);
 		
 		dbgDebug(m_rank) << "\t" << grid::DIMENSION_NAMES[i] << ":="
 			<< m_names[i];
 	}
 	
-	return Grid::SUCCESS;
+	return asagi::Grid::SUCCESS;
 }
+
+/**
+ * The stride is always 1 in each dimension, thus we define the stride array only once.
+ */
+const ptrdiff_t io::NetCdfReader::STRIDE[grid::MAX_DIMENSIONS] = {1, 1, 1};

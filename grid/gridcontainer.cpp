@@ -77,7 +77,7 @@ grid::GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	if (isArray) {
 		switch (type) {
 		case BYTE:
-			m_type = new types::ArrayType<char>();
+			m_type = new types::ArrayType<unsigned char>();
 			break;
 		case INT:
 			m_type = new types::ArrayType<int>();
@@ -99,7 +99,7 @@ grid::GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	} else {
 		switch (type) {
 		case BYTE:
-			m_type = new types::BasicType<char>();
+			m_type = new types::BasicType<unsigned char>();
 			break;
 		case INT:
 			m_type = new types::BasicType<int>();

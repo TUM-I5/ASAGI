@@ -67,7 +67,7 @@ public:
 	
 	void convertByte(const void* data, void* buf)
 	{
-		*static_cast<char*>(buf) = *static_cast<const T*>(data);
+		*static_cast<unsigned char*>(buf) = *static_cast<const T*>(data);
 	}
 	
 	void convertInt(const void* data, void* buf)
@@ -92,11 +92,35 @@ public:
 };
 
 #ifndef ASAGI_NOMPI
-template<> MPI_Datatype BasicType<char>::getMPIType();
-template<> MPI_Datatype BasicType<int>::getMPIType();
-template<> MPI_Datatype BasicType<long>::getMPIType();
-template<> MPI_Datatype BasicType<float>::getMPIType();
-template<> MPI_Datatype BasicType<double>::getMPIType();
+template<> inline
+MPI_Datatype BasicType<unsigned char>::getMPIType()
+{
+	return MPI_BYTE;
+}
+
+template<> inline
+MPI_Datatype BasicType<int>::getMPIType()
+{
+	return MPI_INT;
+}
+
+template<> inline
+MPI_Datatype BasicType<long>::getMPIType()
+{
+	return MPI_LONG;
+}
+
+template<> inline
+MPI_Datatype BasicType<float>::getMPIType()
+{
+	return MPI_FLOAT;
+}
+
+template<> inline
+MPI_Datatype BasicType<double>::getMPIType()
+{
+	return MPI_DOUBLE;
+}
 #endif // ASAGI_NOMPI
 
 }

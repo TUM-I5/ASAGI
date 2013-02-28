@@ -30,36 +30,8 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "basictype.h"
 
-using namespace types;
-
-#ifndef ASAGI_NOMPI
-template<> MPI_Datatype BasicType<char>::getMPIType()
-{
-	return MPI_BYTE;
-}
-
-template<> MPI_Datatype BasicType<int>::getMPIType()
-{
-	return MPI_INT;
-}
-
-template<> MPI_Datatype BasicType<long>::getMPIType()
-{
-	return MPI_LONG;
-}
-
-template<> MPI_Datatype BasicType<float>::getMPIType()
-{
-	return MPI_FLOAT;
-}
-
-template<> MPI_Datatype BasicType<double>::getMPIType()
-{
-	return MPI_DOUBLE;
-}
-#endif // ASAGI_NOMPI

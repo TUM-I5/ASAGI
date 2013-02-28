@@ -111,7 +111,7 @@ asagi::Grid::Error grid::SimpleGridContainer::open(const char* filename,
 	return result;
 }
 
-char grid::SimpleGridContainer::getByte3D(double x, double y,
+unsigned char grid::SimpleGridContainer::getByte3D(double x, double y,
 	double z, unsigned int level)
 {
 	assert(level < m_levels);

@@ -30,7 +30,7 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "structtype.h"
@@ -51,7 +51,7 @@ types::Type* types::createStruct(
 	
 	switch (types[0]) {
 	case asagi::Grid::BYTE:
-		return new types::StructType<char>(count, blockLength,
+		return new types::StructType<unsigned char>(count, blockLength,
 			displacements, types);
 	case asagi::Grid::INT:
 		return new types::StructType<int>(count, blockLength,
