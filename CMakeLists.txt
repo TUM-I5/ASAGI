@@ -87,7 +87,6 @@ if( NOT NOMPI )
 endif( NOT NOMPI )
 
 # Find netcdf
-set( NETCDF_CXX4 "YES" )
 find_package( NetCDF REQUIRED )
 include_directories( SYSTEM ${NETCDF_INCLUDES} )
 
