@@ -16,8 +16,10 @@ function( add_test_executable name )
 		# Link with mpi library
 		target_link_libraries( test_${name} ${MPI_C_LIBRARIES} )
 	endif( ARGV1 )
-	# Tests require test_prepare
-	add_dependencies( test_${name} test_prepare )
+	# Tests require tests.h (the generated header)
+	set_source_files_properties( ${name}.cpp
+	    PROPERTIES OBJECT_DEPENDS ${test_header} )
+    add_dependencies( test_${name} generate_test_header )
 endfunction( add_test_executable )
 
 # Adds an MPI test
@@ -45,10 +47,17 @@ add_executable( test_prepare
 target_link_libraries( test_prepare
 	${NETCDF_LIBRARIES} )
 
-# Always execute test_prepare after build
-add_custom_command( TARGET test_prepare
-	POST_BUILD
-	COMMAND test_prepare )
+# Add rule to generate test header
+add_custom_command( OUTPUT tests.h
+	COMMAND test_prepare
+	MAIN_DEPENDENCY test_prepare )
+add_custom_target( generate_test_header
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests.h )
+
+# Define test header location
+set( test_header ${CMAKE_CURRENT_BINARY_DIR}/tests.h )
+#set_source_files_properties( ${test_header}
+#    PROPERTIES GENERATED true )
 
 # Add directory for generated header files
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
@@ -65,7 +74,6 @@ add_test_executable( adaptivegrid2d YES )
 add_test_executable( localcachegrid2d )
 add_test_executable( passthroughgrid2d )
 add_test_executable( staticgrid2d )
-
 
 # Unit Tests
 add_subdirectory( unittest )
