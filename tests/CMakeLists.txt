@@ -56,8 +56,6 @@ add_custom_target( generate_test_header
 
 # Define test header location
 set( test_header ${CMAKE_CURRENT_BINARY_DIR}/tests.h )
-#set_source_files_properties( ${test_header}
-#    PROPERTIES GENERATED true )
 
 # Add directory for generated header files
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
