@@ -50,6 +50,13 @@ template<typename T>
 class MPIAllocator : public Allocator<T>
 {
 public:
+	/**
+	 * Empty constructor, required by new gcc versions
+	 */
+	MPIAllocator()
+	{
+	}
+
 	asagi::Grid::Error allocate(size_t size, T* &ptr) const
 	{
 		if (MPI_Alloc_mem(size * sizeof(T), MPI_INFO_NULL, &ptr) != MPI_SUCCESS)

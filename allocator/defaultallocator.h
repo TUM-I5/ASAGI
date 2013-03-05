@@ -50,6 +50,13 @@ template<typename T>
 class DefaultAllocator : public Allocator<T>
 {
 public:
+	/**
+	 * Empty constructor, required by newer gcc versions
+	 */
+	DefaultAllocator()
+	{
+	}
+
 	asagi::Grid::Error allocate(size_t size, T* &ptr) const
 	{
 		ptr = new T[size];
