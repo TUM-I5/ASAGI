@@ -220,23 +220,21 @@ asagi::Grid::Error grid::Grid::open(const char* filename)
 		if (isinf(scaling[i])) {
 			m_min[i] = -std::numeric_limits<double>::infinity();
 			m_max[i] = std::numeric_limits<double>::infinity();
-		} else if (m_container.getValuePos()
-				== GridContainer::CELL_CENTERED) {
-			m_min[i] = m_offset[i] + std::min(scaling[i] * (0. - 0.5),
-				scaling[i] * (m_dim[i] - 1 - 0.5));
-			m_max[i] =  (m_offset[i] + std::max(scaling[i] * (0. - 0.5),
-				scaling[i] * (m_dim[i] - 1 + 0.5)))
-				* (1 - NUMERIC_PRECISION);
 		} else {
-			m_min[i] = m_offset[i] + std::min(0.,
-				(m_dim[i] - 1) * scaling[i]);
-			m_max[i] = m_offset[i] + std::max(0.,
-				(m_dim[i] - 1) * scaling[i]);
+			// Warning: min and max are inverted of scaling is negative
+			double min = m_offset[i];
+			double max = m_offset[i] + scaling[i] * (m_dim[i] - 1);
+
+			if (m_container.getValuePos()
+				== GridContainer::CELL_CENTERED) {
+				// Add half a cell on both ends
+				min -= scaling[i] * (0.5 - NUMERIC_PRECISION);
+				max += scaling[i] * (0.5 - NUMERIC_PRECISION);
+			}
+
+			m_min[i] = std::min(min, max);
+			m_max[i] = std::max(min, max);
 		}
-		
-		if (m_max[i] < m_min[i])
-			// Can happen because of NUMERIC_PRECISION
-			m_max[i] = m_min[i];
 	}
 	
 	// Set default cache size
