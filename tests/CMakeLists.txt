@@ -50,7 +50,7 @@ target_link_libraries( test_prepare
 # Add rule to generate test header
 add_custom_command( OUTPUT tests.h
 	COMMAND test_prepare
-	MAIN_DEPENDENCY test_prepare )
+	DEPENDENCIES test_prepare )
 add_custom_target( generate_test_header
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests.h )
 
