@@ -41,6 +41,10 @@
 namespace grid
 {
 
+/**
+ * A simple grid that passes every access directly to the underlying
+ * I/O layer.
+ */
 class PassThroughGrid : public Grid
 {
 private:

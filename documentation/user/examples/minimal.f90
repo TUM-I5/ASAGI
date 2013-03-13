@@ -1,4 +1,7 @@
-include 'asagi.inc'
+! You have two options:
+! - Include the module file _once_ in your project:
+!include 'asagi.f90'
+! - Compile and link the module file as any other file in your project
 
 program minimal
   use mpi

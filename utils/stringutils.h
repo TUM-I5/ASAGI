@@ -47,7 +47,9 @@
 namespace utils
 {
 
-
+/**
+ * A collection of useful string functions based on std::string
+ */
 class StringUtils
 {
 public:

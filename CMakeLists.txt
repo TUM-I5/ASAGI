@@ -4,7 +4,7 @@ cmake_minimum_required( VERSION 2.8 )
 project( ASAGI )
 
 set( ASAGI_VERSION_MAJOR 0 )
-set( ASAGI_VERSION_MINOR 2 )
+set( ASAGI_VERSION_MINOR 3 )
 
 ##### User configuration #####
 option( STATIC_LIB "Compile asagi as static library" OFF )

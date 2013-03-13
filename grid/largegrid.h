@@ -57,7 +57,7 @@ private:
 	 * Information about which blocks are currently stored on which node.
 	 * <br>
 	 * Structure: <br>
-	 * This array consists of {@link m_dictCount} elements.
+	 * This array consists of {@link getLocalBlockCount()} elements.
 	 * Each element stores information about one block. It is a list of
 	 * node/offset pairs which indicate where the block is currently stored.
 	 * The length of the list is determind by {@link m_dictEntries}. The

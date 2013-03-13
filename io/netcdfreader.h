@@ -162,11 +162,9 @@ public:
 	 *  to T.
 	 * 
 	 * @param block The buffer where the values are written to
-	 * @param offset Offset of the block (at least {@link getDim()}
+	 * @param offset Offset of the block (at least {@link getDimensions() values}
 	 *  values)
-	 * @param size Size of the block (at least {@link getDim()} values)
-	 * @param internalSize Number of bytes used for one value,
-	 *  can be different from size in the netcdf file
+	 * @param size Size of the block (at least {@link getDimensions()} values)
 	 */
 	template<typename T>
 	void getBlock(void *block,

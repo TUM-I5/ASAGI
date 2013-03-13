@@ -54,6 +54,9 @@ grid::AdaptiveGridContainer::AdaptiveGridContainer(asagi::Grid::Type type,
 	m_ids = 0;
 }
 
+/**
+ * @see GridContainer::GridContainer()
+ */
 grid::AdaptiveGridContainer::AdaptiveGridContainer(unsigned int count,
 		unsigned int blockLength[],
 		unsigned long displacements[],

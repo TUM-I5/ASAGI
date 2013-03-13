@@ -33,14 +33,14 @@
  * used by default. (C does not support default arguments or overloading,
  * therefore omitting arguments is not possible when using the C interface.)
  *
- * For grids with multiple levels {@link Grid::open()} must be called once for
- * each level. Several levels can be stored in a single NetCDF file with
- * different variable names. (Use {@link Grid::setParam()} to specify the
+ * For grids with multiple levels {@link asagi::Grid::open()} must be called once
+ * for each level. Several levels can be stored in a single NetCDF file with
+ * different variable names. (Use {@link asagi::Grid::setParam()} to specify the
  * variable name.) The coarsest resolution should have the level id 0. With
  * ascending level id, the resolution should get finer. When accessing values
  * with any <code>get</code> function, the level of detail can be selected with
- * the last argument. The function {@link Grid::close()} has to be called only
- * once for the whole grid.
+ * the last argument. The function {@link asagi::Grid::close()} has to be called
+ * only once for the whole grid.
  *
  * @section coordinatemapping Coordinate mapping
  *
@@ -63,7 +63,7 @@
  * @section valuepos Value position
  *
  * ASAGI supports cell-centered and vertex-centered grids. The value position
- * can be switched with {@link Grid::setParam()}.
+ * can be switched with {@link asagi::Grid::setParam()}.
  *
  * @image html valueposition.svg "Cell-centered and vertex-centered grids"
  * @image latex valueposition.eps "Cell-centered and vertex-centered grids"

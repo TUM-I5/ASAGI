@@ -48,6 +48,10 @@
 namespace grid
 {
 
+/**
+ * A grid that maintains a local cache for blocks. Can be combined with other
+ * grid, e.g. StaticGrid.
+ */
 class LocalCacheGrid : virtual public Grid
 {
 private:

@@ -45,6 +45,10 @@ namespace types {
  */
 template<typename T> class StructType : public BasicType<T>
 {
+	/**
+	 * This friend function should be used to create struct types.
+	 * We can not use a static function because StructType is a template.
+	 */
 	friend Type* createStruct(unsigned int count, unsigned int blockLength[],
 		unsigned long displacements[], asagi::Grid::Type types[]);
 private:
@@ -66,6 +70,12 @@ private:
 #endif // ASAGI_NOMPI
 
 private:
+	/**
+	 * @param count Number of elements in the struct
+	 * @param blockLength Size of each element in the struct
+	 * @param displacements Offset of each element in the struct
+	 * @param types Type of each element in the struct
+	 */
 	StructType(unsigned int count, unsigned int blockLength[],
 		unsigned long displacements[], asagi::Grid::Type types[])
 	{
@@ -164,6 +174,9 @@ public:
 		return m_mpiType;
 	}
 #endif // ASAGI_NOMPI
+
+public:
+
 };
 
 Type* createStruct(

@@ -41,6 +41,10 @@
 
 #include <cstdlib>
 
+/**
+ * @param gridCreator The grid creator that should be used to create
+ *  a new grid
+ */
 grid::MultiGrid::MultiGrid(GridCreator &gridCreator)
 	: m_gridCreator(gridCreator),
 	  m_topLevel(false),

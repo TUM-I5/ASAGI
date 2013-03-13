@@ -130,6 +130,14 @@ grid::GridContainer::GridContainer(Type type, bool isArray, unsigned int hint,
 	m_mpiSize = 1;
 }
 
+/**
+ * @param count Number of elements in the struct
+ * @param blockLength Size of each element in the struct
+ * @param displacements Offset of each element in the struct
+ * @param types Type of each element in the struct
+ * @param hint Any performance hints
+ * @param levels The number of levels
+ */
 grid::GridContainer::GridContainer(unsigned int count,
 		unsigned int blockLength[],
 		unsigned long displacements[],

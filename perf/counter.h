@@ -52,7 +52,7 @@ namespace perf
 class Counter
 {
 private:
-	/* Number of available native counters */
+	/** Number of available native counters */
 	static const unsigned int NATIVE_COUNTER_SIZE = 3;
 
 public:

@@ -39,8 +39,14 @@
 namespace grid
 {
 
+/**
+ * Maximum number of dimensions supported by the library
+ */
 const int MAX_DIMENSIONS = 3;
 
+/**
+ * Dimension names
+ */
 const char* const DIMENSION_NAMES[MAX_DIMENSIONS] = {
 	"x",
 	"y",

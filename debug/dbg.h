@@ -263,6 +263,9 @@ public:
 	}
 };
 
+/**
+ * Add a std::vector<T> to the message
+ */
 template <typename T>
 inline Dbg &operator<<(Dbg debug, const std::vector<T> &list)
 {

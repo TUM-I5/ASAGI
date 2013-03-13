@@ -10,25 +10,7 @@
  * @subsection NetCDF
  * 
  * ASAGI uses the NetCDF library (http://www.unidata.ucar.edu/software/netcdf/)
- * to load data files. 
- * 
- * <b>Version <= 4.1.3</b>
- * 
- * Since most standard NetCDF packages do not support the new NetCDF-4 C++
- * interface, you may need to compile the NetCDF library yourself.
- *
- * To enable the NetCDF-4 C++ support, make sure to add the option
- * "enable-cxx-4" to the Configure script:
- * @code{.sh}
- * ./configure --enable-shared --enable-cxx-4 --prefix=<install_dir>
- * make
- * make install
- * @endcode
- * 
- * <b>Version >= 4.2</b>
- * 
- * The C++ interface is no longer part of the main package. You need the
- * standard C library as well as the <i>new</i> C++ library.
+ * to load data files.
  *
  * @section Compilation
  *
@@ -49,8 +31,8 @@
  *  for C and Fortran examples and tests.
  * @li @b Libraries The <code>CMAKE_PREFIX_PATH</code> is used when searching
  *  for the MPI, NetCDF and PNG library. If NetCDF was configured with
- *  <code>--prefix=\<in-stall_dir\></code> for example, set
- *  <code>CMAKE\_PREFIX\_PATH=\<install_dir\></code>.
+ *  <code>--prefix=\<install_dir\></code> for example, set
+ *  <code>CMAKE_PREFIX_PATH=\<install_dir\></code>.
  *
  * Besides the environment variables, you can change the behavior by setting
  * internal CMake variables. They can be configured by adding one ore more
@@ -76,6 +58,15 @@
  * @li <b>THREADSAFETY = ON | OFF</b> If enabled all ASAGI functions are
  *  thread-safe. This is required, for example, if ASAGI is used in hybrid
  *  MPI/OpenMP programs. <code>[ON]</code>
+ * @li <b>NOMPI = ON | OFF</b> Do not compile with MPI support. All algorithms
+ *  that require communication will be disabled. <code>[OFF]</code>
+ *
+ * @section Tests
+ *
+ * If you have enabled the tests, you can run them with the following command:
+ * @code{.sh}
+ * make test
+ * @endcode
  *
  * @section Installation
  *
