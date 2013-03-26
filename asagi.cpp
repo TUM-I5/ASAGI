@@ -51,7 +51,7 @@ asagi::Grid* asagi::Grid::createArray(Type basicType, unsigned int hint,
 	unsigned int levels)
 {
 	if (hint & ADAPTIVE)
-		return new grid::AdaptiveGridContainer(basicType, false, hint, levels);
+		return new grid::AdaptiveGridContainer(basicType, true, hint, levels);
 	return new grid::SimpleGridContainer(basicType, true, hint, levels);
 }
 
