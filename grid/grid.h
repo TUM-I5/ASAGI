@@ -52,6 +52,14 @@ namespace io
 	class NetCdfReader;
 }
 
+/**
+ * @brief The heart of ASAGI
+ *
+ * It contains several different components:
+ * @li GridContainer: Represents a whole grid with all levels.
+ * @li Grid: Describes a rectangular region of one level. It handles
+ *  migration of chunks and provides access to single grid points.
+ */
 namespace grid
 {
 
