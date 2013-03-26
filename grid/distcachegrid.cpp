@@ -33,7 +33,7 @@
  * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "largegrid.h"
+#include "distcachegrid.h"
 
 #include "allocator/mpiallocator.h"
 
@@ -48,7 +48,7 @@
  * 
  * @see Grid::Grid()
  */
-grid::LargeGrid::LargeGrid(const GridContainer& container,
+grid::DistCacheGrid::DistCacheGrid(const GridContainer& container,
 	unsigned int hint, unsigned int id)
 	: Grid(container, hint),
 	  LocalCacheGrid(container, hint,
@@ -62,7 +62,7 @@ grid::LargeGrid::LargeGrid(const GridContainer& container,
 	m_dictWin = MPI_WIN_NULL;
 }
 
-grid::LargeGrid::~LargeGrid()
+grid::DistCacheGrid::~DistCacheGrid()
 {
 	if (m_dataWin != MPI_WIN_NULL)
 		MPI_Win_free(&m_dataWin);
@@ -72,7 +72,7 @@ grid::LargeGrid::~LargeGrid()
 	MPI_Free_mem(m_dictionary);
 }
 
-asagi::Grid::Error grid::LargeGrid::init()
+asagi::Grid::Error grid::DistCacheGrid::init()
 {
 	unsigned long blockSize = getTotalBlockSize();
 	unsigned long dictCount = getLocalBlockCount();
@@ -113,7 +113,7 @@ asagi::Grid::Error grid::LargeGrid::init()
 	return m_globalMutex.init(getMPICommunicator());
 }
 
-void grid::LargeGrid::getBlock(unsigned long block,
+void grid::DistCacheGrid::getBlock(unsigned long block,
 	long oldBlock,
 	unsigned long cacheIndex,
 	unsigned char *cache)
@@ -273,7 +273,7 @@ void grid::LargeGrid::getBlock(unsigned long block,
  * @param[out] rank The rank that contains the block
  * @param[out] offset The index  of the block in the data window
  */
-void grid::LargeGrid::getBlockInfo(unsigned long* dictEntry, unsigned long localOffset,
+void grid::DistCacheGrid::getBlockInfo(unsigned long* dictEntry, unsigned long localOffset,
 	int &rank, unsigned long &offset)
 {
 	unsigned long pos; // Position in the list, we will use
@@ -304,7 +304,7 @@ void grid::LargeGrid::getBlockInfo(unsigned long* dictEntry, unsigned long local
 /**
  * Remove the the current rank form the entry
  */
-void grid::LargeGrid::deleteBlockInfo(unsigned long* dictEntry)
+void grid::DistCacheGrid::deleteBlockInfo(unsigned long* dictEntry)
 {
 	unsigned int i;
 	
@@ -324,7 +324,7 @@ void grid::LargeGrid::deleteBlockInfo(unsigned long* dictEntry)
 /**
  * @return The actual number of elements of single list
  */
-unsigned long grid::LargeGrid::getDictLength()
+unsigned long grid::DistCacheGrid::getDictLength()
 {
 	return m_dictEntries * 2 + 1;
 }

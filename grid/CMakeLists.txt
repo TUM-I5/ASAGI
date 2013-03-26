@@ -4,15 +4,15 @@ set( gridSources
 	grid.cpp
     gridcontainer.cpp
     localcachegrid.cpp
+	localstaticgrid.cpp
 	multigrid.cpp
 	passthroughgrid.cpp
-	simplegridcontainer.cpp
-	staticgrid.cpp )
+	simplegridcontainer.cpp )
 if( NOT NOMPI )
 	set( gridSources
 		${gridSources}
-		largegrid.cpp
-		mpicachegrid.cpp )
+		distcachegrid.cpp
+		diststaticgrid.cpp )
 endif( NOT NOMPI )
 
 ##### Library #####

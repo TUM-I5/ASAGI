@@ -33,7 +33,7 @@
  * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "mpicachegrid.h"
+#include "diststaticgrid.h"
 
 #include <cassert>
 #include <malloc.h>
@@ -46,23 +46,23 @@
 /**
  * @see StaticGrid::StaticGrid()
  */
-grid::MPICacheGrid::MPICacheGrid(const GridContainer &container,
+grid::DistStaticGrid::DistStaticGrid(const GridContainer &container,
 	unsigned int hint)
 	: Grid(container, hint),
-	  StaticGrid(container, hint,
+	  LocalStaticGrid(container, hint,
 			  allocator::MPIAllocator<unsigned char>::allocator),
 	  LocalCacheGrid(container, hint)
 {
 	m_window = MPI_WIN_NULL;
 }
 
-grid::MPICacheGrid::~MPICacheGrid()
+grid::DistStaticGrid::~DistStaticGrid()
 {
 	if (m_window != MPI_WIN_NULL)
 		MPI_Win_free(&m_window);
 }
 
-asagi::Grid::Error grid::MPICacheGrid::init()
+asagi::Grid::Error grid::DistStaticGrid::init()
 {
 	unsigned long blockSize = getTotalBlockSize();
 	unsigned long masterBlockCount = getLocalBlockCount();
@@ -74,7 +74,7 @@ asagi::Grid::Error grid::MPICacheGrid::init()
 		return error;
 
 	// Distribute the blocks
-	error = StaticGrid::init();
+	error = LocalStaticGrid::init();
 	if (error != asagi::Grid::SUCCESS)
 		return error;
 	
@@ -90,7 +90,7 @@ asagi::Grid::Error grid::MPICacheGrid::init()
 	return asagi::Grid::SUCCESS;
 }
 
-void grid::MPICacheGrid::getAt(void* buf, types::Type::converter_t converter,
+void grid::DistStaticGrid::getAt(void* buf, types::Type::converter_t converter,
 	unsigned long x, unsigned long y, unsigned long z)
 {
 	unsigned long block = getBlockByCoords(x, y, z);
@@ -98,7 +98,7 @@ void grid::MPICacheGrid::getAt(void* buf, types::Type::converter_t converter,
 	
 	if (remoteRank == getMPIRank()) {
 		// Nice, this is a block where we are the master
-		StaticGrid::getAt(buf, converter, x, y, z);
+		LocalStaticGrid::getAt(buf, converter, x, y, z);
 		return;
 	}
 	
@@ -109,7 +109,7 @@ void grid::MPICacheGrid::getAt(void* buf, types::Type::converter_t converter,
 /**
  * Transfer the block form the remote rank, that holds it
  */
-void grid::MPICacheGrid::getBlock(unsigned long block,
+void grid::DistStaticGrid::getBlock(unsigned long block,
 	long oldBlock,
 	unsigned long cacheIndex,
 	unsigned char *cache)

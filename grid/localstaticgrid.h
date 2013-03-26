@@ -33,8 +33,8 @@
  * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_STATICGRID_H
-#define GRID_STATICGRID_H
+#ifndef GRID_LOCALSTATICGRID_H
+#define GRID_LOCALSTATICGRID_H
 
 #include "grid.h"
 
@@ -51,7 +51,7 @@ namespace grid
  * 
  * If compiled without MPI, all blocks are local.
  */
-class StaticGrid : virtual public Grid
+class LocalStaticGrid : virtual public Grid
 {
 private:
 	/** Local data cache */
@@ -61,11 +61,11 @@ private:
 	const allocator::Allocator<unsigned char> &m_allocator;
 
 public:
-	StaticGrid(const GridContainer &container,
+	LocalStaticGrid(const GridContainer &container,
 		unsigned int hint = asagi::Grid::NO_HINT,
 		const allocator::Allocator<unsigned char> &allocator
 			= allocator::DefaultAllocator<unsigned char>::allocator);
-	virtual ~StaticGrid();
+	virtual ~LocalStaticGrid();
 	
 protected:
 	virtual asagi::Grid::Error init();
@@ -84,4 +84,4 @@ protected:
 
 }
 
-#endif // GRID_STATICGRID_H
+#endif // GRID_LOCALSTATICGRID_H

@@ -36,11 +36,11 @@
 #include "gridcontainer.h"
 
 #include "grid/localcachegrid.h"
+#include "grid/localstaticgrid.h"
 #include "grid/passthroughgrid.h"
-#include "grid/staticgrid.h"
 #ifndef ASAGI_NOMPI
-#include "grid/mpicachegrid.h"
-#include "grid/largegrid.h"
+#include "grid/diststaticgrid.h"
+#include "grid/distcachegrid.h"
 #endif // ASAGI_NOMPI
 
 #include "types/arraytype.h"
@@ -252,16 +252,16 @@ grid::Grid* grid::GridContainer::createGrid(unsigned int hint,
 		if (hint & SMALL_CACHE)
 			return new LocalCacheGrid(*this, hint);
 
-		return new StaticGrid(*this, hint);
+		return new LocalStaticGrid(*this, hint);
 #ifndef ASAGI_NOMPI
 	}
 #endif // ASAGI_NOMPI
 
 #ifndef ASAGI_NOMPI
 	if (hint & LARGE_GRID)
-		return new LargeGrid(*this, hint, id);
+		return new DistCacheGrid(*this, hint, id);
 
-	return new MPICacheGrid(*this, hint);
+	return new DistStaticGrid(*this, hint);
 #endif // ASAGI_NOMPI
 }
 

@@ -33,8 +33,8 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_LARGEGRID_H
-#define GRID_LARGEGRID_H
+#ifndef GRID_DISTCACHEGRID_H
+#define GRID_DISTCACHEGRID_H
 
 #include "localcachegrid.h"
 
@@ -47,7 +47,7 @@ namespace grid
  * Stores one grid. It maintains a directory where the current location
  * of blocks is stored. Blocks are only loaded dynamically when required.
  */
-class LargeGrid : public LocalCacheGrid
+class DistCacheGrid : public LocalCacheGrid
 {
 private:
 	/** The window that holds the blocks */
@@ -78,10 +78,10 @@ private:
 	mpi::Mutex m_globalMutex;
 	
 public:
-	LargeGrid(const GridContainer& container,
+	DistCacheGrid(const GridContainer& container,
 		unsigned int hint = asagi::Grid::NO_HINT,
 		unsigned int id = 0);
-	virtual ~LargeGrid();
+	virtual ~DistCacheGrid();
 protected:
 	asagi::Grid::Error init();
 
@@ -99,4 +99,4 @@ private:
 
 }
 
-#endif // GRID_LARGEGRID_H
+#endif // GRID_DISTCACHEGRID_H

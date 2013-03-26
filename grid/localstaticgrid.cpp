@@ -33,12 +33,12 @@
  * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "staticgrid.h"
+#include "localstaticgrid.h"
 
 /**
  * @see Grid::Grid()
  */
-grid::StaticGrid::StaticGrid(const GridContainer &container,
+grid::LocalStaticGrid::LocalStaticGrid(const GridContainer &container,
 	unsigned int hint,
 	const allocator::Allocator<unsigned char> &allocator)
 	: Grid(container, hint),
@@ -47,12 +47,12 @@ grid::StaticGrid::StaticGrid(const GridContainer &container,
 	m_data = 0L;
 }
 
-grid::StaticGrid::~StaticGrid()
+grid::LocalStaticGrid::~LocalStaticGrid()
 {
 	m_allocator.free(m_data);
 }
 
-asagi::Grid::Error grid::StaticGrid::init()
+asagi::Grid::Error grid::LocalStaticGrid::init()
 {
 	unsigned long blockSize = getTotalBlockSize();
 	size_t block[3];
@@ -84,7 +84,7 @@ asagi::Grid::Error grid::StaticGrid::init()
 	return asagi::Grid::SUCCESS;
 }
 
-void grid::StaticGrid::getAt(void* buf, types::Type::converter_t converter,
+void grid::LocalStaticGrid::getAt(void* buf, types::Type::converter_t converter,
 	long unsigned int x, long unsigned int y, long unsigned int z)
 {
 	unsigned long blockSize = getTotalBlockSize();

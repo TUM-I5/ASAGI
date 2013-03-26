@@ -33,11 +33,11 @@
  * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_MPICACHEGRID_H
-#define GRID_MPICACHEGRID_H
+#ifndef GRID_DISTSTATICGRID_H
+#define GRID_DISTSTATICGRID_H
 
 #include "localcachegrid.h"
-#include "staticgrid.h"
+#include "localstaticgrid.h"
 
 #ifndef THREADSAFETY
 #include <mutex>
@@ -53,15 +53,15 @@ namespace grid
  * across all MPI tasks. If a block is not available, it is transfered via
  * MPI and stored in a cache.
  */
-class MPICacheGrid : public StaticGrid, public LocalCacheGrid
+class DistStaticGrid : public LocalStaticGrid, public LocalCacheGrid
 {
 private:
 	/** MPI window for communication */
 	MPI_Win m_window;
 public:
-	MPICacheGrid(const GridContainer &container,
+	DistStaticGrid(const GridContainer &container,
 		unsigned int hint = asagi::Grid::NO_HINT);
-	virtual ~MPICacheGrid();
+	virtual ~DistStaticGrid();
 	
 protected:
 	asagi::Grid::Error init();
@@ -86,5 +86,5 @@ protected:
 
 }
 
-#endif // GRID_MPICACHEGRID_H
+#endif // GRID_DISTSTATICGRID_H
 
