@@ -49,13 +49,13 @@
 #ifndef MPI_INCLUDED
 #define MPI_INCLUDED
 #define MPI_INCLUDED_NETCDF
-#endif
-#endif
+#endif // MPI_INCLUDED
+#endif // ASAGI_NOMPI
 #include <netcdf.h>
 #ifdef MPI_INCLUDED_NETCDF
 #undef MPI_INCLUDED
 #undef MPI_INCLUDED_NETCDF
-#endif
+#endif // MPI_INCLUDED_NETCDF
 
 #include "debug/dbg.h"
 
