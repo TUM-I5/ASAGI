@@ -156,90 +156,12 @@ public:
 		return *this;
 	}
 	
-	/********** Char(s) ***********/
-	
 	/**
-	 * Add a text to the message
+	 * Default function to add messages
 	 */
-	Dbg &operator<<(const char* t)
+	template<typename T>
+	Dbg &operator<<(T t)
 	{
-		stream->buffer << t;
-		return maybeSpace();
-	}
-	
-	/**
-	 * Add a single char
-	 */
-	Dbg &operator<<(char t)
-	{
-		stream->buffer << t;
-		return maybeSpace();
-	}
-
-	/********** Strings ***********/
-	
-	/**
-	 * Add a string variable to the message
-	 */
-	Dbg &operator<<(const std::string& t)
-	{
-		stream->buffer << '"' << t << '"';
-		return maybeSpace();
-	}
-	
-	/********** Numbers ***********/
-	
-	/**
-	 * Add an integer to the message
-	 */
-	Dbg &operator<<(int t)
-	{
-		stream->buffer << t;
-		return  maybeSpace();
-	}
-	
-	/**
-	 * Add an unsigned integer to the message
-	 */
-	Dbg &operator<<(unsigned int t)
-	{
-		stream->buffer << t;
-		return  maybeSpace();
-	}
-	
-	/**
-	 * Add a long integer to the message
-	 */
-	Dbg &operator<<(long t)
-	{
-		stream->buffer << t;
-		return maybeSpace();
-	}
-	
-	/**
-	 * Add a unsigned long to the message
-	 */
-	Dbg &operator<<(unsigned long t)
-	{
-		stream->buffer << t;
-		return maybeSpace();
-	}
-	
-	/**
-	 * Add a double to the message
-	 */
-	Dbg &operator<<(double t)
-	{
-		stream->buffer << t;
-		return maybeSpace();
-	}
-	
-	/********* Pointers ***********/
-	
-	/**
-	 * Add a pointer (not the object it points to!) to the message
-	 */
-	Dbg &operator<<(const void* t) {
 		stream->buffer << t;
 		return maybeSpace();
 	}
@@ -262,6 +184,16 @@ public:
 		return *this;
 	}
 };
+
+/**
+ * Add a string variable to the message
+ */
+template<>
+inline Dbg& Dbg::operator<<(const std::string& t)
+{
+	stream->buffer << '"' << t << '"';
+	return maybeSpace();
+}
 
 /**
  * Add a std::vector<T> to the message
