@@ -30,55 +30,47 @@
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
- *
- * @brief String utility functions
+ * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef UTILS_STRINGUTILS_H
-#define UTILS_STRINGUTILS_H
+#ifndef UTILS_TIMEUTILS_H_
+#define UTILS_TIMEUTILS_H_
 
-#include <sstream>
+#include <ctime>
 #include <string>
 
-/**
- * A collection of useful utility functions
- */
 namespace utils
 {
 
 /**
- * A collection of useful string functions based on std::string
+ * A collection of usefull time functions
  */
-class StringUtils
+class TimeUtils
 {
 public:
 	/**
-	 * Replaces from in str with to
+	 * Formats a string using strftime
 	 *
-	 * Taken from http://stackoverflow.com/questions/3418231/c-replace-part-of-a-string-with-another-string
+	 * Taken from http://stackoverflow.com/questions/7935483/c-function-to-format-time-t-as-stdstring-buffer-length
+	 *
+	 * @return A copy of formatString, with all %k replaced with the time information
 	 */
-	static bool replace(std::string& str, const std::string& from, const std::string& to) {
-		size_t start_pos = str.find(from);
-		if(start_pos == std::string::npos)
-			return false;
-		str.replace(start_pos, from.length(), to);
-		return true;
-	}
-
-	/**
-	 * Converts arbitrary datatypes (all datatypes which support the << stream
-	 * operator) into std::string
-	 */
-	template<typename T>
-	static std::string toString(T value)
+	static std::string timeAsString(const std::string& formatString, time_t time)
 	{
-		std::ostringstream ss;
-		ss << value;
-		return ss.str();
+	    const struct tm *timeinfo = localtime(&time);
+
+	    std::string buffer;
+	    buffer.resize(formatString.size()*2);
+	    size_t len = strftime(&buffer[0], buffer.size(), formatString.c_str(), timeinfo);
+	    while (len == 0) {
+	        buffer.resize(buffer.size()*2);
+	        len = strftime(&buffer[0], buffer.size(), formatString.c_str(), timeinfo);
+	    }
+	    buffer.resize(len);
+	    return buffer;
 	}
 };
 
 }
 
-#endif /* UTILS_STRINGUTILS_H */
+#endif /* UTILS_TIMEUTILS_H_ */

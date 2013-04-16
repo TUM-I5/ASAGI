@@ -36,9 +36,16 @@
 #ifndef DEBUG_DBG_H
 #define DEBUG_DBG_H
 
+#include "utils/timeutils.h"
+
 #include <algorithm>
+#include <ctime>
 #include <iostream>
 #include <sstream>
+
+#ifndef DEBUG_PREFIX
+#define DEBUG_PREFIX "%a %b %d %X:"
+#endif // DEBUG_PRFIX
 
 /**
  * @brief Responsible for debugging and info messages
@@ -97,7 +104,7 @@ public:
 	Dbg(DebugType t, int rank)
 		: stream(new Stream(t, rank))
 	{
-		stream->buffer << "ASAGI: ";
+		stream->buffer << utils::TimeUtils::timeAsString(DEBUG_PREFIX, time(nullptr)) << ' ';
 	}
 	/**
 	 * Copy constructor

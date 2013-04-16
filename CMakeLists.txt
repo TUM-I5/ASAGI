@@ -37,6 +37,9 @@ set( InterfaceHeaders
 set( CMAKE_MODULE_PATH
 	${CMAKE_MODULE_PATH}
 	${CMAKE_SOURCE_DIR}/CMake/Modules/ )
+	
+# Set prefix for the debugger
+set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS "DEBUG_PREFIX=\"${CMAKE_PROJECT_NAME} %a %b %d %X:\"")
 
 # Enable warnings
 add_definitions( -Wall )
