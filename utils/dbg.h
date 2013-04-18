@@ -33,8 +33,8 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef DEBUG_DBG_H
-#define DEBUG_DBG_H
+#ifndef UTILS_DBG_H
+#define UTILS_DBG_H
 
 #include "utils/timeutils.h"
 
@@ -215,6 +215,24 @@ public:
 	}
 
 	/**
+	 * Add a string variable to the message
+	 */
+	Dbg &operator<<(const std::string& t)
+	{
+		stream->buffer << '"' << t << '"';
+		return maybeSpace();
+	}
+
+	/**
+	 * Add a string variable to the message
+	 */
+	Dbg &operator<<(std::string& t)
+	{
+		stream->buffer << '"' << t << '"';
+		return maybeSpace();
+	}
+
+	/**
 	 * Operator to add functions like std::endl
 	 */
 	Dbg &operator<<(std::ostream& (*func)(std::ostream&))
@@ -250,16 +268,6 @@ public:
 		return *this;
 	}
 };
-
-/**
- * Add a string variable to the message
- */
-template<>
-inline Dbg& Dbg::operator<<(const std::string& t)
-{
-	stream->buffer << '"' << t << '"';
-	return maybeSpace();
-}
 
 /**
  * Add a std::vector<T> to the message
@@ -362,4 +370,4 @@ utils::NoDbg dbgDebug( int = 0 ) { return utils::NoDbg(); }
 #define NDBG_UNUSED(x)
 #endif // NDEBUG
 
-#endif // DEBUG_DBG_H
+#endif // UTILS_DBG_H
