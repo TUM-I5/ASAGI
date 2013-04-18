@@ -46,9 +46,9 @@
 
 #ifndef DEBUG_LEVEL
 #ifdef NDEBUG
-#define DEBUG_LEVEL 0
-#else // NDEBUG
 #define DEBUG_LEVEL 2
+#else // NDEBUG
+#define DEBUG_LEVEL 3
 #endif // NDEBUG
 #endif // DEBUG_LEVEL
 
