@@ -41,7 +41,6 @@
 
 #include "allocator/mpiallocator.h"
 #include "types/type.h"
-#include "debug/dbg.h"
 
 /**
  * @see StaticGrid::StaticGrid()

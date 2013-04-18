@@ -37,7 +37,7 @@
 #include <mpi.h>
 
 #define DEBUG_ABORT MPI_Abort(MPI_COMM_WORLD, 1)
-#include "debug/dbg.h"
+#include "utils/dbg.h"
 
 #include "tests.h"
 
@@ -81,12 +81,14 @@ int main(int argc, char** argv)
 	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
 		dbgError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
 				<< "but is" << grid->getCounter("accesses");
+		return 1;
 	}
 
 	// Assuming 2 MPI processes / 50 values in each dimension per block
 	if (grid->getCounter("mpi_transfers") != (ceil(NC_WIDTH, 50)*ceil(NC_LENGTH, 50)/2)) {
 		dbgError() << "Counter \"mpi_transfers\" should be" << (ceil(NC_WIDTH, 50)*ceil(NC_LENGTH, 50)/2)
 				<< "but is" << grid->getCounter("mpi_transfers");
+		return 1;
 	}
 
 	if (grid->getCounter("file_loads") != 0) {

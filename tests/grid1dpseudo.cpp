@@ -38,7 +38,8 @@
 #include <cstdlib>
 #include <time.h>
 
-#include "debug/dbg.h"
+#define DEBUG_ABORT MPI_Abort(MPI_COMM_WORLD, 1)
+#include "utils/dbg.h"
 
 #include "tests.h"
 
@@ -64,8 +65,8 @@ int main(int argc, char** argv)
 	for (int i = 0; i < NC_WIDTH; i++) {
 		r = rand() - (RAND_MAX / 2);
 		if (grid->getInt2D(i, r) != i) {
-			dbgDebug() << "Test failed on rank" << rank;
-			dbgDebug() << "Value at" << i << r << "should be"
+			dbgError() << "Test failed on rank" << rank << std::endl
+				<< "Value at" << i << r << "should be"
 				<< i << "but is" << grid->getInt1D(i, r);
 			return 1;
 		}

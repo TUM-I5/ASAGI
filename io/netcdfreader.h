@@ -57,7 +57,7 @@
 #undef MPI_INCLUDED_NETCDF
 #endif // MPI_INCLUDED_NETCDF
 
-#include "debug/dbg.h"
+#include "utils/dbg.h"
 
 /**
  * @brief Classes for read/writing files

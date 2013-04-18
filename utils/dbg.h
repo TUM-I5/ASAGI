@@ -63,7 +63,7 @@
 /**
  * @brief Responsible for debugging and info messages
  */
-namespace debug
+namespace utils
 {
 
 /**
@@ -285,72 +285,72 @@ inline Dbg &operator<<(Dbg debug, const std::vector<T> &list)
  * Create error message and exit
  */
 inline
-debug::Dbg dbgError()
+utils::Dbg dbgError()
 {
-	return debug::Dbg(debug::Dbg::ERROR, 0);
+	return utils::Dbg(utils::Dbg::ERROR, 0);
 }
 
 #if DEBUG_LEVEL >= 1
 /**
  * Create a warning message if enabled
  *
- * @relates debug::Dbg
+ * @relates utils::Dbg
  */
 inline
-debug::Dbg dbgWarning( int rank = 0 )
+utils::Dbg dbgWarning( int rank = 0 )
 {
-	return debug::Dbg(debug::Dbg::WARNING, rank);
+	return utils::Dbg(utils::Dbg::WARNING, rank);
 }
 #else // DEBUG_LEVEL >= 1
 /**
  * Create a dummy warning message if disabled
  *
- * @relates debug::NoDbg
+ * @relates utils::NoDbg
  */
 inline
-debug::NoDbg dbgWarning( int = 0 ) { return debug::NoDbg(); }
+utils::NoDbg dbgWarning( int = 0 ) { return utils::NoDbg(); }
 #endif // DEBUG_LEVEL >= 1
 
 #if DEBUG_LEVEL >= 2
 /**
  * Create a info message if enabled
  *
- * @relates debug::Dbg
+ * @relates utils::Dbg
  */
 inline
-debug::Dbg dbgInfo( int rank = 0 )
+utils::Dbg dbgInfo( int rank = 0 )
 {
-	return debug::Dbg(debug::Dbg::INFO, rank);
+	return utils::Dbg(utils::Dbg::INFO, rank);
 }
 #else // DEBUG_LEVEL >= 2
 /**
  * Create a dummy info message if disabled
  *
- * @relates debug::NoDbg
+ * @relates utils::NoDbg
  */
 inline
-debug::NoDbg dbgInfo( int = 0 ) { return debug::NoDbg(); }
+utils::NoDbg dbgInfo( int = 0 ) { return utils::NoDbg(); }
 #endif // DEBUG_LEVEL >= 2
 
 #if DEBUG_LEVEL >= 3
 /**
  * Create a debug message if enabled
  *
- * @relates debug::Dbg
+ * @relates utils::Dbg
  */
 inline
-debug::Dbg dbgDebug( int rank = 0 )
+utils::Dbg dbgDebug( int rank = 0 )
 {
-	return debug::Dbg(debug::Dbg::DEBUG, rank);
+	return utils::Dbg(utils::Dbg::DEBUG, rank);
 }
 #else // DEBUG_LEVEL >= 3
 /**
  * Create a dummy debug message if disabled
  *
- * @relates debug::NoDbg
+ * @relates utils::NoDbg
  */
 inline
-debug::NoDbg dbgDebug( int = 0 ) { return debug::NoDbg(); }
+utils::NoDbg dbgDebug( int = 0 ) { return utils::NoDbg(); }
 #endif // DEBUG_LEVEL >= 3
 
 

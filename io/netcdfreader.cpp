@@ -35,8 +35,6 @@
 
 #include "netcdfreader.h"
 
-#include "debug/dbg.h"
-
 #define DIM_NOT_MAPPED "<not mapped>"
 
 /**

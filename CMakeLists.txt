@@ -109,7 +109,6 @@ include_directories( ${CMAKE_SOURCE_DIR} )
 # Add static libaries
 add_subdirectory( allocator )
 add_subdirectory( blocks )
-add_subdirectory( debug )
 add_subdirectory( fortran )
 add_subdirectory( grid )
 add_subdirectory( io )
