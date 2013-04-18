@@ -39,13 +39,26 @@
 #include "utils/timeutils.h"
 
 #include <algorithm>
+#include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <sstream>
 
+#ifndef DEBUG_LEVEL
+#ifdef NDEBUG
+#define DEBUG_LEVEL 0
+#else // NDEBUG
+#define DEBUG_LEVEL 2
+#endif // NDEBUG
+#endif // DEBUG_LEVEL
+
 #ifndef DEBUG_PREFIX
-#define DEBUG_PREFIX "%a %b %d %X:"
+#define DEBUG_PREFIX "%a %b %d %X"
 #endif // DEBUG_PRFIX
+
+#ifndef DEBUG_ABORT
+#define DEBUG_ABORT abort()
+#endif // DEBUG_ABORT
 
 /**
  * @brief Responsible for debugging and info messages
@@ -54,7 +67,7 @@ namespace debug
 {
 
 /**
- * Handles debuggin output
+ * Handles debugging output
  * 
  * Most of the code is taken form QDebug form the Qt Framework
  */
@@ -65,8 +78,12 @@ public:
 	enum DebugType {
 		/** A debug messages */
 		DEBUG,
-		/** A fatal error (unused at the moment) */
-		FATAL
+		/** A info message (printed to stdout) */
+		INFO,
+		/** A warning message */
+		WARNING,
+		/** A fatal error */
+		ERROR
 	};
 private:
 	/** Contains all information for a debug message */
@@ -90,7 +107,7 @@ private:
 			buffer(std::stringstream::out),
 			space(true) { }
 	} *stream;
-	/**<
+	/**
 	 * Pointer to all information about the message
 	 */
 public:
@@ -104,7 +121,22 @@ public:
 	Dbg(DebugType t, int rank)
 		: stream(new Stream(t, rank))
 	{
-		stream->buffer << utils::TimeUtils::timeAsString(DEBUG_PREFIX, time(nullptr)) << ' ';
+		stream->buffer << utils::TimeUtils::timeAsString(DEBUG_PREFIX, time(nullptr));
+
+		switch (t) {
+		case DEBUG:
+			stream->buffer << ", Debug: ";
+			break;
+		case INFO:
+			stream->buffer << ", Info:  ";
+			break;
+		case WARNING:
+			stream->buffer << ", Warn:  ";
+			break;
+		case ERROR:
+			stream->buffer << ", Error: ";
+			break;
+		}
 	}
 	/**
 	 * Copy constructor
@@ -114,9 +146,17 @@ public:
 	{
 		if (!--stream->ref) {
 			if (stream->rank == 0) {
-				stream->buffer << std::endl;
-				std::cerr << stream->buffer.str();
+				if (stream->type == INFO)
+					std::cout << stream->buffer.str() << std::endl;
+				else
+					std::cerr << stream->buffer.str() << std::endl;
 			}
+
+			if (stream->type == ERROR) {
+				delete stream;
+				DEBUG_ABORT;
+			}
+
 			delete stream;
 		}
 	}
@@ -172,6 +212,15 @@ public:
 		stream->buffer << t;
 		return maybeSpace();
 	}
+
+	/**
+	 * Operator to add functions like std::endl
+	 */
+	Dbg &operator<<(std::ostream& (*func)(std::ostream&))
+	{
+		stream->buffer << func;
+		return *this; // No space in this case
+	}
 };
 
 /**
@@ -186,7 +235,16 @@ public:
 	/**
 	 * Do nothing with the message
 	 */
-	template<typename T> NoDbg &operator<<(const T&)
+	template<typename T>
+	NoDbg &operator<<(const T&)
+	{
+		return *this;
+	}
+
+	/**
+	 * Operator to add functions like std::endl
+	 */
+	NoDbg &operator<<(std::ostream& (*func)(std::ostream&))
 	{
 		return *this;
 	}
@@ -221,18 +279,63 @@ inline Dbg &operator<<(Dbg debug, const std::vector<T> &list)
 
 }
 
-#ifdef NDEBUG
+// Define global functions
+
 /**
- * Create a dummy debug message when debugging is disabled
- * 
+ * Create error message and exit
+ */
+inline
+debug::Dbg dbgError()
+{
+	return debug::Dbg(debug::Dbg::ERROR, 0);
+}
+
+#if DEBUG_LEVEL >= 1
+/**
+ * Create a warning message if enabled
+ *
+ * @relates debug::Dbg
+ */
+inline
+debug::Dbg dbgWarning( int rank = 0 )
+{
+	return debug::Dbg(debug::Dbg::WARNING, rank);
+}
+#else // DEBUG_LEVEL >= 1
+/**
+ * Create a dummy warning message if disabled
+ *
  * @relates debug::NoDbg
  */
 inline
-debug::NoDbg dbgDebug( int = 0 ) { return debug::NoDbg(); }
-#else // NDEBUG
+debug::NoDbg dbgWarning( int = 0 ) { return debug::NoDbg(); }
+#endif // DEBUG_LEVEL >= 1
+
+#if DEBUG_LEVEL >= 2
 /**
- * Create a debug message when debugging is enabled
- * 
+ * Create a info message if enabled
+ *
+ * @relates debug::Dbg
+ */
+inline
+debug::Dbg dbgInfo( int rank = 0 )
+{
+	return debug::Dbg(debug::Dbg::INFO, rank);
+}
+#else // DEBUG_LEVEL >= 2
+/**
+ * Create a dummy info message if disabled
+ *
+ * @relates debug::NoDbg
+ */
+inline
+debug::NoDbg dbgInfo( int = 0 ) { return debug::NoDbg(); }
+#endif // DEBUG_LEVEL >= 2
+
+#if DEBUG_LEVEL >= 3
+/**
+ * Create a debug message if enabled
+ *
  * @relates debug::Dbg
  */
 inline
@@ -240,9 +343,18 @@ debug::Dbg dbgDebug( int rank = 0 )
 {
 	return debug::Dbg(debug::Dbg::DEBUG, rank);
 }
-#endif // NDEBUG
+#else // DEBUG_LEVEL >= 3
+/**
+ * Create a dummy debug message if disabled
+ *
+ * @relates debug::NoDbg
+ */
+inline
+debug::NoDbg dbgDebug( int = 0 ) { return debug::NoDbg(); }
+#endif // DEBUG_LEVEL >= 3
 
-// Use for variables unused when compilin with NDEBUG
+
+// Use for variables unused when compiling with NDEBUG
 #ifdef NDEBUG
 #define NDBG_UNUSED(x) ((void) x)
 #else // NDEBUG

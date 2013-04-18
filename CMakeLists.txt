@@ -38,8 +38,9 @@ set( CMAKE_MODULE_PATH
 	${CMAKE_MODULE_PATH}
 	${CMAKE_SOURCE_DIR}/CMake/Modules/ )
 	
-# Set prefix for the debugger
-set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS "DEBUG_PREFIX=\"${CMAKE_PROJECT_NAME} %a %b %d %X:\"")
+# Configure debugger
+set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS "DEBUG_PREFIX=\"${CMAKE_PROJECT_NAME} %a %b %d %X\"")
+set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG_LEVEL=3" )
 
 # Enable warnings
 add_definitions( -Wall )

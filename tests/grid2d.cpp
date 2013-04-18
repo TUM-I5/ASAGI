@@ -36,6 +36,7 @@
 #include <asagi.h>
 #include <mpi.h>
 
+#define DEBUG_ABORT MPI_Abort(MPI_COMM_WORLD, 1)
 #include "debug/dbg.h"
 
 #include "tests.h"
@@ -69,8 +70,8 @@ int main(int argc, char** argv)
 		for (int j = 0; j < NC_LENGTH; j++) {
 			value = j * NC_WIDTH + i;
 			if (grid->getInt2D(i, j) != value) {
-				dbgDebug() << "Test failed on rank" << rank;
-				dbgDebug() << "Value at" << i << j << "should be"
+				dbgError() << "Test failed on rank" << rank << std::endl
+					<< "Value at" << i << j << "should be"
 					<< value << "but is" << grid->getInt2D(i, j);
 				return 1;
 			}
@@ -78,19 +79,18 @@ int main(int argc, char** argv)
 	}
 
 	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
-		dbgDebug() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
+		dbgError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
 				<< "but is" << grid->getCounter("accesses");
-		return 1;
 	}
 
 	// Assuming 2 MPI processes / 50 values in each dimension per block
-	if (grid->getCounter("mpi_transferes") != ceil(NC_WIDTH, 50)*ceil(NC_LENGTH, 50)) {
-		dbgDebug() << "Counter \"mpi_transfers\" should be" << (ceil(NC_WIDTH, 50)*ceil(NC_LENGTH, 50))
+	if (grid->getCounter("mpi_transfers") != (ceil(NC_WIDTH, 50)*ceil(NC_LENGTH, 50)/2)) {
+		dbgError() << "Counter \"mpi_transfers\" should be" << (ceil(NC_WIDTH, 50)*ceil(NC_LENGTH, 50)/2)
 				<< "but is" << grid->getCounter("mpi_transfers");
 	}
 
 	if (grid->getCounter("file_loads") != 0) {
-		dbgDebug() << "Counter \"file_loads\" should be 0"
+		dbgError() << "Counter \"file_loads\" should be 0"
 				<< "but is" << grid->getCounter("file_loads");
 		return 1;
 	}
