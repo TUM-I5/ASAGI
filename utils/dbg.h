@@ -121,7 +121,7 @@ public:
 	Dbg(DebugType t, int rank)
 		: stream(new Stream(t, rank))
 	{
-		stream->buffer << utils::TimeUtils::timeAsString(DEBUG_PREFIX, time(nullptr));
+		stream->buffer << utils::TimeUtils::timeAsString(DEBUG_PREFIX, time(0L));
 
 		switch (t) {
 		case DEBUG:
