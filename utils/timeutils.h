@@ -39,6 +39,9 @@
 #include <ctime>
 #include <string>
 
+/**
+ * A collection of useful utility functions
+ */
 namespace utils
 {
 

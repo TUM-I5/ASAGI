@@ -62,7 +62,7 @@
 #endif // DEBUG_ABORT
 
 /**
- * @brief Responsible for debugging and info messages
+ * A collection of useful utility functions
  */
 namespace utils
 {
