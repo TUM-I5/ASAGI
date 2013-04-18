@@ -43,6 +43,7 @@
 #include <ctime>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #ifndef DEBUG_LEVEL
 #ifdef NDEBUG
