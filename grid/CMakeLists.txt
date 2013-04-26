@@ -15,10 +15,5 @@ if( NOT NOMPI )
 		diststaticgrid.cpp )
 endif( NOT NOMPI )
 
-##### Library #####
-add_library( grid
-	${gridSources} )
-if( NOT STATIC_LIB )
-	set_target_properties( grid PROPERTIES
-		COMPILE_FLAGS -fPIC )
-endif()
+##### Add to library #####
+add_sources( ${gridSources} )

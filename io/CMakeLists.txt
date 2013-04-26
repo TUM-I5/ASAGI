@@ -7,16 +7,5 @@ if( PNG_FOUND )
 		${ioSources} pngwriter.cpp )
 endif()
 
-##### Library #####
-add_library( io
-	${ioSources} )
-target_link_libraries( io
-	${NETCDF_LIBRARIES} )
-if( PNG_FOUND )
-	target_link_libraries( io
-		${PNG_LIBRARY} )
-endif( PNG_FOUND )
-if( NOT STATIC_LIB )
-	set_target_properties( io PROPERTIES
-		COMPILE_FLAGS -fPIC )
-endif()
+##### Add to library #####
+add_sources( ${ioSources} )

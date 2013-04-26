@@ -5,10 +5,5 @@ set( typesSources
 	structtype.cpp
 	type.cpp )
 
-##### Library #####
-add_library( types
-	${typesSources} )
-if( NOT STATIC_LIB )
-	set_target_properties( types PROPERTIES
-		COMPILE_FLAGS -fPIC )
-endif()
+##### Add to library #####
+add_sources( ${typesSources} )

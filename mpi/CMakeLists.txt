@@ -1,11 +1,6 @@
 ##### Files #####
-set( syncSources
+set( mpiSources
 	mutex.cpp )
 
-##### Library #####
-add_library( mpi
-	${syncSources} )
-if( NOT STATIC_LIB )
-	set_target_properties( mpi PROPERTIES
-		COMPILE_FLAGS -fPIC )
-endif()
+##### Add to library #####
+add_sources( ${mpiSources} )

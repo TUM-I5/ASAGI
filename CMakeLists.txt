@@ -7,7 +7,8 @@ set( ASAGI_VERSION_MAJOR 0 )
 set( ASAGI_VERSION_MINOR 3 )
 
 ##### User configuration #####
-option( STATIC_LIB "Compile asagi as static library" OFF )
+option( SHARED_LIB "Compile the shared library" ON )
+option( STATIC_LIB "Compile the static library" OFF )
 option( THREADSAFETY "Enable support for multiple threads on each node" ON )
 option( FORTRAN_SUPPORT "Enable Fortran support" ON )
 option( EXAMPLES "Compile examples" OFF )
@@ -21,9 +22,57 @@ if( NOT CMAKE_BUILD_TYPE )
 		"Choose the type of build, options are: Debug Release" FORCE)
 endif( NOT CMAKE_BUILD_TYPE )
 
+##### Macros #####
+# Add sources in subdirectories
+macro( add_sources )
+    file( RELATIVE_PATH _relPath "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" )
+    foreach( _src ${ARGN} )
+        if( _relPath )
+            list( APPEND SRCS "${_relPath}/${_src}" )
+        else( _relPath )
+            list( APPEND SRCS "${_src}" )
+        endif( _relPath )
+    endforeach()
+    
+    if( _relPath )
+        # propagate SRCS to parent directory
+        set( LibSources ${LibSources} ${SRCS} PARENT_SCOPE )
+    else( _relPath )
+        set( LibSources ${LibSources} ${SRCS} )
+    endif( _relPath )
+endmacro( add_sources )
+
+# Link static and shared library
+macro( lib_link_libraries lib )
+    # Link shared lib
+    if( SHARED_LIB )
+        target_link_libraries( ${lib} ${ARGN} )
+    endif( SHARED_LIB )
+    
+    # Link static lib
+    if( STATIC_LIB )
+        target_link_libraries( ${lib}-static ${ARGN} )
+    endif( STATIC_LIB )
+endmacro( lib_link_libraries )
+
+# Set static and shared libary output name
+macro( set_lib_output_name lib name)
+    # Shared library
+    if( SHARED_LIB )
+	    set_target_properties( ${lib}
+		    PROPERTIES OUTPUT_NAME ${name} )
+    endif( SHARED_LIB )
+		
+    # Static library
+    if( STATIC_LIB )
+        set_target_properties( ${lib}-static
+            PROPERTIES OUTPUT_NAME ${name} )
+    endif( STATIC_LIB )
+endmacro( set_lib_output_name )
+
 ##### Files #####
 # Lib Sources
-set( LibSources
+set( mainSources
 	asagi.cpp
 	asagi_f90.cpp )
 
@@ -106,7 +155,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/include )
 # For sub directories
 include_directories( ${CMAKE_SOURCE_DIR} )
 
-# Add static libaries
+# Add sources in subdirectories
 add_subdirectory( allocator )
 add_subdirectory( blocks )
 add_subdirectory( fortran )
@@ -118,6 +167,9 @@ if( NOT NOMPI )
 	add_subdirectory( mpi )
 endif( NOT NOMPI )
 add_subdirectory( types )
+
+# Add sources
+add_sources( ${mainSources} )
 
 # Set rpath
 # use, i.e. don't skip the full RPATH for the build tree
@@ -152,32 +204,34 @@ if( NOT NOMPI )
 endif( NOT NOMPI )
 
 ##### Excecutables #####
-# Library
+# Libraries (static and shared)
+if( SHARED_LIB )
+    add_library( asagi SHARED ${LibSources} )
+endif( SHARED_LIB )
 if( STATIC_LIB )
-	add_library( asagi
-		${LibSources} )
-else()
-	add_library( asagi SHARED
-		${LibSources} )
-endif()
-target_link_libraries( asagi
-	grid
-	blocks
-	io
-	perf
-	types )
+    add_library( asagi-static STATIC ${LibSources} )
+    set_target_properties( asagi-static
+        PROPERTIES OUTPUT_NAME asagi )
+endif( STATIC_LIB )
+
 if( NOMPI )
-	set_target_properties( asagi
-		PROPERTIES OUTPUT_NAME asagi_nompi )
+	set_lib_output_name( asagi asagi_nompi )
 else( NOMPI )
-	target_link_libraries( asagi
-	    mpi
-	    ${MPI_C_LIBRARIES} )
+	lib_link_libraries( asagi ${MPI_C_LIBRARIES} )
 endif( NOMPI )
 
+lib_link_libraries( asagi ${NETCDF_LIBRARIES} )
+if( PNG_FOUND )
+	lib_link_libraries( asagi ${PNG_LIBRARY} )
+endif( PNG_FOUND )
+
 ##### Installation #####
-install( TARGETS asagi
-	DESTINATION lib )
+if( SHARED_LIB )
+    install( TARGETS asagi DESTINATION lib )
+endif( SHARED_LIB )
+if( STATIC_LIB )
+    install( TARGETS asagi-static DESTINATION lib )
+endif( STATIC_LIB )
 install( FILES include/asagi.h include/asagi.f90
 	DESTINATION include )
 
