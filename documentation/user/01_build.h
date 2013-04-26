@@ -52,8 +52,8 @@
  * @li <b>EXAMPLES = ON | OFF</b> Compile example programs. <code>[OFF]</code>
  * @li <b>FORTRAN_SUPPORT = ON | OFF</b> Compile with Fortran support.
  *  <code>[ON]</code>
- * @li <b>STATIC_LIB = ON | OFF</b> Compile ASAGI as a static library.
- *  <code>[OFF]</code>
+ * @li <b>SHARED_LIB = ON | OFF</b> Build shared library. <code>[ON]</code>
+ * @li <b>STATIC_LIB = ON | OFF</b> Build static library. <code>[OFF]</code>
  * @li <b>TESTS = ON | OFF</b> Compile tests. <code>[OFF]</code>
  * @li <b>THREADSAFETY = ON | OFF</b> If enabled all ASAGI functions are
  *  thread-safe. This is required, for example, if ASAGI is used in hybrid
@@ -75,5 +75,5 @@
  * make install
  * @endcode
  * 
- * This will install the library as well as the header files.
+ * This will install the (static and/or shared) library as well as the header files.
  */
