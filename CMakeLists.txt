@@ -189,6 +189,14 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Documentation
 add_subdirectory( documentation )
 
+# Set the target that can be used to link programs with ASAGI
+if( SHARED_LIB )
+    set( asagiTarget asagi )
+else( SHARED_LIB )
+    # We assume at least one of shared/static is build
+    set( asagiTarget asagi-static )
+endif( SHARED_LIB )
+
 # Tests
 if( TESTS )
 	enable_testing()

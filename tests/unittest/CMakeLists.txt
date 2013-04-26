@@ -15,7 +15,7 @@ function( unittest_add_test name header )
 
 	cxxtest_add_test( ${name} ${basename}.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/${header} )
-	target_link_libraries( ${name} asagi )
+	target_link_libraries( ${name} ${asagiTarget} )
 	
 	# Add test header dependencies
 	set_source_files_properties( ${basename}.cpp
