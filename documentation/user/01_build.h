@@ -76,4 +76,9 @@
  * @endcode
  * 
  * This will install the (static and/or shared) library as well as the header files.
+ *
+ * @section static Static library
+ *
+ * When a program is linked against the static version of ASAGI, make sure to link
+ * against netCDF (and PNG if installed) as well.
  */
