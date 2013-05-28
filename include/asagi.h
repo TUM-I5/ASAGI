@@ -410,6 +410,9 @@ public:
 	 *  local memory
 	 *
 	 *  @return The current counter value or 0 if the name is not defined
+	 *
+	 *  @warning The performance counters are not threadsafe for performance reason.
+	 *   You may get wrong result when using more than one thread.
 	 */
 	virtual unsigned long getCounter(const char *name,
 		unsigned int level = 0) = 0;

@@ -41,13 +41,15 @@
 #include <unordered_map>
 
 /**
- * Performance messurement tools
+ * Performance measurement tools
  */
 namespace perf
 {
 
 /**
  * Stores the performance counters for one grid level
+ *
+ * @warning These performance counters are not threadsafe for performance reason.
  */
 class Counter
 {
