@@ -215,7 +215,7 @@ asagi::Grid::Error grid::Grid::open(const char* filename)
 		m_scalingInv[i] = getInvScaling(scaling[i]);
 		
 		// Set min/max
-		if (isinf(scaling[i])) {
+		if (std::isinf(scaling[i])) {
 			m_min[i] = -std::numeric_limits<double>::infinity();
 			m_max[i] = std::numeric_limits<double>::infinity();
 		} else {

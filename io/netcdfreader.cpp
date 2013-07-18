@@ -88,7 +88,7 @@ asagi::Grid::Error io::NetCdfReader::open(const char* varname)
 	}
 
 	dbgDebug(m_rank) << "Dimension mapping:";
-	int dimIds[m_dimensions];
+	int dimIds[grid::MAX_DIMENSIONS];
 	nc_inq_vardimid(m_file, m_variable, dimIds);
 	for (int i = 0; i < m_dimensions; i++) {
 		// Translates dimension order from Fortran to C/C++
