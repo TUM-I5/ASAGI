@@ -136,7 +136,7 @@ asagi::Grid::Error grid::Grid::setParam(const char* name, const char* value)
 			return asagi::Grid::INVALID_VALUE;
 		
 		if ((m_blocksPerNode == 0) && (getMPISize() > 1))
-			dbgDebug() << "Warning: empty block cache size may lead to failures!";
+			dbgWarning() << "Empty block cache size may lead to failures!";
 		
 		return asagi::Grid::SUCCESS;
 	}
