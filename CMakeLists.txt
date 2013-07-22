@@ -225,7 +225,7 @@ endif( STATIC_LIB )
 if( NOMPI )
 	set_lib_output_name( asagi asagi_nompi )
 else( NOMPI )
-	lib_link_libraries( asagi ${MPI_C_LIBRARIES} )
+	lib_link_libraries( asagi )
 endif( NOMPI )
 
 lib_link_libraries( asagi ${NETCDF_LIBRARIES} )
