@@ -1,7 +1,8 @@
 /**
+/**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -29,12 +30,14 @@
  *
  *  Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  *  Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @brief String utility functions
  */
 
-#ifndef UTILS_DBG_H
-#define UTILS_DBG_H
+#ifndef UTILS_LOGGER_H
+#define UTILS_LOGGER_H
 
 #include "utils/timeutils.h"
 
@@ -45,21 +48,21 @@
 #include <sstream>
 #include <vector>
 
-#ifndef DEBUG_LEVEL
+#ifndef LOG_LEVEL
 #ifdef NDEBUG
-#define DEBUG_LEVEL 2
+#define LOG_LEVEL 2
 #else // NDEBUG
-#define DEBUG_LEVEL 3
+#define LOG_LEVEL 3
 #endif // NDEBUG
-#endif // DEBUG_LEVEL
+#endif // LOG_LEVEL
 
-#ifndef DEBUG_PREFIX
-#define DEBUG_PREFIX "%a %b %d %X"
+#ifndef LOG_PREFIX
+#define LOG_PREFIX "%a %b %d %X"
 #endif // DEBUG_PRFIX
 
-#ifndef DEBUG_ABORT
-#define DEBUG_ABORT abort()
-#endif // DEBUG_ABORT
+#ifndef LOG_ABORT
+#define LOG_ABORT abort()
+#endif // LOG_ABORT
 
 /**
  * A collection of useful utility functions
@@ -68,11 +71,11 @@ namespace utils
 {
 
 /**
- * Handles debugging output
+ * Handles debugging/logging output
  * 
  * Most of the code is taken form QDebug form the Qt Framework
  */
-class Dbg
+class Logger
 {
 public:
 	/** Message type */
@@ -119,10 +122,10 @@ public:
 	 * @param rank Rank of the current process, only messages form rank
 	 *  0 will be printed
 	 */
-	Dbg(DebugType t, int rank)
+	Logger(DebugType t, int rank)
 		: stream(new Stream(t, rank))
 	{
-		stream->buffer << utils::TimeUtils::timeAsString(DEBUG_PREFIX, time(0L));
+		stream->buffer << utils::TimeUtils::timeAsString(LOG_PREFIX, time(0L));
 
 		switch (t) {
 		case DEBUG:
@@ -142,8 +145,8 @@ public:
 	/**
 	 * Copy constructor
 	 */
-	Dbg(const Dbg& o) : stream(o.stream) { stream->ref++; };
-	~Dbg()
+	Logger(const Logger& o) : stream(o.stream) { stream->ref++; };
+	~Logger()
 	{
 		if (!--stream->ref) {
 			if (stream->rank == 0) {
@@ -155,7 +158,7 @@ public:
 
 			if (stream->type == ERROR) {
 				delete stream;
-				DEBUG_ABORT;
+				LOG_ABORT;
 			}
 
 			delete stream;
@@ -165,10 +168,10 @@ public:
 	/**
 	 * Copy operator
 	 */
-	Dbg &operator=(const Dbg& other)
+	Logger &operator=(const Logger& other)
 	{
 		if (this != &other) {
-			Dbg copy(other);
+			Logger copy(other);
 			std::swap(stream, copy.stream);
 		}
 		return *this;
@@ -180,7 +183,7 @@ public:
 	/**
 	 * Add a space to output message and activate spaces
 	 */
-	Dbg &space()
+	Logger &space()
 	{
 		stream->space = true;
 		stream->buffer << ' ';
@@ -189,7 +192,7 @@ public:
 	/**
 	 * Deactivate spaces
 	 */
-	Dbg &nospace()
+	Logger &nospace()
 	{
 		stream->space = false;
 		return *this;
@@ -197,7 +200,7 @@ public:
 	/**
 	 * Add space of activated
 	 */
-	Dbg &maybeSpace()
+	Logger &maybeSpace()
 	{
 		if (stream->space)
 			stream->buffer << ' ';
@@ -208,7 +211,7 @@ public:
 	 * Default function to add messages
 	 */
 	template<typename T>
-	Dbg &operator<<(T t)
+	Logger &operator<<(T t)
 	{
 		stream->buffer << t;
 		return maybeSpace();
@@ -217,7 +220,7 @@ public:
 	/**
 	 * Add a string variable to the message
 	 */
-	Dbg &operator<<(const std::string& t)
+	Logger &operator<<(const std::string& t)
 	{
 		stream->buffer << '"' << t << '"';
 		return maybeSpace();
@@ -226,7 +229,7 @@ public:
 	/**
 	 * Add a string variable to the message
 	 */
-	Dbg &operator<<(std::string& t)
+	Logger &operator<<(std::string& t)
 	{
 		stream->buffer << '"' << t << '"';
 		return maybeSpace();
@@ -235,7 +238,7 @@ public:
 	/**
 	 * Operator to add functions like std::endl
 	 */
-	Dbg &operator<<(std::ostream& (*func)(std::ostream&))
+	Logger &operator<<(std::ostream& (*func)(std::ostream&))
 	{
 		stream->buffer << func;
 		return *this; // No space in this case
@@ -243,19 +246,19 @@ public:
 };
 
 /**
- * Dummy debug class, does nothing
+ * Dummy Logger class, does nothing
  */
-class NoDbg
+class NoLogger
 {
 public:
-	NoDbg() {};
-	~NoDbg() {};
+	NoLogger() {};
+	~NoLogger() {};
 	
 	/**
 	 * Do nothing with the message
 	 */
 	template<typename T>
-	NoDbg &operator<<(const T&)
+	NoLogger &operator<<(const T&)
 	{
 		return *this;
 	}
@@ -263,7 +266,7 @@ public:
 	/**
 	 * Operator to add functions like std::endl
 	 */
-	NoDbg &operator<<(std::ostream& (*func)(std::ostream&))
+	NoLogger &operator<<(std::ostream& (*func)(std::ostream&))
 	{
 		return *this;
 	}
@@ -273,7 +276,7 @@ public:
  * Add a std::vector<T> to the message
  */
 template <typename T>
-inline Dbg &operator<<(Dbg debug, const std::vector<T> &list)
+inline Logger &operator<<(Logger debug, const std::vector<T> &list)
 {
 	debug.nospace() << '(';
 	for (size_t i = 0; i < list.size(); i++) {
@@ -294,73 +297,73 @@ inline Dbg &operator<<(Dbg debug, const std::vector<T> &list)
  * Create error message and exit
  */
 inline
-utils::Dbg dbgError()
+utils::Logger logError()
 {
-	return utils::Dbg(utils::Dbg::ERROR, 0);
+	return utils::Logger(utils::Logger::ERROR, 0);
 }
 
-#if DEBUG_LEVEL >= 1
+#if LOG_LEVEL >= 1
 /**
  * Create a warning message if enabled
  *
- * @relates utils::Dbg
+ * @relates utils::Logger
  */
 inline
-utils::Dbg dbgWarning( int rank = 0 )
+utils::Logger logWarning( int rank = 0 )
 {
-	return utils::Dbg(utils::Dbg::WARNING, rank);
+	return utils::Logger(utils::Logger::WARNING, rank);
 }
-#else // DEBUG_LEVEL >= 1
+#else // LOG_LEVEL >= 1
 /**
  * Create a dummy warning message if disabled
  *
- * @relates utils::NoDbg
+ * @relates utils::NoLogger
  */
 inline
-utils::NoDbg dbgWarning( int = 0 ) { return utils::NoDbg(); }
-#endif // DEBUG_LEVEL >= 1
+utils::NoLogger logWarning( int = 0 ) { return utils::NoLogger(); }
+#endif // LOG_LEVEL >= 1
 
-#if DEBUG_LEVEL >= 2
+#if LOG_LEVEL >= 2
 /**
  * Create a info message if enabled
  *
- * @relates utils::Dbg
+ * @relates utils::Logger
  */
 inline
-utils::Dbg dbgInfo( int rank = 0 )
+utils::Logger logInfo( int rank = 0 )
 {
-	return utils::Dbg(utils::Dbg::INFO, rank);
+	return utils::Logger(utils::Logger::INFO, rank);
 }
-#else // DEBUG_LEVEL >= 2
+#else // LOG_LEVEL >= 2
 /**
  * Create a dummy info message if disabled
  *
- * @relates utils::NoDbg
+ * @relates utils::NoLogger
  */
 inline
-utils::NoDbg dbgInfo( int = 0 ) { return utils::NoDbg(); }
-#endif // DEBUG_LEVEL >= 2
+utils::NoLogger logInfo( int = 0 ) { return utils::NoLogger(); }
+#endif // LOG_LEVEL >= 2
 
-#if DEBUG_LEVEL >= 3
+#if LOG_LEVEL >= 3
 /**
  * Create a debug message if enabled
  *
- * @relates utils::Dbg
+ * @relates utils::Logger
  */
 inline
-utils::Dbg dbgDebug( int rank = 0 )
+utils::Logger logDebug( int rank = 0 )
 {
-	return utils::Dbg(utils::Dbg::DEBUG, rank);
+	return utils::Logger(utils::Logger::DEBUG, rank);
 }
-#else // DEBUG_LEVEL >= 3
+#else // LOG_LEVEL >= 3
 /**
  * Create a dummy debug message if disabled
  *
- * @relates utils::NoDbg
+ * @relates utils::NoLogger
  */
 inline
-utils::NoDbg dbgDebug( int = 0 ) { return utils::NoDbg(); }
-#endif // DEBUG_LEVEL >= 3
+utils::NoLogger logDebug( int = 0 ) { return utils::NoLogger(); }
+#endif // LOG_LEVEL >= 3
 
 
 // Use for variables unused when compiling with NDEBUG
@@ -370,4 +373,4 @@ utils::NoDbg dbgDebug( int = 0 ) { return utils::NoDbg(); }
 #define NDBG_UNUSED(x)
 #endif // NDEBUG
 
-#endif // UTILS_DBG_H
+#endif // UTILS_LOGGER_H

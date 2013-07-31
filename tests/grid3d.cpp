@@ -37,7 +37,7 @@
 #include <mpi.h>
 
 #define DEBUG_ABORT MPI_Abort(MPI_COMM_WORLD, 1)
-#include "utils/dbg.h"
+#include "utils/logger.h"
 
 #include "tests.h"
 
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 			for (int k = 0; k < NC_HEIGHT; k++) {
 				value = (k * NC_LENGTH + j) * NC_WIDTH + i;
 				if (grid->getFloat3D(i, j, k) != value) {
-					dbgError() << "Test failed on rank" << rank << std::endl
+					logError() << "Test failed on rank" << rank << std::endl
 						<< "Value at" << i << j << k << "should be"
 						<< value << "but is" << grid->getInt3D(i, j, k);
 					return 1;

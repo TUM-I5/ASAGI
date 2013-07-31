@@ -79,7 +79,7 @@ asagi::Grid::Error io::NetCdfReader::open(const char* varname)
 	nc_inq_varndims(m_file, m_variable, &m_dimensions);
 	
 	if (m_dimensions > grid::MAX_DIMENSIONS) {
-		dbgDebug(m_rank) << "Unsupported number of variable dimensions:"
+		logDebug(m_rank) << "Unsupported number of variable dimensions:"
 			<< m_dimensions;
 
 		nc_close(m_file);
@@ -87,7 +87,7 @@ asagi::Grid::Error io::NetCdfReader::open(const char* varname)
 		return asagi::Grid::UNSUPPORTED_DIMENSIONS;
 	}
 
-	dbgDebug(m_rank) << "Dimension mapping:";
+	logDebug(m_rank) << "Dimension mapping:";
 	int dimIds[grid::MAX_DIMENSIONS];
 	nc_inq_vardimid(m_file, m_variable, dimIds);
 	for (int i = 0; i < m_dimensions; i++) {
@@ -99,7 +99,7 @@ asagi::Grid::Error io::NetCdfReader::open(const char* varname)
 		m_names.push_back(name);
 		m_size.push_back(size);
 		
-		dbgDebug(m_rank) << "\t" << grid::DIMENSION_NAMES[i] << ":="
+		logDebug(m_rank) << "\t" << grid::DIMENSION_NAMES[i] << ":="
 			<< m_names[i];
 	}
 	

@@ -35,7 +35,7 @@
 
 #include <asagi.h>
 
-#include "utils/dbg.h"
+#include "utils/logger.h"
 
 #include "tests.h"
 
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 		for (int j = 0; j < NC_LENGTH; j++) {
 			value = j * NC_WIDTH + i;
 			if (grid->getInt2D(i, j) != value) {
-				dbgError() << "Value at" << i << j << "should be"
+				logError() << "Value at" << i << j << "should be"
 					<< value << "but is" << grid->getInt2D(i, j);
 				return 1;
 			}

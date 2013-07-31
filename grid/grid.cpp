@@ -136,7 +136,7 @@ asagi::Grid::Error grid::Grid::setParam(const char* name, const char* value)
 			return asagi::Grid::INVALID_VALUE;
 		
 		if ((m_blocksPerNode == 0) && (getMPISize() > 1))
-			dbgWarning() << "Empty block cache size may lead to failures!";
+			logWarning() << "Empty block cache size may lead to failures!";
 		
 		return asagi::Grid::SUCCESS;
 	}
@@ -182,13 +182,13 @@ asagi::Grid::Error grid::Grid::open(const char* filename)
 	if (m_timeDimension == -1) {
 		// Time grid, but time dimension not specified
 		m_timeDimension = m_inputFile->getDimensions() - 1;
-		dbgDebug(getMPIRank()) << "Assuming time dimension"
+		logDebug(getMPIRank()) << "Assuming time dimension"
 			<< DIMENSION_NAMES[m_timeDimension];
 	}
 	
 	// Set block size in time dimension
 	if ((m_timeDimension >= 0) && (m_blockSize[m_timeDimension] == 0)) {
-		dbgDebug(getMPIRank()) << "Setting block size in time dimension"
+		logDebug(getMPIRank()) << "Setting block size in time dimension"
 			<< DIMENSION_NAMES[m_timeDimension] << "to 1";
 		m_blockSize[m_timeDimension] = 1;
 	}
@@ -204,7 +204,7 @@ asagi::Grid::Error grid::Grid::open(const char* filename)
 		
 		// A block size large than the dimension does not make any sense
 		if (m_dim[i] < m_blockSize[i]) {
-			dbgDebug(getMPIRank()) << "Shrinking" << DIMENSION_NAMES[i]
+			logDebug(getMPIRank()) << "Shrinking" << DIMENSION_NAMES[i]
 				<< "block size to" << m_dim[i];
 			m_blockSize[i] = m_dim[i];
 		}
