@@ -1,5 +1,4 @@
 /**
-/**
  * @file
  *  This file is part of ASAGI.
  *
