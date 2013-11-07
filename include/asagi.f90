@@ -207,6 +207,33 @@ module asagi
 
     !> @ingroup f_interface
     !!
+    !! @see asagi::Grid::getXDelta()
+    function grid_delta_x( grid_id ) bind( c, name="f90grid_delta_x" )
+      use, intrinsic :: iso_c_binding
+      integer( kind=c_int ), value :: grid_id
+      real( kind=c_double )        :: grid_delta_x
+    end function grid_delta_x
+
+    !> @ingroup f_interface
+    !!
+    !! @see asagi::Grid::getYDelta()
+    function grid_delta_y( grid_id ) bind( c, name="f90grid_delta_y" )
+      use, intrinsic :: iso_c_binding
+      integer( kind=c_int ), value :: grid_id
+      real( kind=c_double )        :: grid_delta_y
+    end function grid_delta_y
+
+    !> @ingroup f_interface
+    !!
+    !! @see asagi::Grid::getZDelta()
+    function grid_delta_z( grid_id ) bind( c, name="f90grid_delta_z" )
+      use, intrinsic :: iso_c_binding
+      integer( kind=c_int ), value :: grid_id
+      real( kind=c_double )        :: grid_delta_z
+    end function grid_delta_z
+
+    !> @ingroup f_interface
+    !!
     !! @see asagi::Grid::getVarSize()
     function grid_var_size( grid_id ) bind( c, name="f90grid_var_size" )
       use, intrinsic :: iso_c_binding
