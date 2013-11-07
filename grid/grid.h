@@ -178,6 +178,28 @@ public:
 		return m_max[2];
 	}
 	
+	/**
+	 * @return The amount two coordinates differ in x dimension
+	 */
+	double getXDelta() const
+	{
+		return (m_max[0] - m_min[0]) / m_dim[0];
+	}
+	/**
+	 * @return The amount two coordinates differ in y dimension
+	 */
+	double getYDelta() const
+	{
+		return (m_max[1] - m_min[1]) / m_dim[1];
+	}
+	/**
+	 * @return The amount two coordinates differ in y dimension
+	 */
+	double getZDelta() const
+	{
+		return (m_max[2] - m_min[2]) / m_dim[2];
+	}
+
 	unsigned char getByte(double x, double y = 0, double z = 0);
 	int getInt(double x, double y = 0, double z = 0);
 	long getLong(double x, double y = 0, double z = 0);

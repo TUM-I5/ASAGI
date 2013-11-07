@@ -246,6 +246,25 @@ public:
 	/**
 	 * @ingroup cxx_interface
 	 * 
+	 * @return The difference of two coordinates in x dimension
+	 */
+	virtual double getXDelta() const = 0;
+	/**
+	 * @ingroup cxx_interface
+	 *
+	 * @return The difference of two coordinates in y dimension
+	 */
+	virtual double getYDelta() const = 0;
+	/**
+	 * @ingroup cxx_interface
+	 *
+	 * @return The difference of two coordinates in z dimension
+	 */
+	virtual double getZDelta() const = 0;
+
+	/**
+	 * @ingroup cxx_interface
+	 *
 	 * @return The number of bytes that are stored in each grid cell
 	 */
 	virtual unsigned int getVarSize() const = 0;
@@ -638,6 +657,25 @@ double grid_max_z(grid_handle* handle);
 /**
  * @ingroup c_interface
  * 
+ * @see asagi::Grid::getXDelta()
+ */
+double grid_delta_x(grid_handle* handle);
+/**
+ * @ingroup c_interface
+ *
+ * @see asagi::Grid::getYDelta()
+ */
+double grid_delta_y(grid_handle* handle);
+/**
+ * @ingroup c_interface
+ *
+ * @see asagi::Grid::getZDelta()
+ */
+double grid_delta_z(grid_handle* handle);
+
+/**
+ * @ingroup c_interface
+ *
  * @see asagi::Grid::getVarSize()
  */
 unsigned int grid_var_size(grid_handle* handle);

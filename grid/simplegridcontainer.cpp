@@ -111,6 +111,21 @@ asagi::Grid::Error grid::SimpleGridContainer::open(const char* filename,
 	return result;
 }
 
+double grid::SimpleGridContainer::getXDelta() const
+{
+	return m_grids[m_levels-1]->getXDelta();
+}
+
+double grid::SimpleGridContainer::getYDelta() const
+{
+	return m_grids[m_levels-1]->getYDelta();
+}
+
+double grid::SimpleGridContainer::getZDelta() const
+{
+	return m_grids[m_levels-1]->getZDelta();
+}
+
 unsigned char grid::SimpleGridContainer::getByte3D(double x, double y,
 	double z, unsigned int level)
 {

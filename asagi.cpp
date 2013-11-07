@@ -131,6 +131,19 @@ double grid_max_y(grid_handle* handle)
 	return handle->getYMax();
 }
 
+double grid_delta_x(grid_handle* handle)
+{
+	return handle->getXDelta();
+}
+double grid_delta_y(grid_handle* handle)
+{
+	return handle->getYDelta();
+}
+double grid_delta_z(grid_handle* handle)
+{
+	return handle->getZDelta();
+}
+
 unsigned int grid_var_size(grid_handle* handle)
 {
 	return handle->getVarSize();

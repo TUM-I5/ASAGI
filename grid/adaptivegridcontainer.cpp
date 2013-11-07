@@ -121,6 +121,21 @@ asagi::Grid::Error grid::AdaptiveGridContainer::open(const char* filename,
 	return SUCCESS;
 }
 
+double grid::AdaptiveGridContainer::getXDelta() const
+{
+	return m_grids->back()->getXDelta();
+}
+
+double grid::AdaptiveGridContainer::getYDelta() const
+{
+	return m_grids->back()->getXDelta();
+}
+
+double grid::AdaptiveGridContainer::getZDelta() const
+{
+	return m_grids->back()->getXDelta();
+}
+
 unsigned char grid::AdaptiveGridContainer::getByte3D(double x, double y, double z, unsigned int level)
 {
 	return getGrid(x, y, z, level)->getByte(x, y, z);

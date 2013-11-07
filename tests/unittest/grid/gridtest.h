@@ -79,4 +79,9 @@ public:
 	{
 		TS_ASSERT_EQUALS(c->getFloat1D(c->getXMax()), NC_WIDTH-1);
 	}
+
+	void testGetXDelta(void)
+	{
+		TS_ASSERT_DELTA(c->getXDelta(), 1.0, 0.001);
+	}
 };

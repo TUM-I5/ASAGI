@@ -119,6 +119,14 @@ public:
 	}
 
 	/**
+	 * @return Read iterator that points to the last grid
+	 */
+	Grid* back()
+	{
+		return m_grids.back();
+	}
+
+	/**
 	 * @return Read iterator that points to the end of the grids
 	 */
 	std::vector<Grid*>::const_iterator end()
