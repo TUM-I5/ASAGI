@@ -15,4 +15,4 @@ http://www5.in.tum.de/asagi/apidoc/index.xhtml
 License
 -------
 
-ASAGI is release under GPLv3 (see [COPYING](COPYING))
+ASAGI is release under LGPLv3 (see [COPYING](COPYING))
