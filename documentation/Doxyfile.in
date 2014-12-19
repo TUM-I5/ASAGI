@@ -690,6 +690,7 @@ RECURSIVE              = YES
 
 EXCLUDE                = @CMAKE_SOURCE_DIR@/examples \
                          @CMAKE_SOURCE_DIR@/preprocess \
+                         @CMAKE_SOURCE_DIR@/submodules \
                          @CMAKE_SOURCE_DIR@/tests \
                          @CMAKE_SOURCE_DIR@/test_progs \
                          @CMAKE_SOURCE_DIR@/tools

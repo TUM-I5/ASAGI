@@ -155,6 +155,9 @@ include_directories( ${CMAKE_SOURCE_DIR}/include )
 # For sub directories
 include_directories( ${CMAKE_SOURCE_DIR} )
 
+# Utils
+include_directories( ${CMAKE_SOURCE_DIR}/submodules )
+
 # Add sources in subdirectories
 add_subdirectory( allocator )
 add_subdirectory( blocks )
@@ -162,7 +165,6 @@ add_subdirectory( fortran )
 add_subdirectory( grid )
 add_subdirectory( io )
 add_subdirectory( perf )
-add_subdirectory( utils )
 if( NOT NOMPI )
 	add_subdirectory( mpi )
 endif( NOT NOMPI )
