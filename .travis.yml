@@ -1,0 +1,18 @@
+language: cpp
+comiler:
+ - gcc
+ - clang
+
+before_install:
+ - sudo apt-get update -qq
+
+install:
+ - sudo apt-get install -qq gfortran openmpi-bin openmpi-common openmpi-dev libnetcdf6 libnetcdf-dev cmake doxygen graphviz texlive-fonts-recommended
+
+script:
+ - mkdir build && cd build && cmake ../ -DTESTS=ON
+ - make
+ - make test
+ - make doc
+ - make apidoc
+
