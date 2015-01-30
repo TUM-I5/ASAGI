@@ -6,11 +6,11 @@ A parallel server for adaptive geoinformation.
 Documentation
 -------------
 
-An interface documentation of the latest release is available here:
-http://www5.in.tum.de/asagi/doc_0_3.pdf
+A documentation of the interface is available here:
+http://tum-i5.github.io/ASAGI/doc.pdf
 
-If you want to contribute to ASAGI, the full documentation might be interesting:
-http://www5.in.tum.de/asagi/apidoc/index.xhtml
+If you want to contribute to ASAGI, the full documentation might be interesting:  
+http://tum-i5.github.io/ASAGI/index.xhtml
 
 License
 -------

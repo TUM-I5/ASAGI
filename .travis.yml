@@ -9,6 +9,14 @@ before_install:
 install:
  - sudo apt-get install -qq gfortran openmpi-bin openmpi-common openmpi-dev libnetcdf6 libnetcdf-dev cmake doxygen graphviz texlive-fonts-recommended
 
+env:
+ global:
+   secure: "ZBhx5ai3VyZ223k5WEAVkC9Av1IqmHpyd4leKkMUrRc7ht2Zy4E3qus+Po3Y0XvwjAfeuR4ObFh69W5rZyq0YSfRCKSNianeBvalZ1mZQ5siOv37rf2OIweuRMjXwPrjXS40ctPamog9rK2/CmXb5jkQ2A08sr32dx3fiIU/gZk="
+
+branches:
+ except:
+  - gh-pages
+
 script:
  - mkdir build && cd build && cmake ../ -DTESTS=ON
  - make
@@ -16,3 +24,6 @@ script:
  - make doc
  - make apidoc
 
+after_success:
+ - cd ..
+ - documentation/gh_pages.sh
