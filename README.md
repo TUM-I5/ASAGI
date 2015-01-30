@@ -16,3 +16,8 @@ License
 -------
 
 ASAGI is release under LGPLv3 (see [COPYING](COPYING))
+
+Build Status
+------------
+
+[![Build Status](https://travis-ci.org/TUM-I5/ASAGI.svg?branch=master)](https://travis-ci.org/TUM-I5/ASAGI)
