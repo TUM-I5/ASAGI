@@ -1,0 +1,7 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classgrid_1_1LocalCacheGrid.xhtml" title="grid::LocalCacheGrid" alt="" coords="5,83,149,112"/>
+<area shape="rect" id="node9" href="$classgrid_1_1LocalStaticGrid.xhtml" title="grid::LocalStaticGrid" alt="" coords="173,83,312,112"/>
+<area shape="rect" id="node12" href="$classgrid_1_1PassThroughGrid.xhtml" title="grid::PassThroughGrid" alt="" coords="336,83,488,112"/>
+<area shape="rect" id="node5" href="$classgrid_1_1DistCacheGrid.xhtml" title="grid::DistCacheGrid" alt="" coords="9,160,145,189"/>
+<area shape="rect" id="node7" href="$classgrid_1_1DistStaticGrid.xhtml" title="grid::DistStaticGrid" alt="" coords="172,160,305,189"/>
+</map>

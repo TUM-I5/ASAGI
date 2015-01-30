@@ -1,0 +1,5 @@
+<map id="G" name="G">
+<area shape="rect" id="node1" href="$classallocator_1_1Allocator.xhtml" title="allocator::Allocator\&lt; T \&gt;" alt="" coords="5,32,168,61"/>
+<area shape="rect" id="node3" href="$classallocator_1_1DefaultAllocator.xhtml" title="allocator::DefaultAllocator\&lt; T \&gt;" alt="" coords="217,5,420,35"/>
+<area shape="rect" id="node5" href="$classallocator_1_1MPIAllocator.xhtml" title="allocator::MPIAllocator\&lt; T \&gt;" alt="" coords="225,59,412,88"/>
+</map>
