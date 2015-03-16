@@ -32,15 +32,18 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_GRIDCONTAINER_H
-#define GRID_GRIDCONTAINER_H
+#ifndef GRID_CONTAINER_H
+#define GRID_CONTAINER_H
 
-#include <asagi.h>
+#include "asagi.h"
 
-#include "fortran/pointerarray.h"
+#include "constants.h"
+#include "mpi/mpicomm.h"
+#include "numa/numa.h"
+#include "perf/counter.h"
 #include "types/type.h"
 
 namespace grid
@@ -51,37 +54,25 @@ class Grid;
 /**
  * A container that stores multiple levels of a grid
  */
-class GridContainer : public asagi::Grid
+class Container
 {
-public:
-	/** Possible positions of the values in a grid */
-	enum ValuePos { CELL_CENTERED, VERTEX_CENTERED };
 private:
-	/** Id of the grid, used for the fortran <-> c interface */
-	int m_id;
-	
-#ifndef ASAGI_NOMPI
-	/** The communicator we use */
-	MPI_Comm m_communicator;
-#endif // ASAGI_NOMPI
-	/** Rank of this process */
-	int m_mpiRank;
-	/** Size of the MPI communicator */
-	int m_mpiSize;
-	
+	/** The MPI Communicator used for this container */
+	const mpi::MPIComm &m_comm;
+
+	/** NUMA "communicator" for this container */
+	const numa::Numa &m_numa;
+
 	/**
 	 * The type of values we save in the grid.
 	 * This class implements all type specific operations.
 	 */
-	types::Type *m_type;
-	
-	/** True if the container should skip MPI calls like MPI_Comm_dup */
-	bool m_noMPI;
+	const types::Type * const m_type;
+
+	/** Value Position (cell-centered || vertex-centered) */
+	ValuePosition m_valuePos;
 
 protected:
-	/** Number of levels this grid container has */
-	const unsigned int m_levels;
-	
 	/** Minimum in x dimension (set by subclasses) */
 	double m_minX;
 	/** Minimum in y dimension (set by subclasses) */
@@ -94,63 +85,69 @@ protected:
 	double m_maxY;
 	/** Maximum in z dimension (set by subclasses) */
 	double m_maxZ;
-	
-	/** Value Position (cell-centered || vertex-centered) */
-	ValuePos m_valuePos;
+
 public:
-	GridContainer(Type type, bool isArray = false,
-		unsigned int hint = NO_HINT,
-		unsigned int levels = 1);
-	GridContainer(unsigned int count,
-		unsigned int blockLength[],
-		unsigned long displacements[],
-		asagi::Grid::Type types[],
-		unsigned int hint = NO_HINT, unsigned int levels = 1);
-	virtual ~GridContainer();
+	Container(const mpi::MPIComm &comm,
+		const numa::Numa &numa,
+		const types::Type* type,
+		ValuePosition valuePos);
+	virtual ~Container();
 	
-#ifndef ASAGI_NOMPI
-	Error setComm(MPI_Comm comm = MPI_COMM_WORLD);
-#endif // ASAGI_NOMPI
-	virtual Error setParam(const char* name, const char* value,
-		unsigned int level = 0);
 	/**
-	 * The default implementation make sure a communicator is set.
-	 * <br>
-	 * Subclasses should override this function and call open from the 
-	 * parent class before doing anythin.
+	 * @brief Initialize a level of the container
+	 *
+	 * This function is not thread-safe and should only be called by one thread
+	 *
+	 * @param filename The name of the file for this level
+	 * @param varname The variable name in the file
+	 * @param level The level that should be initialized
+	 * @return
 	 */
-	virtual Error open(const char* filename, unsigned int level = 0);
+	virtual asagi::Grid::Error init(const char* filename,
+			const char* varname,
+			unsigned int level) = 0;
 	
-	double getXMin() const
+	double getMin(unsigned int n) const
 	{
+		// TODO
 		return m_minX;
 	}
-	double getYMin() const
+	double getMax(unsigned int n) const
 	{
-		return m_minY;
-	}
-	double getZMin() const
-	{
-		return m_minZ;
-	}
-	double getXMax() const
-	{
+		// TODO
 		return m_maxX;
 	}
-	double getYMax() const
-	{
-		return m_maxY;
-	}
-	double getZMax() const
-	{
-		return m_maxZ;
-	}
 	
+	double getDelta(unsigned int n, unsigned int level) const
+	{
+		// TODO
+		return 0;
+	}
+
 	unsigned int getVarSize() const
 	{
 		return m_type->getSize();
 	}
-	
+
+	/**
+	 * Write the value at <code>pos</code> into <code>buf</code>.
+	 *
+	 * @param buf
+	 * @param pos
+	 * @param converter
+	 * @param level
+	 */
+	virtual void getAt(void* buf, const double* pos,
+			types::Type::converter_t converter, unsigned int level = 0) = 0;
+
+	/**
+	 * Get a counter for a specific level
+	 */
+	virtual unsigned long getCounter(perf::Counter::CounterType type,
+			unsigned int level = 0) const = 0;
+
+protected:
+	/*
 	unsigned char getByte1D(double x, unsigned int level = 0)
 	{
 		return getByte3D(x, 0, 0, level);
@@ -199,77 +196,44 @@ public:
 	void getBuf2D(void* buf, double x, double y, unsigned int level = 0)
 	{
 		getBuf3D(buf, x, y, 0, level);
-	}
+	}*/
 	
-#ifndef ASAGI_NOMPI
 	/**
-	 * @return The commicator used for all grids of this container
+	 * @return The communicator for this container
 	 */
-	MPI_Comm getMPICommunicator() const
+	const mpi::MPIComm& comm() const
 	{
-		return m_communicator;
+		return m_comm;
 	}
-#endif // ASAGI_NOMPI
 	
 	/**
-	 * @return The current MPI rank
+	 * @return The NUMA communicator for this container
 	 */
-	int getMPIRank() const
+	const numa::Numa& numa() const
 	{
-		return m_mpiRank;
+		return m_numa;
 	}
-	
+
 	/**
-	 * @return The size of the MPI communicator
+	 * @return The type for this container
 	 */
-	int getMPISize() const
+	const types::Type* type() const
 	{
-		return m_mpiSize;
+		return m_type;
 	}
-	
+
 	/**
-	 * @return The type assosiated with this grid
+	 * @return The value position for this container
 	 */
-	types::Type& getType() const
-	{
-		return *m_type;
-	}
-	
-	/**
-	 * @return The position of values in the grid
-	 */
-	ValuePos getValuePos() const
+	ValuePosition valuePosition() const
 	{
 		return m_valuePos;
-	}
-	
-	/**
-	 * Converts the C pointer of the grid to the Fortran identifier
-	 * 
-	 * @return The unique index of the grid container
-	 */
-	int c2f() const
-	{
-		return m_id;
 	}
 
 protected:
 	grid::Grid* createGrid(unsigned int hint, unsigned int id) const;
-
-private:
-	/** The index -> pointer translation array */
-	static fortran::PointerArray<GridContainer> m_pointers;
-
-public:
-	/**
-	 * Converts a Fortran index to a c/c++ pointer
-	 */
-	static GridContainer* f2c(int i)
-	{
-		return m_pointers.get(i);
-	}
 };
 
 }
 
-#endif // GRID_CONTAINER_GRIDCONTAINER_H
+#endif // GRID_CONTAINER_H

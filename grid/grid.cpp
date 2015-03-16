@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,434 +31,227 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "grid.h"
 
-#include "constants.h"
+#include <algorithm>
 
-#ifdef PNG_ENABLED
-#include "io/pngwriter.h"
-#endif
+#include "utils/stringutils.h"
 
+#include "simplecontainer.h"
+#include "level/passthrough.h"
+#include "types/arraytype.h"
 #include "types/basictype.h"
-
-#include <cstdlib>
-#include <cmath>
-#include <limits>
+#include "types/structtype.h"
 
 /**
- * @param container The container, this grid belongs to
- * @param hint Optimization hints
+ * @param type The basic type of the values
+ * @param isArray True if the type is an array, false if it is a basic
+ *  type
  */
-grid::Grid::Grid(const GridContainer &container,
-	unsigned int hint)
-	: m_container(container), m_variableName("z")
+grid::Grid::Grid(asagi::Grid::Type type, bool isArray)
 {
-	m_inputFile = 0L;
-	
-	m_blockSize[0] = m_blockSize[1] = m_blockSize[2] = 0;
-	
-	m_blocksPerNode = -1;
-	
-	m_handSpread = -1;
+	init();
 
-	if (hint & asagi::Grid::HAS_TIME)
-		m_timeDimension = -1;
-	else
-		m_timeDimension = -2;
+	if (isArray) {
+		switch (type) {
+		case BYTE:
+			m_type = new types::ArrayType<unsigned char>();
+			break;
+		case INT:
+			m_type = new types::ArrayType<int>();
+			break;
+		case LONG:
+			m_type = new types::ArrayType<long>();
+			break;
+		case FLOAT:
+			m_type = new types::ArrayType<float>();
+			break;
+		case DOUBLE:
+			m_type = new types::ArrayType<double>();
+			break;
+		default:
+			m_type = 0L;
+			assert(false);
+			break;
+		}
+	} else {
+		switch (type) {
+		case BYTE:
+			m_type = new types::BasicType<unsigned char>();
+			break;
+		case INT:
+			m_type = new types::BasicType<int>();
+			break;
+		case LONG:
+			m_type = new types::BasicType<long>();
+			break;
+		case FLOAT:
+			m_type = new types::BasicType<float>();
+			break;
+		case DOUBLE:
+			m_type = new types::BasicType<double>();
+			break;
+		default:
+			m_type = 0L;
+			assert(false);
+			break;
+		}
+	}
 }
+
+/**
+ * @param count Number of elements in the struct
+ * @param blockLength Size of each element in the struct
+ * @param displacements Offset of each element in the struct
+ * @param types Type of each element in the struct
+ */
+grid::Grid::Grid(unsigned int count,
+		unsigned int blockLength[],
+		unsigned long displacements[],
+		asagi::Grid::Type types[])
+{
+	init();
+
+	m_type = types::createStruct(count, blockLength,
+		displacements, types);
+}
+
 
 grid::Grid::~Grid()
 {
-	delete m_inputFile;
+	delete m_type;
+
+	for (std::vector<Container*>::const_iterator it = m_containers.begin();
+			it != m_containers.end(); it++)
+		delete *it;
+
+	// Remove from fortran <-> c translation
+	m_pointers.remove(m_id);
+}
+
+void grid::Grid::setParam(const char* name, const char* value, unsigned int level)
+{
+	if (m_params.size() <= level)
+		m_params.resize(level+1);
+
+	// Convert everything to uppercase
+	std::string n = name;
+	utils::StringUtils::toUpper(n);
+	std::replace(n.begin(), n.end(), '-', '_');
+
+	std::string v = value;
+	utils::StringUtils::toUpper(v);
+	std::replace(v.begin(), v.end(), '-', '_');
+
+	m_params[level][n] = v;
+}
+
+asagi::Grid::Error grid::Grid::open(const char* filename, unsigned int level)
+{
+	bool domainMaster;
+	asagi::Grid::Error err = m_numa.registerThread(domainMaster);
+	if (err != asagi::Grid::SUCCESS)
+		return err;
+
+	if (domainMaster) {
+		// Make sure the container has the correct size
+		m_resizeOnce.saveExec(*this, &Grid::initContainers);
+
+		return m_containers[m_numa.domainId()]->init(filename,
+				param("VARIABLE", "z"),
+				level);
+	}
+
+	return asagi::Grid::SUCCESS;
+}
+
+unsigned long grid::Grid::getCounter(const char* name, unsigned int level)
+{
+	perf::Counter::CounterType type = perf::Counter::name2type(name);
+
+	unsigned long counter = 0;
+
+	// Aggregate over all NUMA domains
+	for (std::vector<Container*>::const_iterator it = m_containers.begin();
+			it != m_containers.end(); it++)
+		counter += (*it)->getCounter(type);
+
+	return counter;
 }
 
 /**
- * Accepts the following parameters:
- * @li @b variable-name
- * @li @b time-dimension
- * @li @b x-block-size
- * @li @b y-block-size
- * @li @b z-block-size
- * @li @b block-cache-size
- * @li @b cache-hand-spread
- * 
- * @see asagi::Grid::setParam(const char*, const char*, unsigned int)
+ * Initialize basic variables
+ * Should only be called once by the constructor
  */
-asagi::Grid::Error grid::Grid::setParam(const char* name, const char* value)
+void grid::Grid::init()
 {
-	long blockSize;
-	
-	if (strcmp(name, "variable-name") == 0) {
-		m_variableName = value;
-		return asagi::Grid::SUCCESS;
-	}
-	
-	if (strcmp(name, "time-dimension") == 0) {
-		if (m_timeDimension <= -2)
-			// HAS_TIME hint was not specified
-			//-> ignore this variable
-			return asagi::Grid::SUCCESS;
-		
-		// Value should be x, y or z
-		for (signed char i = 0; i < 3; i++) {
-			if (strcmp(value, DIMENSION_NAMES[i]) == 0) {
-				m_timeDimension = i;
-				return asagi::Grid::SUCCESS;
-			}
-		}
-		
-		return asagi::Grid::INVALID_VALUE;
-	}
-	
-	if (strcmp(&name[1], "-block-size") == 0) {
-		// Check for [xyz]-block-size
-		
-		for (signed char i = 0; i < 3; i++) {
-			if (name[0] == DIMENSION_NAMES[i][0]) {
-				blockSize = atol(value);
-				
-				if (blockSize <= 0)
-					return asagi::Grid::INVALID_VALUE;
-				
-				m_blockSize[i] = blockSize;
-				return asagi::Grid::SUCCESS;
-			}
-		}
-	}
-	
-	if (strcmp(name, "block-cache-size") == 0) {
-		m_blocksPerNode = atol(value);
-		
-		if (m_blocksPerNode < 0)
-			// We set a correct value later
-			return asagi::Grid::INVALID_VALUE;
-		
-		if ((m_blocksPerNode == 0) && (getMPISize() > 1))
-			logWarning() << "Empty block cache size may lead to failures!";
-		
-		return asagi::Grid::SUCCESS;
-	}
-	
-	if ((strcmp(name, "cache-hand-spread") == 0)
-		|| (strcmp(name, "cache-hand-difference") == 0)) { // Obsolete name
-		m_handSpread = atol(value);
-		
-		return asagi::Grid::SUCCESS;
-	}
-	
-	return asagi::Grid::UNKNOWN_PARAM;
+	// Prepare for fortran <-> c translation
+	m_id = m_pointers.add(this);
 }
 
 /**
- * Reads a grid form the file and initializes all variables
+ * Initializes all the containers
  */
-asagi::Grid::Error grid::Grid::open(const char* filename)
+void grid::Grid::initContainers()
 {
-	asagi::Grid::Error error;
-	double scaling[3];
-	
-	// Open NetCDF file
-	m_inputFile = new io::NetCdfReader(filename, getMPIRank());
-	if ((error = m_inputFile->open(m_variableName.c_str()))
-		!= asagi::Grid::SUCCESS)
-		return error;
-	
-#ifdef __INTEL_COMPILER
-	#pragma unroll(3)
-#endif // __INTEL_COMPILER
-	for (unsigned char i = 0; i < 3; i++) {
-		// Get dimension size
-		m_dim[i] = m_inputFile->getSize(i);
-	
-		// Get offset and scaling
-		m_offset[i] = m_inputFile->getOffset(i);
-	
-		scaling[i] = m_inputFile->getScaling(i);
+	enum {
+		PASS_THROUGH,
+		UNKNOWN
+	} containerType = UNKNOWN;
+
+	// Select the container type
+	if (param("PASS_THROUGH", false)) {
+		containerType = PASS_THROUGH;
 	}
 
-	// Set time dimension
-	if (m_timeDimension == -1) {
-		// Time grid, but time dimension not specified
-		m_timeDimension = m_inputFile->getDimensions() - 1;
-		logDebug(getMPIRank()) << "Assuming time dimension"
-			<< DIMENSION_NAMES[m_timeDimension];
+	// Value position
+	std::string strValuePos = param("VALUE_POSITION", "CELL_CENTERED");
+	ValuePosition valuePos;
+	if (strValuePos == "VERTEX_CENTERED")
+		valuePos = VERTEX_CENTERED;
+	else {
+		valuePos = CELL_CENTERED;
+		if (strValuePos != "CELL_CENTERED")
+			logWarning(m_comm.rank()) << "ASAGI: Unknown value position:" << strValuePos;
 	}
-	
-	// Set block size in time dimension
-	if ((m_timeDimension >= 0) && (m_blockSize[m_timeDimension] == 0)) {
-		logDebug(getMPIRank()) << "Setting block size in time dimension"
-			<< DIMENSION_NAMES[m_timeDimension] << "to 1";
-		m_blockSize[m_timeDimension] = 1;
-	}
-	
-	// Set default block size and calculate number of blocks
-#ifdef __INTEL_COMPILER
-	#pragma unroll(3)
-#endif // __INTEL_COMPILER
-	for (unsigned char i = 0; i < 3; i++) {
-		if (m_blockSize[i] == 0)
-			// Setting default block size, if not yet set
-			m_blockSize[i] = 50;
-		
-		// A block size large than the dimension does not make any sense
-		if (m_dim[i] < m_blockSize[i]) {
-			logDebug(getMPIRank()) << "Shrinking" << DIMENSION_NAMES[i]
-				<< "block size to" << m_dim[i];
-			m_blockSize[i] = m_dim[i];
-		}
-		
-		// Integer way of rounding up
-		m_blocks[i] = (m_dim[i] + m_blockSize[i] - 1) / m_blockSize[i];
-		
-		m_scalingInv[i] = getInvScaling(scaling[i]);
-		
-		// Set min/max
-		if (std::isinf(scaling[i])) {
-			m_min[i] = -std::numeric_limits<double>::infinity();
-			m_max[i] = std::numeric_limits<double>::infinity();
-		} else {
-			// Warning: min and max are inverted of scaling is negative
-			double min = m_offset[i];
-			double max = m_offset[i] + scaling[i] * (m_dim[i] - 1);
 
-			if (m_container.getValuePos()
-				== GridContainer::CELL_CENTERED) {
-				// Add half a cell on both ends
-				min -= scaling[i] * (0.5 - NUMERIC_PRECISION);
-				max += scaling[i] * (0.5 - NUMERIC_PRECISION);
-			}
-
-			m_min[i] = std::min(min, max);
-			m_max[i] = std::max(min, max);
+	// Initialize the container
+	m_containers.resize(m_numa.totalDomains());
+	for (std::vector<Container*>::iterator it = m_containers.begin();
+			it != m_containers.end(); it++) {
+		switch (containerType) {
+		case PASS_THROUGH:
+			*it = new SimpleContainer<level::PassThrough>(m_comm, m_numa, m_type,
+					valuePos);
+			break;
+		default:
+			*it = 0L;
+			assert(false);
 		}
 	}
-	
-	// Set default cache size
-	if (m_blocksPerNode < 0)
-		// Default value
-		m_blocksPerNode = 80;
-	
-	// Init type
-	if ((error = getType().check(*m_inputFile)) != asagi::Grid::SUCCESS)
-		return error;
-	
-	// Init subclass
-	error = init();
-	
-	if (!keepFileOpen()) {
-		// input file no longer needed, so we close
-		delete m_inputFile;
-		m_inputFile = 0L;
-	}
-	
-	return error;
 }
 
 /**
- * @return The value at (x,y,z) as a byte
+ * Checks if a parameter exists and returns its value.
+ * If the parameter is not set, the default value is returned.
  */
-unsigned char grid::Grid::getByte(double x, double y, double z)
+template<typename T>
+T grid::Grid::param(const char* name, T defaultValue, unsigned int level) const
 {
-	unsigned char buf;
-	getAt(&buf, &types::Type::convertByte, x, y, z);
-	
-	return buf;
+	if (level >= m_params.size())
+		return defaultValue;
+
+	std::map<std::string, std::string>::const_iterator it = m_params[level].find(name);
+	if (it == m_params[level].end())
+		return defaultValue;
+
+	return utils::StringUtils::parse<T>(it->second, true);
 }
 
-/**
- * @return The value at (x,y,z) as an integer
- */
-int grid::Grid::getInt(double x, double y, double z)
-{
-	int buf;
-	getAt(&buf, &types::Type::convertInt, x, y, z);
-
-	return buf;
-}
-
-/**
- * @return The value at (x,y,z) as a long
- */
-long grid::Grid::getLong(double x, double y, double z)
-{
-	long buf;
-	getAt(&buf, &types::Type::convertLong, x, y, z);
-
-	return buf;
-}
-
-/**
- * @return The value at (x,y,z) as a float
- */
-float grid::Grid::getFloat(double x, double y, double z)
-{
-	float buf;
-	getAt(&buf, &types::Type::convertFloat, x, y, z);
-
-	return buf;
-}
-
-/**
- * @return The value at (x,y,z) as a double
- */
-double grid::Grid::getDouble(double x, double y, double z)
-{
-	double buf;
-	getAt(&buf, &types::Type::convertDouble, x, y, z);
-
-	return buf;
-}
-
-/**
- * Copys the value at (x,y,z) into the buffer
- */
-void grid::Grid::getBuf(void* buf, double x, double y, double z)
-{
-	getAt(buf, &types::Type::convertBuffer, x, y, z);
-}
-
-/**
- * @see asagi::Grid::exportPng()
- */
-bool grid::Grid::exportPng(const char* filename)
-{
-#ifdef PNG_ENABLED
-	float min, max, value;
-	unsigned char red, green, blue;
-	
-	min = max = getAtFloat(0, 0);
-	for (unsigned long i = 0; i < getXDim(); i++) {
-		for (unsigned long j = 0; j < getYDim(); j++) {
-			value = getAtFloat(i, j);
-			if (value < min)
-				min = value;
-			if (value > max)
-				max = value;
-		}
-	}
-	
-	io::PngWriter png(getXDim(), getYDim());
-	if (!png.create(filename))
-		return false;
-	
-	for (unsigned long i = 0; i < getXDim(); i++) {
-		for (unsigned long j = 0; j < getYDim(); j++) {
-			// do some magic here
-			h2rgb((getAtFloat(i, j) - min) / (max - min) * 2 / 3, red, green, blue);
-			png.write(i, getYDim() - j - 1, red, green, blue);
-		}
-	}
-	
-	png.close();
-	
-	return true;
-#else // PNG_ENABLED
-	// TODO generate a warning or something like this
-	return false;
-#endif // PNG_ENABLED
-}
-
-/**
- * Converts the coordinates to indices and writes the value at the position
- * into the buffer
- */
-void grid::Grid::getAt(void* buf, types::Type::converter_t converter,
-	double x, double y, double z)
-{
-	x = round((x - m_offset[0]) * m_scalingInv[0]);
-	y = round((y - m_offset[1]) * m_scalingInv[1]);
-	z = round((z - m_offset[2]) * m_scalingInv[2]);
-
-	assert(x >= 0 && x < getXDim()
-		&& y >= 0 && y < getYDim()
-		&& z >= 0 && z < getZDim());
-
-	m_counter.inc(perf::Counter::ACCESS);
-
-	getAt(buf, converter, static_cast<unsigned long>(x),
-		static_cast<unsigned long>(y), static_cast<unsigned long>(z));
-}
-
-float grid::Grid::getAtFloat(unsigned long x, unsigned long y)
-{
-	float buf;
-	
-	getAt(&buf, &types::Type::convertFloat, x, y);
-	
-	return buf;
-}
-
-/**
- * Calculates a nice rgb representation for a value between 0 and 1
- */
-void grid::Grid::h2rgb(float h, unsigned char &red, unsigned char &green,
-	unsigned char &blue)
-{
-	// h from 0..1
-	
-	h *= 6;
-	float x = fmod(h, 2) - 1;
-	if (x < 0)
-		x *= -1;
-	x = 1 - x;
-	
-	// <= checks are not 100% correct, it should be <
-	// but it solves the "largest-value" issue
-	if (h <= 1) {
-		red = 255;
-		green = x * 255;
-		blue = 0;
-		return;
-	}
-	if (h <= 2) {
-		red = x * 255;
-		green = 255;
-		blue = 0;
-		return;
-	}
-	if (h <= 3) {
-		red = 0;
-		green = 255;
-		blue = x * 255;
-		return;
-	}
-	if (h <= 4) {
-		red = 0;
-		green = x * 255;
-		blue = 255;
-		return;
-	}
-	if (h <= 5) {
-		red = x * 255;
-		green = 0;
-		blue = 255;
-	}
-	// h < 6
-	red = 255;
-	green = 0;
-	blue = x * 255;
-}
-
-/**
- * Calculates 1/scaling, except for scaling = 0 and scaling = inf. In this
- * case it returns 0
- */
-double grid::Grid::getInvScaling(double scaling)
-{
-	if ((scaling == 0) || isinf(scaling))
-		return 0;
-	
-	return 1/scaling;
-}
-
-/**
- * Implementation for round-to-nearest
- */
-double grid::Grid::round(double value)
-{
-	return floor(value + 0.5);
-}
+// Fortran <-> c translation array
+fortran::PointerArray<grid::Grid>
+	grid::Grid::m_pointers;

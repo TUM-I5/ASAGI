@@ -32,40 +32,64 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_SIMPLEGRIDCONTAINER_H
-#define GRID_SIMPLEGRIDCONTAINER_H
+#ifndef GRID_SIMPLECONTAINER_H
+#define GRID_SIMPLECONTAINER_H
 
-#include "gridcontainer.h"
+#include <vector>
+
+#include "container.h"
 
 namespace grid
 {
 
 /**
- * Simple grid container that stores one grid for each level. Each grid has to
- * cover the hole domain.
+ * Simple container that stores the whole grid for each level.
  */
-class SimpleGridContainer : public GridContainer
+template<class Level>
+class SimpleContainer : public Container
 {
 private:
 	/** All grids we control */
-	grid::Grid **m_grids;
+	std::vector<Level> m_levels;
+
 public:
-	SimpleGridContainer(Type type, bool isArray = false,
-		unsigned int hint = NO_HINT,
-		unsigned int levels = 1);
-	SimpleGridContainer(unsigned int count,
-		unsigned int blockLength[],
-		unsigned long displacements[],
-		asagi::Grid::Type types[],
-		unsigned int hint = NO_HINT, unsigned int levels = 1);
-	virtual ~SimpleGridContainer();
+	SimpleContainer(const mpi::MPIComm &comm,
+			const numa::Numa &numa,
+			const types::Type* type,
+			ValuePosition valuePos)
+		: Container(comm, numa, type, valuePos)
+	{
+	}
+
+	virtual ~SimpleContainer()
+	{ }
 	
-	Error setParam(const char* name, const char* value,
-		unsigned int level = 0);
-	Error open(const char* filename, unsigned int level = 0);
+	asagi::Grid::Error init(const char* filename,
+			const char* varname,
+			unsigned int level)
+	{
+		if (m_levels.size() <= level)
+			m_levels.resize(level+1);
+
+		return m_levels[level].init(
+				comm(),
+				numa(),
+				type(),
+				filename,
+				varname,
+				valuePosition());
+	}
+
+	void getAt(void* buf, const double* pos,
+			types::Type::converter_t converter, unsigned int level = 0)
+	{
+		assert(level < m_levels.size());
+
+		m_levels[level].getAt(buf, pos, converter);
+	}
 	
 	double getXDelta() const;
 	double getYDelta() const;
@@ -83,12 +107,16 @@ public:
 		unsigned int level = 0);
 	void getBuf3D(void* buf, double x, double y = 0, double z = 0,
 		unsigned int level = 0);
-	
-	bool exportPng(const char* filename, unsigned int level = 0);
 
-	unsigned long getCounter(const char* name, unsigned int level = 0);
+	unsigned long getCounter(perf::Counter::CounterType type,
+			unsigned int level = 0) const
+	{
+		assert(level < m_levels.size());
+
+		return m_levels[level].getCounter(type);
+	}
 };
 
 }
 
-#endif // GRID_SIMPLEGRIDCONTAINER_H
+#endif // GRID_SIMPLECONTAINER_H

@@ -37,7 +37,7 @@
 
 #include "adaptivegridcontainer.h"
 
-#include "grid/grid.h"
+#include "grid2.h"
 
 /**
  * @see GridContainer::GridContainer()
@@ -187,7 +187,7 @@ unsigned long grid::AdaptiveGridContainer::getCounter(const char* name, unsigned
 {
 	assert(level < m_levels);
 
-	std::vector<grid::Grid*>::const_iterator grid;
+	std::vector<grid::Grid2*>::const_iterator grid;
 	unsigned long counter = 0;
 
 	for (grid = m_grids[level].begin(); grid < m_grids[level].end(); grid++)
@@ -200,10 +200,10 @@ unsigned long grid::AdaptiveGridContainer::getCounter(const char* name, unsigned
  * Get the grid with the best level of detail (but not better than level) for
  * (x,y,z).
  */
-grid::Grid* grid::AdaptiveGridContainer::getGrid(double x, double y, double z,
+grid::Grid2* grid::AdaptiveGridContainer::getGrid(double x, double y, double z,
 	unsigned int level)
 {
-	std::vector<grid::Grid*>::const_iterator grid;
+	std::vector<grid::Grid2*>::const_iterator grid;
 	
 	assert(level < m_levels);
 	assert(m_minX <= x && m_maxX >= x && m_minY <= y && m_maxY >= y

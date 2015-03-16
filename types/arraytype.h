@@ -32,14 +32,13 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TYPES_ARRAYTYPE_H
 #define TYPES_ARRAYTYPE_H
 
 #include "basictype.h"
-
 #include "io/netcdfreader.h"
 
 namespace types {
@@ -62,7 +61,7 @@ private:
 	
 public:
 	ArrayType()
-		: m_arraySize(0) // provide default value to silence compiler
+		: m_arraySize(0)
 #ifndef ASAGI_NOMPI
 		, m_mpiType(MPI_DATATYPE_NULL)
 #endif // ASAGI_NOMPI
@@ -81,7 +80,15 @@ public:
 		if (file.getVarSize() % sizeof(T) != 0)
 			return asagi::Grid::INVALID_VAR_SIZE;
 		
-		m_arraySize = file.getVarSize() / sizeof(T);
+		unsigned int arraySize = file.getVarSize() / sizeof(T);
+
+		// TODO use mutex here
+		if (m_arraySize == 0)
+			m_arraySize = arraySize;
+		else {
+			if (arraySize != m_arraySize)
+				return asagi::Grid::WRONG_SIZE;
+		}
 		
 #ifndef ASAGI_NOMPI
 		// Create the mpi datatype
@@ -95,7 +102,7 @@ public:
 		return asagi::Grid::SUCCESS;
 	}
 	
-	unsigned int getSize()
+	unsigned int getSize() const
 	{
 		return m_arraySize * BasicType<T>::getSize();
 	}
@@ -103,7 +110,7 @@ public:
 	void load(io::NetCdfReader &file,
 		const size_t *offset,
 		const size_t *size,
-		void *buf)
+		void *buf) const
 	{
 		file.getBlock<void>(buf, offset, size);
 	}

@@ -31,61 +31,86 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include <asagi.h>
+#ifndef MPI_MPICOMM_H
+#define MPI_MPICOMM_H
 
-// Do not abort to get real failure
-#define LOG_ABORT
-#include "utils/logger.h"
+#include <mpi.h>
 
-#include "tests.h"
-
-using namespace asagi;
-
-int main(int argc, char** argv)
+namespace mpi
 {
-	Grid* grid = Grid::create();
-	grid->setParam("PASS_THROUGH", "YES");
 
-	if (grid->open(NC_2D) != Grid::SUCCESS) {
-		logError() << "Could not open file";
-		return 1;
+/**
+ * Small wrapper around the MPI communicator
+ */
+class MPIComm
+{
+private:
+	/** The communicator */
+	MPI_Comm m_comm;
+
+	/** My rank */
+	int m_rank;
+
+	/** Total number of ranks */
+	int m_size;
+
+public:
+	MPIComm()
+		: m_comm(MPI_COMM_NULL),
+		  m_rank(0), m_size(1)
+	{ }
+
+	virtual ~MPIComm()
+	{
+		if (m_comm != MPI_COMM_NULL)
+			MPI_Comm_free(&m_comm);
 	}
 
-	int value;
+	/**
+	 * Initialize the communicator
+	 */
+	asagi::Grid::Error init(MPI_Comm comm)
+	{
+		if (MPI_Comm_dup(comm, &m_comm) != MPI_SUCCESS)
+			return asagi::Grid::MPI_ERROR;
 
-	double coords[2];
-	for (int i = 0; i < NC_WIDTH; i++) {
-		coords[0] = i;
+		if (MPI_Comm_rank(m_comm, &m_rank) != MPI_SUCCESS)
+			return asagi::Grid::MPI_ERROR;
+		if (MPI_Comm_size(m_comm, &m_size) != MPI_SUCCESS)
+			return asagi::Grid::MPI_ERROR;
 
-		for (int j = 0; j < NC_LENGTH; j++) {
-			coords[1] = j;
-
-			value = j * NC_WIDTH + i;
-			if (grid->getInt(coords) != value) {
-				logError() << "Value at" << i << j << "should be"
-					<< value << "but is" << grid->getInt(coords);
-				return 1;
-			}
-		}
+		return asagi::Grid::SUCCESS;
 	}
 
-	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
-				<< "but is" << grid->getCounter("accesses");
-		return 1;
+	/**
+	 * @return The associated communicator
+	 */
+	MPI_Comm comm() const
+	{
+		return m_comm;
 	}
 
-	if (grid->getCounter("file_loads") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"file_loads\" should be" << (NC_WIDTH*NC_LENGTH)
-				<< "but is" << grid->getCounter("file_loads");
-		return 1;
+	/**
+	 * @return My rank
+	 */
+	int rank() const
+	{
+		return m_rank;
 	}
 
-	delete grid;
+	/**
+	 * @return Size of the communicator
+	 */
+	int size() const
+	{
+		return m_size;
+	}
+};
 
-	return 0;
 }
+
+#endif // MPI_MPICOMM_H

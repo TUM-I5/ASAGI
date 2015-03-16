@@ -58,13 +58,16 @@ int main(int argc, char** argv)
 	if (grid->open(NC_1D) != Grid::SUCCESS)
 		return 1;
 	
-	for (int i = 0; i < NC_WIDTH; i++) 
-		if (grid->getInt1D(i) != i) {
+	double coords;
+	for (int i = 0; i < NC_WIDTH; i++) {
+		coords = i;
+		if (grid->getInt(&coords) != i) {
 			logError() << "Test failed on rank" << rank << std::endl
 				<< "Value at" << i << "should be"
-				<< i << "but is" << grid->getInt1D(i);
+				<< i << "but is" << grid->getInt(&coords);
 			return 1;
 		}
+	}
 	
 	delete grid;
 	

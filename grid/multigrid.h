@@ -46,7 +46,7 @@
 namespace grid
 {
 
-class Grid;
+class Grid2;
 
 /**
  * Interface that can create grids. The {@link MultiGrid} requires
@@ -61,7 +61,7 @@ public:
 	/**
 	 * @return A new grid
 	 */
-	virtual Grid* createGrid() = 0;
+	virtual Grid2* createGrid() = 0;
 };
 
 /**
@@ -81,7 +81,7 @@ private:
 	bool m_topLevel;
 
 	/** The list of grids that does the real work */
-	std::vector<Grid*> m_grids;
+	std::vector<Grid2*> m_grids;
 
 	/** The next grid that should be used when calling {@link open} */
 	unsigned int m_nextOpen;
@@ -106,7 +106,7 @@ public:
 	/**
 	 * @return The grid the index i
 	 */
-	Grid* getGrid(unsigned int i)
+	Grid2* getGrid(unsigned int i)
 	{
 		assert(i < m_grids.size());
 		return m_grids[i];
@@ -115,7 +115,7 @@ public:
 	/**
 	 * @return Read iterator that points to the beginning of the grids
 	 */
-	std::vector<Grid*>::const_iterator begin()
+	std::vector<Grid2*>::const_iterator begin()
 	{
 		return m_grids.begin();
 	}
@@ -123,7 +123,7 @@ public:
 	/**
 	 * @return Read iterator that points to the last grid
 	 */
-	Grid* back()
+	Grid2* back()
 	{
 		return m_grids.back();
 	}
@@ -131,7 +131,7 @@ public:
 	/**
 	 * @return Read iterator that points to the end of the grids
 	 */
-	std::vector<Grid*>::const_iterator end()
+	std::vector<Grid2*>::const_iterator end()
 	{
 		return m_grids.end();
 	}

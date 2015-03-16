@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "globaltest.h"
@@ -49,7 +49,7 @@ public:
 	void setUp(void)
 	{
 		file3d = new io::NetCdfReader("../../" NC_3D, 0);
-		file3d->open();
+		TS_ASSERT_EQUALS(file3d->open(), asagi::Grid::SUCCESS);
 	}
 	
 	void tearDown(void)
@@ -59,7 +59,7 @@ public:
 	
 	void testGetDimensions(void)
 	{
-		TS_ASSERT_EQUALS(file3d->getDimensions(), 3);
+		TS_ASSERT_EQUALS(file3d->dimensions(), 3u);
 	}
 	
 	void testGetSize(void)

@@ -49,7 +49,7 @@
  */
 grid::DistStaticGrid::DistStaticGrid(const GridContainer &container,
 	unsigned int hint)
-	: Grid(container, hint),
+	: Grid2(container, hint),
 	  LocalStaticGrid(container, hint,
 			  allocator::MPIAllocator<unsigned char>::allocator),
 	  LocalCacheGrid(container, hint)

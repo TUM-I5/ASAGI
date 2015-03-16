@@ -35,57 +35,50 @@
  * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include <asagi.h>
+#include "passthrough.h"
 
-// Do not abort to get real failure
-#define LOG_ABORT
-#include "utils/logger.h"
-
-#include "tests.h"
-
-using namespace asagi;
-
-int main(int argc, char** argv)
+grid::level::PassThrough::PassThrough()
+	: m_buf(0L)
 {
-	Grid* grid = Grid::create();
-	grid->setParam("PASS_THROUGH", "YES");
-
-	if (grid->open(NC_2D) != Grid::SUCCESS) {
-		logError() << "Could not open file";
-		return 1;
-	}
-
-	int value;
-
-	double coords[2];
-	for (int i = 0; i < NC_WIDTH; i++) {
-		coords[0] = i;
-
-		for (int j = 0; j < NC_LENGTH; j++) {
-			coords[1] = j;
-
-			value = j * NC_WIDTH + i;
-			if (grid->getInt(coords) != value) {
-				logError() << "Value at" << i << j << "should be"
-					<< value << "but is" << grid->getInt(coords);
-				return 1;
-			}
-		}
-	}
-
-	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
-				<< "but is" << grid->getCounter("accesses");
-		return 1;
-	}
-
-	if (grid->getCounter("file_loads") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"file_loads\" should be" << (NC_WIDTH*NC_LENGTH)
-				<< "but is" << grid->getCounter("file_loads");
-		return 1;
-	}
-
-	delete grid;
-
-	return 0;
 }
+
+grid::level::PassThrough::~PassThrough()
+{
+	delete [] m_buf;
+}
+
+asagi::Grid::Error grid::level::PassThrough::init(
+		const mpi::MPIComm &comm,
+		const numa::Numa &numa,
+		const types::Type* type,
+		const char* filename,
+		const char* varname,
+		grid::ValuePosition valuePos)
+{
+	asagi::Grid::Error err = _init(comm, numa, type,
+			filename, varname, valuePos);
+	if (err != asagi::Grid::SUCCESS)
+		return err;
+
+	m_buf = new unsigned char[type->getSize() * numa.totalThreads()];
+
+	return asagi::Grid::SUCCESS;
+}
+
+#if 0
+void grid::PassThroughGrid::getAt(void* buf, types::Type::converter_t converter,
+	unsigned long x, unsigned long y, unsigned long z)
+{
+	size_t pos[] = {x, y, z};
+	size_t size[MAX_DIMENSIONS];
+
+	incCounter(perf::Counter::FILE);
+
+	// Load one value in each dimension
+	std::fill_n(size, MAX_DIMENSIONS, 1);
+
+	getType().load(getInputFile(), pos, size, m_mem);
+
+	(getType().*converter)(m_mem, buf);
+}
+#endif

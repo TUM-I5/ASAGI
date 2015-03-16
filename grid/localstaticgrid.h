@@ -38,9 +38,8 @@
 #ifndef GRID_LOCALSTATICGRID_H
 #define GRID_LOCALSTATICGRID_H
 
-#include "grid.h"
-
 #include "allocator/defaultallocator.h"
+#include "grid2.h"
 
 namespace grid
 {
@@ -53,7 +52,7 @@ namespace grid
  * 
  * If compiled without MPI, all blocks are local.
  */
-class LocalStaticGrid : virtual public Grid
+class LocalStaticGrid : virtual public Grid2
 {
 private:
 	/** Local data cache */

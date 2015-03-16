@@ -4,16 +4,19 @@ cmake_minimum_required( VERSION 2.8 )
 project( ASAGI )
 
 set( ASAGI_VERSION_MAJOR 0 )
-set( ASAGI_VERSION_MINOR 3 )
+set( ASAGI_VERSION_MINOR 4 )
 
 ##### User configuration #####
 option( SHARED_LIB "Compile the shared library" ON )
 option( STATIC_LIB "Compile the static library" OFF )
-option( THREADSAFETY "Enable support for multiple threads on each node" ON )
 option( FORTRAN_SUPPORT "Enable Fortran support" ON )
+set( MAX_DIMENSIONS 4 CACHE STRING "Maximum number of dimension supported" )
+option( THREADSAFE "Enable support for multiple threads on each node" ON )
+option( THREADSAFE_COUNTER "Make performance counter thread safe" OFF )
+option( NOMPI "Compile without MPI" OFF )
+option( NONUMA "Compile without NUMA support" OFF )
 option( EXAMPLES "Compile examples" OFF )
 option( TESTS "Test library" OFF )
-option( NOMPI "Compile without MPI" OFF )
 option( ROUND_ROBIN "Distribute blocks round robin on nodes (internal use)" ON )
 
 ##### Default build type #####
@@ -107,22 +110,22 @@ if( FORTRAN_SUPPORT )
 	enable_language( Fortran )
 endif()
 
-# Thread-safety
-if( THREADSAFETY )
-	add_definitions( -DTHREADSAFETY )
+add_definitions( -DMAX_DIMENSIONS=${MAX_DIMENSIONS} )
+
+# Thread safe?
+if( THREADSAFE )
+	add_definitions( -DTHREADSAFE )
+endif()
+
+# Thead safe counters?
+if( THREADSAFE_COUNTER )
+    add_definitions( -DTHREADSAFE_COUNTER )
 endif()
 
 # Use MPI
 if( NOMPI )
 	add_definitions( -DASAGI_NOMPI )
-endif( NOMPI )
-
-# Round robin
-if( ROUND_ROBIN )
-	add_definitions( -DROUND_ROBIN )
-endif( ROUND_ROBIN )
-
-if( NOT NOMPI )
+else( NOMPI )
 	# Find MPI
 	find_package( MPI REQUIRED )
 	if( MPI_LIBRARY )
@@ -137,7 +140,24 @@ if( NOT NOMPI )
 	set( CMAKE_C_COMPILER ${MPI_C_COMPILER} )
 	set( CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER} )
 	set( CMAKE_Fortran_COMPILER ${MPI_Fortran_COMPILER} )
-endif( NOT NOMPI )
+endif( NOMPI )
+
+# Find pthread
+if( NONUMA )
+    find_package( Threads )
+else()
+    find_package( Threads REQUIRED )
+    find_package( Numa REQUIRED )
+    include_directories( SYSTEM ${NUMA_INCLUDE_DIR} )
+endif()
+if( THREADS_FOUND )
+    add_definitions( -DUSE_PTHREAD )
+endif()
+
+# Round robin
+if( ROUND_ROBIN )
+	add_definitions( -DROUND_ROBIN )
+endif( ROUND_ROBIN )
 
 # Find netcdf
 find_package( NetCDF REQUIRED )
@@ -168,6 +188,7 @@ add_subdirectory( perf )
 if( NOT NOMPI )
 	add_subdirectory( mpi )
 endif( NOT NOMPI )
+add_subdirectory( numa )
 add_subdirectory( types )
 
 # Add sources
@@ -224,11 +245,20 @@ if( STATIC_LIB )
         PROPERTIES OUTPUT_NAME asagi )
 endif( STATIC_LIB )
 
+if( THREAD_FOUND )
+    lib_link_libraries( asagi ${CMAKE_THREAD_LIBS_INIT} )
+endif( THREAD_FOUND )
+
 if( NOMPI )
 	set_lib_output_name( asagi asagi_nompi )
 else( NOMPI )
 	lib_link_libraries( asagi )
 endif( NOMPI )
+
+if( NOT NONUMA )
+    link_directories( ${NUMA_LIBRARY_DIR} )
+    lib_link_libraries( asagi ${NUMA_LIBRARY} )
+endif( NOT NONUMA )
 
 lib_link_libraries( asagi ${NETCDF_LIBRARIES} )
 if( PNG_FOUND )

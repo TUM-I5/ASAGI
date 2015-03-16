@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TYPES_STRUCTTYPE_H
@@ -81,6 +81,8 @@ private:
 	StructType(unsigned int count, unsigned int blockLength[],
 		unsigned long displacements[], asagi::Grid::Type types[])
 	{
+		m_size = 0;
+
 #ifndef ASAGI_NOMPI
 		m_count = count;
 		// We can not create the final mpi datatype, because we do not
@@ -110,6 +112,8 @@ private:
 				break;
 			}
 		}
+
+		m_mpiType = MPI_DATATYPE_NULL;
 #endif // ASAGI_NOMPI
 	}
 public:
@@ -157,7 +161,7 @@ public:
 		return asagi::Grid::SUCCESS;
 	}
 	
-	unsigned int getSize()
+	unsigned int getSize() const
 	{
 		return m_size;
 	}
@@ -165,7 +169,7 @@ public:
 	void load(io::NetCdfReader &file,
 		const size_t *offset,
 		const size_t *size,
-		void *buf)
+		void *buf) const
 	{
 		file.getBlock<void>(buf, offset, size);
 	}

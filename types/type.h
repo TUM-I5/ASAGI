@@ -69,7 +69,7 @@ public:
 	 * @see convertDouble
 	 * @see convertBuffer
 	 */
-	typedef void (Type::*converter_t)(const void*, void*);
+	typedef void (Type::*converter_t)(const void*, void*) const;
 	
 public:
 	/**
@@ -90,7 +90,7 @@ public:
 	/**
 	 * @return The size of the variable
 	 */
-	virtual unsigned int getSize() = 0;
+	virtual unsigned int getSize() const = 0;
 	
 	/**
 	 * Loads a block form the netcdf file into the buffer
@@ -98,7 +98,7 @@ public:
 	virtual void load(io::NetCdfReader &file,
 		const size_t *offset,
 		const size_t *size,
-		void *buf) = 0;
+		void *buf) const = 0;
 	
 #ifndef ASAGI_NOMPI
 	/**
@@ -116,28 +116,28 @@ public:
 	 * All these functions have the type "converter_t". This way it is
 	 * possible to pass them arround as pointers.
 	 */
-	virtual void convertByte(const void* data, void* buf) = 0;
+	virtual void convertByte(const void* data, void* buf) const = 0;
 	/**
 	 * @see convertByte
 	 */
-	virtual void convertInt(const void* data, void* buf) = 0;
+	virtual void convertInt(const void* data, void* buf) const = 0;
 	/**
 	 * @see convertByte
 	 */
-	virtual void convertLong(const void* data, void* buf) = 0;
+	virtual void convertLong(const void* data, void* buf) const = 0;
 	/**
 	 * @see convertByte
 	 */
-	virtual void convertFloat(const void* data, void* buf) = 0;
+	virtual void convertFloat(const void* data, void* buf) const = 0;
 	/**
 	 * @see convertByte
 	 */
-	virtual void convertDouble(const void* data, void* buf) = 0;
+	virtual void convertDouble(const void* data, void* buf) const = 0;
 	/**
 	 * This is the "no-conversation" function. It simple copys a whole
 	 * variable from data to buf
 	 */
-	void convertBuffer(const void* data, void* buf)
+	void convertBuffer(const void* data, void* buf) const
 	{
 		memcpy(buf, data, getSize());
 	}

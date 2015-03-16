@@ -43,7 +43,7 @@
 grid::LocalStaticGrid::LocalStaticGrid(const GridContainer &container,
 	unsigned int hint,
 	const allocator::Allocator<unsigned char> &allocator)
-	: Grid(container, hint),
+	: Grid2(container, hint),
 	  m_allocator(allocator)
 {
 	m_data = 0L;

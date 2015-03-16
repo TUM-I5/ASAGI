@@ -32,19 +32,17 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef FORTRAN_POINTERARRAY_H
 #define FORTRAN_POINTERARRAY_H
 
 #include <cassert>
-#ifdef THREADSAFETY
 #include <mutex>
-#endif // THREADSAFETY
 #include <vector>
 
-#define NULL_INDEX -1
+#include "threads/mutex.h"
 
 /**
  * @brief C++ code required to support the Fortran API
@@ -61,12 +59,11 @@ template<class T> class PointerArray
 private:
 	/** Array that maps to the correct pointer */
 	std::vector<T*> m_pointers;
-#ifdef THREADSAFETY
+
 	/**
 	 * Lock, we use to make sure only one thread at a time adds a pointer
 	 */
-	std::mutex m_lock;
-#endif // THREADSAFETY
+	threads::Mutex m_lock;
 public:
 	/**
 	 * Add a new pointer to the map
@@ -75,11 +72,9 @@ public:
 	 */
 	int add(T* const p)
 	{
-#ifdef THREADSAFETY
 		// Lock vector, otherwise the id (return value)
 		// gets messed up
-		std::lock_guard<std::mutex> lock(m_lock);
-#endif // THREADSAFETY
+		std::lock_guard<threads::Mutex> lock(m_lock);
 		
 		m_pointers.push_back(p);
 		return m_pointers.size() - 1;

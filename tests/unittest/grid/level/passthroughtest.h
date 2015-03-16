@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- *
+ * 
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -32,60 +32,61 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include <asagi.h>
-
-// Do not abort to get real failure
-#define LOG_ABORT
-#include "utils/logger.h"
-
+#include "globaltest.h"
 #include "tests.h"
 
-using namespace asagi;
+#include "grid/grid.h"
+#include "grid/simplecontainer.h"
+#include "grid/level/passthrough.h"
 
-int main(int argc, char** argv)
+class GridTest : public CxxTest::TestSuite
 {
-	Grid* grid = Grid::create();
-	grid->setParam("PASS_THROUGH", "YES");
-
-	if (grid->open(NC_2D) != Grid::SUCCESS) {
-		logError() << "Could not open file";
-		return 1;
+	grid::Grid* c;
+	grid::level::PassThrough* grid;
+public:
+	void setUp(void)
+	{
+		// Set up a 1d grid
+		c = new grid::Grid(asagi::Grid::FLOAT);
+		c->setParam("PASS_THROUGH", "YES");
+		c->open("../../../" NC_1D);
+		grid = &static_cast<grid::SimpleContainer<grid::level::PassThrough>*>(c->m_containers[0])->m_levels[0];
+	}
+	
+	void tearDown(void)
+	{
+		delete c;
+	}
+	
+	void testSetParam(void)
+	{
+		/*
+		TS_ASSERT_EQUALS(grid->setParam("x-block-size", "5"),
+			asagi::Grid::SUCCESS);
+		TS_ASSERT_EQUALS(grid->m_blockSize[0], 5u);
+		
+		grid->setParam("y-block-size", "7");
+		TS_ASSERT_EQUALS(grid->m_blockSize[1], 7u);
+		
+		grid->setParam("z-block-size", "42");
+		TS_ASSERT_EQUALS(grid->m_blockSize[2], 42u);
+		
+		TS_ASSERT_EQUALS(grid->setParam("block-cache-size", "100"),
+			asagi::Grid::SUCCESS);
+		TS_ASSERT_EQUALS(grid->m_blocksPerNode, 100);
+		*/
 	}
 
-	int value;
-
-	double coords[2];
-	for (int i = 0; i < NC_WIDTH; i++) {
-		coords[0] = i;
-
-		for (int j = 0; j < NC_LENGTH; j++) {
-			coords[1] = j;
-
-			value = j * NC_WIDTH + i;
-			if (grid->getInt(coords) != value) {
-				logError() << "Value at" << i << j << "should be"
-					<< value << "but is" << grid->getInt(coords);
-				return 1;
-			}
-		}
+	void testGetXMax(void)
+	{
+		//TS_ASSERT_EQUALS(c->getFloat1D(c->getXMax()), NC_WIDTH-1);
 	}
 
-	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
-				<< "but is" << grid->getCounter("accesses");
-		return 1;
+	void testGetXDelta(void)
+	{
+		//TS_ASSERT_DELTA(c->getXDelta(), 1.0, 0.001);
 	}
-
-	if (grid->getCounter("file_loads") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"file_loads\" should be" << (NC_WIDTH*NC_LENGTH)
-				<< "but is" << grid->getCounter("file_loads");
-		return 1;
-	}
-
-	delete grid;
-
-	return 0;
-}
+};

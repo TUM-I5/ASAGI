@@ -32,83 +32,66 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include <asagi.h>
+#include "asagi.h"
 
-#include "grid/simplegridcontainer.h"
-#include "grid/adaptivegridcontainer.h"
+#include "grid/grid.h"
 
 // Static c++ functions
-asagi::Grid* asagi::Grid::create(Type type, unsigned int hint,
-	unsigned int levels)
+asagi::Grid* asagi::Grid::create(Type type)
 {
-	if (hint & ADAPTIVE)
-		return new grid::AdaptiveGridContainer(type, false, hint, levels);
-	return new grid::SimpleGridContainer(type, false, hint, levels);
+	return new grid::Grid(type);
 }
 
-asagi::Grid* asagi::Grid::createArray(Type basicType, unsigned int hint,
-	unsigned int levels)
+asagi::Grid* asagi::Grid::createArray(Type type)
 {
-	if (hint & ADAPTIVE)
-		return new grid::AdaptiveGridContainer(basicType, true, hint, levels);
-	return new grid::SimpleGridContainer(basicType, true, hint, levels);
+	return new grid::Grid(type, true);
 }
 
 asagi::Grid* asagi::Grid::createStruct(unsigned int count,
-	unsigned int blockLength[],
-	unsigned long displacements[],
-	asagi::Grid::Type types[],
-	unsigned int hint,
-	unsigned int levels)
+		unsigned int blockLength[], unsigned long displacements[], Type types[])
 {
-	if (hint & ADAPTIVE)
-		return new grid::AdaptiveGridContainer(count, blockLength,
-			displacements, types, hint, levels);
-	return new grid::SimpleGridContainer(count, blockLength,
-		displacements, types, hint, levels);
+	return new grid::Grid(count, blockLength, displacements, types);
 }
 
 // C interfae
 
 // Init functions
 
-grid_handle* grid_create(grid_type type, unsigned int hint, unsigned int levels)
+asagi_grid* asagi_grid_create(asagi_type type)
 {
-	return asagi::Grid::create(type, hint, levels);
+	return asagi::Grid::create(type);
 }
 
-grid_handle* grid_create_array(grid_type basic_type, unsigned int hint, unsigned int levels)
+asagi_grid* asagi_grid_create_array(asagi_type basic_type)
 {
-	return asagi::Grid::createArray(basic_type, hint, levels);
+	return asagi::Grid::createArray(basic_type);
 }
 
-grid_handle* grid_create_struct(unsigned int count,
+asagi_grid* asagi_grid_create_struct(unsigned int count,
 	unsigned int blockLength[],
 	unsigned long displacements[],
-	grid_type types[],
-	unsigned int hint, unsigned int levels)
+	asagi_type types[])
 {
-	return asagi::Grid::createStruct(count, blockLength, displacements,
-		types, hint, levels);
+	return asagi::Grid::createStruct(count, blockLength, displacements, types);
 }
 
 #ifndef ASAGI_NOMPI
-grid_error grid_set_comm(grid_handle* handle, MPI_Comm comm)
+void asagi_grid_set_comm(asagi_grid* handle, MPI_Comm comm)
 {
-	return handle->setComm(comm);
+	handle->setComm(comm);
 }
 #endif // ASAIG_NOMPI
 
-grid_error grid_set_param(grid_handle* handle, const char* name,
+void asagi_grid_set_param(asagi_grid* handle, const char* name,
 	const char* value, unsigned int level)
 {
-	return handle->setParam(name, value, level);
+	handle->setParam(name, value, level);
 }
 
-grid_error grid_open(grid_handle* handle, const char* filename,
+asagi_error asagi_grid_open(asagi_grid* handle, const char* filename,
 	unsigned int level)
 {
 	return handle->open(filename, level);
@@ -116,137 +99,62 @@ grid_error grid_open(grid_handle* handle, const char* filename,
 
 // Min/Max functions
 
-double grid_min_x(grid_handle* handle)
+double asagi_grid_min(asagi_grid* handle, unsigned int n)
 {
-	return handle->getXMin();
+	return handle->getMin(n);
 }
-double grid_min_y(grid_handle* handle)
+double asagi_grid_max(asagi_grid* handle, unsigned int n)
 {
-	return handle->getYMin();
-}
-double grid_max_x(grid_handle* handle)
-{
-	return handle->getXMax();
-}
-double grid_max_y(grid_handle* handle)
-{
-	return handle->getYMax();
+	return handle->getMax(n);
 }
 
-double grid_delta_x(grid_handle* handle)
+double asagi_grid_delta_x(asagi_grid* handle, unsigned int n,
+		unsigned int level)
 {
-	return handle->getXDelta();
-}
-double grid_delta_y(grid_handle* handle)
-{
-	return handle->getYDelta();
-}
-double grid_delta_z(grid_handle* handle)
-{
-	return handle->getZDelta();
+	return handle->getDelta(n, level);
 }
 
-unsigned int grid_var_size(grid_handle* handle)
+unsigned int asagi_grid_var_size(asagi_grid* handle)
 {
 	return handle->getVarSize();
 }
 
-// 1d functions
+// Getters
 
-unsigned char grid_get_byte_1d(grid_handle* handle, double x, unsigned int level)
+unsigned char asagi_grid_get_byte(asagi_grid* handle, const double* pos,
+		unsigned int level)
 {
-	return handle->getByte1D(x, level);
+	return handle->getByte(pos, level);
 }
-int grid_get_int_1d(grid_handle* handle, double x, unsigned int level)
+int asagi_grid_get_int(asagi_grid* handle, const double* pos,
+		unsigned int level)
 {
-	return handle->getInt1D(x, level);
+	return handle->getInt(pos, level);
 }
-long grid_get_long_1d(grid_handle* handle, double x, unsigned int level)
+long asagi_grid_get_long(asagi_grid* handle, const double* pos,
+		unsigned int level)
 {
-	return handle->getLong1D(x, level);
+	return handle->getLong(pos, level);
 }
-float grid_get_float_1d(grid_handle* handle, double x, unsigned int level)
+float asagi_grid_get_float(asagi_grid* handle, const double* pos,
+		unsigned int level)
 {
-	return handle->getFloat1D(x, level);
+	return handle->getFloat(pos, level);
 }
-double grid_get_double_1d(grid_handle* handle, double x, unsigned int level)
+double asagi_grid_get_double(asagi_grid* handle, const double* pos,
+		unsigned int level)
 {
-	return handle->getDouble1D(x, level);
+	return handle->getDouble(pos, level);
 }
-void grid_get_buf_1d(grid_handle* handle, void* buf, double x,
+void asagi_grid_get_buf(asagi_grid* handle, void* buf, const double* pos,
 	unsigned int level)
 {
-	handle->getBuf1D(buf, x, level);
-}
-
-// 2d functions
-
-unsigned char grid_get_byte_2d(grid_handle* handle, double x, double y,
-	unsigned int level)
-{
-	return handle->getByte2D(x, y, level);
-}
-int grid_get_int_2d(grid_handle* handle, double x, double y, unsigned int level)
-{
-	return handle->getInt2D(x, y, level);
-}
-long grid_get_long_2d(grid_handle* handle, double x, double y,
-	unsigned int level)
-{
-	return handle->getLong2D(x, y, level);
-}
-float grid_get_float_2d(grid_handle* handle, double x, double y,
-	unsigned int level)
-{
-	return handle->getFloat2D(x, y, level);
-}
-double grid_get_double_2d(grid_handle* handle, double x, double y,
-	unsigned int level)
-{
-	return handle->getDouble2D(x, y, level);
-}
-void grid_get_buf_2d(grid_handle* handle, void* buf, double x, double y,
-	unsigned int level)
-{
-	handle->getBuf2D(buf, x, y, level);
-}
-
-// 3d functions
-
-unsigned char grid_get_byte_3d(grid_handle* handle, double x, double y,
-	double z, unsigned int level)
-{
-	return handle->getByte3D(x, y, z, level);
-}
-int grid_get_int_3d(grid_handle* handle, double x, double y, double z,
-	unsigned int level)
-{
-	return handle->getInt3D(x, y, z, level);
-}
-long grid_get_long_3d(grid_handle* handle, double x, double y, double z,
-	unsigned int level)
-{
-	return handle->getLong3D(x, y, z, level);
-}
-float grid_get_float_3d(grid_handle* handle, double x, double y, double z,
-	unsigned int level)
-{
-	return handle->getFloat3D(x, y, z, level);
-}
-double grid_get_double_3d(grid_handle* handle, double x, double y, double z,
-	unsigned int level)
-{
-	return handle->getDouble3D(x, y, z, level);
-}
-void grid_get_buf_3d(grid_handle* handle, void* buf, double x, double y, double z,
-	unsigned int level)
-{
-	handle->getBuf3D(buf, x, y, z, level);
+	handle->getBuf(buf, pos, level);
 }
 
 // destructor
 
-void grid_close(grid_handle* handle)
+void asagi_grid_close(asagi_grid* handle)
 {
 	delete handle;
 }

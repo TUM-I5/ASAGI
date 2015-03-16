@@ -32,15 +32,12 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "simplegridcontainer.h"
+#include "simplecontainer.h"
 
-#include "grid/grid.h"
-
-#include <algorithm>
-
+#if 0
 /**
  * @see GridContainer::GridContainer()
  */
@@ -48,7 +45,7 @@ grid::SimpleGridContainer::SimpleGridContainer(asagi::Grid::Type type, bool isAr
 	unsigned int hint, unsigned int levels)
 	: GridContainer(type, isArray, hint, levels)
 {
-	m_grids = new grid::Grid*[m_levels];
+	m_grids = new grid::Grid2*[m_levels];
 
 	for (unsigned int i = 0; i < levels; i++)
 		m_grids[i] = createGrid(hint, i);
@@ -64,7 +61,7 @@ grid::SimpleGridContainer::SimpleGridContainer(unsigned int count,
 		unsigned int hint, unsigned int levels)
 	: GridContainer(count, blockLength, displacements, types, hint, levels)
 {
-	m_grids = new grid::Grid*[m_levels];
+	m_grids = new grid::Grid2*[m_levels];
 	for (unsigned int i = 0; i < levels; i++)
 		m_grids[i] = createGrid(hint, i);
 }
@@ -76,7 +73,7 @@ grid::SimpleGridContainer::~SimpleGridContainer()
 	delete [] m_grids;
 }
 
-asagi::Grid::Error grid::SimpleGridContainer::setParam(const char* name,
+asagi::Grid::Error grid::SimpleContainer::setParam(const char* name,
 	const char* value, unsigned int level)
 {
 	Error result;
@@ -88,8 +85,9 @@ asagi::Grid::Error grid::SimpleGridContainer::setParam(const char* name,
 	assert(level < m_levels);
 	return m_grids[level]->setParam(name, value);
 }
+#endif
 
-asagi::Grid::Error grid::SimpleGridContainer::open(const char* filename,
+asagi::Grid::Error grid::SimpleContainer::open(const char* filename,
 	unsigned int level)
 {
 	Error result;
@@ -113,6 +111,7 @@ asagi::Grid::Error grid::SimpleGridContainer::open(const char* filename,
 	return result;
 }
 
+#if 0
 double grid::SimpleGridContainer::getXDelta() const
 {
 	return m_grids[m_levels-1]->getXDelta();
@@ -189,3 +188,4 @@ unsigned long grid::SimpleGridContainer::getCounter(const char* name, unsigned i
 
 	return m_grids[level]->getCounter(name);
 }
+#endif

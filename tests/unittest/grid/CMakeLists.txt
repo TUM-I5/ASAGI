@@ -1,1 +1,1 @@
-unittest_add_test( GridGridTest gridtest.h )
+add_subdirectory( level )

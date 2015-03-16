@@ -31,49 +31,20 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "passthroughgrid.h"
+#ifndef THREADS_CXXMUTEX_H
+#define THREADS_CXXMUTEX_H
 
-#include <algorithm>
+#include <mutex>
 
-/**
- * @see Grid::Grid()
- */
-grid::PassThroughGrid::PassThroughGrid(const GridContainer &container,
-		unsigned int hint)
-	: Grid(container, hint),
-	  m_mem(0L)
+namespace threads
 {
+
+typedef std::mutex CxxMutex;
 
 }
 
-grid::PassThroughGrid::~PassThroughGrid()
-{
-	delete [] m_mem;
-}
-
-asagi::Grid::Error grid::PassThroughGrid::init()
-{
-	m_mem = new unsigned char[getType().getSize()];
-
-	return asagi::Grid::SUCCESS;
-}
-
-void grid::PassThroughGrid::getAt(void* buf, types::Type::converter_t converter,
-	unsigned long x, unsigned long y, unsigned long z)
-{
-	size_t pos[] = {x, y, z};
-	size_t size[MAX_DIMENSIONS];
-
-	incCounter(perf::Counter::FILE);
-
-	// Load one value in each dimension
-	std::fill_n(size, MAX_DIMENSIONS, 1);
-
-	getType().load(getInputFile(), pos, size, m_mem);
-
-	(getType().*converter)(m_mem, buf);
-}
+#endif // THREADS_CXXMUTEX_H

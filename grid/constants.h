@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef GRID_CONSTANTS_H
@@ -41,19 +41,8 @@
 namespace grid
 {
 
-/**
- * Maximum number of dimensions supported by the library
- */
-const int MAX_DIMENSIONS = 3;
-
-/**
- * Dimension names
- */
-const char* const DIMENSION_NAMES[MAX_DIMENSIONS] = {
-	"x",
-	"y",
-	"z",
-	/*"t"*/};
+/** Possible positions of the values in a grid */
+enum ValuePosition { CELL_CENTERED, VERTEX_CENTERED };
 
 }
 

@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,433 +31,183 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef GRID_GRID_H
 #define GRID_GRID_H
 
-#include "grid/constants.h"
-#include "grid/gridcontainer.h"
+#include "asagi.h"
 
-#include "perf/counter.h"
+#include <map>
+#include <string>
+#include <vector>
 
+#include "container.h"
+#include "fortran/pointerarray.h"
+#include "mpi/mpicomm.h"
+#include "numa/numa.h"
+#include "threads/once.h"
 #include "types/type.h"
 
-#include "utils/logger.h"
-
-#include <string>
-
-namespace io
-{
-	class NetCdfReader;
-}
-
-/**
- * @brief The heart of ASAGI
- *
- * It contains several different components:
- * @li GridContainer: Represents a whole grid with all levels.
- * @li Grid: Describes a rectangular region of one level. It handles
- *  migration of chunks and provides access to single grid points.
- */
 namespace grid
 {
 
 /**
- * @brief Base class for a grid
- * 
- * A grid stores one level of detail of an adaptive grid
+ * Basic implementation for an asagi::Grid
  */
-class Grid
+class Grid : public asagi::Grid
 {
 private:
-	/** The container we belong too */
-	const GridContainer &m_container;
-	
-	/** Name of the variable in the netcdf file (default: "z") */
-	std::string m_variableName;
-	
-	/** The file that contains this grid */
-	io::NetCdfReader *m_inputFile;
-	
-	/** Total number of elements in x, y and z dimension */
-	unsigned long m_dim[3];
-	
-	/** Offset of the grid */
-	double m_offset[3];
-	
-	/** Minimum possible coordinate in each dimension */
-	double m_min[3];
-	/** Maximum possible coordinate in each dimension */
-	double m_max[3];
-	
-	/**
-	 * 1/scaling in most cases (exceptions: scaling = 0
-	 * and scaling = inf), used to convert coordinates to indices
-	 */
-	double m_scalingInv[3];
-	
-	/** Number of blocks in x, y and z dimension */
-	unsigned long m_blocks[3];
-	
-	/** Number of values in x, y and z dimension in one block */
-	size_t m_blockSize[3];
-	
-	/** Number of cached blocks on each node */
-	long m_blocksPerNode;
-	
-	/**
-	 * Difference between the hands of the 2-handed clock algorithm.
-	 * Subclasses my require this to initialize the
-	 * {@link blocks::BlockManager}.
-	 */
-	long m_handSpread;
-	
-	/**
-	 * 0, 1 or 2 if x, y or z is a time dimension (z is default if
-	 * the HAS_TIME hint is specified);
-	 * -2 if we don't have any time dimension;
-	 * -1 if the time dimension is not (yet) specified
-	 * <br>
-	 * Declare as signed, to remove compiler warning
-	 */
-	signed char m_timeDimension;
+	/** Id of the grid, used for the fortran <-> c interface */
+	int m_id;
 
-	/** Access counters for this grid (level) */
-	perf::Counter m_counter;
+	/**
+	 * The type of values we save in the grid.
+	 * This class implements all type specific operations.
+	 */
+	types::Type *m_type;
+
+	/** Dictionary for storing all parameters (one for each level) */
+	std::vector<std::map<std::string, std::string>> m_params;
+
+	/** NUMA domain management */
+	numa::Numa m_numa;
+
+	/** All grid containers (one for each NUMA domain) */
+	std::vector<Container*> m_containers;
+
+	/** Only resize the containers once */
+	threads::Once m_resizeOnce;
+
+	/** The communicator */
+	mpi::MPIComm m_comm;
 
 public:
-	Grid(const GridContainer &container,
-		unsigned int hint = asagi::Grid::NO_HINT);
+	Grid(asagi::Grid::Type type, bool isArray = false);
+	Grid(unsigned int count,
+		unsigned int blockLength[],
+		unsigned long displacements[],
+		asagi::Grid::Type types[]);
+
 	virtual ~Grid();
-	
-	asagi::Grid::Error setParam(const char* name, const char* value);
-	
-	asagi::Grid::Error open(const char* filename);
-	
-	/**
-	 * @return The minimal possible coordinate in x dimension
-	 */
-	double getXMin() const
-	{
-		return m_min[0];
-	}
-	/**
-	 * @return The minimal possible coordinate in y dimension
-	 */
-	double getYMin() const
-	{
-		return m_min[1];
-	}
-	/**
-	 * @return The minimal possible coordinate in z dimension
-	 */
-	double getZMin() const
-	{
-		return m_min[2];
-	}
-	/**
-	 * @return The maximal possible coordinate in x dimension
-	 */
-	double getXMax() const
-	{
-		return m_max[0];
-	}
-	/**
-	 * @return The minimal possible coordinate in y dimension
-	 */
-	double getYMax() const
-	{
-		return m_max[1];
-	}
-	/**
-	 * @return The minimal possible coordinate in z dimension
-	 */
-	double getZMax() const
-	{
-		return m_max[2];
-	}
-	
-	/**
-	 * @return The amount two coordinates differ in x dimension
-	 */
-	double getXDelta() const
-	{
-		return (m_max[0] - m_min[0]) / m_dim[0];
-	}
-	/**
-	 * @return The amount two coordinates differ in y dimension
-	 */
-	double getYDelta() const
-	{
-		return (m_max[1] - m_min[1]) / m_dim[1];
-	}
-	/**
-	 * @return The amount two coordinates differ in y dimension
-	 */
-	double getZDelta() const
-	{
-		return (m_max[2] - m_min[2]) / m_dim[2];
-	}
 
-	unsigned char getByte(double x, double y = 0, double z = 0);
-	int getInt(double x, double y = 0, double z = 0);
-	long getLong(double x, double y = 0, double z = 0);
-	float getFloat(double x, double y = 0, double z = 0);
-	double getDouble(double x, double y = 0, double z = 0);
-	void getBuf(void* buf, double x, double y = 0, double z = 0);
-	
-	bool exportPng(const char* filename);
-
-	/**
-	 * @return The value of a counter
-	 */
-	unsigned long getCounter(const char* name)
-	{
-		return m_counter.get(name);
-	}
-
-private:
-	void getAt(void* buf, types::Type::converter_t converter,
-		   double x, double y = 0, double z = 0);
-	
-	/**
-	 * This function is used by {@link exportPng(const char*)},
-	 * which only works on floats
-	 */
-	float getAtFloat(unsigned long x, unsigned long y);
-
-protected:
 #ifndef ASAGI_NOMPI
-	/**
-	 * @return The MPI communicator used for this grid
-	 */
-	MPI_Comm getMPICommunicator() const
+	asagi::Grid::Error setComm(MPI_Comm comm = MPI_COMM_WORLD)
 	{
-		return m_container.getMPICommunicator();
+		return m_comm.init(comm);
 	}
 #endif // ASAGI_NOMPI
-	/**
-	 * @return The current MPI rank
-	 */
-	int getMPIRank() const
+
+	asagi::Grid::Error setThreads(unsigned int threads)
 	{
-		return m_container.getMPIRank();
-	}
-	/**
-	 * @return The size of the MPI communicator
-	 */
-	int getMPISize() const
-	{
-		return m_container.getMPISize();
-	}
-	
-	/**
-	 * @return The input file used for this grid
-	 */
-	io::NetCdfReader& getInputFile() const
-	{
-		return *m_inputFile;
-	}
-	
-	/**
-	 * @return The type for this grid
-	 */
-	types::Type& getType() const
-	{
-		return m_container.getType();
-	}
-	
-	/**
-	 * @return The number of cells in x dimension
-	 */
-	unsigned long getXDim() const
-	{
-		return m_dim[0];
-	}
-	/**
-	 * @return The number of cells in y dimension
-	 */
-	unsigned long getYDim() const
-	{
-		return m_dim[1];
-	}
-	/**
-	 * @return The number of cells in z dimension
-	 */
-	unsigned long getZDim() const
-	{
-		return m_dim[2];
-	}
-	
-	/**
-	 * @return The number of blocks we should store on this node
-	 */
-	unsigned long getBlocksPerNode() const
-	{
-		return m_blocksPerNode;
-	}
-	
-	/**
-	 * @return The difference of the 2 hands in the clock algorithm
-	 *  configured by the user
-	 */
-	long getHandsDiff() const
-	{
-		return m_handSpread;
-	}
-	
-	/**
-	 * @return The number of values in each direction in a block
-	 */
-	const size_t* getBlockSize() const
-	{
-		return m_blockSize;
-	}
-	
-	/**
-	 * @return The number of values in direction i in a block
-	 */
-	size_t getBlockSize(unsigned int i) const
-	{
-		return m_blockSize[i];
+		return m_numa.setThreads(threads);
 	}
 
-	/**
-	 * @return The number of values in each block
-	 */
-	unsigned long getTotalBlockSize() const
+	void setParam(const char* name, const char* value, unsigned int level = 0);
+
+	asagi::Grid::Error open(const char* filename, unsigned int level = 0);
+
+	double getMin(unsigned int n) const
 	{
-		return m_blockSize[0] * m_blockSize[1] * m_blockSize[2];
+		return m_containers[0]->getMin(n);
 	}
-	
-	/**
-	 * @return The number of blocks in the grid
-	 */
-	unsigned long getBlockCount() const
+
+	double getMax(unsigned int n) const
 	{
-		return m_blocks[0] * m_blocks[1] * m_blocks[2];
+		return m_containers[0]->getMax(n);
 	}
-	
-	/**
-	 * @return The of blocks that are stored on this node
-	 */
-	unsigned long getLocalBlockCount()
+
+	double getDelta(unsigned int n, unsigned int level = 0) const
 	{
-		return (getBlockCount() + getMPISize() - 1) / getMPISize();
+		return m_containers[0]->getDelta(n, level);
 	}
-	
-	/**
-	 * Calculates the position of <code>block</code> in the grid
-	 * 
-	 * @param block The global block id
-	 * @param[out] pos Position (offset) of the block in each dimension
-	 */
-	void getBlockPos(unsigned long block,
-		size_t *pos) const
+
+	unsigned int getVarSize() const
 	{
-		pos[0] = block % m_blocks[0];
-		pos[1] = (block / m_blocks[0]) % m_blocks[1];
-		pos[2] = block / (m_blocks[0] * m_blocks[1]);
+		return m_type->getSize();
 	}
-	
-	/**
-	 * @return The global block id that stores the value at (x, y, z)
-	 */
-	unsigned long getBlockByCoords(unsigned long x, unsigned long y,
-		unsigned long z) const
+
+	unsigned char getByte(const double* pos, unsigned int level = 0)
 	{
-		return (((z / m_blockSize[2]) * m_blocks[1]
-			+ (y / m_blockSize[1])) * m_blocks[0])
-			+ (x / m_blockSize[0]);
+		unsigned char buf;
+		m_containers[m_numa.domainId()]->getAt(&buf, pos, &types::Type::convertByte, level);
+
+		return buf;
 	}
-	
-	/**
-	 * @param id Global block id
-	 * @return The rank, that stores the block
-	 */
-	int getBlockRank(unsigned long id) const
+
+	int getInt(const double* pos, unsigned int level = 0)
 	{
-#ifdef ROUND_ROBIN
-		return id % getMPISize();
-#else // ROUND_ROBIN
-		return id / getLocalBlockCount();
-#endif // ROUND_ROBIN
+		int buf;
+		m_containers[m_numa.domainId()]->getAt(&buf, pos, &types::Type::convertInt, level);
+
+		return buf;
 	}
-	
-	/**
-	 * @param id Global block id
-	 * @return The offset of the block on the rank
-	 */
-	unsigned long getBlockOffset(unsigned long id) const
+
+	long getLong(const double* pos, unsigned int level = 0)
 	{
-#ifdef ROUND_ROBIN
-		return id / getMPISize();
-#else // ROUND_ROBIN
-		return id % getLocalBlockCount();
-#endif // ROUND_ROBIN
+		long buf;
+		m_containers[m_numa.domainId()]->getAt(&buf, pos, &types::Type::convertLong, level);
+
+		return buf;
 	}
-	
-	/**
-	 * @param id Local block id
-	 * @return The corresponding global id
-	 */
-	unsigned long getGlobalBlock(unsigned long id) const
+
+	float getFloat(const double* pos, unsigned int level = 0)
 	{
-#ifdef ROUND_ROBIN
-		return id * getMPISize() + getMPIRank();
-#else // ROUND_ROBIN
-		return id + getMPIRank() * getLocalBlockCount();
-#endif // ROUND_ROBIN
+		float buf;
+		m_containers[m_numa.domainId()]->getAt(&buf, pos, &types::Type::convertFloat, level);
+
+		return buf;
 	}
-	
-	/**
-	 * This function is called after opening the NetCDF file. Subclasses
-	 * should override it to initialize the grid.
-	 */
-	virtual asagi::Grid::Error init() = 0;
-	
-	/**
-	 * Subclasses should override this and return false, if they still need
-	 * to access the input file after initialization.
-	 * 
-	 * @return True if the input file should be accessable after
-	 * {@link init()} was called.
-	 */
-	virtual bool keepFileOpen() const
+
+	double getDouble(const double* pos, unsigned int level = 0)
 	{
-		return false;
+		double buf;
+		m_containers[m_numa.domainId()]->getAt(&buf, pos, &types::Type::convertDouble, level);
+
+		return buf;
 	}
-	
-	/**
-	 * Writes the value at the specified index into the buffer, after
-	 * converting it with the converter
-	 */
-	virtual void getAt(void* buf, types::Type::converter_t converter,
-		unsigned long x, unsigned long y = 0, unsigned long z = 0) = 0;
+
+	void getBuf(void* buf, const double* pos, unsigned int level = 0)
+	{
+		m_containers[m_numa.domainId()]->getAt(&buf, pos, &types::Type::convertBuffer, level);
+	}
+
+	unsigned long getCounter(const char* name, unsigned int level = 0);
 
 	/**
-	 * Used by subclasses to increment counter.
-	 * perf::Counter::ACCESS is already handled by this class!
+	 * Converts the C pointer of the grid to the Fortran identifier
+	 *
+	 * @return The unique index of the grid container
 	 */
-	void incCounter(perf::Counter::CounterType type)
+	int c2f() const
 	{
-		m_counter.inc(type);
+		return m_id;
 	}
 
 private:
-	/** The smallest number we can represent in a double */
-	static constexpr double NUMERIC_PRECISION = 1e-10;
+	void init();
+
+	void initContainers();
+
+	template<typename T>
+	T param(const char* name, T defaultValue, unsigned int level = 0) const;
+
 private:
-	static void h2rgb(float h, unsigned char &red, unsigned char &green,
-		unsigned char &blue);
-	static double getInvScaling(double scaling);
-	static double round(double value);
+	/** The index -> pointer translation array */
+	static fortran::PointerArray<Grid> m_pointers;
+
+public:
+	/**
+	 * Converts a Fortran index to a c/c++ pointer
+	 */
+	static Grid* f2c(int i)
+	{
+		return m_pointers.get(i);
+	}
 };
 
 }
 
 #endif // GRID_GRID_H
-

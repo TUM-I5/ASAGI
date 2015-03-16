@@ -32,60 +32,74 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2013-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include <asagi.h>
+#ifndef GRID_LEVEL_PASSTHROUGH_H
+#define GRID_LEVEL_PASSTHROUGH_H
 
-// Do not abort to get real failure
-#define LOG_ABORT
-#include "utils/logger.h"
+#include "level.h"
+#include "types/type.h"
 
-#include "tests.h"
-
-using namespace asagi;
-
-int main(int argc, char** argv)
+namespace grid
 {
-	Grid* grid = Grid::create();
-	grid->setParam("PASS_THROUGH", "YES");
 
-	if (grid->open(NC_2D) != Grid::SUCCESS) {
-		logError() << "Could not open file";
-		return 1;
+namespace level
+{
+
+/**
+ * A simple grid that passes every access directly to the underlying
+ * I/O layer.
+ */
+class PassThrough : public Level
+{
+private:
+	/** Buffer for reading one value (on each thread) into memory */
+	unsigned char* m_buf;
+
+public:
+	PassThrough();
+	virtual ~PassThrough();
+
+	asagi::Grid::Error init(
+			const mpi::MPIComm &comm,
+			const numa::Numa &numa,
+			const types::Type *type,
+			const char* filename,
+			const char* varname,
+			grid::ValuePosition valuePos);
+
+	void getAt(void* buf, const double* pos,
+			types::Type::converter_t converter)
+	{
+		incCounter(perf::Counter::ACCESS);
+		incCounter(perf::Counter::FILE);
+
+		// Load one value in each dimension
+		size_t index[MAX_DIMENSIONS];
+		pos2index(pos, index);
+		size_t size[MAX_DIMENSIONS];
+		std::fill_n(size, MAX_DIMENSIONS, 1);
+
+
+		type()->load(inputFile(), index, size, m_buf);
+
+		(type()->*converter)(m_buf, buf);
 	}
 
-	int value;
-
-	double coords[2];
-	for (int i = 0; i < NC_WIDTH; i++) {
-		coords[0] = i;
-
-		for (int j = 0; j < NC_LENGTH; j++) {
-			coords[1] = j;
-
-			value = j * NC_WIDTH + i;
-			if (grid->getInt(coords) != value) {
-				logError() << "Value at" << i << j << "should be"
-					<< value << "but is" << grid->getInt(coords);
-				return 1;
-			}
-		}
+#if 0
+	/**
+	 * @see Grid::keepFileOpen()
+	 */
+	virtual bool keepFileOpen() const
+	{
+		return true;
 	}
+#endif
+};
 
-	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
-				<< "but is" << grid->getCounter("accesses");
-		return 1;
-	}
-
-	if (grid->getCounter("file_loads") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"file_loads\" should be" << (NC_WIDTH*NC_LENGTH)
-				<< "but is" << grid->getCounter("file_loads");
-		return 1;
-	}
-
-	delete grid;
-
-	return 0;
 }
+
+}
+
+#endif /* GRID_LEVEL_PASSTHROUGH_H */

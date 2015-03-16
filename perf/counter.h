@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2013-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef PERF_COUNTER_H
@@ -41,6 +41,11 @@
 #include <cassert>
 #include <string>
 #include <unordered_map>
+
+#ifdef THREADSAFE_COUNTER
+#include <mutex>
+#include "threads/mutex.h"
+#endif // THREADSAFE_COUNTER
 
 /**
  * Performance measurement tools
@@ -57,20 +62,29 @@ class Counter
 {
 private:
 	/** Number of available native counters */
-	static const unsigned int NATIVE_COUNTER_SIZE = 3;
+	static const unsigned int NATIVE_COUNTER_SIZE = 4;
+
+#ifdef THREADSAFE_COUNTER
+	/** Mutex for counters */
+	threads::Mutex m_mutex[NATIVE_COUNTER_SIZE];
+#endif // THREADSAFE_COUNTER
 
 public:
 	/** Available counters */
 	enum CounterType {
 		/** Total number of accesses (native) */
 		ACCESS,
+		/** Local misses but NUMA hits (native) */
+		NUMA,
 		/** Local cache misses but remote hits (native) */
 		MPI,
 		/** Cache misses; fallback to file (native) */
 		FILE,
-		/** Total number of local hits (ACCESS - MPI - FILE) */
+		/** Total number of local hits (ACCESS - NUMA - MPI - FILE) */
 		HIT,
-		/** Total number of local misses (MPI + FILE) */
+		/** Total number of hits on the node (ACCESS - MPI - FILE) */
+		NODE_HIT,
+		/** Total number of local misses (NUMA + MPI + FILE) */
 		MISS,
 		/** Unknown counter */
 		INVALID
@@ -86,9 +100,11 @@ private:
 		NameToCounterMap()
 		{
 			(*this)["accesses"] = ACCESS;
+			(*this)["numa_transfers"] = NUMA;
 			(*this)["mpi_transfers"] = MPI;
 			(*this)["file_loads"] = FILE;
 			(*this)["local_hits"] = HIT;
+			(*this)["node_hits"] = NODE_HIT;
 			(*this)["local_misses"] = MISS;
 		}
 	};
@@ -111,10 +127,17 @@ public:
 		// We should only increment native counters
 		assert(type < NATIVE_COUNTER_SIZE);
 
+#ifdef THREADSAFE_COUNTER
+		std::lock_guard<threads::Mutex> lock(m_mutex[type]);
+#endif // THREADSAFE_COUNTER
+
 		m_counter[type]++;
 	}
 
-	unsigned long get(const char* name);
+	unsigned long get(CounterType type) const;
+
+public:
+	static CounterType name2type(const char* name);
 
 private:
 	static const NameToCounterMap NAME_TO_COUNTER;

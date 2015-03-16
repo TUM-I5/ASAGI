@@ -38,16 +38,15 @@
 #ifndef GRID_ADAPTIVEGRIDCONTAINER_H
 #define GRID_ADAPTIVEGRIDCONTAINER_H
 
-#include "gridcontainer.h"
-
 #include "grid/multigrid.h"
 
 #include <memory>
+#include "container.h"
 
 namespace grid
 {
 
-class Grid;
+class Grid2;
 
 /**
  * @brief An adaptive container that can store multiple grids of the same level
@@ -108,7 +107,7 @@ public:
 	unsigned long getCounter(const char* name, unsigned int level = 0);
 
 public:
-	grid::Grid* createGrid()
+	grid::Grid2* createGrid()
 	{
 #ifdef THREADSAFETY
 		std::lock_guard<std::mutex> lock(m_mutex);
@@ -117,7 +116,7 @@ public:
 	}
 		
 private:
-	grid::Grid* getGrid(double x, double y = 0, double z = 0,
+	grid::Grid2* getGrid(double x, double y = 0, double z = 0,
 		unsigned int level = 0);
 
 private:

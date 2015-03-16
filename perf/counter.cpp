@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2013-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "counter.h"
@@ -53,31 +53,43 @@ perf::Counter::Counter()
  * @param name The name of the counter (can be a non-native type)
  * @return The value of the counter or 0 if the name is unknown
  *
- * @see NAME_TO_COUNTER
+ * @see name2type
  */
-unsigned long perf::Counter::get(const char* name)
+unsigned long perf::Counter::get(CounterType type) const
+{
+	switch (type) {
+	case HIT:
+		return m_counter[ACCESS] - m_counter[NUMA] - m_counter[MPI] -  m_counter[FILE];
+	case NODE_HIT:
+		return m_counter[ACCESS] - m_counter[MPI] -  m_counter[FILE];
+	case MISS:
+		return m_counter[NUMA] + m_counter[MPI] + m_counter[FILE];
+	case INVALID:
+		return 0;
+	default:
+		assert(type < NATIVE_COUNTER_SIZE);
+		// native counters handle after switch statement
+	}
+
+	return m_counter[type];
+}
+
+/**
+ * Converts a string representation of the counter to the counter type
+ *
+ * @param name The name of the type
+ * @return The type
+ */
+perf::Counter::CounterType perf::Counter::name2type(const char* name)
 {
 	std::unordered_map<std::string, CounterType>::const_iterator type
 		= NAME_TO_COUNTER.find(name);
 
 	if (type == NAME_TO_COUNTER.end())
 		// name not found
-		return 0;
+		return INVALID;
 
-	switch (type->second) {
-	case HIT:
-		return m_counter[ACCESS] - m_counter[MPI] -  m_counter[FILE];
-		break;
-	case MISS:
-		return m_counter[MPI] + m_counter[FILE];
-		break;
-	default:
-		assert(type->second < NATIVE_COUNTER_SIZE);
-		// native counters handle after switch statement
-		break;
-	}
-
-	return m_counter[type->second];
+	return type->second;
 }
 
 /**

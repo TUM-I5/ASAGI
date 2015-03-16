@@ -31,61 +31,36 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include <asagi.h>
+#include "globaltest.h"
 
-// Do not abort to get real failure
-#define LOG_ABORT
-#include "utils/logger.h"
+#include "threads/once.h"
 
-#include "tests.h"
-
-using namespace asagi;
-
-int main(int argc, char** argv)
+class OnceTest : public CxxTest::TestSuite
 {
-	Grid* grid = Grid::create();
-	grid->setParam("PASS_THROUGH", "YES");
+	int executed;
+	threads::Once once;
 
-	if (grid->open(NC_2D) != Grid::SUCCESS) {
-		logError() << "Could not open file";
-		return 1;
+public:
+	void setUp(void)
+	{
+		executed = 0;
 	}
 
-	int value;
-
-	double coords[2];
-	for (int i = 0; i < NC_WIDTH; i++) {
-		coords[0] = i;
-
-		for (int j = 0; j < NC_LENGTH; j++) {
-			coords[1] = j;
-
-			value = j * NC_WIDTH + i;
-			if (grid->getInt(coords) != value) {
-				logError() << "Value at" << i << j << "should be"
-					<< value << "but is" << grid->getInt(coords);
-				return 1;
-			}
-		}
+	void testSetParam(void)
+	{
+		once.saveExec(*this, &OnceTest::execute);
+		TS_ASSERT_EQUALS(executed, 1);
+		once.saveExec(*this, &OnceTest::execute);
+		TS_ASSERT_EQUALS(executed, 1);
 	}
 
-	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
-				<< "but is" << grid->getCounter("accesses");
-		return 1;
+private:
+	void execute()
+	{
+		executed++;
 	}
-
-	if (grid->getCounter("file_loads") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"file_loads\" should be" << (NC_WIDTH*NC_LENGTH)
-				<< "but is" << grid->getCounter("file_loads");
-		return 1;
-	}
-
-	delete grid;
-
-	return 0;
-}
+};

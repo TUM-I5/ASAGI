@@ -35,9 +35,11 @@
  * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
+#include "cloak/cloak.h"
+
 #include "netcdfreader.h"
 
-#define DIM_NOT_MAPPED "<not mapped>"
+#define ONE_COMMA(s,i,_) 1,
 
 /**
  * @param filename The name of the netcdf file
@@ -45,9 +47,11 @@
  */
 io::NetCdfReader::NetCdfReader(const char* filename, int rank)
 	: m_filename(filename),
-	m_rank(rank)
+	  m_rank(rank)
 {
+	m_dimensions = -1;
 	m_file = -1;
+	m_variable = -1;
 }
 
 io::NetCdfReader::~NetCdfReader()
@@ -80,7 +84,7 @@ asagi::Grid::Error io::NetCdfReader::open(const char* varname)
 
 	nc_inq_varndims(m_file, m_variable, &m_dimensions);
 	
-	if (m_dimensions > grid::MAX_DIMENSIONS) {
+	if (m_dimensions > MAX_DIMENSIONS) {
 		logDebug(m_rank) << "Unsupported number of variable dimensions:"
 			<< m_dimensions;
 
@@ -90,7 +94,7 @@ asagi::Grid::Error io::NetCdfReader::open(const char* varname)
 	}
 
 	logDebug(m_rank) << "Dimension mapping:";
-	int dimIds[grid::MAX_DIMENSIONS];
+	int dimIds[MAX_DIMENSIONS];
 	nc_inq_vardimid(m_file, m_variable, dimIds);
 	for (int i = 0; i < m_dimensions; i++) {
 		// Translates dimension order from Fortran to C/C++
@@ -101,7 +105,7 @@ asagi::Grid::Error io::NetCdfReader::open(const char* varname)
 		m_names.push_back(name);
 		m_size.push_back(size);
 		
-		logDebug(m_rank) << "\t" << grid::DIMENSION_NAMES[i] << ":="
+		logDebug(m_rank) << "\t dimension" << i << ":="
 			<< m_names[i];
 	}
 	
@@ -111,4 +115,4 @@ asagi::Grid::Error io::NetCdfReader::open(const char* varname)
 /**
  * The stride is always 1 in each dimension, thus we define the stride array only once.
  */
-const ptrdiff_t io::NetCdfReader::STRIDE[grid::MAX_DIMENSIONS] = {1, 1, 1};
+const ptrdiff_t io::NetCdfReader::STRIDE[MAX_DIMENSIONS] = {EXPR_S(0)(REPEAT_S(0, DEC(MAX_DIMENSIONS), ONE_COMMA, ~))};

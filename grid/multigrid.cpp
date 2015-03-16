@@ -37,11 +37,10 @@
 
 #include "multigrid.h"
 
-#include "grid/grid.h"
-
 #include "utils/stringutils.h"
 
 #include <cstdlib>
+#include "grid2.h"
 
 /**
  * @param gridCreator The grid creator that should be used to create
@@ -57,7 +56,7 @@ grid::MultiGrid::MultiGrid(GridCreator &gridCreator)
 
 grid::MultiGrid::~MultiGrid()
 {
-	for (std::vector<Grid*>::const_iterator i = m_grids.begin();
+	for (std::vector<Grid2*>::const_iterator i = m_grids.begin();
 		i < m_grids.end(); i++)
 		delete *i;
 }

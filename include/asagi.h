@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  * 
  * @brief Include file for C and C++ API
  * 
@@ -64,8 +64,8 @@ namespace asagi {
 
 /**
  * @ingroup cxx_interface
- * 
- * @brief C++ Interface for ASAGI
+ *
+ * @brief C++ Interface for ASAGI grids
  */
 class asagi::Grid
 {
@@ -73,7 +73,7 @@ public:
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * The basic types supported by ASAGI
+	 * The primitive data types supported by ASAGI
 	 */
 	enum Type {
 		/** signed byte */
@@ -87,17 +87,21 @@ public:
 		/** 8-byte floating point value */
 		DOUBLE
 	};
-	
+
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * Possible errors that could occure
+	 * Possible errors that could occur
 	 */
 	enum Error {
 		/** No error */
 		SUCCESS = 0,
 		/** An MPI function failed */
 		MPI_ERROR,
+		/** A pthread function failed */
+		THREAD_ERROR,
+		/** An error in the NUMA detection code */
+		NUMA_ERROR,
 		/** Unknown configuration parameter */
 		UNKNOWN_PARAM,
 		/** Invalid configuration value */
@@ -106,6 +110,8 @@ public:
 		NOT_OPEN,
 		/** netCDF variable not found */
 		VAR_NOT_FOUND,
+		/** Wrong variable size in the file */
+		WRONG_SIZE,
 		/** Unsupported number of dimensions input file */
 		UNSUPPORTED_DIMENSIONS,
 		/** More than one topmost grid specified */
@@ -154,11 +160,22 @@ public:
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * Call this function before {@link open()} if another communicator
-	 * than the default MPI_COMM_WORLD should be used.
+	 * Call this function before {@link open()} if the grids should
+	 * exchange chunks via MPI.
 	 */
-	virtual Error setComm(MPI_Comm comm) = 0;
+	virtual Error setComm(MPI_Comm comm = MPI_COMM_WORLD) = 0;
 #endif
+
+	/**
+	 * @ingroup cxx_interface
+	 *
+	 * @brief Sets the number of threads in the application
+	 *
+	 * This function must be called before {@link open()}.
+	 * If it is not called, one thread is assumed.
+	 */
+	virtual Error setThreads(unsigned int threads) = 0;
+
 	/**
 	 * @ingroup cxx_interface
 	 * 
@@ -192,18 +209,18 @@ public:
 	 * @param value The new value for the parameter
 	 * @param level Change the parameter for the specified level of detail.
 	 * <br> Should be 0 when setting @b value-position
-	 * @return @c SUCCESS if the parameter was successfully changed <br>
-	 * @c UNKNOWN_PARAM if the parameter is not supported <br>
-	 * @c INVALID_VALUE if the parameter does not accept this value
 	 */
-	virtual Error setParam(const char* name, const char* value,
+	virtual void setParam(const char* name, const char* value,
 		unsigned int level = 0) = 0;
+
 	/**
 	 * @ingroup cxx_interface
 	 * 
 	 * @brief Loads values from a NetCDF file
 	 * 
-	 * This function must be called for each level of detail
+	 * This function must be called for each level of detail.
+	 * If more than one thread is used, this is a collective function
+	 * for all threads.
 	 */
 	virtual Error open(const char* filename,
 		unsigned int level = 0) = 0;
@@ -211,58 +228,23 @@ public:
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * @return The minimum allowed coordinate in x dimension
+	 * @return The minimum allowed coordinate in dimension <code>n</code>
 	 */
-	virtual double getXMin() const = 0;
+	virtual double getMin(unsigned int n) const = 0;
+
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * @return The minimum allowed coordinate in y dimension
+	 * @return The maximum allowed coordinate in dimension <code>n</code>
 	 */
-	virtual double getYMin() const = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @return The minimum allowed coordinate in z dimension
-	 */
-	virtual double getZMin() const = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @return The maxmium allowed coordinate in x dimension
-	 */
-	virtual double getXMax() const = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @return The maximum allowed coordinate in y dimension
-	 */
-	virtual double getYMax() const = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @return The maximum allowed coordinate in z dimension
-	 */
-	virtual double getZMax() const = 0;
+	virtual double getMax(unsigned int n) const = 0;
 	
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * @return The difference of two coordinates in x dimension
+	 * @return The difference of two coordinates in dimension <code>n</code>
 	 */
-	virtual double getXDelta() const = 0;
-	/**
-	 * @ingroup cxx_interface
-	 *
-	 * @return The difference of two coordinates in y dimension
-	 */
-	virtual double getYDelta() const = 0;
-	/**
-	 * @ingroup cxx_interface
-	 *
-	 * @return The difference of two coordinates in z dimension
-	 */
-	virtual double getZDelta() const = 0;
+	virtual double getDelta(unsigned int n, unsigned int level = 0) const = 0;
 
 	/**
 	 * @ingroup cxx_interface
@@ -271,150 +253,67 @@ public:
 	 */
 	virtual unsigned int getVarSize() const = 0;
 	
-	/********* 1D ********/
-	
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @see getByte2D
-	 */
-	virtual unsigned char getByte1D(double x, unsigned int level = 0) = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @see getInt2D
-	 */
-	virtual int getInt1D(double x, unsigned int level = 0) = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @see getLong2D
-	 */
-	virtual long getLong1D(double x, unsigned int level = 0) = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @see getFloat2D
-	 */
-	virtual float getFloat1D(double x, unsigned int level = 0) = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @see getDouble2D
-	 */
-	virtual double getDouble1D(double x, unsigned int level = 0) = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @see getBuf2D
-	 */
-	virtual void getBuf1D(void* buf, double x, unsigned int level = 0) = 0;
-	
-	/******** 2D *********/
-	
 	/**
 	 * @ingroup cxx_interface
 	 * 
 	 * If the grid contains array values, only the first element of the
 	 * array is returned
 	 * 
-	 * @return The element at (x,y) as a char
+	 * @param pos The coordinates of the value, the array must have at least
+	 *  the size of the dimension of the grid
+	 * @return The element at <code>pos</code> as a char
 	 */
-	virtual unsigned char getByte2D(double x, double y,
-		unsigned int level = 0) = 0;
+	virtual unsigned char getByte(const double* pos, unsigned int level = 0) = 0;
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * @return The element at (x,y) as an integer
+	 * @param pos The coordinates of the value, the array must have at least
+	 *  the size of the dimension of the grid
+	 * @return The element at <code>pos</code> as an integer
 	 * 
-	 * @see getByte2D
+	 * @see getByte
 	 */
-	virtual int getInt2D(double x, double y, unsigned int level = 0) = 0;
+	virtual int getInt(const double* pos, unsigned int level = 0) = 0;
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * @return The element at (x,y) as a long
+	 * @param pos The coordinates of the value, the array must have at least
+	 *  the size of the dimension of the grid
+	 * @return The element at <code>pos</code> as a long
 	 * 
-	 * @see getByte2D
+	 * @see getByte
 	 */
-	virtual long getLong2D(double x, double y, unsigned int level = 0) = 0;
+	virtual long getLong(const double* pos, unsigned int level = 0) = 0;
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * @return The element at (x,y) as a float
+	 * @param pos The coordinates of the value, the array must have at least
+	 *  the size of the dimension of the grid
+	 * @return The element at <code>pos</code> as a float
 	 * 
-	 * @see getByte2D
+	 * @see getByte
 	 */
-	virtual float getFloat2D(double x, double y,
-		unsigned int level = 0) = 0;
+	virtual float getFloat(const double* pos, unsigned int level = 0) = 0;
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * @return The element at (x,y) as a double
+	 * @param pos The coordinates of the value, the array must have at least
+	 *  the size of the dimension of the grid
+	 * @return The element at <code>pos</code> as a double
 	 * 
-	 * @see getByte2D
+	 * @see getByte
 	 */
-	virtual double getDouble2D(double x, double y,
-		unsigned int level = 0) = 0;
+	virtual double getDouble(const double* pos, unsigned int level = 0) = 0;
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * Copys the element at (x,y) into buf. The buffer size has to be
-	 * (at least) {@link getVarSize()} bytes. 
-	 */
-	virtual void getBuf2D(void* buf, double x, double y,
-		unsigned int level = 0) = 0;
-	/**
-	 * @ingroup cxx_interface
+	 * Copys the element at <code>pos</code> into buf. The buffer size has to be
+	 * (at least) {@link getVarSize()} bytes.
 	 * 
-	 * @see getByte2D
+	 * @param pos The coordinates of the value, the array must have at least
+	 *  the size of the dimension of the grid
 	 */
-	
-	/******** 3D ********/
-	
-	virtual unsigned char getByte3D(double x, double y, double z,
-		unsigned int level = 0) = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @see getInt2D
-	 */
-	virtual int getInt3D(double x, double y, double z,
-		unsigned int level = 0) = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @see getLong2D
-	 */
-	virtual long getLong3D(double x, double y, double z,
-		unsigned int level = 0) = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @see getFloat2D
-	 */
-	virtual float getFloat3D(double x, double y, double z,
-		unsigned int level = 0) = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @see getDouble2D
-	 */
-	virtual double getDouble3D(double x, double y, double z,
-		unsigned int level = 0) = 0;
-	/**
-	 * @ingroup cxx_interface
-	 * 
-	 * @see getBuf2D
-	 */
-	virtual void getBuf3D(void* buf, double x, double y, double z,
-		unsigned int level = 0) = 0;
-	
-	/**
-	 * Exports the grid to png file. Should not be used for 3D grids
-	 */
-	virtual bool exportPng(const char* filename,
-		unsigned int level = 0) = 0;
+	virtual void getBuf(void* buf, const double* pos, unsigned int level = 0) = 0;
 
 	/**
 	 * @ingroup cxx_interface
@@ -442,45 +341,36 @@ public:
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * Creates a new grid with basic values
+	 * Creates a new grid containing values with a primitive
+	 * data type
 	 * 
-	 * @param type The type of the grid
-	 * @param hint A combination of hints
-	 * @param levels The number of level this grid should have
+	 * @param type The type of the values in the grid
 	 */
-	static asagi::Grid* create(Type type = FLOAT,
-		unsigned int hint = NO_HINT, unsigned int levels = 1);
-	
+
+	static asagi::Grid* create(Type type = FLOAT);
 	/**
 	 * @ingroup cxx_interface
-	 * 
-	 * Creates a new grid with array values
-	 * 
-	 * @param basicType The type of the array values in the grid
-	 * @param hint A combination of hints
-	 * @param levels The number of levels this grid should have
+	 *
+	 * Creates a new grid containing arrays
+	 *
+	 * The length of the arrays is determined by the input file
+	 *
+	 * @param type The type of the values in the arrays
 	 */
-	static asagi::Grid* createArray(Type basicType = FLOAT,
-		unsigned int hint = NO_HINT, unsigned int levels = 1);
-	
+	static asagi::Grid* createArray(Type type = FLOAT);
+
 	/**
 	 * @ingroup cxx_interface
-	 * 
-	 * Creates a new grid with a struct, very similar to
-	 * MPI_Type_create_struct
-	 * 
-	 * @param count Number of blocks in the struct
+	 *
+	 * Creates a new grid containing structured values
+	 *
+	 * @param count Number of blocks in the structure
 	 * @param blockLength Number of elements in each block
 	 * @param displacements Displacement of each block
-	 * @param types Block type
-	 * @param hint A combination of hints
-	 * @param levels The number of levels this grid should have
+	 * @param types Primitive types of the blocks
 	 */
 	static asagi::Grid* createStruct(unsigned int count,
-		unsigned int blockLength[],
-		unsigned long displacements[],
-		asagi::Grid::Type types[],
-		unsigned int hint = NO_HINT, unsigned int levels = 1);
+		unsigned int blockLength[], unsigned long displacements[], Type types[]);
 	
 	/**
 	 * @ingroup cxx_interface
@@ -490,7 +380,7 @@ public:
 	 * NetCDF file.
 	 * <br>
 	 * This function does the same as calling <code>delete grid;</code> and
-	 * it is the C++ equivalent to {@link grid_close(grid_handle*)} and
+	 * it is the C++ equivalent to {@link grid_close(asagi_grid*)} and
 	 * {@link ASAGI::grid_close}
 	 * 
 	 * @param grid The grid that should be closed.
@@ -501,100 +391,69 @@ public:
 	}
 };
 
-typedef asagi::Grid grid_handle;
-typedef asagi::Grid::Type grid_type;
-typedef asagi::Grid::Error grid_error;
+typedef asagi::Grid asagi_grid;
+typedef asagi::Grid::Type asagi_type;
+typedef asagi::Grid::Error asagi_error;
+
 #else
+
 /**
  * @ingroup c_interface
  * 
  * A handle for a grid
  */
-typedef struct grid_handle grid_handle;
+typedef struct asagi_grid asagi_grid;
+
 /**
  * @ingroup c_interface
  *
  * @see asagi::Grid::Type
  */
-typedef enum { GRID_BYTE, GRID_INT, GRID_LONG, GRID_FLOAT, GRID_DOUBLE } grid_type;
+typedef enum { ASAGI_BYTE, ASAGI_INT, ASAGI_LONG, ASAGI_FLOAT, ASAGI_DOUBLE } asagi_type;
 /**
  * @ingroup c_interface
  *
  * @see asagi::Grid::Error
  */
-typedef enum { GRID_SUCCESS = 0, GRID_MPI_ERROR, GRID_UNKNOWN_PARAM,
-	GRID_INVALID_VALUE, GRID_NOT_OPEN, GRID_VAR_NOT_FOUND,
-	GRID_UNSUPPORTED_DIMENSIONS, GRID_MULTIPLE_TOPGRIDS,
-	GRID_INVALID_VAR_SIZE } grid_error;
+typedef enum {
+	ASAGI_SUCCESS = 0,
+	ASAGI_MPI_ERROR,
+	ASAGI_THREAD_ERROR,
+	ASAGI_NUMA_ERROR,
+	ASAGI_UNKNOWN_PARAM,
+	ASAGI_INVALID_VALUE,
+	ASAGI_NOT_OPEN,
+	ASAGI_VAR_NOT_FOUND,
+	ASAGI_WRONG_SIZE,
+	ASAGI_UNSUPPORTED_DIMENSIONS,
+	ASAGI_MULTIPLE_TOPGRIDS,
+	ASAGI_INVALID_VAR_SIZE
+} asagi_error;
 #endif
-
-/**
- * @ingroup c_interface
- *
- * @see asagi::Grid::NO_HINT
- */
-const unsigned int GRID_NO_HINT = 0x0;
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::HAS_TIME
- */
-const unsigned int GRID_HAS_TIME = 0x1;
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::NOMPI
- */
-const unsigned int GRID_NOMPI = 0x2;
-/**
- * @ingroup c_interface
- *
- * @see asagi::Grid::SMALL_CACHE
- */
-const unsigned int SMALL_CACHE = 0x4;
-/**
- * @ingroup c_interface
- *
- * @see asagi::Grid::LARGE_GRID
- */
-const unsigned int GRID_LARGE_GRID = 0x8;
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::ADAPTIVE
- */
-const unsigned int GRID_ADAPTIVE = 0x10;
-/**
- * @ingroup c_interface
- *
- * @see asagi::Grid::PASS_THROUGH
- */
-const unsigned int PASS_THROUGH = 0x20;
 
 /**
  * @ingroup c_interface
  * 
  * @see asagi::Grid::create()
  */
-grid_handle* grid_create(grid_type type, unsigned int hint,
-	unsigned int levels);
+asagi_grid* asagi_grid_create(asagi_type type);
+
 /**
  * @ingroup c_interface
  * 
  * @see asagi::Grid::createArray()
  */
-grid_handle* grid_create_array(grid_type basic_type, unsigned int hint,
-	unsigned int levels);
+asagi_grid* asagi_grid_create_array(asagi_type basic_type);
+
 /**
  * @ingroup c_interface
  * 
  * @see asagi::Grid::createStruct()
  */
-grid_handle* grid_create_struct(unsigned int count,
+asagi_grid* asagi_grid_create_struct(unsigned int count,
 	unsigned int blockLength[],
 	unsigned long displacements[],
-	grid_type types[],
-	unsigned int hint, unsigned int levels);
+	asagi_type types[]);
 
 #ifndef ASAGI_NOMPI
 /**
@@ -602,217 +461,100 @@ grid_handle* grid_create_struct(unsigned int count,
  * 
  * @see asagi::Grid::setComm()
  */
-grid_error grid_set_comm(grid_handle* handle, MPI_Comm comm);
+void asagi_grid_set_comm(asagi_grid* handle, MPI_Comm comm);
 #endif
 /**
  * @ingroup c_interface
  * 
  * @see asagi::Grid::setParam()
  */
-grid_error grid_set_param(grid_handle* handle, const char* name,
+void asagi_grid_set_param(asagi_grid* handle, const char* name,
 	const char* value, unsigned int level);
 /**
  * @ingroup c_interface
  * 
  * @see asagi::Grid::open()
  */
-grid_error grid_open(grid_handle* handle, const char* filename,
+asagi_error asagi_grid_open(asagi_grid* handle, const char* filename,
 	unsigned int level);
 
 /**
  * @ingroup c_interface
  * 
- * @see asagi::Grid::getXMin()
+ * @see asagi::Grid::getMin()
  */
-double grid_min_x(grid_handle* handle);
+double asagi_grid_min(asagi_grid* handle, unsigned int n);
 /**
  * @ingroup c_interface
  *
- * @see asagi::Grid::getXMax()
+ * @see asagi::Grid::getMax()
  */
-double grid_min_y(grid_handle* handle);
-/**
- * @ingroup c_interface
- *
- * @see asagi::Grid::getYMin()
- */
-double grid_min_z(grid_handle* handle);
-/**
- * @ingroup c_interface
- *
- * @see asagi::Grid::getYMax()
- */
-double grid_max_x(grid_handle* handle);
-/**
- * @ingroup c_interface
- *
- * @see asagi::Grid::getZMin()
- */
-double grid_max_y(grid_handle* handle);
-/**
- * @ingroup c_interface
- *
- * @see asagi::Grid::getZMax()
- */
-double grid_max_z(grid_handle* handle);
+double asagi_grid_max(asagi_grid* handle, unsigned int n);
 
 /**
  * @ingroup c_interface
  * 
- * @see asagi::Grid::getXDelta()
+ * @see asagi::Grid::getDelta()
  */
-double grid_delta_x(grid_handle* handle);
-/**
- * @ingroup c_interface
- *
- * @see asagi::Grid::getYDelta()
- */
-double grid_delta_y(grid_handle* handle);
-/**
- * @ingroup c_interface
- *
- * @see asagi::Grid::getZDelta()
- */
-double grid_delta_z(grid_handle* handle);
+double asagi_grid_delta(asagi_grid* handle, unsigned int n,
+		unsigned int level);
 
 /**
  * @ingroup c_interface
  *
  * @see asagi::Grid::getVarSize()
  */
-unsigned int grid_var_size(grid_handle* handle);
+unsigned int asagi_grid_var_size(asagi_grid* handle);
 
 /**
  * @ingroup c_interface
  * 
- * @see asagi::Grid::getByte1D()
+ * @see asagi::Grid::getByte()
  */
-unsigned char grid_get_byte_1d(grid_handle* handle, double x,
+unsigned char asagi_grid_get_byte(asagi_grid* handle, const double* pos,
 	unsigned int level);
 /**
  * @ingroup c_interface
  * 
- * @see asagi::Grid::getInt1D()
+ * @see asagi::Grid::getInt()
  */
-int grid_get_int_1d(grid_handle* handle, double x, unsigned int level);
+int asagi_grid_get_int(asagi_grid* handle, const double* pos,
+		unsigned int level);
 /**
  * @ingroup c_interface
  * 
- * @see asagi::Grid::getLong1D()
+ * @see asagi::Grid::getLong()
  */
-long grid_get_long_1d(grid_handle* handle, double x, unsigned int level);
+long asagi_grid_get_long(asagi_grid* handle, const double* pos,
+		unsigned int level);
 /**
  * @ingroup c_interface
  * 
- * @see asagi::Grid::getFloat1D()
+ * @see asagi::Grid::getFloat()
  */
-float grid_get_float_1d(grid_handle* handle, double x, unsigned int level);
+float asagi_grid_get_float(asagi_grid* handle, const double* pos,
+		unsigned int level);
 /**
  * @ingroup c_interface
  * 
- * @see asagi::Grid::getDouble1D()
+ * @see asagi::Grid::getDouble()
  */
-double grid_get_double_1d(grid_handle* handle, double x, unsigned int level);
+double asagi_grid_get_double(asagi_grid* handle, const double* pos,
+		unsigned int level);
 /**
  * @ingroup c_interface
  * 
- * @see asagi::Grid::getBuf1D()
+ * @see asagi::Grid::getBuf()
  */
-void grid_get_buf_1d(grid_handle* handle,void* buf, double x,
+void asagi_grid_get_buf(asagi_grid* handle,void* buf, const double* pos,
 	unsigned int level);
-
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::getByte2D()
- */
-unsigned char grid_get_byte_2d(grid_handle* handle, double x, double y,
-	unsigned int level);
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::getInt2D()
- */
-int grid_get_int_2d(grid_handle* handle, double x, double y,
-	unsigned int level);
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::getLong2D()
- */
-long grid_get_long_2d(grid_handle* handle, double x, double y,
-	unsigned int level);
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::getFloat2D()
- */
-float grid_get_float_2d(grid_handle* handle, double x, double y,
-	unsigned int level);
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::getDouble2D()
- */
-double grid_get_double_2d(grid_handle* handle, double x, double y,
-	unsigned int level);
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::getBuf2D()
- */
-void grid_get_buf_2d(grid_handle* handle,void* buf, double x, double y,
-	unsigned int level);
-
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::getByte3D()
- */
-unsigned char grid_get_byte_3d(grid_handle* handle, double x, double y, double z,
-	unsigned int level);
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::getInt3D()
- */
-int grid_get_int_3d(grid_handle* handle, double x, double y, double z,
-	unsigned int level);
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::getLong3D()
- */
-long grid_get_long_3d(grid_handle* handle, double x, double y, double z,
-	unsigned int level);
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::getFloat3D()
- */
-float grid_get_float_3d(grid_handle* handle, double x, double y, double z,
-	unsigned int level);
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::getDouble3D()
- */
-double grid_get_double_3d(grid_handle* handle, double x, double y, double z,
-	unsigned int level);
-/**
- * @ingroup c_interface
- * 
- * @see asagi::Grid::getBuf3D()
- */
-void grid_get_buf_3d(grid_handle* handle,void* buf, double x, double y,
-	double z, unsigned int level);
 
 /**
  * @ingroup c_interface
  * 
  * @see asagi::Grid::close(asagi::Grid*)
  */
-void grid_close(grid_handle* handle);
+void asagi_grid_close(asagi_grid* handle);
 
 #ifdef __cplusplus
 }

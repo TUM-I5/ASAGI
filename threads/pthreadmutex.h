@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,59 +31,59 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "globaltest.h"
-#include "tests.h"
+#ifndef THREADS_PTHREADMUTEX_H
+#define THREADS_PTHREADMUTEX_H
 
-#include "grid/grid.h"
+#ifndef USE_PTHREAD
+#error "PThreads are not enabled."
+#endif // USE_PTHREAD
 
-#include "grid/simplegridcontainer.h"
+#include <pthread.h>
 
-class GridTest : public CxxTest::TestSuite
+namespace threads
 {
-	grid::SimpleGridContainer* c;
-	grid::Grid* grid;
+
+/**
+ * Mutex based on pthread spin locks
+ */
+class PthreadMutex
+{
+private:
+	/** The pthread spin lock */
+	pthread_spinlock_t m_lock;
+
 public:
-	void setUp(void)
+	PthreadMutex()
 	{
-		// Set up a 1d grid
-		c = new grid::SimpleGridContainer(asagi::Grid::FLOAT);
-		c->open("../../" NC_1D);
-		grid = c->m_grids[0];
-	}
-	
-	void tearDown(void)
-	{
-		delete c;
-	}
-	
-	void testSetParam(void)
-	{
-		TS_ASSERT_EQUALS(grid->setParam("x-block-size", "5"),
-			asagi::Grid::SUCCESS);
-		TS_ASSERT_EQUALS(grid->m_blockSize[0], 5u);
-		
-		grid->setParam("y-block-size", "7");
-		TS_ASSERT_EQUALS(grid->m_blockSize[1], 7u);
-		
-		grid->setParam("z-block-size", "42");
-		TS_ASSERT_EQUALS(grid->m_blockSize[2], 42u);
-		
-		TS_ASSERT_EQUALS(grid->setParam("block-cache-size", "100"),
-			asagi::Grid::SUCCESS);
-		TS_ASSERT_EQUALS(grid->m_blocksPerNode, 100);
+		pthread_spin_init(&m_lock, PTHREAD_PROCESS_PRIVATE);
 	}
 
-	void testGetXMax(void)
+	~PthreadMutex()
 	{
-		TS_ASSERT_EQUALS(c->getFloat1D(c->getXMax()), NC_WIDTH-1);
+		pthread_spin_destroy(&m_lock);
 	}
 
-	void testGetXDelta(void)
+	/**
+	 * Lock the mutex
+	 */
+	void lock()
 	{
-		TS_ASSERT_DELTA(c->getXDelta(), 1.0, 0.001);
+		pthread_spin_lock(&m_lock);
+	}
+
+	/**
+	 * Unlock the mutex
+	 */
+	void unlock()
+	{
+		pthread_spin_unlock(&m_lock);
 	}
 };
+
+}
+
+#endif // THREADS_PTHREADMUTEX_H

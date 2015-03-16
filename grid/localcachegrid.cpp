@@ -43,7 +43,7 @@
 grid::LocalCacheGrid::LocalCacheGrid(const GridContainer &container,
 		unsigned int hint,
 		const allocator::Allocator<unsigned char> &allocator)
-	: Grid(container, hint),
+	: Grid2(container, hint),
 	  m_cache(0L),
 	  m_allocator(allocator)
 {

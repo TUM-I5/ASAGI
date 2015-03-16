@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef ASAGI_F95_H
@@ -44,22 +44,19 @@
 extern "C" {
 #endif
 
-int f90grid_create(grid_type type, int hint,
-	int levels);
+int f90asagi_grid_create(asagi_type type);
 
-int f90grid_create_array(grid_type basic_type, int hint,
-	int levels);
+int f90asagi_grid_create_array(asagi_type basic_type);
 
-int f90grid_create_struct(int count,
+int f90asagi_grid_create_struct(int count,
 	int blockLength[],
 	long displacements[],
-	grid_type types[],
-	int hint, int levels);
+	asagi_type types[]);
 
-grid_error f90grid_set_comm(int grid_id, int comm);
-grid_error f90grid_set_param(int grid_id, const char* name,
+void f90asagi_grid_set_comm(int grid_id, int comm);
+void f90asagi_grid_set_param(int grid_id, const char* name,
 	const char* value, int level);
-grid_error f90grid_open(int grid_id, const char* filename,
+asagi_error f90asagi_grid_open(int grid_id, const char* filename,
 	int level);
 
 double f90grid_min_x(int grid_id);

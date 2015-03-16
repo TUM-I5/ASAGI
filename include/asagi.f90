@@ -32,7 +32,7 @@
 !!  mit diesem Programm erhalten haben. Wenn nicht, siehe
 !!  <http://www.gnu.org/licenses/>.
 !! 
-!! @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+!! @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
 !!
 !! @brief Include file for Fortran API
 !!
@@ -83,6 +83,7 @@ module asagi
   !> @ingroup f_interface
   !!
   !! @see asagi::Grid::Error
+  !! @todo update
   enum, bind( c )
     enumerator :: GRID_SUCCESS = 0, GRID_MPI_ERROR, GRID_UNKNOWN_PARAM, &
       GRID_INVALID_VALUE, GRID_NOT_OPEN, GRID_VAR_NOT_FOUND, &
@@ -95,13 +96,11 @@ module asagi
   !> @endcond ingore
   
     !> @internal
-    function grid_create_c( grid_type, hint, levels ) bind( c, name="f90grid_create" )
+    function asagi_grid_create_c( grid_type ) bind( c, name="f90grid_create" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_type
-      integer( kind=c_int ), value :: hint
-      integer( kind=c_int ), value :: levels
-      integer( kind=c_int )        :: grid_create_c
-    end function grid_create_c
+      integer( kind=c_int )        :: asagi_grid_create_c
+    end function asagi_grid_create_c
 
     !> @internal
     function grid_create_array_c( grid_basictype, hint, levels ) bind( c, name="f90grid_create_array" )
@@ -493,11 +492,9 @@ module asagi
     !> @ingroup f_interface
     !!
     !! @see asagi::Grid::create()
-    function grid_create( grid_type, hint, levels )
+    function asagi_grid_create( grid_type, hint, levels )
       integer, optional, intent(in) :: grid_type
-      integer, optional, intent(in) :: hint
-      integer, optional, intent(in) :: levels
-      integer                       :: grid_create
+      integer                       :: asagi_grid_create
 
       !variables send to asagi
       integer :: g, h, l
@@ -518,8 +515,8 @@ module asagi
         l = 1
       endif
 
-      grid_create = grid_create_c( g, h, l )
-    end function grid_create
+      asagi_grid_create = asagi_grid_create_c( g, h, l )
+    end function asagi_grid_create
 
     !> @ingroup f_interface
     !!

@@ -35,95 +35,81 @@
  * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef TYPES_BASICTYPE_H
-#define TYPES_BASICTYPE_H
+#include "container.h"
 
-#include "type.h"
-#include "io/netcdfreader.h"
+#if 0
+#include "grid/localcachegrid.h"
+#include "grid/localstaticgrid.h"
+#include "grid/passthroughgrid.h"
 
-namespace types {
+#ifndef ASAGI_NOMPI
+#include "grid/diststaticgrid.h"
+#include "grid/distcachegrid.h"
+#endif // ASAGI_NOMPI
+
+#include "types/arraytype.h"
+#include "types/basictype.h"
+#include "types/structtype.h"
+
+#include <cassert>
+#include <cstring>
+#include <limits>
+#endif
+
+grid::Container::Container(const mpi::MPIComm &comm,
+		const numa::Numa &numa,
+		const types::Type* type,
+		ValuePosition valuePos)
+	: m_comm(comm), m_numa(numa), m_type(type),
+	  m_valuePos(valuePos)
+{
+}
+
+grid::Container::~Container()
+{
+}
+
+#if 0
+asagi::Grid::Error grid::Container::open(const char* filename,
+	unsigned int level)
+{
+	assert(level < m_levels);
+	
+#ifdef ASAGI_NOMPI
+	return SUCCESS;
+#else // ASAGI_NOMPI
+	// Make sure we have our own communicator
+	if (m_noMPI)
+		return SUCCESS;
+	return setComm();
+#endif // ASAGI_NOMPI
+}
 
 /**
- * Implementation for basic types like int, long, float, double
+ * Creates a new grid according to the hints
  */
-template<typename T> class BasicType : public Type
-{   
-public:
-	virtual unsigned int getSize() const
-	{
-		return sizeof(T);
-	}
-	
-	virtual void load(io::NetCdfReader &file,
-		const size_t *offset,
-		const size_t *size,
-		void *buf) const
-	{
-		file.getBlock<T>(buf, offset, size);
-	}
-	
-#ifndef ASAGI_NOMPI
-	virtual MPI_Datatype getMPIType();
-#endif // ASAGI_NOMPI
-	
-	void convertByte(const void* data, void* buf) const
-	{
-		*static_cast<unsigned char*>(buf) = *static_cast<const T*>(data);
-	}
-	
-	void convertInt(const void* data, void* buf) const
-	{
-		*static_cast<int*>(buf) = *static_cast<const T*>(data);
-	}
-	
-	void convertLong(const void* data, void* buf) const
-	{
-		*static_cast<long*>(buf) = *static_cast<const T*>(data);
-	}
-	
-	void convertFloat(const void* data, void* buf) const
-	{
-		*static_cast<float*>(buf) = *static_cast<const T*>(data);
-	}
-	
-	void convertDouble(const void* data, void* buf) const
-	{
-		*static_cast<double*>(buf) = *static_cast<const T*>(data);
-	}
-};
+grid::Grid2* grid::GridContainer::createGrid(unsigned int hint,
+	unsigned int id) const
+{
+	if (hint & PASS_THROUGH)
+		return new PassThroughGrid(*this, hint);
 
 #ifndef ASAGI_NOMPI
-template<> inline
-MPI_Datatype BasicType<unsigned char>::getMPIType()
-{
-	return MPI_BYTE;
-}
+	if (hint & NOMPI) {
+#endif // ASAGI_NOMPI
+		if (hint & SMALL_CACHE)
+			return new LocalCacheGrid(*this, hint);
 
-template<> inline
-MPI_Datatype BasicType<int>::getMPIType()
-{
-	return MPI_INT;
-}
-
-template<> inline
-MPI_Datatype BasicType<long>::getMPIType()
-{
-	return MPI_LONG;
-}
-
-template<> inline
-MPI_Datatype BasicType<float>::getMPIType()
-{
-	return MPI_FLOAT;
-}
-
-template<> inline
-MPI_Datatype BasicType<double>::getMPIType()
-{
-	return MPI_DOUBLE;
-}
+		return new LocalStaticGrid(*this, hint);
+#ifndef ASAGI_NOMPI
+	}
 #endif // ASAGI_NOMPI
 
-}
+#ifndef ASAGI_NOMPI
+	if (hint & LARGE_GRID)
+		return new DistCacheGrid(*this, hint, id);
 
-#endif // TYPES_BASICTYPE_H
+	return new DistStaticGrid(*this, hint);
+#endif // ASAGI_NOMPI
+}
+#endif

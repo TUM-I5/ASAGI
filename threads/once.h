@@ -31,48 +31,61 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_PASSTHROUGHGRID_H
-#define GRID_PASSTHROUGHGRID_H
+#ifndef THREADS_ONCE_H
+#define THREADS_ONCE_H
 
-#include "grid.h"
+#include <mutex>
 
-namespace grid
+#include "mutex.h"
+
+namespace threads
 {
 
 /**
- * A simple grid that passes every access directly to the underlying
- * I/O layer.
+ * A small class that executes a function exactly once
  */
-class PassThroughGrid : public Grid
-{
+class Once {
 private:
-	/** Memory to save one value (allocated only once) */
-	unsigned char *m_mem;
+	/** Already executed */
+	bool m_state;
+
+	/** Mutex to lock the state */
+	Mutex m_mutex;
 
 public:
-	PassThroughGrid(const GridContainer &container,
-		unsigned int hint = asagi::Grid::NO_HINT);
-	virtual ~PassThroughGrid();
-
-protected:
-	virtual asagi::Grid::Error init();
-
-	virtual void getAt(void* buf, types::Type::converter_t converter,
-			unsigned long x, unsigned long y, unsigned long z);
+	Once()
+		: m_state(false)
+	{ }
 
 	/**
-	 * @see Grid::keepFileOpen()
+	 * Executes <code>func</code> of <code>obj</code>
+	 * exactly once. When this function returns, <code>func</code>
+	 * has been executed.
 	 */
-	virtual bool keepFileOpen() const
+	template<class T>
+	void saveExec(T &obj, void (T::*func)())
 	{
-		return true;
+		// Default case
+		if (m_state)
+			return;
+
+		// Lock the state and double check
+		std::lock_guard<Mutex> lock(m_mutex);
+		if (m_state)
+			return;
+
+		// Save execute:
+		// Execute the function before freeing the lock
+		(obj.*func)();
+
+		m_state = true;
 	}
 };
 
 }
 
-#endif /* GRID_PASSTHROUGHGRID_H */
+#endif // THREADS_ONCE_H

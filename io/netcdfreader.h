@@ -38,9 +38,7 @@
 #ifndef IO_NETCDF_H
 #define IO_NETCDF_H
 
-#include <asagi.h>
-
-#include "grid/constants.h"
+#include "asagi.h"
 
 #include <cassert>
 #include <limits>
@@ -111,7 +109,7 @@ public:
 	/**
 	 * @return The number of dimensions
 	 */
-	int getDimensions() const
+	unsigned int dimensions() const
 	{
 		return m_dimensions;
 	}
@@ -131,7 +129,7 @@ public:
 	 */
 	double getOffset(int i) const
 	{
-		if (i >= getDimensions())
+		if (i >= m_dimensions)
 			return 0;
 
 		int x;
@@ -186,9 +184,9 @@ public:
 	{
 		// The netCDF standard (Coords convention) uses Fortran
 		// dimension ordering -> reverse offset and size arrays
-		size_t actOffset[grid::MAX_DIMENSIONS];
+		size_t actOffset[MAX_DIMENSIONS];
 		std::reverse_copy(offset, offset+m_dimensions, actOffset);
-		size_t actSize[grid::MAX_DIMENSIONS];
+		size_t actSize[MAX_DIMENSIONS];
 		std::reverse_copy(size, size+m_dimensions, actSize);
 
 		// Make sure we do not read more than the available data
@@ -239,7 +237,7 @@ private:
 		const ptrdiff_t *imap, T *buffer);
 
 private:
-	static const ptrdiff_t STRIDE[grid::MAX_DIMENSIONS];
+	static const ptrdiff_t STRIDE[MAX_DIMENSIONS];
 };
 
 template<> inline

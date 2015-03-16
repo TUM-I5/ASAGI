@@ -52,7 +52,7 @@
  */
 grid::DistCacheGrid::DistCacheGrid(const GridContainer& container,
 	unsigned int hint, unsigned int id)
-	: Grid(container, hint),
+	: Grid2(container, hint),
 	  LocalCacheGrid(container, hint,
 			  allocator::MPIAllocator<unsigned char>::allocator),
 	  m_globalMutex(id)
