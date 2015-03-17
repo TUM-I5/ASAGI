@@ -63,12 +63,6 @@ private:
 	/** NUMA "communicator" for this container */
 	const numa::Numa &m_numa;
 
-	/**
-	 * The type of values we save in the grid.
-	 * This class implements all type specific operations.
-	 */
-	const types::Type * const m_type;
-
 	/** Value Position (cell-centered || vertex-centered) */
 	ValuePosition m_valuePos;
 
@@ -89,7 +83,6 @@ protected:
 public:
 	Container(const mpi::MPIComm &comm,
 		const numa::Numa &numa,
-		const types::Type* type,
 		ValuePosition valuePos);
 	virtual ~Container();
 	
@@ -124,21 +117,46 @@ public:
 		return 0;
 	}
 
+#if 0
 	unsigned int getVarSize() const
 	{
 		return m_type->getSize();
 	}
+#endif
+
+	/**
+	 * @see getBuf
+	 */
+	virtual void getByte(unsigned char* buf, const double* pos, unsigned int level = 0) = 0;
+
+	/**
+	 * @see getBuf
+	 */
+	virtual void getInt(int* buf, const double* pos, unsigned int level = 0) = 0;
+
+	/**
+	 * @see getBuf
+	 */
+	virtual void getLong(long* buf, const double* pos, unsigned int level = 0) = 0;
+
+	/**
+	 * @see getBuf
+	 */
+	virtual void getFloat(float* buf, const double* pos, unsigned int level = 0) = 0;
+
+	/**
+	 * @see getBuf
+	 */
+	virtual void getDouble(double* buf, const double* pos, unsigned int level = 0) = 0;
 
 	/**
 	 * Write the value at <code>pos</code> into <code>buf</code>.
 	 *
 	 * @param buf
 	 * @param pos
-	 * @param converter
 	 * @param level
 	 */
-	virtual void getAt(void* buf, const double* pos,
-			types::Type::converter_t converter, unsigned int level = 0) = 0;
+	virtual void getBuf(void* buf, const double* pos, unsigned int level = 0) = 0;
 
 	/**
 	 * Get a counter for a specific level
@@ -215,14 +233,6 @@ protected:
 	}
 
 	/**
-	 * @return The type for this container
-	 */
-	const types::Type* type() const
-	{
-		return m_type;
-	}
-
-	/**
 	 * @return The value position for this container
 	 */
 	ValuePosition valuePosition() const
@@ -235,5 +245,21 @@ protected:
 };
 
 }
+
+#define CONTAINER_GETVAR_FUNC(N, T)                                \
+	void get##N(T* buf, const double* pos, unsigned int level = 0) \
+	{                                                              \
+		getAt(buf, pos, level);                                    \
+	}
+// Use this macro in the subclass to implement all get*(buf, pos, level) functions
+// and redirect them to a templatized function getAt<T>(buf, pos, level)
+#define CONTAINER_GETVAR \
+	CONTAINER_GETVAR_FUNC(Byte, unsigned char) \
+	CONTAINER_GETVAR_FUNC(Int, int) \
+	CONTAINER_GETVAR_FUNC(Long, long) \
+	CONTAINER_GETVAR_FUNC(Float, float) \
+	CONTAINER_GETVAR_FUNC(Double, double) \
+	CONTAINER_GETVAR_FUNC(Buf, void)
+
 
 #endif // GRID_CONTAINER_H

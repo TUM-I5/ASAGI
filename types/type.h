@@ -61,18 +61,6 @@ class Type
 {
 public:
 	/**
-	 * Describes a function that converts form one basic type to another.
-	 * @see convertByte
-	 * @see convertInt
-	 * @see convertLong
-	 * @see convertFloat
-	 * @see convertDouble
-	 * @see convertBuffer
-	 */
-	typedef void (Type::*converter_t)(const void*, void*) const;
-	
-public:
-	/**
 	 * Empty destructor, makes sure constructor
 	 * of child classes is called
 	 */
@@ -90,8 +78,8 @@ public:
 	/**
 	 * @return The size of the variable
 	 */
-	virtual unsigned int getSize() const = 0;
-	
+	virtual unsigned int size() const = 0;
+
 	/**
 	 * Loads a block form the netcdf file into the buffer
 	 */
@@ -107,42 +95,21 @@ public:
 	virtual MPI_Datatype getMPIType() = 0;
 #endif // ASAGI_NOMPI
 	
+protected:
 	/**
-	 * Conversation functions:
-	 * The value is copied from data to buf, doing transformations between
-	 * basic types.<br>
-	 * E.g.: If the type of this class is "float" and the "convertDouble" is
-	 * called, *data should be a float and *buf a double.<br>
-	 * All these functions have the type "converter_t". This way it is
-	 * possible to pass them arround as pointers.
+	 * Copies the data from <code>data</code> to <code>buf</code>
 	 */
-	virtual void convertByte(const void* data, void* buf) const = 0;
-	/**
-	 * @see convertByte
-	 */
-	virtual void convertInt(const void* data, void* buf) const = 0;
-	/**
-	 * @see convertByte
-	 */
-	virtual void convertLong(const void* data, void* buf) const = 0;
-	/**
-	 * @see convertByte
-	 */
-	virtual void convertFloat(const void* data, void* buf) const = 0;
-	/**
-	 * @see convertByte
-	 */
-	virtual void convertDouble(const void* data, void* buf) const = 0;
-	/**
-	 * This is the "no-conversation" function. It simple copys a whole
-	 * variable from data to buf
-	 */
-	void convertBuffer(const void* data, void* buf) const
+	static void copy(const void* data, void* buf, unsigned int size)
 	{
-		memcpy(buf, data, getSize());
+		memcpy(buf, data, size);
 	}
 };
 
 }
+
+// Use this macro in subclasses to implement size(). It assumes you have
+// size_static() defined. We use size() for dynamic linking and size_static()
+// for static linking
+#define TYPE_SIZE_FUNC unsigned int size() const { return size_static(); }
 
 #endif // TYPES_TYPE_H

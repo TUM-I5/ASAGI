@@ -43,14 +43,10 @@
 #include "utils/logger.h"
 
 #include "grid/constants.h"
+#include "io/netcdfreader.h"
 #include "mpi/mpicomm.h"
 #include "numa/numa.h"
 #include "perf/counter.h"
-
-namespace io
-{
-class NetCdfReader;
-}
 
 namespace types
 {
@@ -69,6 +65,7 @@ namespace level
 /**
  * @brief Base class for a grid level
  */
+template<class Type>
 class Level
 {
 private:
@@ -82,7 +79,7 @@ private:
 	 * The type of values we save in the grid.
 	 * This class implements all type specific operations.
 	 */
-	const types::Type* m_type;
+	const Type* m_type;
 
 	/** The file that contains this grid */
 	io::NetCdfReader *m_inputFile;
@@ -139,9 +136,24 @@ private:
 	perf::Counter m_counter;
 
 public:
-	Level();
+	Level()
+		: m_comm(0L), m_numa(0L), m_type(0L),
+		  m_inputFile(0L)
+	{
+	}
 
-	virtual ~Level();
+	Level(const mpi::MPIComm &comm,
+			const numa::Numa &numa,
+			const Type &type)
+		: m_comm(&comm), m_numa(&numa), m_type(&type),
+		  m_inputFile(0L)
+	{
+	}
+
+	virtual ~Level()
+	{
+		delete m_inputFile;
+	}
 
 	/**
 	 * Get the current counter for a specific type
@@ -152,19 +164,138 @@ public:
 	}
 	
 protected:
-	asagi::Grid::Error _init(
-			const mpi::MPIComm &comm,
-			const numa::Numa &numa,
-			const types::Type* type,
+	/**
+	 * Initialize the grid level
+	 */
+	asagi::Grid::Error open(
 			const char* filename,
 			const char* varname,
-			grid::ValuePosition valuePos);
+			grid::ValuePosition valuePos)
+	{
+		asagi::Grid::Error err;
+
+		double scaling[MAX_DIMENSIONS];
+
+		// Open NetCDF file
+		m_inputFile = new io::NetCdfReader(filename, comm().rank());
+		if ((err = m_inputFile->open(varname)) != asagi::Grid::SUCCESS)
+			return err;
+
+		m_dims = m_inputFile->dimensions();
+
+		for (unsigned int i = 0; i < m_dims; i++) {
+			// Get dimension size
+			m_dim[i] = m_inputFile->getSize(i);
+
+			// Get offset and scaling
+			m_offset[i] = m_inputFile->getOffset(i);
+
+			scaling[i] = m_inputFile->getScaling(i);
+		}
+
+	#if 0
+		// Set time dimension
+		if (m_timeDimension == -1) {
+			// Time grid, but time dimension not specified
+			m_timeDimension = m_inputFile->getDimensions() - 1;
+			logDebug(getMPIRank()) << "Assuming time dimension"
+				<< DIMENSION_NAMES[m_timeDimension];
+		}
+
+		// Set block size in time dimension
+		if ((m_timeDimension >= 0) && (m_blockSize[m_timeDimension] == 0)) {
+			logDebug(getMPIRank()) << "Setting block size in time dimension"
+				<< DIMENSION_NAMES[m_timeDimension] << "to 1";
+			m_blockSize[m_timeDimension] = 1;
+		}
+	#endif
+
+		// Set default block size and calculate number of blocks
+		for (unsigned int i = 0; i < m_dims; i++) {
+	#if 0
+			if (m_blockSize[i] == 0)
+				// Setting default block size, if not yet set
+				m_blockSize[i] = 50;
+
+			// A block size large than the dimension does not make any sense
+			if (m_dim[i] < m_blockSize[i]) {
+				logDebug(getMPIRank()) << "Shrinking" << DIMENSION_NAMES[i]
+					<< "block size to" << m_dim[i];
+				m_blockSize[i] = m_dim[i];
+			}
+
+			// Integer way of rounding up
+			m_blocks[i] = (m_dim[i] + m_blockSize[i] - 1) / m_blockSize[i];
+	#endif
+
+			m_scalingInv[i] = getInvScaling(scaling[i]);
+
+			// Set min/max
+			if (std::isinf(scaling[i])) {
+				m_min[i] = -std::numeric_limits<double>::infinity();
+				m_max[i] = std::numeric_limits<double>::infinity();
+			} else {
+				// Warning: min and max are inverted of scaling is negative
+				double min = m_offset[i];
+				double max = m_offset[i] + scaling[i] * (m_dim[i] - 1);
+
+				if (valuePos == grid::CELL_CENTERED) {
+					// Add half a cell on both ends
+					min -= scaling[i] * (0.5 - NUMERIC_PRECISION);
+					max += scaling[i] * (0.5 - NUMERIC_PRECISION);
+				}
+
+				m_min[i] = std::min(min, max);
+				m_max[i] = std::max(min, max);
+			}
+		}
+
+	#if 0
+		// Set default cache size
+		if (m_blocksPerNode < 0)
+			// Default value
+			m_blocksPerNode = 80;
+
+		// Init type
+		if ((error = getType().check(*m_inputFile)) != asagi::Grid::SUCCESS)
+			return error;
+
+		// Init subclass
+		error = init();
+
+		if (!keepFileOpen()) {
+			// input file no longer needed, so we close
+			delete m_inputFile;
+			m_inputFile = 0L;
+		}
+	#endif
+
+		return asagi::Grid::SUCCESS;
+	}
 
 #if 0
 private:
 	void getAt(void* buf, types::Type::converter_t converter,
 		   double x, double y = 0, double z = 0);
 #endif
+
+	const mpi::MPIComm& comm() const
+	{
+		return *m_comm;
+	}
+
+	const numa::Numa& numa() const
+	{
+		return *m_numa;
+	}
+
+	/**
+	 * @return The type for this grid
+	 */
+	const Type& type() const
+	{
+		return *m_type;
+	}
 	
 	/**
 	 * @return The input file used for this grid
@@ -172,14 +303,6 @@ private:
 	io::NetCdfReader& inputFile() const
 	{
 		return *m_inputFile;
-	}
-	
-	/**
-	 * @return The type for this grid
-	 */
-	const types::Type* type() const
-	{
-		return m_type;
 	}
 	
 	/**
@@ -388,9 +511,26 @@ private:
 	/** The smallest number we can represent in a double */
 	static constexpr double NUMERIC_PRECISION = 1e-10;
 
-	static double getInvScaling(double scaling);
 
-	static double round(double value);
+	/**
+	 * Calculates 1/scaling, except for scaling = 0 and scaling = inf. In this
+	 * case it returns 0
+	 */
+	double getInvScaling(double scaling)
+	{
+		if ((scaling == 0) || isinf(scaling))
+			return 0;
+
+		return 1/scaling;
+	}
+
+	/**
+	 * Implementation for round-to-nearest
+	 */
+	double round(double value)
+	{
+		return floor(value + 0.5);
+	}
 };
 
 }

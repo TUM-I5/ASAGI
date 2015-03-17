@@ -42,10 +42,40 @@
 #include "utils/stringutils.h"
 
 #include "simplecontainer.h"
+#include "magic/typelist.h"
 #include "level/passthrough.h"
 #include "types/arraytype.h"
 #include "types/basictype.h"
 #include "types/structtype.h"
+
+/**
+ * Creates the container depending on the type of the <code>grid</code>
+ */
+template<template<template<class Type> class Level, class Type> class Container,
+	template<class Type> class Level,
+	class TypeList>
+grid::Container* grid::Grid::TypeSelector<Container, Level, TypeList>
+	::createContainer(Grid &grid,
+		ValuePosition valuePos)
+{
+	typedef typename TypeList::Head Head;
+	typedef typename TypeList::Tail Tail;
+
+	if (Head* type = dynamic_cast<Head*>(grid.m_type))
+		return new Container<Level, Head>(grid.m_comm, grid.m_numa, *type, valuePos);
+
+	return TypeSelector<Container, Level, Tail>::createContainer(grid, valuePos);
+}
+
+template<template<template<class Type> class Level, class Type> class Container,
+	template<class Type> class Level>
+grid::Container* grid::Grid::TypeSelector<Container, Level, magic::NullType>
+::createContainer(Grid &grid,
+	ValuePosition valuePos)
+{
+	assert(false);
+	return 0L;
+}
 
 /**
  * @param type The basic type of the values
@@ -193,6 +223,10 @@ void grid::Grid::init()
 	m_id = m_pointers.add(this);
 }
 
+
+//template<class Container, class Level, typename TypeList>
+//grid::Container* grid::Grid::test(types::Type* type)
+
 /**
  * Initializes all the containers
  */
@@ -202,6 +236,24 @@ void grid::Grid::initContainers()
 		PASS_THROUGH,
 		UNKNOWN
 	} containerType = UNKNOWN;
+
+	typedef magic::MakeTypelist<
+			types::BasicType<unsigned char>,
+			types::BasicType<int>,
+			types::BasicType<long>,
+			types::BasicType<float>,
+			types::BasicType<double>,
+			types::ArrayType<unsigned char>,
+			types::ArrayType<int>,
+			types::ArrayType<long>,
+			types::ArrayType<float>,
+			types::ArrayType<double>,
+			types::StructType<unsigned char>,
+			types::StructType<int>,
+			types::StructType<long>,
+			types::StructType<float>,
+			types::StructType<double>
+	>::result typelist;
 
 	// Select the container type
 	if (param("PASS_THROUGH", false)) {
@@ -219,14 +271,19 @@ void grid::Grid::initContainers()
 			logWarning(m_comm.rank()) << "ASAGI: Unknown value position:" << strValuePos;
 	}
 
+	//Dispatcher<SimpleContainer, level::PassThrough,
+	//	TYPELIST_2(types::BasicType<unsigned char>, types::BasicType<int>)>::test(*this, m_type);
+	TypeSelector<SimpleContainer, level::PassThrough,
+		magic::MakeTypelist<types::BasicType<unsigned char>, types::BasicType<int>>::result>::createContainer(*this,
+				valuePos);
+
 	// Initialize the container
 	m_containers.resize(m_numa.totalDomains());
 	for (std::vector<Container*>::iterator it = m_containers.begin();
 			it != m_containers.end(); it++) {
 		switch (containerType) {
 		case PASS_THROUGH:
-			*it = new SimpleContainer<level::PassThrough>(m_comm, m_numa, m_type,
-					valuePos);
+			*it = TypeSelector<SimpleContainer, level::PassThrough, typelist>::createContainer(*this, valuePos);
 			break;
 		default:
 			*it = 0L;

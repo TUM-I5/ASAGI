@@ -37,8 +37,6 @@
 
 #include "level.h"
 
-#include "io/netcdfreader.h"
-
 #if 0
 #include "constants.h"
 #ifdef PNG_ENABLED
@@ -170,121 +168,6 @@ asagi::Grid::Error grid::Grid2::setParam(const char* name, const char* value)
 }
 #endif
 
-/**
- * Initialize the grid level
- */
-asagi::Grid::Error grid::level::Level::_init(
-		const mpi::MPIComm &comm,
-		const numa::Numa &numa,
-		const types::Type* type,
-		const char* filename,
-		const char* varname,
-		grid::ValuePosition valuePos)
-{
-	asagi::Grid::Error err;
-
-	m_comm = &comm;
-	m_numa = &numa;
-	m_type = type;
-
-	double scaling[3];
-	
-	// Open NetCDF file
-	m_inputFile = new io::NetCdfReader(filename, m_comm->rank());
-	if ((err = m_inputFile->open(varname)) != asagi::Grid::SUCCESS)
-		return err;
-	
-	m_dims = m_inputFile->dimensions();
-
-	for (unsigned int i = 0; i < m_dims; i++) {
-		// Get dimension size
-		m_dim[i] = m_inputFile->getSize(i);
-	
-		// Get offset and scaling
-		m_offset[i] = m_inputFile->getOffset(i);
-	
-		scaling[i] = m_inputFile->getScaling(i);
-	}
-
-#if 0
-	// Set time dimension
-	if (m_timeDimension == -1) {
-		// Time grid, but time dimension not specified
-		m_timeDimension = m_inputFile->getDimensions() - 1;
-		logDebug(getMPIRank()) << "Assuming time dimension"
-			<< DIMENSION_NAMES[m_timeDimension];
-	}
-	
-	// Set block size in time dimension
-	if ((m_timeDimension >= 0) && (m_blockSize[m_timeDimension] == 0)) {
-		logDebug(getMPIRank()) << "Setting block size in time dimension"
-			<< DIMENSION_NAMES[m_timeDimension] << "to 1";
-		m_blockSize[m_timeDimension] = 1;
-	}
-#endif
-	
-	// Set default block size and calculate number of blocks
-	for (unsigned int i = 0; i < m_dims; i++) {
-#if 0
-		if (m_blockSize[i] == 0)
-			// Setting default block size, if not yet set
-			m_blockSize[i] = 50;
-		
-		// A block size large than the dimension does not make any sense
-		if (m_dim[i] < m_blockSize[i]) {
-			logDebug(getMPIRank()) << "Shrinking" << DIMENSION_NAMES[i]
-				<< "block size to" << m_dim[i];
-			m_blockSize[i] = m_dim[i];
-		}
-		
-		// Integer way of rounding up
-		m_blocks[i] = (m_dim[i] + m_blockSize[i] - 1) / m_blockSize[i];
-#endif
-		
-		m_scalingInv[i] = getInvScaling(scaling[i]);
-		
-		// Set min/max
-		if (std::isinf(scaling[i])) {
-			m_min[i] = -std::numeric_limits<double>::infinity();
-			m_max[i] = std::numeric_limits<double>::infinity();
-		} else {
-			// Warning: min and max are inverted of scaling is negative
-			double min = m_offset[i];
-			double max = m_offset[i] + scaling[i] * (m_dim[i] - 1);
-
-			if (valuePos == grid::CELL_CENTERED) {
-				// Add half a cell on both ends
-				min -= scaling[i] * (0.5 - NUMERIC_PRECISION);
-				max += scaling[i] * (0.5 - NUMERIC_PRECISION);
-			}
-
-			m_min[i] = std::min(min, max);
-			m_max[i] = std::max(min, max);
-		}
-	}
-	
-#if 0
-	// Set default cache size
-	if (m_blocksPerNode < 0)
-		// Default value
-		m_blocksPerNode = 80;
-	
-	// Init type
-	if ((error = getType().check(*m_inputFile)) != asagi::Grid::SUCCESS)
-		return error;
-	
-	// Init subclass
-	error = init();
-	
-	if (!keepFileOpen()) {
-		// input file no longer needed, so we close
-		delete m_inputFile;
-		m_inputFile = 0L;
-	}
-#endif
-	
-	return asagi::Grid::SUCCESS;
-}
 
 #if 0
 /**
@@ -472,23 +355,3 @@ void grid::Grid2::h2rgb(float h, unsigned char &red, unsigned char &green,
 	blue = x * 255;
 }
 #endif
-
-/**
- * Calculates 1/scaling, except for scaling = 0 and scaling = inf. In this
- * case it returns 0
- */
-double grid::level::Level::getInvScaling(double scaling)
-{
-	if ((scaling == 0) || isinf(scaling))
-		return 0;
-	
-	return 1/scaling;
-}
-
-/**
- * Implementation for round-to-nearest
- */
-double grid::level::Level::round(double value)
-{
-	return floor(value + 0.5);
-}

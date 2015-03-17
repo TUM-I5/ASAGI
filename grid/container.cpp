@@ -58,9 +58,8 @@
 
 grid::Container::Container(const mpi::MPIComm &comm,
 		const numa::Numa &numa,
-		const types::Type* type,
 		ValuePosition valuePos)
-	: m_comm(comm), m_numa(numa), m_type(type),
+	: m_comm(comm), m_numa(numa),
 	  m_valuePos(valuePos)
 {
 }

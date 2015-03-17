@@ -31,86 +31,49 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2013-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_LEVEL_PASSTHROUGH_H
-#define GRID_LEVEL_PASSTHROUGH_H
+#ifndef GRID_TYPEDCONTAINER_H
+#define GRID_TYPEDCONTAINER_H
 
-#include "level.h"
-#include "types/type.h"
+#include "container.h"
 
 namespace grid
 {
 
-namespace level
-{
-
-/**
- * A simple grid that passes every access directly to the underlying
- * I/O layer.
- */
 template<class Type>
-class PassThrough : public Level<Type>
+class TypedContainer : public Container
 {
 private:
-	/** Buffer for reading one value (on each thread) into memory */
-	unsigned char* m_buf;
+	/**
+	 * The type of values we save in the grid.
+	 * This class implements all type specific operations.
+	 */
+	const Type &m_type;
 
 public:
-	PassThrough(
-			const mpi::MPIComm &comm,
+	TypedContainer(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
-			const Type &type)
-		: Level<Type>(comm, numa, type),
-		  m_buf(0L)
+			const Type &type,
+			ValuePosition valuePos)
+		: Container(comm, numa, valuePos),
+		  m_type(type)
 	{
 	}
 
-	virtual ~PassThrough()
+	virtual ~TypedContainer() {}
+
+	/**
+	 * @return The type for this container
+	 */
+	const Type& type() const
 	{
-		delete [] m_buf;
-	}
-
-	asagi::Grid::Error open(
-			const char* filename,
-			const char* varname,
-			grid::ValuePosition valuePos)
-	{
-		asagi::Grid::Error err = Level<Type>::open(filename, varname, valuePos);
-		if (err != asagi::Grid::SUCCESS)
-			return err;
-
-		m_buf = new unsigned char[this->type().size_static()
-				* this->numa().totalThreads()];
-
-		return asagi::Grid::SUCCESS;
-	}
-
-	template<typename T>
-	void getAt(T* buf, const double* pos)
-	{
-		this->incCounter(perf::Counter::ACCESS);
-		this->incCounter(perf::Counter::FILE);
-
-		// Load one value in each dimension
-		size_t index[MAX_DIMENSIONS];
-		this->pos2index(pos, index);
-		size_t size[MAX_DIMENSIONS];
-		std::fill_n(size, MAX_DIMENSIONS, 1);
-
-		// Get the buffer for the current thread
-		unsigned char* threadBuf = &m_buf[this->type().size_static()
-				* this->numa().threadId()];
-
-		this->type().load(this->inputFile(), index, size, threadBuf);
-		this->type().convert(threadBuf, buf);
+		return m_type;
 	}
 };
 
 }
 
-}
-
-#endif /* GRID_LEVEL_PASSTHROUGH_H */
+#endif // GRID_TYPEDCONTAINER_H

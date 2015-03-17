@@ -40,7 +40,7 @@
 
 #include <vector>
 
-#include "container.h"
+#include "typedcontainer.h"
 
 namespace grid
 {
@@ -48,19 +48,19 @@ namespace grid
 /**
  * Simple container that stores the whole grid for each level.
  */
-template<class Level>
-class SimpleContainer : public Container
+template<template<class Type> class Level, class Type>
+class SimpleContainer : public TypedContainer<Type>
 {
 private:
 	/** All grids we control */
-	std::vector<Level> m_levels;
+	std::vector<Level<Type>> m_levels;
 
 public:
 	SimpleContainer(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
-			const types::Type* type,
+			const Type &type,
 			ValuePosition valuePos)
-		: Container(comm, numa, type, valuePos)
+		: TypedContainer<Type>(comm, numa, type, valuePos)
 	{
 	}
 
@@ -72,23 +72,27 @@ public:
 			unsigned int level)
 	{
 		if (m_levels.size() <= level)
-			m_levels.resize(level+1);
+			m_levels.reserve(level+1);
 
-		return m_levels[level].init(
-				comm(),
-				numa(),
-				type(),
+		m_levels[level] = Level<Type>(
+				this->comm(),
+				this->numa(),
+				this->type());
+
+		return m_levels[level].open(
 				filename,
 				varname,
-				valuePosition());
+				this->valuePosition());
 	}
 
-	void getAt(void* buf, const double* pos,
-			types::Type::converter_t converter, unsigned int level = 0)
+	CONTAINER_GETVAR
+
+	template<typename T>
+	void getAt(T* buf, const double* pos, unsigned int level = 0)
 	{
 		assert(level < m_levels.size());
 
-		m_levels[level].getAt(buf, pos, converter);
+		m_levels[level].getAt(buf, pos);
 	}
 	
 	double getXDelta() const;

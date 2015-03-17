@@ -160,18 +160,15 @@ public:
 		
 		return asagi::Grid::SUCCESS;
 	}
-	
-	unsigned int getSize() const
+
+	TYPE_SIZE_FUNC
+
+	/**
+	 * Same as {@link size()} but not available for dynamic linking
+	 */
+	unsigned int size_static() const
 	{
 		return m_size;
-	}
-	
-	void load(io::NetCdfReader &file,
-		const size_t *offset,
-		const size_t *size,
-		void *buf) const
-	{
-		file.getBlock<void>(buf, offset, size);
 	}
 	
 #ifndef ASAGI_NOMPI
@@ -181,8 +178,21 @@ public:
 	}
 #endif // ASAGI_NOMPI
 
-public:
+	void load(io::NetCdfReader &file,
+		const size_t *offset,
+		const size_t *size,
+		void *buf) const
+	{
+		file.getBlock<void>(buf, offset, size);
+	}
 
+	/**
+	 * @copydoc BasicType::convert(const void*, void*)
+	 */
+	void convert(const void* data, void* buf) const
+	{
+		copy(data, buf, size_static());
+	}
 };
 
 Type* createStruct(

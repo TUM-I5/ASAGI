@@ -41,11 +41,12 @@
 #include "grid/grid.h"
 #include "grid/simplecontainer.h"
 #include "grid/level/passthrough.h"
+#include "types/basictype.h"
 
 class GridTest : public CxxTest::TestSuite
 {
 	grid::Grid* c;
-	grid::level::PassThrough* grid;
+	grid::level::PassThrough<types::BasicType<float>>* grid;
 public:
 	void setUp(void)
 	{
@@ -53,7 +54,8 @@ public:
 		c = new grid::Grid(asagi::Grid::FLOAT);
 		c->setParam("PASS_THROUGH", "YES");
 		c->open("../../../" NC_1D);
-		grid = &static_cast<grid::SimpleContainer<grid::level::PassThrough>*>(c->m_containers[0])->m_levels[0];
+		grid = &static_cast<grid::SimpleContainer<grid::level::PassThrough,
+				types::BasicType<float>>*>(c->m_containers[0])->m_levels[0];
 	}
 	
 	void tearDown(void)

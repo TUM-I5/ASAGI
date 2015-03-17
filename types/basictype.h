@@ -49,11 +49,16 @@ namespace types {
 template<typename T> class BasicType : public Type
 {   
 public:
-	virtual unsigned int getSize() const
+	TYPE_SIZE_FUNC
+
+	/**
+	 * Same as {@link size()} but not available for dynamic linking
+	 */
+	unsigned int size_static() const
 	{
 		return sizeof(T);
 	}
-	
+
 	virtual void load(io::NetCdfReader &file,
 		const size_t *offset,
 		const size_t *size,
@@ -61,34 +66,27 @@ public:
 	{
 		file.getBlock<T>(buf, offset, size);
 	}
-	
+
 #ifndef ASAGI_NOMPI
 	virtual MPI_Datatype getMPIType();
 #endif // ASAGI_NOMPI
 	
-	void convertByte(const void* data, void* buf) const
+	/**
+	 * The value is copied from data to buf, doing transformations between
+	 * basic types.
+	 */
+	template<typename B>
+	void convert(const void* data, B* buf) const
 	{
-		*static_cast<unsigned char*>(buf) = *static_cast<const T*>(data);
+		*buf = *static_cast<const T*>(data);
 	}
-	
-	void convertInt(const void* data, void* buf) const
+
+	/**
+	 * Uses the "no-conversion" function for void pointers
+	 */
+	void convert(const void* data, void* buf) const
 	{
-		*static_cast<int*>(buf) = *static_cast<const T*>(data);
-	}
-	
-	void convertLong(const void* data, void* buf) const
-	{
-		*static_cast<long*>(buf) = *static_cast<const T*>(data);
-	}
-	
-	void convertFloat(const void* data, void* buf) const
-	{
-		*static_cast<float*>(buf) = *static_cast<const T*>(data);
-	}
-	
-	void convertDouble(const void* data, void* buf) const
-	{
-		*static_cast<double*>(buf) = *static_cast<const T*>(data);
+		copy(data, buf, size_static());
 	}
 };
 

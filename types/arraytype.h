@@ -101,12 +101,24 @@ public:
 		
 		return asagi::Grid::SUCCESS;
 	}
-	
-	unsigned int getSize() const
+
+	TYPE_SIZE_FUNC
+
+	/**
+	 * Same as {@link size()} but not available for dynamic linking
+	 */
+	unsigned int size_static() const
 	{
-		return m_arraySize * BasicType<T>::getSize();
+		return m_arraySize * BasicType<T>::size_static();
 	}
-	
+
+#ifndef ASAGI_NOMPI
+	MPI_Datatype getMPIType()
+	{
+		return m_mpiType;
+	}
+#endif // ASAGI_NOMPI
+
 	void load(io::NetCdfReader &file,
 		const size_t *offset,
 		const size_t *size,
@@ -114,13 +126,14 @@ public:
 	{
 		file.getBlock<void>(buf, offset, size);
 	}
-	
-#ifndef ASAGI_NOMPI
-	MPI_Datatype getMPIType()
+
+	/**
+	 * @copydoc BasicType::convert(const void*, void*)
+	 */
+	void convert(const void* data, void* buf) const
 	{
-		return m_mpiType;
+		copy(data, buf, size_static());
 	}
-#endif // ASAGI_NOMPI
 };
 
 }

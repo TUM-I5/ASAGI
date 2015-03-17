@@ -46,6 +46,7 @@
 
 #include "container.h"
 #include "fortran/pointerarray.h"
+#include "magic/nulltype.h"
 #include "mpi/mpicomm.h"
 #include "numa/numa.h"
 #include "threads/once.h"
@@ -60,6 +61,19 @@ namespace grid
 class Grid : public asagi::Grid
 {
 private:
+	/**
+	 * Creates a container that depends on {@link m_type}
+	 */
+	template<template<template<class Type> class Level, class Type> class Container,
+		template<class Type> class Level,
+		class TypeList>
+	class TypeSelector
+	{
+	public:
+		static grid::Container* createContainer(Grid &grid,
+				ValuePosition valuePos);
+	};
+
 	/** Id of the grid, used for the fortran <-> c interface */
 	int m_id;
 
@@ -126,13 +140,13 @@ public:
 
 	unsigned int getVarSize() const
 	{
-		return m_type->getSize();
+		return m_type->size();
 	}
 
 	unsigned char getByte(const double* pos, unsigned int level = 0)
 	{
 		unsigned char buf;
-		m_containers[m_numa.domainId()]->getAt(&buf, pos, &types::Type::convertByte, level);
+		m_containers[m_numa.domainId()]->getByte(&buf, pos, level);
 
 		return buf;
 	}
@@ -140,7 +154,7 @@ public:
 	int getInt(const double* pos, unsigned int level = 0)
 	{
 		int buf;
-		m_containers[m_numa.domainId()]->getAt(&buf, pos, &types::Type::convertInt, level);
+		m_containers[m_numa.domainId()]->getInt(&buf, pos, level);
 
 		return buf;
 	}
@@ -148,7 +162,7 @@ public:
 	long getLong(const double* pos, unsigned int level = 0)
 	{
 		long buf;
-		m_containers[m_numa.domainId()]->getAt(&buf, pos, &types::Type::convertLong, level);
+		m_containers[m_numa.domainId()]->getLong(&buf, pos, level);
 
 		return buf;
 	}
@@ -156,7 +170,7 @@ public:
 	float getFloat(const double* pos, unsigned int level = 0)
 	{
 		float buf;
-		m_containers[m_numa.domainId()]->getAt(&buf, pos, &types::Type::convertFloat, level);
+		m_containers[m_numa.domainId()]->getFloat(&buf, pos, level);
 
 		return buf;
 	}
@@ -164,14 +178,14 @@ public:
 	double getDouble(const double* pos, unsigned int level = 0)
 	{
 		double buf;
-		m_containers[m_numa.domainId()]->getAt(&buf, pos, &types::Type::convertDouble, level);
+		m_containers[m_numa.domainId()]->getDouble(&buf, pos, level);
 
 		return buf;
 	}
 
 	void getBuf(void* buf, const double* pos, unsigned int level = 0)
 	{
-		m_containers[m_numa.domainId()]->getAt(&buf, pos, &types::Type::convertBuffer, level);
+		m_containers[m_numa.domainId()]->getBuf(&buf, pos, level);
 	}
 
 	unsigned long getCounter(const char* name, unsigned int level = 0);
@@ -206,6 +220,15 @@ public:
 	{
 		return m_pointers.get(i);
 	}
+};
+
+
+template<template<template<class Type> class Level, class Type> class Container,
+	template<class Type> class Level>
+class Grid::TypeSelector<Container, Level, magic::NullType>
+{
+public:
+	static grid::Container* createContainer(Grid &grid, ValuePosition valuePos);
 };
 
 }
