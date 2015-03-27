@@ -52,6 +52,14 @@ public:
 	TYPE_SIZE_FUNC
 
 	/**
+	 * Check compatibility of the input file with this type.
+	 */
+	asagi::Grid::Error check(const io::NetCdfReader &file)
+	{
+		return asagi::Grid::SUCCESS;
+	}
+
+	/**
 	 * Same as {@link size()} but not available for dynamic linking
 	 */
 	unsigned int size_static() const
@@ -59,7 +67,10 @@ public:
 		return sizeof(T);
 	}
 
-	virtual void load(io::NetCdfReader &file,
+	/**
+	 * Loads a block form the netCDF file into the buffer
+	 */
+	void load(io::NetCdfReader &file,
 		const size_t *offset,
 		const size_t *size,
 		void *buf) const
@@ -86,7 +97,7 @@ public:
 	 */
 	void convert(const void* data, void* buf) const
 	{
-		copy(data, buf, size_static());
+		Type::copy(data, buf, size_static());
 	}
 };
 

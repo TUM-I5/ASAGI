@@ -46,40 +46,25 @@
 class GridTest : public CxxTest::TestSuite
 {
 	grid::Grid* c;
-	grid::level::PassThrough<types::BasicType<float>>* grid;
+	grid::level::PassThrough<magic::NullType, magic::NullType, types::BasicType<float>>* grid;
 public:
 	void setUp(void)
 	{
 		// Set up a 1d grid
 		c = new grid::Grid(asagi::Grid::FLOAT);
-		c->setParam("PASS_THROUGH", "YES");
+		c->setParam("GRID", "PASS_THROUGH");
 		c->open("../../../" NC_1D);
-		grid = &static_cast<grid::SimpleContainer<grid::level::PassThrough,
+		grid = &dynamic_cast<grid::SimpleContainer<grid::level::PassThrough<magic::NullType,
+					magic::NullType, types::BasicType<float>>,
+				magic::NullType, magic::NullType,
 				types::BasicType<float>>*>(c->m_containers[0])->m_levels[0];
+
+		TS_ASSERT(grid);
 	}
 	
 	void tearDown(void)
 	{
 		delete c;
-	}
-	
-	void testSetParam(void)
-	{
-		/*
-		TS_ASSERT_EQUALS(grid->setParam("x-block-size", "5"),
-			asagi::Grid::SUCCESS);
-		TS_ASSERT_EQUALS(grid->m_blockSize[0], 5u);
-		
-		grid->setParam("y-block-size", "7");
-		TS_ASSERT_EQUALS(grid->m_blockSize[1], 7u);
-		
-		grid->setParam("z-block-size", "42");
-		TS_ASSERT_EQUALS(grid->m_blockSize[2], 42u);
-		
-		TS_ASSERT_EQUALS(grid->setParam("block-cache-size", "100"),
-			asagi::Grid::SUCCESS);
-		TS_ASSERT_EQUALS(grid->m_blocksPerNode, 100);
-		*/
 	}
 
 	void testGetXMax(void)

@@ -35,7 +35,7 @@
  * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "localstaticgrid.h"
+#include "level/full.h"
 
 /**
  * @see Grid::Grid()

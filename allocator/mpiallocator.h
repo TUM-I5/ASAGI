@@ -40,7 +40,7 @@
 
 #include <asagi.h>
 
-#include "allocator/allocator.h"
+//#include "allocator/allocator.h"
 
 namespace allocator
 {

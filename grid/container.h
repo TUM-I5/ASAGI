@@ -63,8 +63,11 @@ private:
 	/** NUMA "communicator" for this container */
 	const numa::Numa &m_numa;
 
+	/** Time dimension or -1 if no time dimension exists */
+	const int m_timeDimension;
+
 	/** Value Position (cell-centered || vertex-centered) */
-	ValuePosition m_valuePos;
+	const ValuePosition m_valuePos;
 
 protected:
 	/** Minimum in x dimension (set by subclasses) */
@@ -83,6 +86,7 @@ protected:
 public:
 	Container(const mpi::MPIComm &comm,
 		const numa::Numa &numa,
+		int timeDimension,
 		ValuePosition valuePos);
 	virtual ~Container();
 	
@@ -93,11 +97,13 @@ public:
 	 *
 	 * @param filename The name of the file for this level
 	 * @param varname The variable name in the file
+	 * @param blockSizes Size of the blocks in each dimension
 	 * @param level The level that should be initialized
 	 * @return
 	 */
 	virtual asagi::Grid::Error init(const char* filename,
 			const char* varname,
+			const unsigned int* blockSize,
 			unsigned int level) = 0;
 	
 	double getMin(unsigned int n) const
@@ -230,6 +236,14 @@ protected:
 	const numa::Numa& numa() const
 	{
 		return m_numa;
+	}
+
+	/**
+	 * @return The time dimension or -1 if not time dimension is set
+	 */
+	int timeDimension() const
+	{
+		return m_timeDimension;
 	}
 
 	/**

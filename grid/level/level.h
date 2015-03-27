@@ -79,7 +79,7 @@ private:
 	 * The type of values we save in the grid.
 	 * This class implements all type specific operations.
 	 */
-	const Type* m_type;
+	Type* m_type;
 
 	/** The file that contains this grid */
 	io::NetCdfReader *m_inputFile;
@@ -104,49 +104,21 @@ private:
 	 */
 	double m_scalingInv[MAX_DIMENSIONS];
 
-#if 0
-	/** Number of blocks in x, y and z dimension */
-	unsigned long m_blocks[MAX_DIMENSIONS];
-	
-	/** Number of values in x, y and z dimension in one block */
-	size_t m_blockSize[MAX_DIMENSIONS];
-	
-	/** Number of cached blocks on each node */
-	long m_blocksPerNode;
-	
-	/**
-	 * Difference between the hands of the 2-handed clock algorithm.
-	 * Subclasses my require this to initialize the
-	 * {@link blocks::BlockManager}.
-	 */
-	long m_handSpread;
-	
-	/**
-	 * 0, 1 or 2 if x, y or z is a time dimension (z is default if
-	 * the HAS_TIME hint is specified);
-	 * -2 if we don't have any time dimension;
-	 * -1 if the time dimension is not (yet) specified
-	 * <br>
-	 * Declare as signed, to remove compiler warning
-	 */
-	signed char m_timeDimension;
-#endif
-
 	/** Access counters for this grid (level) */
 	perf::Counter m_counter;
 
 public:
 	Level()
 		: m_comm(0L), m_numa(0L), m_type(0L),
-		  m_inputFile(0L)
+		  m_inputFile(0L), m_dims(0)
 	{
 	}
 
 	Level(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
-			const Type &type)
+			Type &type)
 		: m_comm(&comm), m_numa(&numa), m_type(&type),
-		  m_inputFile(0L)
+		  m_inputFile(0L), m_dims(0)
 	{
 	}
 
@@ -255,11 +227,14 @@ protected:
 		if (m_blocksPerNode < 0)
 			// Default value
 			m_blocksPerNode = 80;
+#endif
 
 		// Init type
-		if ((error = getType().check(*m_inputFile)) != asagi::Grid::SUCCESS)
-			return error;
+		err = m_type->check(*m_inputFile);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
 
+#if 0
 		// Init subclass
 		error = init();
 
@@ -306,6 +281,22 @@ private:
 	}
 	
 	/**
+	 * @return The number of dimensions
+	 */
+	unsigned int dimensions() const
+	{
+		return m_dims;
+	}
+
+	/**
+	 * @return The number of cells in dimension i
+	 */
+	unsigned long size(unsigned int i) const
+	{
+		return m_dim[i];
+	}
+
+	/**
 	 * Converts from the real world coordinates to the indices
 	 * of the file.
 	 *
@@ -330,28 +321,6 @@ private:
 	}
 
 #if 0
-	/**
-	 * @return The number of cells in x dimension
-	 */
-	unsigned long getXDim() const
-	{
-		return m_dim[0];
-	}
-	/**
-	 * @return The number of cells in y dimension
-	 */
-	unsigned long getYDim() const
-	{
-		return m_dim[1];
-	}
-	/**
-	 * @return The number of cells in z dimension
-	 */
-	unsigned long getZDim() const
-	{
-		return m_dim[2];
-	}
-	
 	/**
 	 * @return The number of blocks we should store on this node
 	 */
@@ -518,7 +487,7 @@ private:
 	 */
 	double getInvScaling(double scaling)
 	{
-		if ((scaling == 0) || isinf(scaling))
+		if ((scaling == 0) || std::isinf(scaling))
 			return 0;
 
 		return 1/scaling;

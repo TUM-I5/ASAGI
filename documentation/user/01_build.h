@@ -3,6 +3,9 @@
  * 
  * @section Pre-requirements
  *
+ * @subsection Compiler
+ * ASAGI requires at least GCC 4.7 or Intel Compiler 12.1
+ *
  * @subsection MPI
  * ASAGI makes use of the RMA (Remote Memory Access) API of the MPI-2 standard
  * to transfer data. An MPI library that supports the new standard is required.

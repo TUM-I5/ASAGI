@@ -32,15 +32,13 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
- * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2013-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef ALLOCATOR_DEFAULTALLOCATOR_H
-#define ALLOCATOR_DEFAULTALLOCATOR_H
+#ifndef ALLOCATOR_DEFAULT_H
+#define ALLOCATOR_DEFAULT_H
 
-#include <asagi.h>
-
-#include "allocator/allocator.h"
+#include "asagi.h"
 
 namespace allocator
 {
@@ -48,38 +46,31 @@ namespace allocator
 /**
  * This allocator uses default C++ new/delete mechanism
  */
-template<typename T>
-class DefaultAllocator : public Allocator<T>
+class Default
 {
 public:
 	/**
-	 * Empty constructor, required by newer gcc versions
+	 * Allocates sizeof(T)*size bytes and saves the pointer in ptr.
+	 *
+	 * @return asagi::Grid::SUCCESS if the memory was allocated
 	 */
-	DefaultAllocator()
-	{
-	}
-
-	asagi::Grid::Error allocate(size_t size, T* &ptr) const
+	template<typename T>
+	static asagi::Grid::Error allocate(size_t size, T* &ptr)
 	{
 		ptr = new T[size];
 		return asagi::Grid::SUCCESS;
 	}
 
-	void free(T *ptr) const
+	/**
+	 * Frees the memory allocated with allocate()
+	 */
+	template<typename T>
+	static void free(T *ptr)
 	{
 		delete [] ptr;
 	}
-
-public:
-	static const DefaultAllocator<T> allocator;
 };
-
-/**
- * Provides a default instance for each type
- */
-template<typename T>
-const DefaultAllocator<T> DefaultAllocator<T>::allocator;
 
 }
 
-#endif /* ALLOCATOR_DEFAULTALLOCATOR_H */
+#endif /* ALLOCATOR_DEFAULT_H */

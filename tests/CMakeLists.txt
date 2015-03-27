@@ -50,7 +50,7 @@ target_link_libraries( test_prepare
 # Add rule to generate test header
 add_custom_command( OUTPUT tests.h
 	COMMAND test_prepare
-	DEPENDENCIES test_prepare )
+	DEPENDS test_prepare )
 add_custom_target( generate_test_header
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests.h )
 
@@ -69,9 +69,9 @@ add_test_executable( grid1d YES )
 #add_test_executable( largegrid2d YES )
 #add_test_executable( adaptivegrid2d YES )
 
+add_test_executable( fullgrid2d )
 #add_test_executable( localcachegrid2d )
 add_test_executable( passthroughgrid2d )
-#add_test_executable( staticgrid2d )
 
 # Unit Tests
 add_subdirectory( unittest )
@@ -85,6 +85,6 @@ add_subdirectory( unittest )
 #add_test_run( LargeGrid2D test_largegrid2d 2 )
 #add_test_run( AdaptiveGrid2D test_adaptivegrid2d 2 )
 
+add_test_run( FullGrid2D test_fullgrid2d ) 
 #add_test_run( LocalCacheGrid2D test_localcachegrid2d )
 add_test_run( PassThroughGrid2D test_passthroughgrid2d )
-#add_test_run( StaticGrid2D test_staticgrid2d ) 

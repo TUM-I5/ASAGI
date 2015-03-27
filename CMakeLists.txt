@@ -17,7 +17,8 @@ option( NOMPI "Compile without MPI" OFF )
 option( NONUMA "Compile without NUMA support" OFF )
 option( EXAMPLES "Compile examples" OFF )
 option( TESTS "Test library" OFF )
-option( ROUND_ROBIN "Distribute blocks round robin on nodes (internal use)" ON )
+option( ROUND_ROBIN "Distribute blocks round robin on nodes" ON )
+mark_as_advanced( ROUND_ROBIN )
 
 ##### Default build type #####
 if( NOT CMAKE_BUILD_TYPE )

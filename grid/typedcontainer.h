@@ -51,14 +51,15 @@ private:
 	 * The type of values we save in the grid.
 	 * This class implements all type specific operations.
 	 */
-	const Type &m_type;
+	Type &m_type;
 
 public:
 	TypedContainer(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
-			const Type &type,
+			Type &type,
+			int timeDimension,
 			ValuePosition valuePos)
-		: Container(comm, numa, valuePos),
+		: Container(comm, numa, timeDimension, valuePos),
 		  m_type(type)
 	{
 	}
@@ -69,6 +70,14 @@ public:
 	 * @return The type for this container
 	 */
 	const Type& type() const
+	{
+		return m_type;
+	}
+
+	/**
+	 * @copydoc const Type& type() const
+	 */
+	Type& type()
 	{
 		return m_type;
 	}

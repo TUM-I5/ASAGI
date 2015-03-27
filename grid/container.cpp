@@ -58,9 +58,10 @@
 
 grid::Container::Container(const mpi::MPIComm &comm,
 		const numa::Numa &numa,
+		int timeDimension,
 		ValuePosition valuePos)
 	: m_comm(comm), m_numa(numa),
-	  m_valuePos(valuePos)
+	  m_timeDimension(timeDimension), m_valuePos(valuePos)
 {
 }
 

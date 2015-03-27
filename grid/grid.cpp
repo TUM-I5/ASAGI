@@ -43,6 +43,7 @@
 
 #include "simplecontainer.h"
 #include "magic/typelist.h"
+#include "level/full.h"
 #include "level/passthrough.h"
 #include "types/arraytype.h"
 #include "types/basictype.h"
@@ -51,27 +52,45 @@
 /**
  * Creates the container depending on the type of the <code>grid</code>
  */
-template<template<template<class Type> class Level, class Type> class Container,
-	template<class Type> class Level,
-	class TypeList>
-grid::Container* grid::Grid::TypeSelector<Container, Level, TypeList>
-	::createContainer(Grid &grid,
-		ValuePosition valuePos)
+template<template<class Level, class MPIComm, class NumaComm, class Type> class Container,
+	template<class MPIComm, class NumaComm, class Type> class Level,
+	class MPIComm, class NumaComm, class TypeList>
+grid::Container* grid::Grid::TypeSelector<Container, Level, MPIComm, NumaComm, TypeList>
+	::createContainer(Grid &grid)
 {
 	typedef typename TypeList::Head Head;
 	typedef typename TypeList::Tail Tail;
 
-	if (Head* type = dynamic_cast<Head*>(grid.m_type))
-		return new Container<Level, Head>(grid.m_comm, grid.m_numa, *type, valuePos);
+	if (Head* type = dynamic_cast<Head*>(grid.m_type)) {
+		// Time dimension
+		int timeDimension = grid.param("TIME_DIMENSION", -1);
 
-	return TypeSelector<Container, Level, Tail>::createContainer(grid, valuePos);
+		// Value position
+		std::string strValuePos = grid.param("VALUE_POSITION", "CELL_CENTERED");
+		ValuePosition valuePos;
+		if (strValuePos == "VERTEX_CENTERED")
+			valuePos = VERTEX_CENTERED;
+		else {
+			valuePos = CELL_CENTERED;
+			if (strValuePos != "CELL_CENTERED") {
+				logWarning(grid.m_comm.rank()) << "ASAGI: Unknown value position:" << strValuePos;
+				logWarning(grid.m_comm.rank()) << "ASAGI: Assuming CELL_CENTERED";
+			}
+		}
+
+		// Create the container
+		return new Container<Level<MPIComm, NumaComm, Head>, MPIComm, NumaComm, Head>(grid.m_comm, grid.m_numa,
+				*type, timeDimension, valuePos);
+	}
+
+	return TypeSelector<Container, Level, MPIComm, NumaComm, Tail>::createContainer(grid);
 }
 
-template<template<template<class Type> class Level, class Type> class Container,
-	template<class Type> class Level>
-grid::Container* grid::Grid::TypeSelector<Container, Level, magic::NullType>
-::createContainer(Grid &grid,
-	ValuePosition valuePos)
+template<template<class Level, class MPIComm, class NumaComm, class Type> class Container,
+	template<class MPIComm, class NumaComm, class Type> class Level,
+	class MPIComm, class NumaComm>
+grid::Container* grid::Grid::TypeSelector<Container, Level, MPIComm, NumaComm, magic::NullType>
+	::createContainer(Grid &grid)
 {
 	assert(false);
 	return 0L;
@@ -191,8 +210,15 @@ asagi::Grid::Error grid::Grid::open(const char* filename, unsigned int level)
 		// Make sure the container has the correct size
 		m_resizeOnce.saveExec(*this, &Grid::initContainers);
 
+		unsigned int blockSizes[MAX_DIMENSIONS];
+		for (unsigned int i = 0; i < MAX_DIMENSIONS; i++) {
+			std::string sizeName = "BLOCK_SIZE_" + utils::StringUtils::toString(i);
+			blockSizes[i] = param(sizeName.c_str(), 0, level); // 0 -> use default
+		}
+
 		return m_containers[m_numa.domainId()]->init(filename,
 				param("VARIABLE", "z"),
+				blockSizes,
 				level);
 	}
 
@@ -233,6 +259,8 @@ void grid::Grid::init()
 void grid::Grid::initContainers()
 {
 	enum {
+		FULL,
+		CACHED,
 		PASS_THROUGH,
 		UNKNOWN
 	} containerType = UNKNOWN;
@@ -256,34 +284,29 @@ void grid::Grid::initContainers()
 	>::result typelist;
 
 	// Select the container type
-	if (param("PASS_THROUGH", false)) {
+	std::string gridType = param("GRID", "FULL");
+	if (gridType == "CACHED")
+		containerType = CACHED;
+	else if (gridType == "PASS_THROUGH")
 		containerType = PASS_THROUGH;
-	}
-
-	// Value position
-	std::string strValuePos = param("VALUE_POSITION", "CELL_CENTERED");
-	ValuePosition valuePos;
-	if (strValuePos == "VERTEX_CENTERED")
-		valuePos = VERTEX_CENTERED;
 	else {
-		valuePos = CELL_CENTERED;
-		if (strValuePos != "CELL_CENTERED")
-			logWarning(m_comm.rank()) << "ASAGI: Unknown value position:" << strValuePos;
+		containerType = FULL;
+		if (gridType != "FULL") {
+			logWarning(m_comm.rank()) << "ASAGI: Unknown grid type:" << gridType;
+			logWarning(m_comm.rank()) << "ASAGI: Assuming FULL";
+		}
 	}
-
-	//Dispatcher<SimpleContainer, level::PassThrough,
-	//	TYPELIST_2(types::BasicType<unsigned char>, types::BasicType<int>)>::test(*this, m_type);
-	TypeSelector<SimpleContainer, level::PassThrough,
-		magic::MakeTypelist<types::BasicType<unsigned char>, types::BasicType<int>>::result>::createContainer(*this,
-				valuePos);
 
 	// Initialize the container
 	m_containers.resize(m_numa.totalDomains());
 	for (std::vector<Container*>::iterator it = m_containers.begin();
 			it != m_containers.end(); it++) {
 		switch (containerType) {
+		case FULL:
+			*it = TypeSelector<SimpleContainer, level::FullDefault, magic::NullType, magic::NullType, typelist>::createContainer(*this);
+			break;
 		case PASS_THROUGH:
-			*it = TypeSelector<SimpleContainer, level::PassThrough, typelist>::createContainer(*this, valuePos);
+			*it = TypeSelector<SimpleContainer, level::PassThrough, magic::NullType, magic::NullType, typelist>::createContainer(*this);
 			break;
 		default:
 			*it = 0L;

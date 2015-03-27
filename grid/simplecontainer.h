@@ -48,19 +48,20 @@ namespace grid
 /**
  * Simple container that stores the whole grid for each level.
  */
-template<template<class Type> class Level, class Type>
+template<class Level, class MPIComm, class NumaComm, class Type>
 class SimpleContainer : public TypedContainer<Type>
 {
 private:
 	/** All grids we control */
-	std::vector<Level<Type>> m_levels;
+	std::vector<Level> m_levels;
 
 public:
 	SimpleContainer(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
-			const Type &type,
+			Type &type,
+			int timeDimension,
 			ValuePosition valuePos)
-		: TypedContainer<Type>(comm, numa, type, valuePos)
+		: TypedContainer<Type>(comm, numa, type, timeDimension, valuePos)
 	{
 	}
 
@@ -69,12 +70,13 @@ public:
 	
 	asagi::Grid::Error init(const char* filename,
 			const char* varname,
+			const unsigned int* blockSize,
 			unsigned int level)
 	{
 		if (m_levels.size() <= level)
 			m_levels.reserve(level+1);
 
-		m_levels[level] = Level<Type>(
+		m_levels[level] = Level(
 				this->comm(),
 				this->numa(),
 				this->type());
@@ -82,6 +84,8 @@ public:
 		return m_levels[level].open(
 				filename,
 				varname,
+				blockSize,
+				this->timeDimension(),
 				this->valuePosition());
 	}
 

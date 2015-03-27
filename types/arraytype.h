@@ -38,8 +38,13 @@
 #ifndef TYPES_ARRAYTYPE_H
 #define TYPES_ARRAYTYPE_H
 
+#include "asagi.h"
+
+#include <mutex>
+
 #include "basictype.h"
 #include "io/netcdfreader.h"
+#include "threads/mutex.h"
 
 namespace types {
 
@@ -59,6 +64,9 @@ private:
 	MPI_Datatype m_mpiType;
 #endif // ASAGI_NOMPI
 	
+	/** Lock for the check */
+	threads::Mutex m_lock;
+
 public:
 	ArrayType()
 		: m_arraySize(0)
@@ -82,22 +90,28 @@ public:
 		
 		unsigned int arraySize = file.getVarSize() / sizeof(T);
 
-		// TODO use mutex here
-		if (m_arraySize == 0)
+		// Lock the array size
+		m_lock.lock();
+
+		if (m_arraySize == 0) {
 			m_arraySize = arraySize;
-		else {
+
+			m_lock.unlock();
+
+#ifndef ASAGI_NOMPI
+			// Create the mpi datatype
+			if (MPI_Type_contiguous(m_arraySize, BasicType<T>::getMPIType(),
+					&m_mpiType) != MPI_SUCCESS)
+				return asagi::Grid::MPI_ERROR;
+			if (MPI_Type_commit(&m_mpiType) != MPI_SUCCESS)
+				return asagi::Grid::MPI_ERROR;
+#endif // ASAGI_NOMPI
+		} else {
+			std::lock_guard<threads::Mutex> lock(m_lock, std::adopt_lock);
+
 			if (arraySize != m_arraySize)
 				return asagi::Grid::WRONG_SIZE;
 		}
-		
-#ifndef ASAGI_NOMPI
-		// Create the mpi datatype
-		if (MPI_Type_contiguous(m_arraySize, BasicType<T>::getMPIType(),
-			&m_mpiType) != MPI_SUCCESS)
-			return asagi::Grid::MPI_ERROR;
-		if (MPI_Type_commit(&m_mpiType) != MPI_SUCCESS)
-			return asagi::Grid::MPI_ERROR;
-#endif // ASAGI_NOMPI
 		
 		return asagi::Grid::SUCCESS;
 	}
@@ -132,7 +146,7 @@ public:
 	 */
 	void convert(const void* data, void* buf) const
 	{
-		copy(data, buf, size_static());
+		Type::copy(data, buf, size_static());
 	}
 };
 

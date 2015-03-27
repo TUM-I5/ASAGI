@@ -67,26 +67,9 @@ public:
 	virtual ~Type() { }
 	
 	/**
-	 * Check compatibility of the input file with this type.
-	 */
-	virtual asagi::Grid::Error check(const io::NetCdfReader &file)
-	{
-		// Default: everything is okay
-		return asagi::Grid::SUCCESS;
-	}
-	
-	/**
 	 * @return The size of the variable
 	 */
 	virtual unsigned int size() const = 0;
-
-	/**
-	 * Loads a block form the netcdf file into the buffer
-	 */
-	virtual void load(io::NetCdfReader &file,
-		const size_t *offset,
-		const size_t *size,
-		void *buf) const = 0;
 	
 #ifndef ASAGI_NOMPI
 	/**

@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include <fstream>
@@ -46,9 +46,9 @@
 #define NC_PERFTEST NC_2D
 #define HEADER_FILENAME "tests.h"
 
-#define WIDTH 51
-#define LENGTH 51
-#define HEIGHT 51
+#define WIDTH 70
+#define LENGTH 70
+#define HEIGHT 70
 
 int main()
 {

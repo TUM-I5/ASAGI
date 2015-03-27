@@ -62,16 +62,28 @@ class Grid : public asagi::Grid
 {
 private:
 	/**
+	 * Create a container that depends on the NUMA settings
+	 */
+	template<template< class Level, class MPIComm, class NumaComm, class Type> class Container,
+		template<class MPIComm, class NumaComm, class Type> class Level,
+		class MPIComm, class NumaList, class TypeList>
+	class NumaSelector
+	{
+	public:
+		static grid::Container* createContainer(Grid &grid);
+	};
+
+
+	/**
 	 * Creates a container that depends on {@link m_type}
 	 */
-	template<template<template<class Type> class Level, class Type> class Container,
-		template<class Type> class Level,
-		class TypeList>
+	template<template< class Level, class MPIComm, class NumaComm, class Type> class Container,
+		template<class MPIComm, class NumaComm, class Type> class Level,
+		class MPIComm, class NumaComm, class TypeList>
 	class TypeSelector
 	{
 	public:
-		static grid::Container* createContainer(Grid &grid,
-				ValuePosition valuePos);
+		static grid::Container* createContainer(Grid &grid);
 	};
 
 	/** Id of the grid, used for the fortran <-> c interface */
@@ -223,12 +235,13 @@ public:
 };
 
 
-template<template<template<class Type> class Level, class Type> class Container,
-	template<class Type> class Level>
-class Grid::TypeSelector<Container, Level, magic::NullType>
+template<template<class Level, class MPIComm, class NumaComm, class Type> class Container,
+	template<class MPIComm, class NumaComm, class Type> class Level,
+	class MPIComm, class NumaComm>
+class Grid::TypeSelector<Container, Level, MPIComm, NumaComm, magic::NullType>
 {
 public:
-	static grid::Container* createContainer(Grid &grid, ValuePosition valuePos);
+	static grid::Container* createContainer(Grid &grid);
 };
 
 }
