@@ -43,6 +43,7 @@
 
 #include "simplecontainer.h"
 #include "magic/typelist.h"
+#include "level/cache.h"
 #include "level/full.h"
 #include "level/passthrough.h"
 #include "types/arraytype.h"
@@ -213,12 +214,14 @@ asagi::Grid::Error grid::Grid::open(const char* filename, unsigned int level)
 		unsigned int blockSizes[MAX_DIMENSIONS];
 		for (unsigned int i = 0; i < MAX_DIMENSIONS; i++) {
 			std::string sizeName = "BLOCK_SIZE_" + utils::StringUtils::toString(i);
-			blockSizes[i] = param(sizeName.c_str(), 0, level); // 0 -> use default
+			blockSizes[i] = param(sizeName.c_str(), 0u, level); // 0 -> use default
 		}
 
 		return m_containers[m_numa.domainId()]->init(filename,
-				param("VARIABLE", "z"),
+				param("VARIABLE", "z", level),
 				blockSizes,
+				param("CACHE_SIZE", 128u, level),
+				param("CACHE_HAND_SPREAD", -1, level),
 				level);
 	}
 
@@ -304,6 +307,9 @@ void grid::Grid::initContainers()
 		switch (containerType) {
 		case FULL:
 			*it = TypeSelector<SimpleContainer, level::FullDefault, magic::NullType, magic::NullType, typelist>::createContainer(*this);
+			break;
+		case CACHED:
+			*it = TypeSelector<SimpleContainer, level::CacheDefault, magic::NullType, magic::NullType, typelist>::createContainer(*this);
 			break;
 		case PASS_THROUGH:
 			*it = TypeSelector<SimpleContainer, level::PassThrough, magic::NullType, magic::NullType, typelist>::createContainer(*this);

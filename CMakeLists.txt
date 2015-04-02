@@ -181,7 +181,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/submodules )
 
 # Add sources in subdirectories
 add_subdirectory( allocator )
-add_subdirectory( blocks )
+add_subdirectory( cache )
 add_subdirectory( fortran )
 add_subdirectory( grid )
 add_subdirectory( io )

@@ -469,6 +469,15 @@ private:
 #endif
 
 	/**
+	 * Close the input file immediately
+	 */
+	void closeInputFile()
+	{
+		delete m_inputFile;
+		m_inputFile = 0L;
+	}
+
+	/**
 	 * Used by subclasses to increment counter
 	 */
 	void incCounter(perf::Counter::CounterType type)

@@ -27,7 +27,7 @@ if( CXXTEST_FOUND )
 	include_directories( ${CXXTEST_INCLUDE_DIR} )
 
 	# Tests
-	add_subdirectory( blocks )
+	add_subdirectory( cache )
 	add_subdirectory( grid )
 	add_subdirectory( io )
 	add_subdirectory( numa )

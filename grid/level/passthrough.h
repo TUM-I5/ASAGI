@@ -78,6 +78,8 @@ public:
 			const char* varname,
 			const unsigned int* blockSize,
 			int timeDimension,
+			unsigned int cacheSize,
+			int cacheHandSpread,
 			grid::ValuePosition valuePos)
 	{
 		asagi::Grid::Error err = Level<Type>::open(filename, varname, valuePos);

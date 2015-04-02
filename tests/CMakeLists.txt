@@ -70,7 +70,7 @@ add_test_executable( grid1d YES )
 #add_test_executable( adaptivegrid2d YES )
 
 add_test_executable( fullgrid2d )
-#add_test_executable( localcachegrid2d )
+add_test_executable( cachegrid2d )
 add_test_executable( passthroughgrid2d )
 
 # Unit Tests
@@ -86,5 +86,5 @@ add_subdirectory( unittest )
 #add_test_run( AdaptiveGrid2D test_adaptivegrid2d 2 )
 
 add_test_run( FullGrid2D test_fullgrid2d ) 
-#add_test_run( LocalCacheGrid2D test_localcachegrid2d )
+add_test_run( LocalCacheGrid2D test_cachegrid2d )
 add_test_run( PassThroughGrid2D test_passthroughgrid2d )

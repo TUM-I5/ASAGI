@@ -98,12 +98,16 @@ public:
 	 * @param filename The name of the file for this level
 	 * @param varname The variable name in the file
 	 * @param blockSizes Size of the blocks in each dimension
+	 * @param cacheSize Number of blocks stored in the cache
+	 * @param Difference between the two hands in the LRU algorithm
 	 * @param level The level that should be initialized
 	 * @return
 	 */
 	virtual asagi::Grid::Error init(const char* filename,
 			const char* varname,
 			const unsigned int* blockSize,
+			unsigned int cacheSize,
+			int cacheHandSpread,
 			unsigned int level) = 0;
 	
 	double getMin(unsigned int n) const

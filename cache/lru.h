@@ -32,13 +32,13 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef BLOCKS_LRU_H
-#define BLOCKS_LRU_H
+#ifndef CACHE_LRU_H
+#define CACHE_LRU_H
 
-namespace blocks
+namespace cache
 {
 	
 /**
@@ -60,13 +60,38 @@ private:
 	/** Flag list for second chance */
 	bool *m_referenced;
 public:
-	LRU();
-	virtual ~LRU();
-	
-	void init(unsigned long size, long handDiff = 0);
+	LRU()
+		: m_size(0), m_nextPage(0L), m_nextClear(0),
+		  m_referenced(0L)
+	{
+	}
+
+	virtual ~LRU()
+	{
+		delete [] m_referenced;
+	}
+
+	/**
+	 * Initialize the LRU algorithm
+	 */
+	void init(unsigned long size, long handDiff = -1)
+	{
+		m_size = size;
+		m_nextPage = size - 1; // Some magic so getFree() works
+		if (handDiff < 0)
+			// Some default value
+			m_nextClear = size / 2;
+		else
+			m_nextClear = handDiff;
+
+		m_referenced = new bool[size];
+		// Rest of the array will bet set to "false" by getFree()
+		for (unsigned long i = 0; i < m_nextClear; i++)
+			m_referenced[i] = false;
+	}
 	
 	/**
-	 * An element is accesed, the second chance bit is set
+	 * An element is accessed, the second chance bit is set
 	 */
 	void access(unsigned long index)
 	{
@@ -96,4 +121,4 @@ public:
 
 }
 
-#endif // BLOCKS_LRU_H
+#endif // CACHE_LRU_H

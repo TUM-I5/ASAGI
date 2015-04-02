@@ -32,21 +32,22 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "globaltest.h"
 #include "tests.h"
 
-#include "blocks/blockmanager.h"
+#include "cache/cachemanager.h"
+
 
 class ArrayTypeTest : public CxxTest::TestSuite
 {
-	blocks::BlockManager* manager;
+	cache::CacheManager* manager;
 public:
 	void setUp(void)
 	{
-		manager = new blocks::BlockManager();
+		manager = new cache::CacheManager();
 		manager->init(3);
 	}
 	

@@ -359,6 +359,25 @@ private:
 #endif // ROUND_ROBIN
 	}
 	
+	/**
+	 * Computes the offset of a value in the block from the coordinates of the value
+	 *
+	 * @param index The coordinates of the value
+	 * @return The offset of the value in the block
+	 */
+	unsigned long calcOffsetInBlock(const size_t *coords)
+	{
+		unsigned long offset = 0;
+		for (int i = this->dimensions()-1; i >= 0; i--) {
+			offset *= blockSize(i);
+			offset += coords[i] % blockSize(i);
+		}
+
+		assert(offset < totalBlockSize());
+
+		return offset;
+	}
+
 #if 0
 	/**
 	 * Subclasses should override this and return false, if they still need

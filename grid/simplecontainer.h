@@ -71,6 +71,8 @@ public:
 	asagi::Grid::Error init(const char* filename,
 			const char* varname,
 			const unsigned int* blockSize,
+			unsigned int cacheSize,
+			int cacheHandSpread,
 			unsigned int level)
 	{
 		if (m_levels.size() <= level)
@@ -86,6 +88,8 @@ public:
 				varname,
 				blockSize,
 				this->timeDimension(),
+				cacheSize,
+				cacheHandSpread,
 				this->valuePosition());
 	}
 

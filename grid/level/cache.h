@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -35,11 +35,13 @@
  * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_LEVEL_FULL_H
-#define GRID_LEVEL_FULL_H
+#ifndef GRID_LEVEL_CACHE_H
+#define GRID_LEVEL_CACHE_H
 
 #include "blocked.h"
 #include "allocator/default.h"
+#include "cache/cachemanager.h"
+#include "threads/mutex.h"
 
 namespace grid
 {
@@ -48,34 +50,40 @@ namespace level
 {
 
 /**
- * This grid loads all (local) blocks into memory at initialization.
- * Neither does this class change the blocks nor does it fetch new blocks.
- * If you try to access values of a non-local block, the behavior is
- * undefined.
- * 
- * If compiled without MPI, all blocks are local.
+ * A grid that maintains a local cache for blocks. Can be combined with other
+ * grid, e.g. StaticGrid.
  */
 template<class MPIComm, class NumaComm, class Type, class Allocator = allocator::Default>
-class Full : public Blocked<Type>
+class Cache : public Blocked<Type>
 {
 private:
-	/** Local data cache */
-	unsigned char* m_data;
+	/** Cache memory */
+	unsigned char *m_cache;
+
+	/** BlockManager used to control the cache */
+	cache::CacheManager m_cacheManager;
+
+	/** Mutex to lock the complete cache manager */
+	threads::Mutex m_cacheMutex;
+
+	/** Mutexes to lock the blocks in the cache */
+	threads::Mutex *m_blockMutexes;
 
 public:
-	Full(const mpi::MPIComm &comm,
+	Cache(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
 		: Blocked<Type>(comm, numa, type),
-		  m_data(0L)
+		  m_cache(0L), m_blockMutexes(0L)
 	{
 	}
 
-	virtual ~Full()
+	virtual ~Cache()
 	{
-		Allocator::free(m_data);
+		Allocator::free(m_cache);
+		delete [] m_blockMutexes;
 	}
-	
+
 	asagi::Grid::Error open(
 		const char* filename,
 		const char* varname,
@@ -92,36 +100,20 @@ public:
 
 		// Allocate the memory
 		err = Allocator::allocate(
-				this->type().size_static() * this->totalBlockSize() * this->localBlockCount(),
-				m_data);
+				this->type().size_static() * this->totalBlockSize() * cacheSize,
+				m_cache);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
-		// Load the blocks from the file
-		for (unsigned long i = 0; i < this->localBlockCount(); i++) {
-			if (this->local2global(i) >= this->totalBlockCount())
-				// Last process(es) may control less blocks
-				break;
+		// Initialize the cache manager
+		m_cacheManager.init(cacheSize, cacheHandSpread);
 
-			// Get coordinates of the block
-			size_t blockPos[MAX_DIMENSIONS];
-			this->calcBlockPosition(this->local2global(i), blockPos);
-
-			// Get coordinates of the first value in the block
-			for (unsigned char j = 0; j < this->dimensions(); j++)
-				blockPos[j] *= this->blockSize(j);
-
-			// Load the block
-			this->type().load(this->inputFile(),
-				blockPos, this->blockSize(),
-				&m_data[this->type().size_static() * this->totalBlockSize() * i]);
-		}
-
-		this->closeInputFile();
+		// Allocate the mutexes for the blocks
+		m_blockMutexes = new threads::Mutex[cacheSize];
 
 		return asagi::Grid::SUCCESS;
 	}
-	
+
 	template<typename T>
 	void getAt(T* buf, const double* pos)
 	{
@@ -134,40 +126,81 @@ public:
 		// Get block id from the index
 		unsigned long globalBlockId = this->blockByCoords(index);
 
-		assert(this->blockRank(globalBlockId) == this->comm().rank());
-		assert(this->blockDomain(globalBlockId) == this->numa().domainId());
+		unsigned long cachePos;
 
-		// The offset of the block
-		unsigned long localBlockId = this->blockOffset(globalBlockId);
+		m_cacheMutex.lock();
 
-		assert(localBlockId < this->localBlockCount());
+		if (m_cacheManager.getIndex(globalBlockId, cachePos)) {
+			// Block is in the cache
+			// Lock the cache position but unlock the cache manager
+			m_blockMutexes[cachePos].lock();
+			m_cacheMutex.unlock();
+		} else {
+			// Block not in cache
+			// Get a free block position
+			long oldGlobalBlockId = m_cacheManager.getFreeIndex(globalBlockId, cachePos);
 
-		// Compute the offset of the value in the block
+			// Lock the cache position and unlock the cache manager
+			m_blockMutexes[cachePos].lock();
+			m_cacheMutex.unlock();
+
+			// Load the block
+			loadBlock(index, cachePos, oldGlobalBlockId);
+		}
+
+		// Compute the offset in the block
 		unsigned long offset = this->calcOffsetInBlock(index);
 
 		// Finally, we fill the buffer
 		this->type().convert(
-				&m_data[this->type().size_static() *
-						(localBlockId * this->totalBlockSize() + offset)],
+				&m_cache[this->type().size_static() *
+						(cachePos * this->totalBlockSize() + offset)],
 				buf);
+
+		// Free the block in the cache
+		m_blockMutexes[cachePos].unlock();
+	}
+
+	/**
+	 * Load a block from the file
+	 *
+	 * @param index The coordinates of the value
+	 * @param cachePos The position in the cache very the block should be stored
+	 * @param oldBlockId The block id that gets overridden or -1
+	 */
+	void loadBlock(const size_t *index, unsigned long cachePos, long oldBlockId)
+	{
+		this->incCounter(perf::Counter::FILE);
+
+		size_t index2[MAX_DIMENSIONS];
+		memcpy(index2, index, this->dimensions() * sizeof(size_t));
+
+		// Get coordinates of the first value in the block
+		for (unsigned char i = 0; i < this->dimensions(); i++)
+			index2[i] -= index2[i] % this->blockSize(i);
+
+		// Load the block
+		this->type().load(this->inputFile(),
+			index2, this->blockSize(),
+			&m_cache[this->type().size_static() * this->totalBlockSize() * cachePos]);
 	}
 
 #if 0
 	/**
-	 * @return A pointer to the blocks
+	 * @return A pointer to the cached blocks
 	 */
-	unsigned char* getData()
+	unsigned char* getCache()
 	{
-		return m_data;
+		return m_cache;
 	}
 #endif
 };
 
 template<class MPIComm, class NumaComm, class Type>
-using FullDefault = Full<MPIComm, NumaComm, Type>;
+using CacheDefault = Cache<MPIComm, NumaComm, Type>;
 
 }
 
 }
 
-#endif // GRID_LEVEL_FULL_H
+#endif /* GRID_LEVEL_CACHE_H */

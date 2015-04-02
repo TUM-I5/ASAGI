@@ -32,73 +32,56 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "blockmanager.h"
+#include <asagi.h>
 
-using namespace blocks;
-using namespace std;
+// Do not abort to get real failure
+#define LOG_ABORT
+#include "utils/logger.h"
 
-BlockManager::BlockManager()
+#include "tests.h"
+
+using namespace asagi;
+
+int main(int argc, char** argv)
 {
-	m_indexToBlock = 0L;
-}
-
-BlockManager::~BlockManager()
-{
-	delete [] m_indexToBlock;
-}
-
-void BlockManager::init(unsigned long maxBlocksPerNode,
-	long handDiff)
-{
-	m_indexToBlock = new long[maxBlocksPerNode];
-	for (unsigned long i = 0; i < maxBlocksPerNode; i++)
-		m_indexToBlock[i] = -1;
+	Grid* grid = Grid::create();
+	grid->setParam("GRID", "CACHED");
 	
-	m_lru.init(maxBlocksPerNode, handDiff);
-}
+	if (grid->open(NC_2D) != Grid::SUCCESS) {
+		logError() << "Could not open file";
+		return 1;
+	}
 
-/**
- * @param block The global block id
- * @param[out] index If true, the local index of this block,
- *  otherwise the value is undefined
- * @return True if this block is stored, false otherwise
- */
-bool BlockManager::getIndex(unsigned long block, unsigned long &index)
-{
-	unordered_map<unsigned long, unsigned long>::const_iterator value
-		= m_blockToIndex.find(block);
-		
-	if (value == m_blockToIndex.end())
-		return false;
-	
-	index = (*value).second;
-	m_lru.access(index);
-	
-	return true;
-}
+	int value;
 
-/**
- * @param block The id of the new block
- * @param index The index, where the block should be saved
- * @return The id of the block that was deleted
- */
-long BlockManager::getFreeIndex(unsigned long block, unsigned long &index)
-{
-	index = m_lru.getFree();
-	long oldBlock = m_indexToBlock[index];
-	
-	if (oldBlock >= 0) {
-		// This block is not empty
-		// -> delete the old block
-		
-		m_blockToIndex.erase(oldBlock);
+	double coords[2];
+	for (int i = 0; i < NC_WIDTH; i++) {
+		coords[0] = i;
+
+		for (int j = 0; j < NC_LENGTH; j++) {
+			coords[1] = j;
+
+			value = j * NC_WIDTH + i;
+			if (grid->getInt(coords) != value) {
+				logError() << "Value at" << i << j << "should be"
+					<< value << "but is" << grid->getInt(coords);
+				return 1;
+			}
+		}
+	}
+
+	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
+		logError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
+				<< "but is" << grid->getCounter("accesses");
+		return 1;
 	}
 	
-	m_indexToBlock[index] = block;
-	m_blockToIndex[block] = index;
+	// TODO check misses/hits
+
+	delete grid;
 	
-	return oldBlock;
+	return 0;
 }
