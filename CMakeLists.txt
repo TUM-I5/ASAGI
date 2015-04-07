@@ -19,6 +19,8 @@ option( EXAMPLES "Compile examples" OFF )
 option( TESTS "Test library" OFF )
 option( ROUND_ROBIN "Distribute blocks round robin on nodes" ON )
 mark_as_advanced( ROUND_ROBIN )
+option( DEBUG_NUMA "Overrides CPU NUMA information (each core gets its own NUMA domain" OFF )
+mark_as_advanced( DEBUG_NUMA )
 
 ##### Default build type #####
 if( NOT CMAKE_BUILD_TYPE )
@@ -160,6 +162,11 @@ if( ROUND_ROBIN )
 	add_definitions( -DROUND_ROBIN )
 endif( ROUND_ROBIN )
 
+# Debug NUMA
+if( DEBUG_NUMA )
+    add_definitions( -DDEBUG_NUMA )
+endif( DEBUG_NUMA )
+
 # Find netcdf
 find_package( NetCDF REQUIRED )
 include_directories( SYSTEM ${NETCDF_INCLUDES} )
@@ -191,6 +198,8 @@ if( NOT NOMPI )
 	add_subdirectory( mpi )
 endif( NOT NOMPI )
 add_subdirectory( numa )
+add_subdirectory( threads )
+add_subdirectory( transfer )
 add_subdirectory( types )
 
 # Add sources

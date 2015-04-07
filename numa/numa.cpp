@@ -75,7 +75,11 @@ asagi::Grid::Error numa::Numa::registerThread(bool &masterThread)
 	int cpu = sched_getcpu();
 	if (cpu < 0)
 		return asagi::Grid::NUMA_ERROR;
+#if DEBUG_NUMA
+	int domain = cpu;
+#else // DEBUG_NUMA
 	int domain = numa_node_of_cpu(cpu);
+#endif // DEBUG_NUMA
 	if (domain < 0)
 		return asagi::Grid::NUMA_ERROR;
 

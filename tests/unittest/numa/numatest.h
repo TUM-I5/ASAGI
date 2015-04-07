@@ -67,7 +67,12 @@ public:
 		pthread_join(thread, 0L);
 		TS_ASSERT_EQUALS(err2, asagi::Grid::SUCCESS);
 
-		TS_ASSERT(master ^ master2);
+		if (numa2.totalDomains() == 1) {
+			TS_ASSERT(master ^ master2);
+		} else {
+			TS_ASSERT(master);
+			TS_ASSERT(master2);
+		}
 
 		TS_ASSERT_EQUALS(numa2.threadId(), 0u);
 		TS_ASSERT_EQUALS(threadId2, 1u);
