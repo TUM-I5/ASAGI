@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- *
+ * 
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -35,13 +35,13 @@
  * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_LEVEL_CACHE_H
-#define GRID_LEVEL_CACHE_H
+#ifndef GRID_LEVEL_FULLDIST_H
+#define GRID_LEVEL_FULLDIST_H
 
-#include "blocked.h"
+#include "full.h"
 #include "allocator/default.h"
+#include "allocator/mpialloc.h"
 #include "cache/cachemanager.h"
-#include "threads/mutex.h"
 
 namespace grid
 {
@@ -50,25 +50,29 @@ namespace level
 {
 
 /**
- * A grid that maintains a local cache for blocks. Can be combined with other
- * grid, e.g. StaticGrid.
+ * Grid level implementation, that distributes the grid at the beginning
+ * across all MPI tasks. If a block is not available, it is transfered via
+ * MPI and stored in a cache.
  */
-template<class MPIComm, class NumaComm, class Type, class Allocator = allocator::Default>
-class Cache : public Blocked<Type>
+template<class MPITrans, class NumaComm, class Type>
+class FullDist : public Full<MPITrans, NumaComm, Type, allocator::MPIAlloc>
 {
 private:
 	/** Manager used to control the cache */
-	cache::CacheManager<Allocator> m_cacheManager;
+	cache::CacheManager<allocator::Default> m_cacheManager;
+
+	/** The MPI transfer class */
+	MPITrans m_mpiTrans;
 
 public:
-	Cache(const mpi::MPIComm &comm,
+	FullDist(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
-		: Blocked<Type>(comm, numa, type)
+		: Full<MPITrans, NumaComm, Type, allocator::MPIAlloc>(comm, numa, type)
 	{
 	}
 
-	virtual ~Cache()
+	virtual ~FullDist()
 	{
 	}
 
@@ -81,8 +85,10 @@ public:
 		int cacheHandSpread,
 		grid::ValuePosition valuePos)
 	{
-		asagi::Grid::Error err = Blocked<Type>::open(filename, varname,
-				blockSize, timeDimension, valuePos);
+		asagi::Grid::Error err = Full<MPITrans, NumaComm, Type, allocator::MPIAlloc>::open(filename, varname,
+				blockSize, timeDimension,
+				cacheSize, cacheHandSpread,
+				valuePos);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
@@ -93,14 +99,19 @@ public:
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
+		// Initialize the MPI transfer class
+		err = m_mpiTrans.init(this->data(),
+				this->localBlockCount(), this->totalBlockSize(), this->type().size_static(),
+				this->type(), this->comm());
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
 		return asagi::Grid::SUCCESS;
 	}
 
 	template<typename T>
 	void getAt(T* buf, const double* pos)
 	{
-		this->incCounter(perf::Counter::ACCESS);
-
 		// Get the index from the position
 		size_t index[MAX_DIMENSIONS];
 		this->pos2index(pos, index);
@@ -108,13 +119,28 @@ public:
 		// Get block id from the index
 		unsigned long globalBlockId = this->blockByCoords(index);
 
-		unsigned long cacheId;
-		unsigned char* data;
-		long oldGlobalBlockId = m_cacheManager.get(globalBlockId, cacheId, data);
+		if (this->blockRank(globalBlockId) == this->comm().rank()
+				&& this->blockDomain(globalBlockId) == this->numa().domainId()) {
+			Full<MPITrans, NumaComm, Type, allocator::MPIAlloc>::getAt(buf, pos);
+			return;
+		}
 
-		if (static_cast<long>(globalBlockId) != oldGlobalBlockId)
+		// Only increment this if the case is not handled by the parent class
+		this->incCounter(perf::Counter::ACCESS);
+
+		// Check the cache
+		unsigned long cacheId;
+		unsigned char* cache;
+		long oldGlobalBlockId = m_cacheManager.get(globalBlockId, cacheId, cache);
+
+		if (static_cast<long>(globalBlockId) != oldGlobalBlockId) {
 			// Cache not filled, do this first
-			loadBlock(index, data);
+			this->incCounter(perf::Counter::MPI);
+
+			m_mpiTrans.transfer(this->blockRank(globalBlockId),
+					this->blockOffset(globalBlockId),
+					cache);
+		}
 
 		// Compute the offset in the block
 		unsigned long offset = this->calcOffsetInBlock(index);
@@ -122,51 +148,46 @@ public:
 		assert(offset < this->totalBlockSize());
 
 		// Finally, we fill the buffer
-		this->type().convert(&data[this->type().size_static() * offset], buf);
+		this->type().convert(&cache[this->type().size_static() * offset], buf);
 
 		// Free the block in the cache
 		m_cacheManager.unlock(cacheId);
 	}
 
-	/**
-	 * Load a block from the file
-	 *
-	 * @param index The coordinates of the value
-	 * @param data Memory where the block should be stored
-	 * @param cachePos The position in the cache very the block should be stored
-	 */
-	void loadBlock(const size_t *index, unsigned char* data)
-	{
-		this->incCounter(perf::Counter::FILE);
-
-		size_t index2[MAX_DIMENSIONS];
-
-		// Get coordinates of the first value in the block
-		for (unsigned char i = 0; i < this->dimensions(); i++)
-			index2[i] = index[i] - (index[i] % this->blockSize(i));
-
-		// Load the block
-		this->type().load(this->inputFile(),
-			index2, this->blockSize(),
-			data);
-	}
-
 #if 0
+private:
+	/** MPI window for communication */
+	MPI_Win m_window;
+public:
+	DistStaticGrid(const GridContainer &container,
+		unsigned int hint = asagi::Grid::NO_HINT);
+	virtual ~DistStaticGrid();
+	
+protected:
+	asagi::Grid::Error init();
+	
+	void getAt(void* buf, types::Type::converter_t converter,
+		unsigned long x, unsigned long y = 0, unsigned long z = 0);
+
+	void getBlock(unsigned long block,
+		long oldBlock,
+		unsigned long cacheIndex,
+		unsigned char* cache);
+
 	/**
-	 * @return A pointer to the cached blocks
+	 * We can free all netCDF related resources, because we use MPI to
+	 * transfer blocks
 	 */
-	unsigned char* getCache()
+	bool keepFileOpen() const
 	{
-		return m_cache;
+		return false;
 	}
 #endif
 };
 
-template<class MPIComm, class NumaComm, class Type>
-using CacheDefault = Cache<MPIComm, NumaComm, Type>;
-
 }
 
 }
 
-#endif /* GRID_LEVEL_CACHE_H */
+#endif // GRID_LEVEL_FULLDIST_H
+

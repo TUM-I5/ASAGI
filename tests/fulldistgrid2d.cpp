@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- *
+ * 
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,57 +31,62 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- *
- * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * 
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
-
-#ifndef ALLOCATOR_MPIALLOCATOR_H
-#define ALLOCATOR_MPIALLOCATOR_H
 
 #include <asagi.h>
 
-//#include "allocator/allocator.h"
+// Do not abort to get real failure
+#define LOG_ABORT
+#include "utils/logger.h"
 
-namespace allocator
+#include "tests.h"
+
+using namespace asagi;
+
+int main(int argc, char** argv)
 {
+	MPI_Init(&argc, &argv);
 
-/**
- * This allocator uses MPI mechanisms to allocate/free memory
- */
-template<typename T>
-class MPIAllocator : public Allocator<T>
-{
-public:
-	/**
-	 * Empty constructor, required by new gcc versions
-	 */
-	MPIAllocator()
-	{
+	int rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+	Grid* grid = Grid::create();
+	grid->setComm(MPI_COMM_WORLD);
+
+	if (grid->open(NC_2D) != Grid::SUCCESS) {
+		logError() << "Could not open file";
+		return 1;
 	}
 
-	asagi::Grid::Error allocate(size_t size, T* &ptr) const
-	{
-		if (MPI_Alloc_mem(size * sizeof(T), MPI_INFO_NULL, &ptr) != MPI_SUCCESS)
-			return asagi::Grid::MPI_ERROR;
+	int value;
 
-		return asagi::Grid::SUCCESS;
+	double coords[2];
+	for (int i = 0; i < NC_WIDTH; i++) {
+		coords[0] = i;
+
+		for (int j = 0; j < NC_LENGTH; j++) {
+			coords[1] = j;
+
+			value = j * NC_WIDTH + i;
+			if (grid->getInt(coords) != value) {
+				logError() << "Value at" << i << j << "should be"
+					<< value << "but is" << grid->getInt(coords);
+				return 1;
+			}
+		}
 	}
 
-	void free(T *ptr) const
-	{
-		MPI_Free_mem(ptr);
+	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
+		logError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
+				<< "but is" << grid->getCounter("accesses");
+		return 1;
 	}
+	
+	delete grid;
+	
+	MPI_Finalize();
 
-public:
-	static const MPIAllocator<T> allocator;
-};
-
-/**
- * Provides a default instance for each type
- */
-template<typename T>
-const MPIAllocator<T> MPIAllocator<T>::allocator;
-
+	return 0;
 }
-
-#endif /* ALLOCATOR_MPIALLOCATOR_H */

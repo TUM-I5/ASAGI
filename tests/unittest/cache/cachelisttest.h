@@ -32,56 +32,84 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "globaltest.h"
 #include "tests.h"
 
-#include "allocator/default.h"
-#include "cache/cachemanager.h"
+#include "cache/cachelist.h"
 
-class CacheManagerTest : public CxxTest::TestSuite
+class CacheListTest : public CxxTest::TestSuite
 {
-	cache::CacheManager<allocator::Default>* manager;
+	cache::CacheList* list;
 public:
 	void setUp(void)
 	{
-		manager = new cache::CacheManager<allocator::Default>();
-		manager->init(3, sizeof(int));
+		list = new cache::CacheList();
+		list->init(3);
 	}
 	
 	void tearDown(void)
 	{
-		delete manager;
+		delete list;
 	}
 	
-	void testGet(void)
+	void testGetIndex(void)
 	{
-		unsigned long cacheId;
-		unsigned char* data;
+		unsigned long block;
 		
-		TS_ASSERT_EQUALS(manager->get(5, cacheId, data), -1);
-		*reinterpret_cast<int*>(data) = 5;
-		manager->unlock(cacheId);
-
-		TS_ASSERT_EQUALS(manager->get(3, cacheId, data), -1);
-		*reinterpret_cast<int*>(data) = 3;
-		manager->unlock(cacheId);
-
-		TS_ASSERT_EQUALS(manager->get(5, cacheId, data), 5);
-		TS_ASSERT_EQUALS(*reinterpret_cast<int*>(data), 5);
-		manager->unlock(cacheId);
-
-		TS_ASSERT_EQUALS(manager->get(10, cacheId, data), -1);
-		manager->unlock(cacheId);
-
-		TS_ASSERT_EQUALS(manager->get(3, cacheId, data), 3);
-		TS_ASSERT_EQUALS(*reinterpret_cast<int*>(data), 3);
-		manager->unlock(cacheId);
-
+		block = 5;
+		TS_ASSERT(!list->getIndex(block, block));
+		TS_ASSERT_EQUALS(block, 5u);
+		
+		list->getFreeIndex(block, block);
+		block = 6;
+		list->getFreeIndex(block, block);
+		block = 7;
+		list->getFreeIndex(block, block);
+		
+		block = 6;
+		TS_ASSERT(list->getIndex(block, block));
+		TS_ASSERT_EQUALS(block, 1u);
+		
 		// Override first entry
-		TS_ASSERT_LESS_THAN_EQUALS(0, manager->get(12, cacheId, data));
-		manager->unlock(cacheId);
+		block = 8;
+		list->getFreeIndex(block, block);
+		
+		block = 8;
+		TS_ASSERT(list->getIndex(block, block));
+		TS_ASSERT_EQUALS(block, 0u);
+		
+		block = 5;
+		TS_ASSERT(!list->getIndex(block, block));
+		TS_ASSERT_EQUALS(block, 5u);
+	}
+	
+	void testGetFreeIndex(void)
+	{
+		unsigned long block;
+		
+		block = 5;
+		TS_ASSERT_LESS_THAN(list->getFreeIndex(block, block), 0);
+		TS_ASSERT_EQUALS(block, 0u);
+		
+		block = 6;
+		TS_ASSERT_LESS_THAN(list->getFreeIndex(block, block), 0);
+		TS_ASSERT_EQUALS(block, 1u);
+		
+		block = 7;
+		TS_ASSERT_LESS_THAN(list->getFreeIndex(block, block), 0);
+		TS_ASSERT_EQUALS(block, 2u);
+		
+		// BlockManager with size 3 -> this should override the first
+		// block
+		block = 8;
+		TS_ASSERT_EQUALS(list->getFreeIndex(block, block), 5);
+		TS_ASSERT_EQUALS(block, 0u);
+		
+		block = 7;
+		TS_ASSERT_EQUALS(list->getFreeIndex(block, block), 6);
+		TS_ASSERT_EQUALS(block, 1u);
 	}
 };

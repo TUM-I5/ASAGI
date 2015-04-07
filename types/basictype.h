@@ -79,7 +79,7 @@ public:
 	}
 
 #ifndef ASAGI_NOMPI
-	virtual MPI_Datatype getMPIType();
+	virtual MPI_Datatype getMPIType() const;
 #endif // ASAGI_NOMPI
 	
 	/**
@@ -103,31 +103,31 @@ public:
 
 #ifndef ASAGI_NOMPI
 template<> inline
-MPI_Datatype BasicType<unsigned char>::getMPIType()
+MPI_Datatype BasicType<unsigned char>::getMPIType() const
 {
 	return MPI_BYTE;
 }
 
 template<> inline
-MPI_Datatype BasicType<int>::getMPIType()
+MPI_Datatype BasicType<int>::getMPIType() const
 {
 	return MPI_INT;
 }
 
 template<> inline
-MPI_Datatype BasicType<long>::getMPIType()
+MPI_Datatype BasicType<long>::getMPIType() const
 {
 	return MPI_LONG;
 }
 
 template<> inline
-MPI_Datatype BasicType<float>::getMPIType()
+MPI_Datatype BasicType<float>::getMPIType() const
 {
 	return MPI_FLOAT;
 }
 
 template<> inline
-MPI_Datatype BasicType<double>::getMPIType()
+MPI_Datatype BasicType<double>::getMPIType() const
 {
 	return MPI_DOUBLE;
 }

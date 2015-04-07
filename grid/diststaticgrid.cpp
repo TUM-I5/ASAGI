@@ -35,13 +35,12 @@
  * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "diststaticgrid.h"
-
 #include <cassert>
 #include <malloc.h>
 #include <stdlib.h>
 
-#include "allocator/mpiallocator.h"
+#include "../allocator/mpialloc.h"
+#include "level/fulldist.h"
 #include "types/type.h"
 
 /**

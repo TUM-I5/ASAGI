@@ -75,7 +75,7 @@ public:
 	/**
 	 * @return The corresponding MPI_Datatype for this type
 	 */
-	virtual MPI_Datatype getMPIType() = 0;
+	virtual MPI_Datatype getMPIType() const = 0;
 #endif // ASAGI_NOMPI
 	
 protected:

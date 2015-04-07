@@ -193,7 +193,7 @@ public:
 	}
 	
 #ifndef ASAGI_NOMPI
-	MPI_Datatype getMPIType()
+	MPI_Datatype getMPIType() const
 	{
 		return m_mpiType;
 	}

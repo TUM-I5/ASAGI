@@ -152,15 +152,14 @@ public:
 				buf);
 	}
 
-#if 0
+protected:
 	/**
 	 * @return A pointer to the blocks
 	 */
-	unsigned char* getData()
+	unsigned char* data()
 	{
 		return m_data;
 	}
-#endif
 };
 
 template<class MPIComm, class NumaComm, class Type>

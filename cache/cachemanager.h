@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,111 +31,127 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef CACHE_CACHEMANAGER_H
-#define CACHE_CACHEMANAGER_H
+#ifndef CACHE_CHACHEMANAGER_H
+#define CACHE_CHACHEMANAGER_H
 
-#include <unordered_map>
+#include <cstring>
 
-#include "lru.h"
+#include "cachelist.h"
+#include "threads/mutex.h"
 
-/**
- * @brief Algorithms to handle the local block cache
- */
 namespace cache
 {
 
 /**
- * @brief Controls a list of blocks
- * 
- * It does not store the blocks itself, it only handles the free spaces in the
- * list and maps between block index and list position.
+ * @brief Manages a block cache
  */
+template<class Allocator>
 class CacheManager
 {
 private:
-	/** Algorithm we use to delete old blocks */
-	LRU m_lru;
-	
-	/**
-	 * Maps from the local index of the block to the real block id.
-	 * A block id < 0 means that this index is empty
-	 */
-	long *m_indexToBlock;
+	/** Cache memory */
+	unsigned char *m_cache;
 
-	/** Maps from the block id to the index where it is stored */
-	std::unordered_map<unsigned long, unsigned long> m_blockToIndex;
+	/** The size of one block in the cache in bytes */
+	unsigned long m_blockSize;
+
+	/** Mutex to lock the complete cache manager */
+	threads::Mutex m_cacheMutex;
+
+	/** List of cached blocks */
+	CacheList m_cacheList;
+
+	/** Mutexes to lock the blocks in the cache */
+	threads::Mutex *m_blockMutexes;
+
 public:
 	CacheManager()
-		: m_indexToBlock(0L)
+		: m_cache(0L), m_blockSize(0), m_blockMutexes(0L)
 	{
 	}
-	
+
 	virtual ~CacheManager()
 	{
-		delete [] m_indexToBlock;
+		Allocator::free(m_cache);
+		delete [] m_blockMutexes;
 	}
 
 	/**
-	 * @param maxBlocksPerNode The maximum number of blocks stored on this
-	 *  node
+	 * Initializes the cache manager
+	 *
+	 * @param blocks Number of blocks
+	 * @param blockSize The size of one block in bytes
 	 * @param handDiff Difference between the two hands in the
 	 *  2-handed clock algorithm
 	 */
-	void init(unsigned long maxBlocksPerNode, long handDiff = -1)
+	asagi::Grid::Error init(unsigned long blocks, unsigned long blockSize, long handDiff = -1)
 	{
-		m_indexToBlock = new long[maxBlocksPerNode];
-		for (unsigned long i = 0; i < maxBlocksPerNode; i++)
-			m_indexToBlock[i] = -1;
+		m_blockSize = blockSize;
 
-		m_lru.init(maxBlocksPerNode, handDiff);
+		m_cacheList.init(blocks, handDiff);
+
+		// Allocate the mutexes for the blocks
+		m_blockMutexes = new threads::Mutex[blocks];
+
+		// Allocate the cache
+		asagi::Grid::Error err = Allocator::allocate(blocks * blockSize, m_cache);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
+		// Initialize the memory to make sure it get allocated in the correct NUMA domain
+		memset(m_cache, 0, blocks * blockSize);
+
+		return asagi::Grid::SUCCESS;
 	}
 
 	/**
-	 * @param block The global block id
-	 * @param[out] index If true, the local index of this block,
-	 *  otherwise the value is undefined
-	 * @return True if this block is stored, false otherwise
+	 * Get the cache entry for the the block id.
+	 * This function will lock the cache entry for further access. Use
+	 * {@link unlock} to unlock the cache entry.
+	 *
+	 * @param blockId The requested block id
+	 * @param[out] cacheId Identifier that can be passed to {@link unlock} to unlock
+	 *  the cache entry
+	 * @param[out] data A pointer to the request cache entry
+	 * @return The block id of the element that is currently stored at the cache position.
+	 *  If this is not equal to <code>blockId</code> the cache entry needs to be filled
+	 *  first. -1 is returned if the cache entry needs to be filled but it is currently
+	 *  empty/does not contain any valid block.
 	 */
-	bool getIndex(unsigned long block, unsigned long &index)
+	long get(unsigned long blockId, unsigned long &cacheId, unsigned char* &data)
 	{
-		std::unordered_map<unsigned long, unsigned long>::const_iterator value
-			= m_blockToIndex.find(block);
+		m_cacheMutex.lock();
 
-		if (value == m_blockToIndex.end())
-			return false;
+		long oldBlockId = blockId;
+		if (!m_cacheList.getIndex(blockId, cacheId))
+			// Block not in cache
+			// Get a free block position
+			oldBlockId = m_cacheList.getFreeIndex(blockId, cacheId);
 
-		index = (*value).second;
-		m_lru.access(index);
+		// Lock the cache position and unlock the cache manager
+		m_blockMutexes[cacheId].lock();
+		m_cacheMutex.unlock();
 
-		return true;
+		// Get the memory position
+		data = &m_cache[cacheId * m_blockSize];
+
+		return oldBlockId;
 	}
-	
+
 	/**
-	 * @param block The id of the new block
-	 * @param index The index, where the block should be saved
-	 * @return The id of the block that was deleted
+	 * Unlock the cache entry previously locked with {@link get}
+	 *
+	 * @param cacheId The cache entry identifier
 	 */
-	long getFreeIndex(unsigned long block, unsigned long &index)
+	void unlock(unsigned long cacheId)
 	{
-		index = m_lru.getFree();
-		long oldBlock = m_indexToBlock[index];
-
-		if (oldBlock >= 0) {
-			// This block is not empty
-			// -> delete the old block
-
-			m_blockToIndex.erase(oldBlock);
-		}
-
-		m_indexToBlock[index] = block;
-		m_blockToIndex[block] = index;
-
-		return oldBlock;
+		m_blockMutexes[cacheId].unlock();
 	}
+
 };
 
 }

@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,62 +31,56 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2013-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef GRID_DISTSTATICGRID_H
-#define GRID_DISTSTATICGRID_H
+#ifndef ALLOCATOR_MPIALLOC_H
+#define ALLOCATOR_MPIALLOC_H
 
-#include "localcachegrid.h"
-#include "localstaticgrid.h"
+#include "asagi.h"
 
-#ifndef THREADSAFETY
-#include <mutex>
-#endif // THREADSAFETY
+#include "default.h"
 
-#include "../cache/cachemanager.h"
-
-namespace grid
+namespace allocator
 {
 
 /**
- * Simple grid implementation, that distributes the grid at the beginning
- * across all MPI tasks. If a block is not available, it is transfered via
- * MPI and stored in a cache.
+ * This allocator uses MPI mechanisms to allocate/free memory
  */
-class DistStaticGrid : public LocalStaticGrid, public LocalCacheGrid
+class MPIAlloc
 {
-private:
-	/** MPI window for communication */
-	MPI_Win m_window;
 public:
-	DistStaticGrid(const GridContainer &container,
-		unsigned int hint = asagi::Grid::NO_HINT);
-	virtual ~DistStaticGrid();
-	
-protected:
-	asagi::Grid::Error init();
-	
-	void getAt(void* buf, types::Type::converter_t converter,
-		unsigned long x, unsigned long y = 0, unsigned long z = 0);
+	/**
+	 * @copydoc Default::allocate
+	 */
+	template<typename T>
+	static asagi::Grid::Error allocate(size_t size, T* &ptr)
+	{
+#ifdef ASAGI_NOMPI
+		return Default::allocate(size, ptr);
+#else // ASAGI_NOMPI
+		if (MPI_Alloc_mem(size * sizeof(T), MPI_INFO_NULL, &ptr) != MPI_SUCCESS)
+			return asagi::Grid::MPI_ERROR;
 
-	void getBlock(unsigned long block,
-		long oldBlock,
-		unsigned long cacheIndex,
-		unsigned char* cache);
+		return asagi::Grid::SUCCESS;
+#endif // ASAGI_NOMPI
+	}
 
 	/**
-	 * We can free all netCDF related resources, because we use MPI to
-	 * transfer blocks
+	 * @copydoc Default::free
 	 */
-	bool keepFileOpen() const
+	template<typename T>
+	static void free(T *ptr)
 	{
-		return false;
+#ifdef ASAGI_NOMPI
+		Default::free(ptr);
+#else // ASAGI_NOMPI
+		MPI_Free_mem(ptr);
+#endif // ASAGI_NOMPI
 	}
 };
 
 }
 
-#endif // GRID_DISTSTATICGRID_H
-
+#endif // ALLOCATOR_MPIALLOC_H

@@ -38,6 +38,7 @@
 #include "grid.h"
 
 #include <algorithm>
+#include <cassert>
 
 #include "utils/stringutils.h"
 
@@ -46,6 +47,8 @@
 #include "level/cache.h"
 #include "level/full.h"
 #include "level/passthrough.h"
+#include "level/fulldist.h"
+#include "transfer/mpifull.h"
 #include "types/arraytype.h"
 #include "types/basictype.h"
 #include "types/structtype.h"
@@ -248,7 +251,7 @@ unsigned long grid::Grid::getCounter(const char* name, unsigned int level)
  */
 void grid::Grid::init()
 {
-	// Prepare for fortran <-> c translation
+	// Prepare for Fortran <-> c translation
 	m_id = m_pointers.add(this);
 }
 
@@ -265,6 +268,7 @@ void grid::Grid::initContainers()
 		FULL,
 		CACHED,
 		PASS_THROUGH,
+		FULL_MPI,
 		UNKNOWN
 	} containerType = UNKNOWN;
 
@@ -293,10 +297,17 @@ void grid::Grid::initContainers()
 	else if (gridType == "PASS_THROUGH")
 		containerType = PASS_THROUGH;
 	else {
-		containerType = FULL;
 		if (gridType != "FULL") {
 			logWarning(m_comm.rank()) << "ASAGI: Unknown grid type:" << gridType;
 			logWarning(m_comm.rank()) << "ASAGI: Assuming FULL";
+		}
+
+		if (m_comm.size() > 1 && m_numa.totalDomains() == 1)
+			containerType = FULL_MPI;
+		else {
+			assert(m_comm.size() == 1);
+			assert(m_numa.totalDomains() == 1);
+			containerType = FULL;
 		}
 	}
 
@@ -313,6 +324,9 @@ void grid::Grid::initContainers()
 			break;
 		case PASS_THROUGH:
 			*it = TypeSelector<SimpleContainer, level::PassThrough, magic::NullType, magic::NullType, typelist>::createContainer(*this);
+			break;
+		case FULL_MPI:
+			*it = TypeSelector<SimpleContainer, level::FullDist, transfer::MPIFull, magic::NullType, typelist>::createContainer(*this);
 			break;
 		default:
 			*it = 0L;

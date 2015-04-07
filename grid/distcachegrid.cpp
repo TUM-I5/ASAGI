@@ -37,11 +37,10 @@
 
 #include "distcachegrid.h"
 
-#include "allocator/mpiallocator.h"
-
 #include <cstring>
 #include <cstdlib>
 #include <time.h>
+#include "../allocator/mpialloc.h"
 
 /**
  * @param container The container, this grid belongs to
