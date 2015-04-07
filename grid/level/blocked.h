@@ -88,6 +88,12 @@ private:
 #endif
 
 public:
+	Blocked()
+		: Level<Type>(),
+		  m_totalBlocks(0), m_totalBlockSize(0)
+	{
+	}
+
 	Blocked(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)

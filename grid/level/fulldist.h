@@ -65,6 +65,11 @@ private:
 	MPITrans m_mpiTrans;
 
 public:
+	FullDist()
+		: Full<MPITrans, NumaComm, Type, allocator::MPIAlloc>()
+	{
+	}
+
 	FullDist(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)

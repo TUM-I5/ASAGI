@@ -63,6 +63,12 @@ private:
 	unsigned char* m_data;
 
 public:
+	Full()
+		: Blocked<Type>(),
+		  m_data(0L)
+	{
+	}
+
 	Full(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)

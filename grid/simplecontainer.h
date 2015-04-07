@@ -41,6 +41,7 @@
 #include <vector>
 
 #include "typedcontainer.h"
+#include "utils/logger.h"
 
 namespace grid
 {
@@ -66,7 +67,9 @@ public:
 	}
 
 	virtual ~SimpleContainer()
-	{ }
+	{
+		m_levels.clear();
+	}
 	
 	asagi::Grid::Error init(const char* filename,
 			const char* varname,
@@ -76,7 +79,7 @@ public:
 			unsigned int level)
 	{
 		if (m_levels.size() <= level)
-			m_levels.reserve(level+1);
+			m_levels.resize(level+1);
 
 		m_levels[level] = Level(
 				this->comm(),

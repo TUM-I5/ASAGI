@@ -59,6 +59,12 @@ private:
 	unsigned char* m_buf;
 
 public:
+	PassThrough()
+		: Level<Type>(),
+		  m_buf(0L)
+	{
+	}
+
 	PassThrough(
 			const mpi::MPIComm &comm,
 			const numa::Numa &numa,

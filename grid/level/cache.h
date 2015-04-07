@@ -61,6 +61,11 @@ private:
 	cache::CacheManager<Allocator> m_cacheManager;
 
 public:
+	Cache()
+		: Blocked<Type>()
+	{
+	}
+
 	Cache(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
