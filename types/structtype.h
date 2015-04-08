@@ -182,12 +182,7 @@ public:
 		return asagi::Grid::SUCCESS;
 	}
 
-	TYPE_SIZE_FUNC
-
-	/**
-	 * Same as {@link size()} but not available for dynamic linking
-	 */
-	unsigned int size_static() const
+	unsigned int size() const
 	{
 		return m_size;
 	}
@@ -212,7 +207,7 @@ public:
 	 */
 	void convert(const void* data, void* buf) const
 	{
-		Type::copy(data, buf, size_static());
+		Type::copy(data, buf, m_size);
 	}
 };
 

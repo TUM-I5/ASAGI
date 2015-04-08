@@ -90,7 +90,8 @@ public:
 		int cacheHandSpread,
 		grid::ValuePosition valuePos)
 	{
-		asagi::Grid::Error err = Full<MPITrans, NumaComm, Type, allocator::MPIAlloc>::open(filename, varname,
+		asagi::Grid::Error err = Full<MPITrans, NumaComm, Type, allocator::MPIAlloc>::open(
+				filename, varname,
 				blockSize, timeDimension,
 				cacheSize, cacheHandSpread,
 				valuePos);
@@ -99,14 +100,14 @@ public:
 
 		// Initialize the cache manager
 		err = m_cacheManager.init(cacheSize,
-				this->type().size_static() * this->totalBlockSize(),
+				this->typeSize() * this->totalBlockSize(),
 				cacheHandSpread);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
 		// Initialize the MPI transfer class
 		err = m_mpiTrans.init(this->data(),
-				this->localBlockCount(), this->totalBlockSize(), this->type().size_static(),
+				this->localBlockCount(), this->totalBlockSize(), this->typeSize(),
 				this->type(), this->comm());
 		if (err != asagi::Grid::SUCCESS)
 			return err;
@@ -153,7 +154,7 @@ public:
 		assert(offset < this->totalBlockSize());
 
 		// Finally, we fill the buffer
-		this->type().convert(&cache[this->type().size_static() * offset], buf);
+		this->type().convert(&cache[this->typeSize() * offset], buf);
 
 		// Free the block in the cache
 		m_cacheManager.unlock(cacheId);

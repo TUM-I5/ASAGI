@@ -49,8 +49,6 @@ namespace types {
 template<typename T> class BasicType : public Type
 {   
 public:
-	TYPE_SIZE_FUNC
-
 	/**
 	 * Check compatibility of the input file with this type.
 	 */
@@ -59,10 +57,7 @@ public:
 		return asagi::Grid::SUCCESS;
 	}
 
-	/**
-	 * Same as {@link size()} but not available for dynamic linking
-	 */
-	unsigned int size_static() const
+	unsigned int size() const
 	{
 		return sizeof(T);
 	}
@@ -97,7 +92,7 @@ public:
 	 */
 	void convert(const void* data, void* buf) const
 	{
-		Type::copy(data, buf, size_static());
+		Type::copy(data, buf, sizeof(T));
 	}
 };
 

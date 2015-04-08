@@ -93,7 +93,7 @@ public:
 
 		// Initialize the cache manager
 		err = m_cacheManager.init(cacheSize,
-				this->type().size_static() * this->totalBlockSize(),
+				this->typeSize() * this->totalBlockSize(),
 				cacheHandSpread);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
@@ -127,7 +127,7 @@ public:
 		assert(offset < this->totalBlockSize());
 
 		// Finally, we fill the buffer
-		this->type().convert(&data[this->type().size_static() * offset], buf);
+		this->type().convert(&data[this->typeSize() * offset], buf);
 
 		// Free the block in the cache
 		m_cacheManager.unlock(cacheId);

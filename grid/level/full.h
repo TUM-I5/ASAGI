@@ -98,7 +98,7 @@ public:
 
 		// Allocate the memory
 		err = Allocator::allocate(
-				this->type().size_static() * this->totalBlockSize() * this->localBlockCount(),
+				this->typeSize() * this->totalBlockSize() * this->localBlockCount(),
 				m_data);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
@@ -120,7 +120,7 @@ public:
 			// Load the block
 			this->type().load(this->inputFile(),
 				blockPos, this->blockSize(),
-				&m_data[this->type().size_static() * this->totalBlockSize() * i]);
+				&m_data[this->typeSize() * this->totalBlockSize() * i]);
 		}
 
 		this->closeInputFile();
@@ -153,7 +153,7 @@ public:
 
 		// Finally, we fill the buffer
 		this->type().convert(
-				&m_data[this->type().size_static() *
+				&m_data[this->typeSize() *
 						(localBlockId * this->totalBlockSize() + offset)],
 				buf);
 	}

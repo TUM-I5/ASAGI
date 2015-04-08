@@ -81,6 +81,9 @@ private:
 	 */
 	Type* m_type;
 
+	/** The size of the type */
+	unsigned int m_typeSize;
+
 	/** The file that contains this grid */
 	io::NetCdfReader *m_inputFile;
 	
@@ -110,6 +113,7 @@ private:
 public:
 	Level()
 		: m_comm(0L), m_numa(0L), m_type(0L),
+		  m_typeSize(0),
 		  m_inputFile(0L), m_dims(0)
 	{
 	}
@@ -118,6 +122,7 @@ public:
 			const numa::Numa &numa,
 			Type &type)
 		: m_comm(&comm), m_numa(&numa), m_type(&type),
+		  m_typeSize(type.size()),
 		  m_inputFile(0L), m_dims(0)
 	{
 	}
@@ -272,6 +277,16 @@ private:
 		return *m_type;
 	}
 	
+	/**
+	 * Does the same as <code>type().size()</code> but faster
+	 *
+	 * @return The size of the type
+	 */
+	unsigned int typeSize() const
+	{
+		return m_typeSize;
+	}
+
 	/**
 	 * @return The input file used for this grid
 	 */

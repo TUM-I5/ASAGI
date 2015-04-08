@@ -92,7 +92,7 @@ public:
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
-		m_buf = new unsigned char[this->type().size_static()
+		m_buf = new unsigned char[this->typeSize()
 				* this->numa().totalThreads()];
 
 		return asagi::Grid::SUCCESS;
@@ -111,7 +111,7 @@ public:
 		std::fill_n(size, MAX_DIMENSIONS, 1);
 
 		// Get the buffer for the current thread
-		unsigned char* threadBuf = &m_buf[this->type().size_static()
+		unsigned char* threadBuf = &m_buf[this->typeSize()
 				* this->numa().threadId()];
 
 		this->type().load(this->inputFile(), index, size, threadBuf);

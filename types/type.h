@@ -90,9 +90,4 @@ protected:
 
 }
 
-// Use this macro in subclasses to implement size(). It assumes you have
-// size_static() defined. We use size() for dynamic linking and size_static()
-// for static linking
-#define TYPE_SIZE_FUNC unsigned int size() const { return size_static(); }
-
 #endif // TYPES_TYPE_H
