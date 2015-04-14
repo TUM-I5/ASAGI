@@ -32,6 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
+ * @copyright 2013-2014 Manuel Fasching <manuel.fasching@tum.de>
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
