@@ -50,7 +50,7 @@ public:
 		executed = 0;
 	}
 
-	void testSetParam(void)
+	void testSaveExec(void)
 	{
 		once.saveExec(*this, &OnceTest::execute);
 		TS_ASSERT_EQUALS(executed, 1);

@@ -1,0 +1,182 @@
+/**
+ * @file
+ *  This file is part of ASAGI.
+ *
+ *  ASAGI is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as
+ *  published by the Free Software Foundation, either version 3 of
+ *  the License, or  (at your option) any later version.
+ *
+ *  ASAGI is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with ASAGI.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Diese Datei ist Teil von ASAGI.
+ *
+ *  ASAGI ist Freie Software: Sie koennen es unter den Bedingungen
+ *  der GNU Lesser General Public License, wie von der Free Software
+ *  Foundation, Version 3 der Lizenz oder (nach Ihrer Option) jeder
+ *  spaeteren veroeffentlichten Version, weiterverbreiten und/oder
+ *  modifizieren.
+ *
+ *  ASAGI wird in der Hoffnung, dass es nuetzlich sein wird, aber
+ *  OHNE JEDE GEWAEHELEISTUNG, bereitgestellt; sogar ohne die implizite
+ *  Gewaehrleistung der MARKTFAEHIGKEIT oder EIGNUNG FUER EINEN BESTIMMTEN
+ *  ZWECK. Siehe die GNU Lesser General Public License fuer weitere Details.
+ *
+ *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
+ *  mit diesem Programm erhalten haben. Wenn nicht, siehe
+ *  <http://www.gnu.org/licenses/>.
+ *
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ */
+
+#ifndef THREADS_SYNC_H
+#define THREADS_SYNC_H
+
+#include <pthread.h>
+
+namespace threads
+{
+
+/**
+ * @brief Synchronizes a set of threads
+ *
+ * {@link startBarrier()} and {@link endBarrier()} act as a barrier together.
+ * In addition, any code in between those function calls is only executed by
+ * one thread at a time.
+ */
+class Sync
+{
+private:
+	/** Number of threads that already synchronized */
+	unsigned int m_syncedThreads;
+
+	/** Mutex used to synchronize the threads */
+	pthread_mutex_t m_mutex;
+
+	/** Condition variable to wait for all threads */
+	pthread_cond_t m_condition;
+
+	/** Pointer to the broadcasted data */
+	void* m_data;
+
+public:
+	Sync()
+		: m_syncedThreads(0),
+		  m_mutex(PTHREAD_MUTEX_INITIALIZER),
+		  m_condition(PTHREAD_COND_INITIALIZER),
+		  m_data(0L)
+	{
+	}
+
+	virtual ~Sync()
+	{
+		pthread_cond_destroy(&m_condition);
+		pthread_mutex_destroy(&m_mutex);
+	}
+
+	/**
+	 * Starts a barrier synchronization
+	 *
+	 * @return True on success, false otherwise
+	 */
+	bool startBarrier()
+	{
+		return pthread_mutex_lock(&m_mutex) == 0;
+	}
+
+	/**
+	 * Waits in the barrier synchronization
+	 *
+	 * @param numThreads Number of threads that should wait in the barrier
+	 * @return True on success, false otherwise
+	 */
+	bool waitBarrier(unsigned int numThreads)
+	{
+		m_syncedThreads++;
+
+		if (m_syncedThreads == numThreads) {
+			// Cleanup for next time
+			m_syncedThreads = 0;
+
+			if (pthread_cond_broadcast(&m_condition) != 0) {
+				pthread_mutex_unlock(&m_mutex);
+				return false;
+			}
+		} else {
+			if (pthread_cond_wait(&m_condition, &m_mutex) != 0) {
+				pthread_mutex_unlock(&m_mutex);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Ends the barrier synchronization
+	 *
+	 * @return True on success, false otherwise
+	 */
+	bool endBarrier()
+	{
+		return pthread_mutex_unlock(&m_mutex) == 0;
+	}
+
+	/**
+	 * Should be called between {@link startBarrier()} and {@link waitBarrier()}
+	 *
+	 * @return The number threads that are already waiting in {@link waitBarrier()}
+	 */
+	unsigned int waiting() const
+	{
+		return m_syncedThreads;
+	}
+
+	/**
+	 * Same as calling {@link startBarrier()} and {@link endBarrier()}
+	 */
+	bool barrier(unsigned int numThreads)
+	{
+		if (!startBarrier())
+			return false;
+		if (!waitBarrier(numThreads))
+			return false;
+		return endBarrier();
+	}
+
+	/**
+	 * Broadcast data to all threads
+	 *
+	 * @param data The data that should be broadcasted (has to be a pointer)
+	 * @param numThreads Number of threads that should share the data
+	 * @param current The thread id of the current thread
+	 * @param root The thread with the original data
+	 * @return True on success, false otherwise
+	 */
+	template<typename T>
+	bool broadcast(T* &data, unsigned int numThreads, unsigned int current, unsigned int root = 0)
+	{
+		if (!startBarrier())
+			return false;
+
+		if (current == root)
+			m_data = data;
+
+		if (!waitBarrier(numThreads))
+			return false;
+
+		data = static_cast<T*>(m_data);
+
+		return endBarrier();
+	}
+};
+
+}
+
+#endif // THREADS_SYNC_H

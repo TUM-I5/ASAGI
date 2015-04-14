@@ -39,7 +39,9 @@
 
 #include <algorithm>
 #include <cassert>
+#include <string>
 
+#include "utils/logger.h"
 #include "utils/stringutils.h"
 
 #include "simplecontainer.h"
@@ -49,6 +51,7 @@
 #include "level/passthrough.h"
 #include "level/fulldist.h"
 #include "transfer/mpifull.h"
+#include "transfer/numafull.h"
 #include "types/arraytype.h"
 #include "types/basictype.h"
 #include "types/structtype.h"
@@ -220,15 +223,18 @@ asagi::Grid::Error grid::Grid::open(const char* filename, unsigned int level)
 			blockSizes[i] = param(sizeName.c_str(), 0u, level); // 0 -> use default
 		}
 
-		return m_containers[m_numa.domainId()]->init(filename,
+		err = m_containers[m_numa.domainId()]->init(filename,
 				param("VARIABLE", "z", level),
 				blockSizes,
 				param("CACHE_SIZE", 128u, level),
 				param("CACHE_HAND_SPREAD", -1, level),
 				level);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
 	}
 
-	return asagi::Grid::SUCCESS;
+	// Make sure everything is setup
+	return m_numa.barrier();
 }
 
 unsigned long grid::Grid::getCounter(const char* name, unsigned int level)
@@ -269,6 +275,7 @@ void grid::Grid::initContainers()
 		CACHED,
 		PASS_THROUGH,
 		FULL_MPI,
+		FULL_MPI_NUMA,
 		UNKNOWN
 	} containerType = UNKNOWN;
 
@@ -304,6 +311,8 @@ void grid::Grid::initContainers()
 
 		if (m_comm.size() > 1 && m_numa.totalDomains() == 1)
 			containerType = FULL_MPI;
+		else if (m_comm.size() > 1 && m_numa.totalDomains() > 1)
+			containerType = FULL_MPI_NUMA;
 		else {
 			assert(m_comm.size() == 1);
 			assert(m_numa.totalDomains() == 1);
@@ -326,7 +335,13 @@ void grid::Grid::initContainers()
 			*it = TypeSelector<SimpleContainer, level::PassThrough, magic::NullType, magic::NullType, typelist>::createContainer(*this);
 			break;
 		case FULL_MPI:
-			*it = TypeSelector<SimpleContainer, level::FullDist, transfer::MPIFull, magic::NullType, typelist>::createContainer(*this);
+			// TODO use no numa
+			*it = TypeSelector<SimpleContainer, level::FullDist,
+				transfer::MPIFull, transfer::NumaFull, typelist>::createContainer(*this);
+			break;
+		case FULL_MPI_NUMA:
+			*it = TypeSelector<SimpleContainer, level::FullDist,
+				transfer::MPIFull, transfer::NumaFull, typelist>::createContainer(*this);
 			break;
 		default:
 			*it = 0L;

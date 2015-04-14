@@ -55,7 +55,7 @@ namespace level
  * 
  * If compiled without MPI, all blocks are local.
  */
-template<class MPIComm, class NumaComm, class Type, class Allocator = allocator::Default>
+template<class MPIComm, class NumaTrans, class Type, class Allocator>
 class Full : public Blocked<Type>
 {
 private:
@@ -63,9 +63,9 @@ private:
 	unsigned char* m_data;
 
 public:
-	Full()
-		: Blocked<Type>(),
-		  m_data(0L)
+	Full(const Full<MPIComm, NumaTrans, Type, Allocator> &other)
+		: Blocked<Type>(other),
+		  m_data(other.m_data)
 	{
 	}
 
@@ -79,7 +79,8 @@ public:
 
 	virtual ~Full()
 	{
-		Allocator::free(m_data);
+		if (&this->numa() && this->numaDomainId() == 0)
+			this->numa().template free<Allocator>(m_data);
 	}
 	
 	asagi::Grid::Error open(
@@ -97,7 +98,7 @@ public:
 			return err;
 
 		// Allocate the memory
-		err = Allocator::allocate(
+		err = this->numa().template allocate<Allocator>(
 				this->typeSize() * this->totalBlockSize() * this->localBlockCount(),
 				m_data);
 		if (err != asagi::Grid::SUCCESS)
@@ -141,7 +142,7 @@ public:
 		unsigned long globalBlockId = this->blockByCoords(index);
 
 		assert(this->blockRank(globalBlockId) == this->comm().rank());
-		assert(this->blockDomain(globalBlockId) == this->numa().domainId());
+		assert(this->blockDomain(globalBlockId) == this->numaDomainId());
 
 		// The offset of the block
 		unsigned long localBlockId = this->blockOffset(globalBlockId);
@@ -169,7 +170,7 @@ protected:
 };
 
 template<class MPIComm, class NumaComm, class Type>
-using FullDefault = Full<MPIComm, NumaComm, Type>;
+using FullDefault = Full<MPIComm, NumaComm, Type, allocator::Default>;
 
 }
 

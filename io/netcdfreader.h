@@ -40,12 +40,14 @@
 
 #include "asagi.h"
 
+#include <algorithm>
 #include <cassert>
 #include <limits>
+#include <mutex>
+#include <string>
 #include <vector>
-#include <algorithm>
+
 #ifndef ASAGI_NOMPI
-#include <mpi.h>
 #ifndef MPI_INCLUDED
 #define MPI_INCLUDED
 #define MPI_INCLUDED_NETCDF
@@ -57,7 +59,7 @@
 #undef MPI_INCLUDED_NETCDF
 #endif // MPI_INCLUDED_NETCDF
 
-#include "utils/logger.h"
+#include "threads/mutex.h"
 
 /**
  * @brief Classes for read/writing files
@@ -87,10 +89,14 @@ private:
 	int m_dimensions;
 	
 	/** The name of the dimensions in the netCDF file */
-	std::vector<std::string> m_names;
+	std::string* m_names;
 
 	/** The size of the dimensions in the netCDF file */
-	std::vector<size_t> m_size;
+	size_t* m_size;
+
+	// Must be declared before the functions
+	static threads::Mutex netcdfLock;
+
 public:
 	NetCdfReader(const char* filename, int rank);
 	virtual ~NetCdfReader();
@@ -132,6 +138,7 @@ public:
 		if (i >= m_dimensions)
 			return 0;
 
+		std::lock_guard<threads::Mutex> lock(netcdfLock);
 		int x;
 		if (nc_inq_varid(m_file, m_names[i].c_str(), &x) != NC_NOERR)
 			return 0;
@@ -154,7 +161,8 @@ public:
 		unsigned long size = getSize(i);
 		if (size == 1)
 			return std::numeric_limits<double>::infinity();
-		
+
+		std::lock_guard<threads::Mutex> lock(netcdfLock);
 		int x;
 		if (nc_inq_varid(m_file, m_names[i].c_str(), &x) != NC_NOERR)
 			return 1;
@@ -202,6 +210,7 @@ public:
 		for (int i = m_dimensions-2; i >= 0; i--)
 			imap[i] = imap[i+1] * size[m_dimensions-i-1];
 
+		std::lock_guard<threads::Mutex> lock(netcdfLock);
 		getVar(actOffset, actSize, imap,
 			static_cast<T*>(block));
 	}
@@ -211,6 +220,7 @@ public:
 	 */
 	unsigned int getVarSize() const
 	{
+		std::lock_guard<threads::Mutex> lock(netcdfLock);
 		nc_type type;
 		nc_inq_vartype(m_file, m_variable, &type);
 		size_t size;

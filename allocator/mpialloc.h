@@ -41,9 +41,14 @@
 #include "asagi.h"
 
 #include "default.h"
+#include "mpi/mpicomm.h"
 
 namespace allocator
 {
+
+#ifdef ASAGI_NOMPI
+typedef MPIAlloc Default;
+#else // ASAGI_NOMPI
 
 /**
  * This allocator uses MPI mechanisms to allocate/free memory
@@ -57,14 +62,12 @@ public:
 	template<typename T>
 	static asagi::Grid::Error allocate(size_t size, T* &ptr)
 	{
-#ifdef ASAGI_NOMPI
-		return Default::allocate(size, ptr);
-#else // ASAGI_NOMPI
+		std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
+
 		if (MPI_Alloc_mem(size * sizeof(T), MPI_INFO_NULL, &ptr) != MPI_SUCCESS)
 			return asagi::Grid::MPI_ERROR;
 
 		return asagi::Grid::SUCCESS;
-#endif // ASAGI_NOMPI
 	}
 
 	/**
@@ -73,13 +76,14 @@ public:
 	template<typename T>
 	static void free(T *ptr)
 	{
-#ifdef ASAGI_NOMPI
-		Default::free(ptr);
-#else // ASAGI_NOMPI
-		MPI_Free_mem(ptr);
-#endif // ASAGI_NOMPI
+		if (ptr) {
+			std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
+			MPI_Free_mem(ptr);
+		}
 	}
 };
+
+#endif // ASAGI_NOMPI
 
 }
 

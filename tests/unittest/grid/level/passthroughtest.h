@@ -43,7 +43,7 @@
 #include "grid/level/passthrough.h"
 #include "types/basictype.h"
 
-class GridTest : public CxxTest::TestSuite
+class PassThroughTest : public CxxTest::TestSuite
 {
 	grid::Grid* c;
 	grid::level::PassThrough<magic::NullType, magic::NullType, types::BasicType<float>>* grid;
@@ -65,6 +65,16 @@ public:
 	void tearDown(void)
 	{
 		delete c;
+	}
+
+	void testTypeSize(void)
+	{
+		TS_ASSERT_EQUALS(grid->typeSize(), sizeof(float));
+	}
+
+	void testNumaDomainId(void)
+	{
+		TS_ASSERT_EQUALS(grid->numaDomainId(), grid->numa().domainId());
 	}
 
 	void testGetXMax(void)

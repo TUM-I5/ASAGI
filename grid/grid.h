@@ -234,7 +234,6 @@ public:
 	}
 };
 
-
 template<template<class Level, class MPIComm, class NumaComm, class Type> class Container,
 	template<class MPIComm, class NumaComm, class Type> class Level,
 	class MPIComm, class NumaComm>

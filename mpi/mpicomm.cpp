@@ -35,37 +35,7 @@
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef THREADS_MUTEX_H
-#define THREADS_MUTEX_H
+#include "mpicomm.h"
 
-#ifdef THREADSAFE
-
-#ifdef USE_PTHREAD
-#include "pthreadmutex.h"
-
-namespace threads
-{
-typedef PthreadMutex Mutex;
-}
-
-#else // USE_PTHREAD
-#include "cxxmutex.h"
-
-namespace threads
-{
-typedef CxxMutex Mutex;
-}
-
-#endif // USE_PTHREAD
-
-#else // THREADSAFE
-#include "noopmutex.h"
-
-namespace threads
-{
-typedef NoopMutex Mutex;
-}
-
-#endif // THREADSAFE
-
-#endif // THREADS_MUTEX_H
+/** Lock to protect all MPI calls */
+mpi::Lock mpi::MPIComm::mpiLock;

@@ -38,11 +38,13 @@
 #ifndef NUMA_NUMA_H
 #define NUMA_NUMA_H
 
+#include "asagi.h"
+
 #include <map>
 #include <pthread.h>
 #include <vector>
 
-#include "asagi.h"
+#include "threads/sync.h"
 
 // Define the size of thread and numa id so we can store 2 ids
 // in one pointer
@@ -55,6 +57,8 @@ typedef id_t uint16_t;
 namespace numa
 {
 
+class NumaComm;
+
 /**
  * Detects and handles NUMA domains
  */
@@ -64,26 +68,26 @@ private:
 	/** Total number of threads */
 	unsigned int m_totalThreads;
 
-	/** Maps from the NUMA domain to our domain identifier */
+	/** Maps from the NUMA domain to the domain identifier */
 	std::map<int, unsigned int> m_domains;
 
 	/** Temporary array to identify if the master thread already found for a domain */
 	std::vector<bool> m_masterThreads;
 
-	/** Number of threads that already synchronized */
-	unsigned int m_syncedThreads;
-
-	/** Mutex used to synchronize the threads */
-	pthread_mutex_t m_mutex;
-
-	/** Condition variable to wait for all threads */
-	pthread_cond_t m_condition;
-
 	/** The pthread key we use to store the domain identifier for each thread */
 	pthread_key_t m_ptkey;
 
+	/** True if the threads/domains are already initialized */
+	bool m_initialized;
+
 	/** True, if the key could not be created */
 	bool m_keyError;
+
+	/** Synchronization mechanism for the threads */
+	mutable threads::Sync m_syncThreads;
+
+	/** Synchronization mechanism for the domain */
+	mutable threads::Sync m_syncDomains;
 public:
 	Numa();
 
@@ -133,6 +137,18 @@ public:
 		uintptr_t ids = reinterpret_cast<std::uintptr_t>(pthread_getspecific(m_ptkey));
 		return ids & ((static_cast<uintptr_t>(1) << sizeof(id_t)*8) - 1);
 	}
+
+	/**
+	 * Synchronizes all threads
+	 */
+	asagi::Grid::Error barrier() const
+	{
+		if (!m_syncThreads.barrier(m_totalThreads))
+			return asagi::Grid::THREAD_ERROR;
+		return asagi::Grid::SUCCESS;
+	}
+
+	NumaComm* createComm() const;
 };
 
 }

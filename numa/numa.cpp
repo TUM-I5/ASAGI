@@ -35,15 +35,15 @@
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "numa.h"
-
 #include <numa.h>
 #include <sched.h>
 
+#include "numa.h"
+#include "numacomm.h"
+
 numa::Numa::Numa()
-	: m_totalThreads(1), m_syncedThreads(0),
-	  m_mutex(PTHREAD_MUTEX_INITIALIZER),
-	  m_condition(PTHREAD_COND_INITIALIZER),
+	: m_totalThreads(1),
+	  m_initialized(false),
 	  m_keyError(false)
 {
 	if (pthread_key_create(&m_ptkey, 0L) != 0)
@@ -54,8 +54,6 @@ numa::Numa::Numa()
 numa::Numa::~Numa()
 {
 	pthread_key_delete(m_ptkey);
-	pthread_cond_destroy(&m_condition);
-	pthread_mutex_destroy(&m_mutex);
 }
 
 /**
@@ -71,6 +69,11 @@ numa::Numa::~Numa()
  */
 asagi::Grid::Error numa::Numa::registerThread(bool &masterThread)
 {
+	if (m_initialized) {
+		masterThread = m_masterThreads[threadId()];
+		return asagi::Grid::SUCCESS;
+	}
+
 	// Get the NUMA domain
 	int cpu = sched_getcpu();
 	if (cpu < 0)
@@ -83,12 +86,16 @@ asagi::Grid::Error numa::Numa::registerThread(bool &masterThread)
 	if (domain < 0)
 		return asagi::Grid::NUMA_ERROR;
 
-	// Lock lock all variables
-	if (pthread_mutex_lock(&m_mutex) != 0)
+	// Lock all variables
+	if (!m_syncThreads.startBarrier())
 		return asagi::Grid::THREAD_ERROR;
 
 	// Get thead id
-	unsigned int threadId = m_syncedThreads;
+	unsigned int threadId = m_syncThreads.waiting();
+
+	// Detect if we are the master thread
+	if (m_masterThreads.size() <= threadId)
+		m_masterThreads.resize(threadId+1);
 
 	// Get the domain id from the NUMA domain
 	unsigned int domainId;
@@ -98,36 +105,24 @@ asagi::Grid::Error numa::Numa::registerThread(bool &masterThread)
 		// new domain
 		domainId = m_domains.size();
 		m_domains[domain] = domainId;
-	} else
+
+		// This is the master thread
+		m_masterThreads[threadId] = masterThread = true;
+	} else {
 		domainId = domIt->second;
 
-	// Detect if we are the master thread
-	if (m_masterThreads.size() <= domainId)
-		m_masterThreads.resize(domainId+1);
-	masterThread = !m_masterThreads[domainId];
-	m_masterThreads[domainId] = true;
-
-	// This thread has finished
-	m_syncedThreads++;
-
-	if (m_syncedThreads == m_totalThreads) {
-		// Cleanup for next iteration
-		m_syncedThreads = 0;
-		std::fill(m_masterThreads.begin(), m_masterThreads.end(), false);
-
-		if (pthread_cond_broadcast(&m_condition) != 0) {
-			pthread_mutex_unlock(&m_mutex);
-			return asagi::Grid::THREAD_ERROR;
-		}
-	} else {
-		if (pthread_cond_wait(&m_condition, &m_mutex) != 0) {
-			pthread_mutex_unlock(&m_mutex);
-			return asagi::Grid::THREAD_ERROR;
-		}
+		// This is not the master thread
+		masterThread = false;
 	}
 
-	// Synchronization done
-	if (pthread_mutex_unlock(&m_mutex) != 0)
+	// Last thread?
+	if (m_syncThreads.waiting() >= m_totalThreads-1)
+		m_initialized = true;
+
+	// Wait for all threads
+	if (!m_syncThreads.waitBarrier(m_totalThreads))
+		return asagi::Grid::THREAD_ERROR;
+	if (!m_syncThreads.endBarrier())
 		return asagi::Grid::THREAD_ERROR;
 
 	// Check if the key was created successfully
@@ -141,4 +136,24 @@ asagi::Grid::Error numa::Numa::registerThread(bool &masterThread)
 		return asagi::Grid::THREAD_ERROR;
 
 	return asagi::Grid::SUCCESS;
+}
+
+/**
+ * Creates <b>one</b> NUMA communicator.
+ * This is a collective operation among all NUMA domains
+ *
+ * @warning The caller is responsible for freeing the communicator.
+ */
+numa::NumaComm* numa::Numa::createComm() const
+{
+	NumaComm* comm;
+	unsigned int current = domainId();
+
+	if (current == 0)
+		comm = new NumaComm(*this);
+
+	if (!m_syncDomains.broadcast(comm, totalDomains(), current))
+		return 0L;
+
+	return comm;
 }

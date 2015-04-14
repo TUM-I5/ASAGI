@@ -88,10 +88,13 @@ private:
 #endif
 
 public:
-	Blocked()
-		: Level<Type>(),
-		  m_totalBlocks(0), m_totalBlockSize(0)
+	Blocked(const Blocked<Type> &other)
+		: Level<Type>(other),
+		  m_totalBlocks(other.m_totalBlocks),
+		  m_totalBlockSize(other.m_totalBlockSize)
 	{
+		// We do not copy m_blocks and m_blockSize here
+		// Since they should not be filled anyway at this point
 	}
 
 	Blocked(const mpi::MPIComm &comm,
@@ -183,53 +186,6 @@ protected:
 		return asagi::Grid::SUCCESS;
 	}
 
-#if 0
-private:
-	void getAt(void* buf, types::Type::converter_t converter,
-		   double x, double y = 0, double z = 0);
-#endif
-
-#if 0
-	/**
-	 * @return The number of cells in x dimension
-	 */
-	unsigned long getXDim() const
-	{
-		return m_dim[0];
-	}
-	/**
-	 * @return The number of cells in y dimension
-	 */
-	unsigned long getYDim() const
-	{
-		return m_dim[1];
-	}
-	/**
-	 * @return The number of cells in z dimension
-	 */
-	unsigned long getZDim() const
-	{
-		return m_dim[2];
-	}
-	
-	/**
-	 * @return The number of blocks we should store on this node
-	 */
-	unsigned long getBlocksPerNode() const
-	{
-		return m_blocksPerNode;
-	}
-	
-	/**
-	 * @return The difference of the 2 hands in the clock algorithm
-	 *  configured by the user
-	 */
-	long getHandsDiff() const
-	{
-		return m_handSpread;
-	}
-#endif
-	
 	/**
 	 * @return The number of values in each direction in a block
 	 */
@@ -267,7 +223,7 @@ private:
 	 */
 	unsigned long nodeBlockCount() const
 	{
-		return (totalBlockCount() + this->comm().size() - 1) / this->comm().size();
+		return localBlockCount() * this->numa().totalDomains();
 	}
 
 	/**
@@ -275,7 +231,8 @@ private:
 	 */
 	unsigned long localBlockCount() const
 	{
-		return (nodeBlockCount() + this->numa().totalDomains() - 1) / this->numa().totalDomains();
+		unsigned long cores = this->numa().totalDomains() * this->comm().size();
+		return (totalBlockCount() + cores - 1) / cores;
 	}
 
 	/**
@@ -316,7 +273,7 @@ private:
 #ifdef ROUND_ROBIN
 		return id % this->comm().size();
 #else // ROUND_ROBIN
-		return id / localBlockCount();
+		return id / nodeBlockCount();
 #endif // ROUND_ROBIN
 	}
 	
@@ -329,7 +286,20 @@ private:
 #ifdef ROUND_ROBIN
 		return (id / this->comm().size()) % this->numa().totalDomains();
 #else // ROUND_ROBIN
-		return (id % nodeBlockCount()) / localBlockCount();
+		return (id / localBlockCount()) % this->numa().totalDomains();
+#endif // ROUND_ROBIN
+	}
+
+	/**
+	 * @param id Global block id
+	 * @return The offset of the block on the corresponding NUMA domain
+	 */
+	unsigned long blockOffset(unsigned long id) const
+	{
+#ifdef ROUND_ROBIN
+		return id / this->comm().size() / this->numa().totalDomains();
+#else // ROUND_ROBIN
+		return id % localBlockCount();
 #endif // ROUND_ROBIN
 	}
 
@@ -337,15 +307,11 @@ private:
 	 * @param id Global block id
 	 * @return The offset of the block on the corresponding rank
 	 */
-	unsigned long blockOffset(unsigned long id) const
+	unsigned long blockNodeOffset(unsigned long id) const
 	{
-#ifdef ROUND_ROBIN
-		return (id / this->comm().size()) / this->numa().totalDomains();
-#else // ROUND_ROBIN
-		return id % localBlockCount();
-#endif // ROUND_ROBIN
+		return blockOffset(id) + blockDomain(id) * localBlockCount();
 	}
-	
+
 	/**
 	 * Converts a local block id to a global block id
 	 *
@@ -357,10 +323,10 @@ private:
 		assert(id < localBlockCount());
 
 #ifdef ROUND_ROBIN
-		return (id * this->numa().totalDomains() + this->numa().domainId())
+		return (id * this->numa().totalDomains() + this->numaDomainId())
 				* this->comm().size() + this->comm().rank();
 #else // ROUND_ROBIN
-		return id + (this->numa().domainId() + this->comm().rank() * this->numa().totalDomains())
+		return id + (this->numaDomainId() + this->comm().rank() * this->numa().totalDomains())
 				* localBlockCount();
 #endif // ROUND_ROBIN
 	}
@@ -383,27 +349,6 @@ private:
 
 		return offset;
 	}
-
-#if 0
-	/**
-	 * Subclasses should override this and return false, if they still need
-	 * to access the input file after initialization.
-	 * 
-	 * @return True if the input file should be accessable after
-	 * {@link init()} was called.
-	 */
-	virtual bool keepFileOpen() const
-	{
-		return false;
-	}
-	
-	/**
-	 * Writes the value at the specified index into the buffer, after
-	 * converting it with the converter
-	 */
-	virtual void getAt(void* buf, types::Type::converter_t converter,
-		unsigned long x, unsigned long y = 0, unsigned long z = 0) = 0;
-#endif
 };
 
 }

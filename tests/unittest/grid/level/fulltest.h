@@ -43,17 +43,17 @@
 #include "grid/level/full.h"
 #include "types/basictype.h"
 
-class GridTest : public CxxTest::TestSuite
+class FullTest : public CxxTest::TestSuite
 {
 	grid::Grid* c;
-	grid::level::Full<magic::NullType, magic::NullType, types::BasicType<float>>* grid;
+	grid::level::FullDefault<magic::NullType, magic::NullType, types::BasicType<float>>* grid;
 public:
 	void setUp(void)
 	{
 		// Set up a 1d grid
 		c = new grid::Grid(asagi::Grid::FLOAT);
 		c->open("../../../" NC_1D);
-		grid = &dynamic_cast<grid::SimpleContainer<grid::level::Full<magic::NullType,
+		grid = &dynamic_cast<grid::SimpleContainer<grid::level::FullDefault<magic::NullType,
 					magic::NullType, types::BasicType<float>>,
 				magic::NullType, magic::NullType,
 				types::BasicType<float>>*>(c->m_containers[0])->m_levels[0];

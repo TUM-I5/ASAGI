@@ -40,12 +40,15 @@
 
 #include "asagi.h"
 
+#include <cassert>
+#include <utility>
+
 #include "utils/logger.h"
 
 #include "grid/constants.h"
 #include "io/netcdfreader.h"
 #include "mpi/mpicomm.h"
-#include "numa/numa.h"
+#include "numa/numacomm.h"
 #include "perf/counter.h"
 
 namespace types
@@ -70,10 +73,13 @@ class Level
 {
 private:
 	/** The MPI Communicator used for this level */
-	const mpi::MPIComm* m_comm;
+	const mpi::MPIComm* m_mpiComm;
 
-	/** NUMA "communicator" for this level */
-	const numa::Numa* m_numa;
+	/** NUMA communicator for this level */
+	numa::NumaComm* m_numaComm;
+
+	/** The NUMA domain identifier for this instance */
+	unsigned int m_numaDomainId;
 
 	/**
 	 * The type of values we save in the grid.
@@ -111,18 +117,21 @@ private:
 	perf::Counter m_counter;
 
 public:
-	Level()
-		: m_comm(0L), m_numa(0L), m_type(0L),
-		  m_typeSize(0),
-		  m_inputFile(0L), m_dims(0)
+	Level(const Level &other)
+		: m_mpiComm(other.m_mpiComm), m_numaComm(other.m_numaComm->copy()),
+		  m_numaDomainId(other.m_numaDomainId), m_type(other.m_type),
+		  m_typeSize(other.m_typeSize),
+		  m_inputFile(other.m_inputFile), m_dims(other.m_dims)
 	{
+		assert(m_numaDomainId == m_numaComm->domainId());
 	}
 
 	Level(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
-		: m_comm(&comm), m_numa(&numa), m_type(&type),
-		  m_typeSize(type.size()),
+		: m_mpiComm(&comm), m_numaComm(numa.createComm()),
+		  m_numaDomainId(numa.domainId()), m_type(&type),
+		  m_typeSize(0L),
 		  m_inputFile(0L), m_dims(0)
 	{
 	}
@@ -130,6 +139,8 @@ public:
 	virtual ~Level()
 	{
 		delete m_inputFile;
+		if (m_numaDomainId == 0)
+			delete m_numaComm;
 	}
 
 	/**
@@ -149,6 +160,10 @@ protected:
 			const char* varname,
 			grid::ValuePosition valuePos)
 	{
+		// Check for NUMA errors from the constructor
+		if (m_numaComm == 0L)
+			return asagi::Grid::THREAD_ERROR;
+
 		asagi::Grid::Error err;
 
 		double scaling[MAX_DIMENSIONS];
@@ -170,7 +185,7 @@ protected:
 			scaling[i] = m_inputFile->getScaling(i);
 		}
 
-	#if 0
+#if 0
 		// Set time dimension
 		if (m_timeDimension == -1) {
 			// Time grid, but time dimension not specified
@@ -185,11 +200,11 @@ protected:
 				<< DIMENSION_NAMES[m_timeDimension] << "to 1";
 			m_blockSize[m_timeDimension] = 1;
 		}
-	#endif
+#endif
 
 		// Set default block size and calculate number of blocks
 		for (unsigned int i = 0; i < m_dims; i++) {
-	#if 0
+#if 0
 			if (m_blockSize[i] == 0)
 				// Setting default block size, if not yet set
 				m_blockSize[i] = 50;
@@ -203,7 +218,7 @@ protected:
 
 			// Integer way of rounding up
 			m_blocks[i] = (m_dim[i] + m_blockSize[i] - 1) / m_blockSize[i];
-	#endif
+#endif
 
 			m_scalingInv[i] = getInvScaling(scaling[i]);
 
@@ -227,7 +242,7 @@ protected:
 			}
 		}
 
-	#if 0
+#if 0
 		// Set default cache size
 		if (m_blocksPerNode < 0)
 			// Default value
@@ -238,6 +253,8 @@ protected:
 		err = m_type->check(*m_inputFile);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
+
+		m_typeSize = m_type->size();
 
 #if 0
 		// Init subclass
@@ -259,14 +276,38 @@ private:
 		   double x, double y = 0, double z = 0);
 #endif
 
+	/**
+	 * @return The MPI communicator
+	 */
 	const mpi::MPIComm& comm() const
 	{
-		return *m_comm;
+		return *m_mpiComm;
 	}
 
-	const numa::Numa& numa() const
+	/**
+	 * @return The NUMA communicator
+	 */
+	numa::NumaComm& numa()
 	{
-		return *m_numa;
+		return *m_numaComm;
+	}
+
+	/**
+	 * @copydoc numa()
+	 */
+	const numa::NumaComm& numa() const
+	{
+		return *m_numaComm;
+	}
+
+	/**
+	 * @return The domain ID on which this level was created.
+	 *  Should be the same as <code>numa().domainId()</code>
+	 *  except for the destructor.
+	 */
+	unsigned int numaDomainId() const
+	{
+		return m_numaDomainId;
 	}
 
 	/**

@@ -54,8 +54,8 @@ namespace level
  * across all MPI tasks. If a block is not available, it is transfered via
  * MPI and stored in a cache.
  */
-template<class MPITrans, class NumaComm, class Type>
-class FullDist : public Full<MPITrans, NumaComm, Type, allocator::MPIAlloc>
+template<class MPITrans, class NumaTrans, class Type>
+class FullDist : public Full<MPITrans, NumaTrans, Type, allocator::MPIAlloc>
 {
 private:
 	/** Manager used to control the cache */
@@ -64,16 +64,21 @@ private:
 	/** The MPI transfer class */
 	MPITrans m_mpiTrans;
 
+	/** The NUMA transfer class */
+	NumaTrans m_numaTrans;
+
 public:
-	FullDist()
-		: Full<MPITrans, NumaComm, Type, allocator::MPIAlloc>()
+	FullDist(const FullDist<MPITrans, NumaTrans, Type> &other)
+		: Full<MPITrans, NumaTrans, Type, allocator::MPIAlloc>(other),
+		  m_cacheManager(other.m_cacheManager),
+		  m_mpiTrans(other.m_mpiTrans), m_numaTrans(other.m_numaTrans)
 	{
 	}
 
 	FullDist(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
-		: Full<MPITrans, NumaComm, Type, allocator::MPIAlloc>(comm, numa, type)
+		: Full<MPITrans, NumaTrans, Type, allocator::MPIAlloc>(comm, numa, type)
 	{
 	}
 
@@ -90,7 +95,7 @@ public:
 		int cacheHandSpread,
 		grid::ValuePosition valuePos)
 	{
-		asagi::Grid::Error err = Full<MPITrans, NumaComm, Type, allocator::MPIAlloc>::open(
+		asagi::Grid::Error err = Full<MPITrans, NumaTrans, Type, allocator::MPIAlloc>::open(
 				filename, varname,
 				blockSize, timeDimension,
 				cacheSize, cacheHandSpread,
@@ -107,8 +112,15 @@ public:
 
 		// Initialize the MPI transfer class
 		err = m_mpiTrans.init(this->data(),
-				this->localBlockCount(), this->totalBlockSize(), this->typeSize(),
-				this->type(), this->comm());
+				this->localBlockCount(), this->totalBlockSize(),
+				this->type(), this->comm(), this->numa());
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
+		// Initialize NUMA transfer class
+		err = m_numaTrans.init(this->data(),
+				this->localBlockCount(), this->totalBlockSize(),
+				this->type(), this->comm(), this->numa());
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
@@ -126,8 +138,8 @@ public:
 		unsigned long globalBlockId = this->blockByCoords(index);
 
 		if (this->blockRank(globalBlockId) == this->comm().rank()
-				&& this->blockDomain(globalBlockId) == this->numa().domainId()) {
-			Full<MPITrans, NumaComm, Type, allocator::MPIAlloc>::getAt(buf, pos);
+				&& this->blockDomain(globalBlockId) == this->numaDomainId()) {
+			Full<MPITrans, NumaTrans, Type, allocator::MPIAlloc>::getAt(buf, pos);
 			return;
 		}
 
@@ -141,11 +153,18 @@ public:
 
 		if (static_cast<long>(globalBlockId) != oldGlobalBlockId) {
 			// Cache not filled, do this first
-			this->incCounter(perf::Counter::MPI);
 
-			m_mpiTrans.transfer(this->blockRank(globalBlockId),
-					this->blockOffset(globalBlockId),
-					cache);
+			if (m_numaTrans.transfer(globalBlockId,
+					this->blockRank(globalBlockId), this->blockDomain(globalBlockId),
+					this->blockOffset(globalBlockId), cache)) {
+				this->incCounter(perf::Counter::NUMA);
+			} else {
+				this->incCounter(perf::Counter::MPI);
+
+				m_mpiTrans.transfer(this->blockRank(globalBlockId),
+						this->blockNodeOffset(globalBlockId),
+						cache);
+			}
 		}
 
 		// Compute the offset in the block
@@ -161,9 +180,6 @@ public:
 	}
 
 #if 0
-private:
-	/** MPI window for communication */
-	MPI_Win m_window;
 public:
 	DistStaticGrid(const GridContainer &container,
 		unsigned int hint = asagi::Grid::NO_HINT);

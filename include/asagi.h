@@ -48,10 +48,6 @@
 #endif
 
 #ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
 
 /**
  * @internal
@@ -429,6 +425,10 @@ typedef enum {
 	ASAGI_MULTIPLE_TOPGRIDS,
 	ASAGI_INVALID_VAR_SIZE
 } asagi_error;
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /**
