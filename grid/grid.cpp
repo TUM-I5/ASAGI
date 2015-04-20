@@ -52,6 +52,7 @@
 #include "level/fulldist.h"
 #include "transfer/mpifull.h"
 #include "transfer/numafull.h"
+#include "transfer/numano.h"
 #include "types/arraytype.h"
 #include "types/basictype.h"
 #include "types/structtype.h"
@@ -335,9 +336,8 @@ void grid::Grid::initContainers()
 			*it = TypeSelector<SimpleContainer, level::PassThrough, magic::NullType, magic::NullType, typelist>::createContainer(*this);
 			break;
 		case FULL_MPI:
-			// TODO use no numa
 			*it = TypeSelector<SimpleContainer, level::FullDist,
-				transfer::MPIFull, transfer::NumaFull, typelist>::createContainer(*this);
+				transfer::MPIFull, transfer::NumaNo, typelist>::createContainer(*this);
 			break;
 		case FULL_MPI_NUMA:
 			*it = TypeSelector<SimpleContainer, level::FullDist,
