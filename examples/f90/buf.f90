@@ -7,22 +7,27 @@ program buf
   
   integer :: grid_id
   integer :: error
+  real( kind=c_double ), dimension(2) :: pos
   real, allocatable, target :: value
 
   call MPI_Init( error )
   
-  grid_id = grid_create( GRID_FLOAT )
+  grid_id = asagi_grid_create( ASAGI_FLOAT )
 
-  if( grid_open( grid_id, "../data/tohoku_1850m_bath.nc" ) /= GRID_SUCCESS ) then
+  if( asagi_grid_open( grid_id, "tests/2dgrid.nc" ) /= ASAGI_SUCCESS ) then
     write (*,*) 'Could not load file'
     call exit(1)
   end if
 
-  allocate( value )
-  call grid_get_buf_2d( grid_id, c_loc( value ), -1.d+0, -5005.32d+0 )
-  write (*,*) "Value at -1x-5005.32:", value
+  call asagi_grid_set_comm( grid_id, MPI_COMM_WORLD )
 
-  call grid_close( grid_id )
+  allocate( value )
+  pos(1) = 1.0
+  pos(2) = 50.3
+  call asagi_grid_get_buf( grid_id, c_loc( value ), pos )
+  write (*,*) "Value at 1x50.3:", value
+
+  call asagi_grid_close( grid_id )
 
   call MPI_Finalize( error )
   

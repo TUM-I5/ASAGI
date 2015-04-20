@@ -17,8 +17,8 @@ include_directories( SYSTEM ${MPI_Fortran_INCLUDE_PATH} )
 add_executable( f90_simple
 	${SimpleF90Sources} )
 target_link_libraries( f90_simple
-	asagi
-	${MPI_Fortran_LIBRARIES} )
+	${asagiTarget} ${asagiLibs}
+	${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES} )
 set_target_properties( f90_simple PROPERTIES
 	LINKER_LANGUAGE Fortran
 	OUTPUT_NAME simple )
@@ -27,8 +27,8 @@ set_target_properties( f90_simple PROPERTIES
 add_executable( f90_buf
 	${BufF90Sources} )
 target_link_libraries( f90_buf
-	asagi
-	${MPI_Fortran_LIBRARIES} )
+	${asagiTarget} ${asagiLibs}
+	${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES} )
 set_target_properties( f90_buf PROPERTIES
 	LINKER_LANGUAGE Fortran
 	OUTPUT_NAME buf )

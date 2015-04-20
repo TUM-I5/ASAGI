@@ -75,6 +75,11 @@ void f90asagi_grid_set_comm(int grid_id, int comm)
 #endif // ASAGI_NOMPI
 }
 
+void f90asagi_grid_set_threads(int grid_id, int threads)
+{
+	grid::Grid::f2c(grid_id)->setThreads(threads);
+}
+
 void f90asagi_grid_set_param(int grid_id, const char* name,
 	const char* value, int level)
 {
@@ -118,7 +123,7 @@ int f90asagi_grid_get_int(int grid_id, double* pos, int level)
 {
 	return grid::Grid::f2c(grid_id)->getInt(pos, level);
 }
-long f90asagi_grid_get_long_(int grid_id, double* pos, int level)
+long f90asagi_grid_get_long(int grid_id, double* pos, int level)
 {
 	return grid::Grid::f2c(grid_id)->getLong(pos, level);
 }
@@ -138,7 +143,7 @@ void f90asagi_grid_get_buf(int grid_id, void* buf, double* pos,
 
 // destructor
 
-void f90grid_close(int grid_id)
+void f90asagi_grid_close(int grid_id)
 {
 	delete grid::Grid::f2c(grid_id);
 }

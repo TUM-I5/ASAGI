@@ -70,18 +70,10 @@ private:
 	const ValuePosition m_valuePos;
 
 protected:
-	/** Minimum in x dimension (set by subclasses) */
-	double m_minX;
-	/** Minimum in y dimension (set by subclasses) */
-	double m_minY;
-	/** Minimum in z dimension (set by subclasses) */
-	double m_minZ;
-	/** Maximum in x dimension (set by subclasses) */
-	double m_maxX;
-	/** Maximum in y dimension (set by subclasses) */
-	double m_maxY;
-	/** Maximum in z dimension (set by subclasses) */
-	double m_maxZ;
+	/** Minimum in each dimension (set by subclasses) */
+	double m_min[MAX_DIMENSIONS];
+	/** Maximum in each dimension (set by subclasses) */
+	double m_max[MAX_DIMENSIONS];
 
 public:
 	Container(const mpi::MPIComm &comm,
@@ -110,15 +102,24 @@ public:
 			int cacheHandSpread,
 			unsigned int level) = 0;
 	
+	/**
+	 * @return The minimum range of the grid in dimension <code>n</code>
+	 */
 	double getMin(unsigned int n) const
 	{
-		// TODO
-		return m_minX;
+		assert(n < MAX_DIMENSIONS);
+
+		return m_min[n];
 	}
+
+	/**
+	 * @return The maximum range of the grid in dimension <code>n</code>
+	 */
 	double getMax(unsigned int n) const
 	{
-		// TODO
-		return m_maxX;
+		assert(n < MAX_DIMENSIONS);
+
+		return m_max[n];
 	}
 	
 	double getDelta(unsigned int n, unsigned int level) const

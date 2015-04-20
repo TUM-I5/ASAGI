@@ -85,6 +85,11 @@ void asagi_grid_set_comm(asagi_grid* handle, MPI_Comm comm)
 }
 #endif // ASAIG_NOMPI
 
+void asagi_grid_set_threads(asagi_grid* handle, unsigned int threads)
+{
+	handle->setThreads(threads);
+}
+
 void asagi_grid_set_param(asagi_grid* handle, const char* name,
 	const char* value, unsigned int level)
 {

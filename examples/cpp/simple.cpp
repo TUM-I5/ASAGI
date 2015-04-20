@@ -29,7 +29,6 @@ int main (int argc, char **argv)
 	if (rank == 0) {
 		printf("Range X: %f - %f\n", grid->getMin(0), grid->getMax(0));
 		printf("Range Y: %f - %f\n", grid->getMin(1), grid->getMax(1));
-		printf("Range Z: %f - %f\n", grid->getMin(2), grid->getMax(2));
 	}
 	
 	if (rank == 0) {

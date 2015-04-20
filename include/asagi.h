@@ -116,32 +116,6 @@ public:
 		INVALID_VAR_SIZE
 	};
 	
-	/** Does not provide any hint for ASAGI (default) */
-	static const unsigned int NO_HINT = 0x0;
-	/** One dimension in the grid is a time dimension */
-	static const unsigned int HAS_TIME = 0x1;
-	/**
-	 * Don't use any MPI, even when compiled with MPI support
-	 * (MPI_Init may not be called before creating the grid)
-	 */
-	static const unsigned int NOMPI = 0x2;
-	/**
-	 * ASAGI should use a small cache. Less memory is used, but
-	 * more cache misses occur.
-	 */
-	static const unsigned int SMALL_CACHE = 0x4;
-	/** Use this, if you are going to load a large grid with ASAGI */
-	static const unsigned int LARGE_GRID = 0x8;
-	/**
-	 * Use an adaptive container. Allows you to load multiple grids with
-	 * the same level of detail. Not fully tested yet.
-	 */
-	static const unsigned int ADAPTIVE = 0x10;
-	/**
-	 * Use ASAGI only as a wrapper for the underlying I/O library.
-	 * ASAGI does not cache any values. Works also without MPI.
-	 */
-	static const unsigned int PASS_THROUGH = 0x20;
 public:
 	/**
 	 * @ingroup cxx_interface
@@ -463,6 +437,14 @@ asagi_grid* asagi_grid_create_struct(unsigned int count,
  */
 void asagi_grid_set_comm(asagi_grid* handle, MPI_Comm comm);
 #endif
+
+/**
+ * @ingroup c_interface
+ *
+ * @see asagi::Grid::setThreads()
+ */
+void asagi_grid_set_threads(asagi_grid* handle, unsigned int threads);
+
 /**
  * @ingroup c_interface
  * 

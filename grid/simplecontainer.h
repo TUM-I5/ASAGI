@@ -81,7 +81,7 @@ public:
 			m_levels.resize(level+1,
 					Level(this->comm(), this->numa(), this->type()));
 
-		return m_levels[level].open(
+		asagi::Grid::Error err = m_levels[level].open(
 				filename,
 				varname,
 				blockSize,
@@ -89,6 +89,18 @@ public:
 				cacheSize,
 				cacheHandSpread,
 				this->valuePosition());
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
+		if (level == 0) {
+			// Set min/max/...
+			for (unsigned int i = 0; i < m_levels[0].dimensions(); i++) {
+				this->m_min[i] = m_levels[0].min(i);
+				this->m_max[i] = m_levels[0].max(i);
+			}
+		}
+
+		return asagi::Grid::SUCCESS;
 	}
 
 	CONTAINER_GETVAR

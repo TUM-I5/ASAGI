@@ -151,6 +151,34 @@ public:
 		return m_counter.get(type);
 	}
 	
+	/**
+	 * @return The number of dimensions
+	 */
+	unsigned int dimensions() const
+	{
+		return m_dims;
+	}
+
+	/**
+	 * The minimum range of the grid in dimension <code>n</code>
+	 */
+	double min(unsigned int n) const
+	{
+		assert(n < dimensions());
+
+		return m_min[n];
+	}
+
+	/**
+	 * The maximum range of the grid in dimension <code>n</code>
+	 */
+	double max(unsigned int n) const
+	{
+		assert(n < dimensions());
+
+		return m_max[n];
+	}
+
 protected:
 	/**
 	 * Initialize the grid level
@@ -256,17 +284,6 @@ protected:
 
 		m_typeSize = m_type->size();
 
-#if 0
-		// Init subclass
-		error = init();
-
-		if (!keepFileOpen()) {
-			// input file no longer needed, so we close
-			delete m_inputFile;
-			m_inputFile = 0L;
-		}
-	#endif
-
 		return asagi::Grid::SUCCESS;
 	}
 
@@ -335,21 +352,13 @@ private:
 	{
 		return *m_inputFile;
 	}
-	
-	/**
-	 * @return The number of dimensions
-	 */
-	unsigned int dimensions() const
-	{
-		return m_dims;
-	}
 
 	/**
-	 * @return The number of cells in dimension i
+	 * @return The number of cells in dimension n
 	 */
-	unsigned long size(unsigned int i) const
+	unsigned long size(unsigned int n) const
 	{
-		return m_dim[i];
+		return m_dim[n];
 	}
 
 	/**
@@ -497,31 +506,6 @@ private:
 		return id + getMPIRank() * getLocalBlockCount();
 #endif // ROUND_ROBIN
 	}
-	
-	/**
-	 * This function is called after opening the NetCDF file. Subclasses
-	 * should override it to initialize the grid.
-	 */
-	virtual asagi::Grid::Error init() = 0;
-	
-	/**
-	 * Subclasses should override this and return false, if they still need
-	 * to access the input file after initialization.
-	 * 
-	 * @return True if the input file should be accessable after
-	 * {@link init()} was called.
-	 */
-	virtual bool keepFileOpen() const
-	{
-		return false;
-	}
-	
-	/**
-	 * Writes the value at the specified index into the buffer, after
-	 * converting it with the converter
-	 */
-	virtual void getAt(void* buf, types::Type::converter_t converter,
-		unsigned long x, unsigned long y = 0, unsigned long z = 0) = 0;
 #endif
 
 	/**
