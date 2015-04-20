@@ -51,6 +51,7 @@
 #include "level/passthrough.h"
 #include "level/fulldist.h"
 #include "transfer/mpifull.h"
+#include "transfer/mpino.h"
 #include "transfer/numafull.h"
 #include "transfer/numano.h"
 #include "types/arraytype.h"
@@ -275,6 +276,7 @@ void grid::Grid::initContainers()
 		FULL,
 		CACHED,
 		PASS_THROUGH,
+		FULL_NUMA,
 		FULL_MPI,
 		FULL_MPI_NUMA,
 		UNKNOWN
@@ -310,7 +312,9 @@ void grid::Grid::initContainers()
 			logWarning(m_comm.rank()) << "ASAGI: Assuming FULL";
 		}
 
-		if (m_comm.size() > 1 && m_numa.totalDomains() == 1)
+		if (m_comm.size() == 1 && m_numa.totalDomains() > 1)
+			containerType = FULL_NUMA;
+		else if (m_comm.size() > 1 && m_numa.totalDomains() == 1)
 			containerType = FULL_MPI;
 		else if (m_comm.size() > 1 && m_numa.totalDomains() > 1)
 			containerType = FULL_MPI_NUMA;
@@ -335,12 +339,16 @@ void grid::Grid::initContainers()
 		case PASS_THROUGH:
 			*it = TypeSelector<SimpleContainer, level::PassThrough, magic::NullType, magic::NullType, typelist>::createContainer(*this);
 			break;
+		case FULL_NUMA:
+			*it = TypeSelector<SimpleContainer, level::FullDistDefault,
+				transfer::MPINo, transfer::NumaFull, typelist>::createContainer(*this);
+			break;
 		case FULL_MPI:
-			*it = TypeSelector<SimpleContainer, level::FullDist,
+			*it = TypeSelector<SimpleContainer, level::FullDistMPI,
 				transfer::MPIFull, transfer::NumaNo, typelist>::createContainer(*this);
 			break;
 		case FULL_MPI_NUMA:
-			*it = TypeSelector<SimpleContainer, level::FullDist,
+			*it = TypeSelector<SimpleContainer, level::FullDistMPI,
 				transfer::MPIFull, transfer::NumaFull, typelist>::createContainer(*this);
 			break;
 		default:

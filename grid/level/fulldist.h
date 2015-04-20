@@ -54,8 +54,8 @@ namespace level
  * across all MPI tasks. If a block is not available, it is transfered via
  * MPI and stored in a cache.
  */
-template<class MPITrans, class NumaTrans, class Type>
-class FullDist : public Full<MPITrans, NumaTrans, Type, allocator::MPIAlloc>
+template<class MPITrans, class NumaTrans, class Type, class Allocator>
+class FullDist : public Full<MPITrans, NumaTrans, Type, Allocator>
 {
 private:
 	/** Manager used to control the cache */
@@ -68,8 +68,8 @@ private:
 	NumaTrans m_numaTrans;
 
 public:
-	FullDist(const FullDist<MPITrans, NumaTrans, Type> &other)
-		: Full<MPITrans, NumaTrans, Type, allocator::MPIAlloc>(other),
+	FullDist(const FullDist<MPITrans, NumaTrans, Type, Allocator> &other)
+		: Full<MPITrans, NumaTrans, Type, Allocator>(other),
 		  m_cacheManager(other.m_cacheManager),
 		  m_mpiTrans(other.m_mpiTrans), m_numaTrans(other.m_numaTrans)
 	{
@@ -78,7 +78,7 @@ public:
 	FullDist(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
-		: Full<MPITrans, NumaTrans, Type, allocator::MPIAlloc>(comm, numa, type)
+		: Full<MPITrans, NumaTrans, Type, Allocator>(comm, numa, type)
 	{
 	}
 
@@ -95,7 +95,7 @@ public:
 		int cacheHandSpread,
 		grid::ValuePosition valuePos)
 	{
-		asagi::Grid::Error err = Full<MPITrans, NumaTrans, Type, allocator::MPIAlloc>::open(
+		asagi::Grid::Error err = Full<MPITrans, NumaTrans, Type, Allocator>::open(
 				filename, varname,
 				blockSize, timeDimension,
 				cacheSize, cacheHandSpread,
@@ -139,7 +139,7 @@ public:
 
 		if (this->blockRank(globalBlockId) == this->comm().rank()
 				&& this->blockDomain(globalBlockId) == this->numaDomainId()) {
-			Full<MPITrans, NumaTrans, Type, allocator::MPIAlloc>::getAt(buf, pos);
+			Full<MPITrans, NumaTrans, Type, Allocator>::getAt(buf, pos);
 			return;
 		}
 
@@ -206,6 +206,12 @@ protected:
 	}
 #endif
 };
+
+template<class MPITrans, class NumaTrans, class Type>
+using FullDistDefault = FullDist<MPITrans, NumaTrans, Type, allocator::Default>;
+
+template<class MPITrans, class NumaTrans, class Type>
+using FullDistMPI = FullDist<MPITrans, NumaTrans, Type, allocator::MPIAlloc>;
 
 }
 

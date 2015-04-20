@@ -35,53 +35,52 @@
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef TRANSFER_NUMANO_H
-#define TRANSFER_NUMANO_H
+#ifndef TRANSFER_MPINO_H
+#define TRANSFER_MPINO_H
+
+#include <cassert>
 
 namespace transfer
 {
 
 /**
- * Disables all NUMA copies
+ * Disables MPI transfers
  */
-class NumaNo
+class MPINo
 {
-private:
-
 public:
-	NumaNo()
+	MPINo()
 	{
 	}
 
-	virtual ~NumaNo()
+	virtual ~MPINo()
 	{
 	}
 
 	/**
 	 * Initialize the transfer class
 	 */
-	asagi::Grid::Error init(const unsigned char* data,
+	asagi::Grid::Error init(unsigned char* data,
 			unsigned long blockCount,
 			unsigned long blockSize,
 			const types::Type &type,
 			const mpi::MPIComm &mpiComm,
-			const numa::NumaComm &numaComm)
+			numa::NumaComm &numaComm)
 	{
 		return asagi::Grid::SUCCESS;
 	}
 
 	/**
-	 * @return Always false
+	 * Should never be called
 	 */
-	bool transfer(unsigned long blockId,
-			int remoteRank, unsigned int domainId, unsigned long offset,
+	void transfer(int remoteRank, unsigned long offset,
 			unsigned char *cache)
 	{
-		return false;
+		assert(false);
 	}
 };
 
 }
 
-#endif // TRANSFER_NUMANO_H
+#endif // TRANSFER_MPINO_H
 
