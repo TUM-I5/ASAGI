@@ -7,7 +7,7 @@ before_install:
  - sudo apt-get update -qq
 
 install:
- - sudo apt-get install -qq gfortran openmpi-bin openmpi-common openmpi-dev libnetcdf6 libnetcdf-dev cmake doxygen graphviz texlive-fonts-recommended
+ - sudo apt-get install -qq gfortran openmpi-bin openmpi-common openmpi-dev libnetcdf6 libnetcdf-dev libnuma1 libnuma-dev cmake doxygen graphviz texlive-fonts-recommended
 
 env:
  global:
