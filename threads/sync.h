@@ -194,14 +194,10 @@ public:
 		if (current == root)
 			m_data = data;
 
-		logInfo() << current << m_data;
-
 		if (!waitBarrier(numThreads))
 			return false;
 
 		data = static_cast<T*>(m_data);
-
-		logInfo() << current << data;
 
 		return endBarrier();
 	}
