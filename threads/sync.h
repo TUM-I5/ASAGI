@@ -41,6 +41,8 @@
 
 #include <pthread.h>
 
+#include "utils/logger.h"
+
 namespace threads
 {
 
@@ -63,6 +65,12 @@ private:
 	/** Condition variable to wait for all threads */
 	pthread_cond_t m_condition;
 
+	/** True if we are in the finishing phase */
+	bool m_finishing;
+
+	/** Condition variable for threads waiting for the previous finishing phase */
+	pthread_cond_t m_finishCondition;
+
 	/** Pointer to the broadcasted data */
 	void* m_data;
 
@@ -71,6 +79,8 @@ public:
 		: m_syncedThreads(0),
 		  m_mutex(PTHREAD_MUTEX_INITIALIZER),
 		  m_condition(PTHREAD_COND_INITIALIZER),
+		  m_finishing(false),
+		  m_finishCondition(PTHREAD_COND_INITIALIZER),
 		  m_data(0L)
 	{
 	}
@@ -79,6 +89,7 @@ public:
 	{
 		pthread_cond_destroy(&m_condition);
 		pthread_mutex_destroy(&m_mutex);
+		pthread_cond_destroy(&m_finishCondition);
 	}
 
 	/**
@@ -88,7 +99,14 @@ public:
 	 */
 	bool startBarrier()
 	{
-		return pthread_mutex_lock(&m_mutex) == 0;
+		if (!pthread_mutex_lock(&m_mutex))
+
+		if (m_finishing) {
+			if (pthread_cond_wait(&m_finishCondition, &m_mutex))
+				return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -102,8 +120,8 @@ public:
 		m_syncedThreads++;
 
 		if (m_syncedThreads == numThreads) {
-			// Cleanup for next time
-			m_syncedThreads = 0;
+			// We start the finishing phase now
+			m_finishing = true;
 
 			if (pthread_cond_broadcast(&m_condition) != 0) {
 				pthread_mutex_unlock(&m_mutex);
@@ -114,6 +132,13 @@ public:
 				pthread_mutex_unlock(&m_mutex);
 				return false;
 			}
+		}
+
+		m_syncedThreads--;
+		if (m_syncedThreads == 0) {
+			// Last synchronized threads
+			m_finishing = false;
+			pthread_cond_broadcast(&m_finishCondition);
 		}
 
 		return true;
@@ -169,10 +194,14 @@ public:
 		if (current == root)
 			m_data = data;
 
+		logInfo() << current << m_data;
+
 		if (!waitBarrier(numThreads))
 			return false;
 
 		data = static_cast<T*>(m_data);
+
+		logInfo() << current << data;
 
 		return endBarrier();
 	}
