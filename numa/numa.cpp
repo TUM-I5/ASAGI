@@ -78,11 +78,7 @@ asagi::Grid::Error numa::Numa::registerThread(bool &masterThread)
 	int cpu = sched_getcpu();
 	if (cpu < 0)
 		return asagi::Grid::NUMA_ERROR;
-#if DEBUG_NUMA
-	int domain = cpu;
-#else // DEBUG_NUMA
 	int domain = numa_node_of_cpu(cpu);
-#endif // DEBUG_NUMA
 	if (domain < 0)
 		return asagi::Grid::NUMA_ERROR;
 
@@ -92,6 +88,10 @@ asagi::Grid::Error numa::Numa::registerThread(bool &masterThread)
 
 	// Get thead id
 	unsigned int threadId = m_syncThreads.waiting();
+#if DEBUG_NUMA
+	// Each thread gets its own domain
+	domain = threadId;
+#endif // DEBUG_NUMA
 
 	// Detect if we are the master thread
 	if (m_masterThreads.size() <= threadId)
