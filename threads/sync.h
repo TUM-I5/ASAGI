@@ -41,8 +41,6 @@
 
 #include <pthread.h>
 
-#include "utils/logger.h"
-
 namespace threads
 {
 

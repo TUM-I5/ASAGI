@@ -97,9 +97,10 @@ public:
 	 * @param block The global block id
 	 * @param[out] index If true, the local index of this block,
 	 *  otherwise the value is undefined
+	 * @param access True if the blocked should be marked as accessed
 	 * @return True if this block is stored, false otherwise
 	 */
-	bool getIndex(unsigned long block, unsigned long &index)
+	bool getIndex(unsigned long block, unsigned long &index, bool access = true)
 	{
 		std::unordered_map<unsigned long, unsigned long>::const_iterator value
 			= m_blockToIndex.find(block);
@@ -108,7 +109,8 @@ public:
 			return false;
 
 		index = (*value).second;
-		m_lru.access(index);
+		if (access)
+			m_lru.access(index);
 
 		return true;
 	}

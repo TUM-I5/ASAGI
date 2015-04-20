@@ -45,6 +45,8 @@
 
 using namespace asagi;
 
+void* work(void *p);
+
 int main(int argc, char** argv)
 {
 	MPI_Init(&argc, &argv);
@@ -54,10 +56,48 @@ int main(int argc, char** argv)
 
 	Grid* grid = Grid::create();
 	grid->setComm(MPI_COMM_WORLD);
+	grid->setThreads(2);
+	grid->setParam("NUMA_CACHE", "1");
+
+	pthread_t thread;
+	pthread_create(&thread, 0L, &work, grid);
+
+	void* ret = work(grid);
+	if (ret != 0)
+		return reinterpret_cast<std::intptr_t>(ret);
+
+	pthread_join(thread, &ret);
+	if (ret != 0)
+		return reinterpret_cast<std::intptr_t>(ret);
+
+	unsigned long accesses = grid->getCounter("accesses");
+	if (accesses == 0 || accesses > NC_WIDTH * NC_LENGTH * 2) {
+		logError() << "Counter \"accesses\" should be less than" << (NC_WIDTH*NC_LENGTH * 2)
+				<< "but is" << accesses;
+		return 1;
+	}
+
+#ifdef DEBUG_NUMA
+	if (grid->getCounter("numa_transfers") == 0) {
+		logError() << "Counter \"numa_transfers\" should be greater than zero";
+		return 1;
+	}
+#endif // DEBUG_NUMA
+
+	delete grid;
+
+	MPI_Finalize();
+
+	return 0;
+}
+
+void* work(void* p)
+{
+	Grid* grid = static_cast<Grid*>(p);
 
 	if (grid->open(NC_2D) != Grid::SUCCESS) {
 		logError() << "Could not open file";
-		return 1;
+		return reinterpret_cast<void*>(1L);
 	}
 
 	int value;
@@ -73,21 +113,10 @@ int main(int argc, char** argv)
 			if (grid->getInt(coords) != value) {
 				logError() << "Value at" << i << j << "should be"
 					<< value << "but is" << grid->getInt(coords);
-				return 1;
+				return reinterpret_cast<void*>(1L);
 			}
 		}
 	}
 
-	unsigned long accesses = grid->getCounter("accesses");
-	if (accesses == 0 || accesses > NC_WIDTH * NC_LENGTH * 2) {
-		logError() << "Counter \"accesses\" should be less than" << (NC_WIDTH*NC_LENGTH * 2)
-				<< "but is" << accesses;
-		return 1;
-	}
-	
-	delete grid;
-	
-	MPI_Finalize();
-
-	return 0;
+	return reinterpret_cast<void*>(0L);
 }

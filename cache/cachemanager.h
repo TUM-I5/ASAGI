@@ -143,7 +143,40 @@ public:
 	}
 
 	/**
-	 * Unlock the cache entry previously locked with {@link get}
+	 * Tries to get and lock a specific block.
+	 * Intend to copy blocks between NUMA domains.
+	 * {@link unlock} to unlock the cache entry if the block ID was found.
+	 *
+	 * @param blockId The requested block id
+	 * @param[out] cacheId Identifier that can be passed to {@link unlock} to unlock
+	 *  the cache entry
+	 * @param data A pointer to the request cache entry (if found)
+	 * @return True of the block ID was found, false otherwise
+	 */
+	bool tryGet(unsigned long blockId, unsigned long &cacheId, const unsigned char* &data)
+	{
+		m_cacheMutex.lock();
+
+		if (!m_cacheList.getIndex(blockId, cacheId, false)) {
+			m_cacheMutex.unlock();
+			return false;
+		}
+
+		// Try to lock the block
+		// Use try_lock() to avoid deadlocks
+		if (!m_blockMutexes[cacheId].try_lock()) {
+			m_cacheMutex.unlock();
+			return false;
+		}
+		m_cacheMutex.unlock();
+
+		data = &m_cache[cacheId * m_blockSize];
+
+		return true;
+	}
+
+	/**
+	 * Unlock the cache entry previously locked with {@link get} or {@link tryGet}
 	 *
 	 * @param cacheId The cache entry identifier
 	 */

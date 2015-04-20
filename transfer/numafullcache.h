@@ -35,100 +35,101 @@
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef TRANSFER_NUMAFULL_H
-#define TRANSFER_NUMAFULL_H
+#ifndef TRANSFER_NUMAFULLCACHE_H
+#define TRANSFER_NUMAFULLCACHE_H
 
 #include <cstring>
+
+#include "cache/cachemanager.h"
+#include "threads/mutex.h"
 
 namespace transfer
 {
 
 /**
- * Copies blocks between NUMA assuming full storage
+ * Copies blocks between NUMA assuming full storage.
+ * Will also copy blocks from other caches.
  */
-class NumaFull
+class NumaFullCache : public NumaFull
 {
 private:
-	/** Pointer to the local static memory */
-	const unsigned char* m_data;
+	/** NUMA domain ID of this instance */
+	unsigned int m_domainId;
 
-	/** Number of blocks per NUMA domain */
-	unsigned long m_blockCount;
+	/** Total number of domains */
+	unsigned int m_totalDomains;
 
-	/** Block size (in bytes) */
-	unsigned long m_blockSize;
-
-	/** The rank of this process */
-	int m_rank;
+	/** List of all cache managers */
+	cache::CacheManager<allocator::Default>** m_cacheManager;
 
 public:
-	NumaFull()
-		: m_data(0L),
-		  m_blockCount(0), m_blockSize(0),
-		  m_rank(-1)
+	NumaFullCache()
+		: m_domainId(0), m_totalDomains(0), m_cacheManager(0L)
 	{
 	}
 
-	virtual ~NumaFull()
+	virtual ~NumaFullCache()
 	{
+		if (m_domainId == 0)
+			delete [] m_cacheManager;
 	}
 
-	/**
-	 * Initialize the transfer class
-	 */
+
 	asagi::Grid::Error init(const unsigned char* data,
 			unsigned long blockCount,
 			unsigned long blockSize,
 			const types::Type &type,
 			const mpi::MPIComm &mpiComm,
-			const numa::NumaComm &numaComm,
+			numa::NumaComm &numaComm,
 			cache::CacheManager<allocator::Default> &cacheManager)
 	{
-		m_blockCount = blockCount;
-		m_blockSize = blockSize * type.size();
+		asagi::Grid::Error err = NumaFull::init(data, blockCount, blockSize,
+				type, mpiComm, numaComm, cacheManager);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
 
-		// Compute the start of the memory
-		m_data = &data[- static_cast<long>(numaComm.domainId()
-				* m_blockSize * m_blockCount)];
+		m_domainId = numaComm.domainId();
+		m_totalDomains = numaComm.totalDomains();
 
-		m_rank = mpiComm.rank();
+		// Create shared object and broadcast pointer
+		if (m_domainId == 0) {
+			m_cacheManager = new cache::CacheManager<allocator::Default>*[numaComm.totalDomains()];
+		}
+		err = numaComm.broadcast(m_cacheManager);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
+		// Set the cache manager
+		m_cacheManager[m_domainId] = &cacheManager;
 
 		return asagi::Grid::SUCCESS;
 	}
 
-	/**
-	 * Gets a block from the static storage of another NUMA domain
-	 *
-	 * @param blockId The global block id
-	 * @param remoteRank The rank where the block is stored
-	 * @param domainId Id of the NUMA domain that stores the data
-	 * @param offset Offset of the block on the NUMA domain
-	 * @param cache Pointer to the local cache for this block
-	 */
 	bool transfer(unsigned long blockId,
 			int remoteRank, unsigned int domainId, unsigned long offset,
 			unsigned char* cache)
 	{
-		if (remoteRank != m_rank)
-			return false;
+		if (NumaFull::transfer(blockId, remoteRank, domainId, offset, cache))
+			return true;
 
-		memcpy(cache, &m_data[(m_blockCount * domainId + offset) * m_blockSize],
-				m_blockSize);
+		for (unsigned int i = 0; i < m_totalDomains; i++) {
+			if (i == m_domainId)
+				continue;
 
-		return true;
-	}
+			unsigned long cacheId;
+			const unsigned char* remoteCache;
+			if (m_cacheManager[i]->tryGet(blockId, cacheId, remoteCache)) {
+				memcpy(cache, remoteCache, blockSize());
+				m_cacheManager[i]->unlock(cacheId);
+				return true;
+			}
+		}
 
-protected:
-	/**
-	 * @return The size of one block (in bytes)
-	 */
-	unsigned long blockSize() const
-	{
-		return m_blockSize;
+		return false;
 	}
 };
 
 }
 
-#endif // TRANSFER_NUMAFULL_H
+#endif // TRANSFER_NUMAFULLCACHE_H
 

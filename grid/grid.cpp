@@ -53,6 +53,7 @@
 #include "transfer/mpifull.h"
 #include "transfer/mpino.h"
 #include "transfer/numafull.h"
+#include "transfer/numafullcache.h"
 #include "transfer/numano.h"
 #include "types/arraytype.h"
 #include "types/basictype.h"
@@ -279,6 +280,7 @@ void grid::Grid::initContainers()
 		FULL_NUMA,
 		FULL_MPI,
 		FULL_MPI_NUMA,
+		FULL_MPI_NUMACACHE,
 		UNKNOWN
 	} containerType = UNKNOWN;
 
@@ -316,9 +318,12 @@ void grid::Grid::initContainers()
 			containerType = FULL_NUMA;
 		else if (m_comm.size() > 1 && m_numa.totalDomains() == 1)
 			containerType = FULL_MPI;
-		else if (m_comm.size() > 1 && m_numa.totalDomains() > 1)
-			containerType = FULL_MPI_NUMA;
-		else {
+		else if (m_comm.size() > 1 && m_numa.totalDomains() > 1) {
+			if (param("NUMA_CACHE", false))
+				containerType = FULL_MPI_NUMACACHE;
+			else
+				containerType = FULL_MPI_NUMA;
+		} else {
 			assert(m_comm.size() == 1);
 			assert(m_numa.totalDomains() == 1);
 			containerType = FULL;
@@ -350,6 +355,10 @@ void grid::Grid::initContainers()
 		case FULL_MPI_NUMA:
 			*it = TypeSelector<SimpleContainer, level::FullDistMPI,
 				transfer::MPIFull, transfer::NumaFull, typelist>::createContainer(*this);
+			break;
+		case FULL_MPI_NUMACACHE:
+			*it = TypeSelector<SimpleContainer, level::FullDistMPI,
+				transfer::MPIFull, transfer::NumaFullCache, typelist>::createContainer(*this);
 			break;
 		default:
 			*it = 0L;

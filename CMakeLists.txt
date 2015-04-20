@@ -162,12 +162,6 @@ endif( DEBUG_NUMA )
 find_package( NetCDF REQUIRED )
 include_directories( SYSTEM ${NETCDF_INCLUDES} )
 
-# Find png
-find_package( PNG )
-if( PNG_FOUND )
-	add_definitions( -DPNG_ENABLED )
-endif()
-
 # Add library include files for all exectuables
 include_directories( ${CMAKE_SOURCE_DIR}/include )
 

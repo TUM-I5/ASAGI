@@ -76,6 +76,14 @@ public:
 	}
 
 	/**
+	 * Try to lock the mutex
+	 */
+	bool try_lock()
+	{
+		return pthread_spin_trylock(&m_lock) == 0;
+	}
+
+	/**
 	 * Unlock the mutex
 	 */
 	void unlock()

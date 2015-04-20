@@ -65,7 +65,8 @@ public:
 			unsigned long blockSize,
 			const types::Type &type,
 			const mpi::MPIComm &mpiComm,
-			const numa::NumaComm &numaComm)
+			const numa::NumaComm &numaComm,
+			cache::CacheManager<allocator::Default> &cacheManager)
 	{
 		return asagi::Grid::SUCCESS;
 	}

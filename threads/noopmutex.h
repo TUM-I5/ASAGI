@@ -56,6 +56,14 @@ public:
 	}
 
 	/**
+	 * Try lock nothing
+	 */
+	bool try_lock()
+	{
+		return false;
+	}
+
+	/**
 	 * Unlock nothing
 	 */
 	void unlock()

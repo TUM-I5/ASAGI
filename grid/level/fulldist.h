@@ -120,7 +120,8 @@ public:
 		// Initialize NUMA transfer class
 		err = m_numaTrans.init(this->data(),
 				this->localBlockCount(), this->totalBlockSize(),
-				this->type(), this->comm(), this->numa());
+				this->type(), this->comm(), this->numa(),
+				m_cacheManager);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
