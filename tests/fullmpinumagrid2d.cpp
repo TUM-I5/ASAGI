@@ -69,9 +69,10 @@ int main(int argc, char** argv)
 	if (ret != 0)
 		return reinterpret_cast<std::intptr_t>(ret);
 
-	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH * 2) {
-		logError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH * 2)
-				<< "but is" << grid->getCounter("accesses");
+	unsigned long accesses = grid->getCounter("accesses");
+	if (accesses == 0 || accesses > NC_WIDTH * NC_LENGTH * 2) {
+		logError() << "Counter \"accesses\" should be less than" << (NC_WIDTH*NC_LENGTH * 2)
+				<< "but is" << accesses;
 		return 1;
 	}
 

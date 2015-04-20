@@ -56,6 +56,7 @@ int main(int argc, char** argv)
 	}
 
 	int value;
+	float buf;
 
 	double coords[2];
 	for (int i = 0; i < NC_WIDTH; i++) {
@@ -66,21 +67,28 @@ int main(int argc, char** argv)
 
 			value = j * NC_WIDTH + i;
 			if (grid->getInt(coords) != value) {
-				logError() << "Value at" << i << j << "should be"
+				logError() << "Value (int) at" << i << j << "should be"
+					<< value << "but is" << grid->getInt(coords);
+				return 1;
+			}
+
+			grid->getBuf(&buf, coords);
+			if (buf != value) {
+				logError() << "Value (buffer) at" << i << j << "should be"
 					<< value << "but is" << grid->getInt(coords);
 				return 1;
 			}
 		}
 	}
 
-	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
+	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH * 2) {
+		logError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH*2)
 				<< "but is" << grid->getCounter("accesses");
 		return 1;
 	}
 
-	if (grid->getCounter("file_loads") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"file_loads\" should be" << (NC_WIDTH*NC_LENGTH)
+	if (grid->getCounter("file_loads") != NC_WIDTH * NC_LENGTH * 2) {
+		logError() << "Counter \"file_loads\" should be" << (NC_WIDTH*NC_LENGTH*2)
 				<< "but is" << grid->getCounter("file_loads");
 		return 1;
 	}

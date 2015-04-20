@@ -62,21 +62,6 @@ macro( lib_link_libraries lib )
     endif( STATIC_LIB )
 endmacro( lib_link_libraries )
 
-# Set static and shared libary output name
-macro( set_lib_output_name lib name)
-    # Shared library
-    if( SHARED_LIB )
-	    set_target_properties( ${lib}
-		    PROPERTIES OUTPUT_NAME ${name} )
-    endif( SHARED_LIB )
-		
-    # Static library
-    if( STATIC_LIB )
-        set_target_properties( ${lib}-static
-            PROPERTIES OUTPUT_NAME ${name} )
-    endif( STATIC_LIB )
-endmacro( set_lib_output_name )
-
 ##### Files #####
 # Lib Sources
 set( mainSources
@@ -143,7 +128,7 @@ else( NOMPI )
 	endif()
 	set( CMAKE_C_COMPILER ${MPI_C_COMPILER} )
 	set( CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER} )
-	set( CMAKE_Fortran_COMPILER ${MPI_Fortran_COMPILER} )
+	set( CMAKE_Fortran_COMPILER ${MPI_Fortran_COMPILER} ) 
 endif( NOMPI )
 
 # Find pthread
@@ -229,6 +214,32 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Documentation
 add_subdirectory( documentation )
 
+##### Libraries #####
+# Libraries (static and shared)
+if( SHARED_LIB )
+    add_library( asagi SHARED ${LibSources} )
+endif( SHARED_LIB )
+if( STATIC_LIB )
+    add_library( asagi-static STATIC ${LibSources} )
+    set_target_properties( asagi-static
+        PROPERTIES OUTPUT_NAME asagi )
+endif( STATIC_LIB )
+
+# Set static and shared libary output name to "nompi"
+if( NOMPI )
+    # Shared library
+    if( SHARED_LIB )
+	    set_target_properties( asagi
+		    PROPERTIES OUTPUT_NAME asagi_nompi )
+    endif( SHARED_LIB )
+		
+    # Static library
+    if( STATIC_LIB )
+        set_target_properties( asagi-static
+            PROPERTIES OUTPUT_NAME asagi_nompi )
+    endif( STATIC_LIB )
+endif( NOMPI )
+
 # Set the target that can be used to link programs with ASAGI
 if( SHARED_LIB )
     set( asagiTarget asagi )
@@ -237,6 +248,18 @@ else( SHARED_LIB )
     set( asagiTarget asagi-static )
 endif( SHARED_LIB )
 
+# Additional libs required to link with asagi
+set( asagiLibs ${NETCDF_LIBRARIES} )
+
+if( THREAD_FOUND )
+    set( asagiLibs ${asagiLibs} ${CMAKE_THREAD_LIBS_INIT} )
+endif( THREAD_FOUND )
+if( NOT NONUMA )
+    link_directories( ${NUMA_LIBRARY_DIR} )
+    set( asagiLibs ${asagiLibs} ${NUMA_LIBRARY} )
+endif( NOT NONUMA )
+
+##### Excecutables #####
 # Tests
 if( TESTS )
 	enable_testing()
@@ -248,39 +271,8 @@ if( NOT NOMPI )
 	if( EXAMPLES )
 		# Add examples
 		add_subdirectory( examples )
-	endif()
+	endif( EXAMPLES )
 endif( NOT NOMPI )
-
-##### Excecutables #####
-# Libraries (static and shared)
-if( SHARED_LIB )
-    add_library( asagi SHARED ${LibSources} )
-endif( SHARED_LIB )
-if( STATIC_LIB )
-    add_library( asagi-static STATIC ${LibSources} )
-    set_target_properties( asagi-static
-        PROPERTIES OUTPUT_NAME asagi )
-endif( STATIC_LIB )
-
-if( THREAD_FOUND )
-    lib_link_libraries( asagi ${CMAKE_THREAD_LIBS_INIT} )
-endif( THREAD_FOUND )
-
-if( NOMPI )
-	set_lib_output_name( asagi asagi_nompi )
-else( NOMPI )
-	lib_link_libraries( asagi )
-endif( NOMPI )
-
-if( NOT NONUMA )
-    link_directories( ${NUMA_LIBRARY_DIR} )
-    lib_link_libraries( asagi ${NUMA_LIBRARY} )
-endif( NOT NONUMA )
-
-lib_link_libraries( asagi ${NETCDF_LIBRARIES} )
-if( PNG_FOUND )
-	lib_link_libraries( asagi ${PNG_LIBRARY} )
-endif( PNG_FOUND )
 
 ##### Installation #####
 if( SHARED_LIB )
@@ -298,13 +290,14 @@ INCLUDE(InstallRequiredSystemLibraries)
 
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${CMAKE_PROJECT_NAME})
 SET(CPACK_PACKAGE_VENDOR "Sebastian Rettenberger")
-#SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
 SET(CPACK_PACKAGE_VERSION_MAJOR ${ASAGI_VERSION_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${ASAGI_VERSION_MINOR})
 SET(CPACK_PACKAGE_VERSION_PATCH "0")
 set(CPACK_SOURCE_IGNORE_FILES
 	"\\\\.svn/"
+	"\\\\.git/"
 	"\\\\.kdev4"
 	"~$"
 	"/preprocess/"

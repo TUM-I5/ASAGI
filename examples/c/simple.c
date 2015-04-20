@@ -8,17 +8,18 @@ int main (int argc, char** argv)
 {
 	MPI_Init(&argc, &argv);
 	
-	grid_handle* grid = grid_create(GRID_FLOAT, GRID_NO_HINT, 1);
+	asagi_grid* grid = asagi_grid_create(ASAGI_FLOAT);
 	
-	if (grid_open(grid, "../data/tohoku_1850m_bath.nc", 0) != GRID_SUCCESS) {
+	if (asagi_grid_open(grid, "tests/2dgrid.nc", 0) != ASAGI_SUCCESS) {
 		printf("Could not load file\n");
 		return 1;
 	}
 	
-	printf("Range X: %f-%f\n", grid_min_x(grid), grid_max_x(grid));
-	printf("Range Y: %f-%f\n", grid_min_y(grid), grid_max_y(grid));
+	printf("Range X: %f-%f\n", asagi_grid_min(grid, 0), asagi_grid_max(grid, 0));
+	printf("Range Y: %f-%f\n", asagi_grid_min(grid, 1), asagi_grid_max(grid, 1));
 	
-	printf("Value at 5x10: %f\n", grid_get_float_2d(grid, 5, 10, 0));
+	double pos[] = {5, 10};
+	printf("Value at 5x10: %f\n", asagi_grid_get_float(grid, pos, 0));
 	
 	// Print memory usage
 // 	char status_path[100];
@@ -32,7 +33,7 @@ int main (int argc, char** argv)
 // 	}
 // 	fclose(f);
 	
-	grid_close(grid);
+	asagi_grid_close(grid);
 	
 	MPI_Finalize();
 	

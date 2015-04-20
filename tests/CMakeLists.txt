@@ -11,7 +11,7 @@ function( add_test_executable name )
 	# Create the executable
 	add_executable( test_${name} ${name}.cpp )
 	# Link with asagi
-	target_link_libraries( test_${name} ${asagiTarget} )
+	target_link_libraries( test_${name} ${asagiTarget} ${asagiLibs} )
 	if( ARGV1 )
 		# Link with mpi library
 		target_link_libraries( test_${name} ${MPI_C_LIBRARIES} )

@@ -197,7 +197,7 @@ public:
 
 	void getBuf(void* buf, const double* pos, unsigned int level = 0)
 	{
-		m_containers[m_numa.domainId()]->getBuf(&buf, pos, level);
+		m_containers[m_numa.domainId()]->getBuf(buf, pos, level);
 	}
 
 	unsigned long getCounter(const char* name, unsigned int level = 0);

@@ -280,11 +280,6 @@ void grid::Grid::initContainers()
 	} containerType = UNKNOWN;
 
 	typedef magic::MakeTypelist<
-			types::BasicType<unsigned char>,
-			types::BasicType<int>,
-			types::BasicType<long>,
-			types::BasicType<float>,
-			types::BasicType<double>,
 			types::ArrayType<unsigned char>,
 			types::ArrayType<int>,
 			types::ArrayType<long>,
@@ -294,7 +289,12 @@ void grid::Grid::initContainers()
 			types::StructType<int>,
 			types::StructType<long>,
 			types::StructType<float>,
-			types::StructType<double>
+			types::StructType<double>,
+			types::BasicType<unsigned char>,
+			types::BasicType<int>,
+			types::BasicType<long>,
+			types::BasicType<float>,
+			types::BasicType<double>
 	>::result typelist;
 
 	// Select the container type
