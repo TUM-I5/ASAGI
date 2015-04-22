@@ -66,7 +66,7 @@ public:
 			const types::Type &type,
 			const mpi::MPIComm &mpiComm,
 			const numa::NumaComm &numaComm,
-			cache::CacheManager<allocator::Default> &cacheManager)
+			cache::CacheManager &cacheManager)
 	{
 		return asagi::Grid::SUCCESS;
 	}

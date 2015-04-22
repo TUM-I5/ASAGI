@@ -58,8 +58,11 @@ template<class MPITrans, class NumaTrans, class Type, class Allocator>
 class FullDist : public Full<MPITrans, NumaTrans, Type, Allocator>
 {
 private:
+	/** The memory for the cache */
+	unsigned char* m_cache;
+
 	/** Manager used to control the cache */
-	cache::CacheManager<allocator::Default> m_cacheManager;
+	cache::CacheManager m_cacheManager;
 
 	/** The MPI transfer class */
 	MPITrans m_mpiTrans;
@@ -68,22 +71,17 @@ private:
 	NumaTrans m_numaTrans;
 
 public:
-	FullDist(const FullDist<MPITrans, NumaTrans, Type, Allocator> &other)
-		: Full<MPITrans, NumaTrans, Type, Allocator>(other),
-		  m_cacheManager(other.m_cacheManager),
-		  m_mpiTrans(other.m_mpiTrans), m_numaTrans(other.m_numaTrans)
-	{
-	}
-
 	FullDist(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
-		: Full<MPITrans, NumaTrans, Type, Allocator>(comm, numa, type)
+		: Full<MPITrans, NumaTrans, Type, Allocator>(comm, numa, type),
+		  m_cache(0L)
 	{
 	}
 
 	virtual ~FullDist()
 	{
+		Allocator::free(m_cache);
 	}
 
 	asagi::Grid::Error open(
@@ -103,12 +101,17 @@ public:
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
-		// Initialize the cache manager
-		err = m_cacheManager.init(cacheSize,
-				this->typeSize() * this->totalBlockSize(),
-				cacheHandSpread);
+		// Initialize the cache
+		err = Allocator::allocate(
+				this->typeSize() * this->totalBlockSize() * cacheSize,
+				m_cache);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
+
+		// Initialize the cache manager
+		m_cacheManager.init(m_cache, cacheSize,
+				this->typeSize() * this->totalBlockSize(),
+				cacheHandSpread);
 
 		// Initialize the MPI transfer class
 		err = m_mpiTrans.init(this->data(),
@@ -148,9 +151,9 @@ public:
 		this->incCounter(perf::Counter::ACCESS);
 
 		// Check the cache
-		unsigned long cacheId;
+		unsigned long cacheOffset;
 		unsigned char* cache;
-		long oldGlobalBlockId = m_cacheManager.get(globalBlockId, cacheId, cache);
+		long oldGlobalBlockId = m_cacheManager.get(globalBlockId, cacheOffset, cache);
 
 		if (static_cast<long>(globalBlockId) != oldGlobalBlockId) {
 			// Cache not filled, do this first
@@ -177,7 +180,7 @@ public:
 		this->type().convert(&cache[this->typeSize() * offset], buf);
 
 		// Free the block in the cache
-		m_cacheManager.unlock(cacheId);
+		m_cacheManager.unlock(cacheOffset);
 	}
 
 #if 0

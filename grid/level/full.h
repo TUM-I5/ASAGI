@@ -55,7 +55,7 @@ namespace level
  * 
  * If compiled without MPI, all blocks are local.
  */
-template<class MPIComm, class NumaTrans, class Type, class Allocator>
+template<class MPITrans, class NumaTrans, class Type, class Allocator>
 class Full : public Blocked<Type>
 {
 private:
@@ -63,12 +63,6 @@ private:
 	unsigned char* m_data;
 
 public:
-	Full(const Full<MPIComm, NumaTrans, Type, Allocator> &other)
-		: Blocked<Type>(other),
-		  m_data(other.m_data)
-	{
-	}
-
 	Full(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
@@ -169,8 +163,8 @@ protected:
 	}
 };
 
-template<class MPIComm, class NumaComm, class Type>
-using FullDefault = Full<MPIComm, NumaComm, Type, allocator::Default>;
+template<class MPITrans, class NumaTrans, class Type>
+using FullDefault = Full<MPITrans, NumaTrans, Type, allocator::Default>;
 
 }
 

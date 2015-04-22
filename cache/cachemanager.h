@@ -49,7 +49,6 @@ namespace cache
 /**
  * @brief Manages a block cache
  */
-template<class Allocator>
 class CacheManager
 {
 private:
@@ -76,20 +75,22 @@ public:
 
 	virtual ~CacheManager()
 	{
-		Allocator::free(m_cache);
 		delete [] m_blockMutexes;
 	}
 
 	/**
 	 * Initializes the cache manager
 	 *
+	 * @param cache Pointer the memory location that should be used as a cache
 	 * @param blocks Number of blocks
 	 * @param blockSize The size of one block in bytes
 	 * @param handDiff Difference between the two hands in the
 	 *  2-handed clock algorithm
 	 */
-	asagi::Grid::Error init(unsigned long blocks, unsigned long blockSize, long handDiff = -1)
+	void init(unsigned char* cache,
+			unsigned long blocks, unsigned long blockSize, long handDiff = -1)
 	{
+		m_cache = cache;
 		m_blockSize = blockSize;
 
 		m_cacheList.init(blocks, handDiff);
@@ -97,15 +98,8 @@ public:
 		// Allocate the mutexes for the blocks
 		m_blockMutexes = new threads::Mutex[blocks];
 
-		// Allocate the cache
-		asagi::Grid::Error err = Allocator::allocate(blocks * blockSize, m_cache);
-		if (err != asagi::Grid::SUCCESS)
-			return err;
-
 		// Initialize the memory to make sure it get allocated in the correct NUMA domain
 		memset(m_cache, 0, blocks * blockSize);
-
-		return asagi::Grid::SUCCESS;
 	}
 
 	/**
@@ -114,30 +108,30 @@ public:
 	 * {@link unlock} to unlock the cache entry.
 	 *
 	 * @param blockId The requested block id
-	 * @param[out] cacheId Identifier that can be passed to {@link unlock} to unlock
-	 *  the cache entry
+	 * @param[out] cacheOffset Offset (in blocks) in the cache;
+	 *  can be passed to {@link unlock} to unlock the cache entry
 	 * @param[out] data A pointer to the request cache entry
 	 * @return The block id of the element that is currently stored at the cache position.
 	 *  If this is not equal to <code>blockId</code> the cache entry needs to be filled
 	 *  first. -1 is returned if the cache entry needs to be filled but it is currently
 	 *  empty/does not contain any valid block.
 	 */
-	long get(unsigned long blockId, unsigned long &cacheId, unsigned char* &data)
+	long get(unsigned long blockId, unsigned long &cacheOffset, unsigned char* &data)
 	{
 		m_cacheMutex.lock();
 
 		long oldBlockId = blockId;
-		if (!m_cacheList.getIndex(blockId, cacheId))
+		if (!m_cacheList.getIndex(blockId, cacheOffset))
 			// Block not in cache
 			// Get a free block position
-			oldBlockId = m_cacheList.getFreeIndex(blockId, cacheId);
+			oldBlockId = m_cacheList.getFreeIndex(blockId, cacheOffset);
 
 		// Lock the cache position and unlock the cache manager
-		m_blockMutexes[cacheId].lock();
+		m_blockMutexes[cacheOffset].lock();
 		m_cacheMutex.unlock();
 
 		// Get the memory position
-		data = &m_cache[cacheId * m_blockSize];
+		data = &m_cache[cacheOffset * m_blockSize];
 
 		return oldBlockId;
 	}
@@ -148,29 +142,29 @@ public:
 	 * {@link unlock} to unlock the cache entry if the block ID was found.
 	 *
 	 * @param blockId The requested block id
-	 * @param[out] cacheId Identifier that can be passed to {@link unlock} to unlock
-	 *  the cache entry
+	 * @param[out] cacheOffset Offset (in blocks) in the cache;
+	 *  can be passed to {@link unlock} to unlock the cache entry
 	 * @param data A pointer to the request cache entry (if found)
 	 * @return True of the block ID was found, false otherwise
 	 */
-	bool tryGet(unsigned long blockId, unsigned long &cacheId, const unsigned char* &data)
+	bool tryGet(unsigned long blockId, unsigned long &cacheOffset, const unsigned char* &data)
 	{
 		m_cacheMutex.lock();
 
-		if (!m_cacheList.getIndex(blockId, cacheId, false)) {
+		if (!m_cacheList.getIndex(blockId, cacheOffset, false)) {
 			m_cacheMutex.unlock();
 			return false;
 		}
 
 		// Try to lock the block
 		// Use try_lock() to avoid deadlocks
-		if (!m_blockMutexes[cacheId].try_lock()) {
+		if (!m_blockMutexes[cacheOffset].try_lock()) {
 			m_cacheMutex.unlock();
 			return false;
 		}
 		m_cacheMutex.unlock();
 
-		data = &m_cache[cacheId * m_blockSize];
+		data = &m_cache[cacheOffset * m_blockSize];
 
 		return true;
 	}
@@ -178,11 +172,11 @@ public:
 	/**
 	 * Unlock the cache entry previously locked with {@link get} or {@link tryGet}
 	 *
-	 * @param cacheId The cache entry identifier
+	 * @param cacheOffset The cache entry offset
 	 */
-	void unlock(unsigned long cacheId)
+	void unlock(unsigned long cacheOffset)
 	{
-		m_blockMutexes[cacheId].unlock();
+		m_blockMutexes[cacheOffset].unlock();
 	}
 
 };

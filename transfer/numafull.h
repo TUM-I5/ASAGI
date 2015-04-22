@@ -82,7 +82,7 @@ public:
 			const types::Type &type,
 			const mpi::MPIComm &mpiComm,
 			const numa::NumaComm &numaComm,
-			cache::CacheManager<allocator::Default> &cacheManager)
+			cache::CacheManager &cacheManager)
 	{
 		m_blockCount = blockCount;
 		m_blockSize = blockSize * type.size();

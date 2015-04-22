@@ -43,17 +43,20 @@
 
 class CacheManagerTest : public CxxTest::TestSuite
 {
-	cache::CacheManager<allocator::Default>* manager;
+	unsigned char* cache;
+	cache::CacheManager* manager;
 public:
 	void setUp(void)
 	{
-		manager = new cache::CacheManager<allocator::Default>();
-		manager->init(3, sizeof(int));
+		cache = new unsigned char[3*sizeof(int)];
+		manager = new cache::CacheManager();
+		manager->init(cache, 3, sizeof(int));
 	}
 	
 	void tearDown(void)
 	{
 		delete manager;
+		delete [] cache;
 	}
 	
 	void testGet(void)

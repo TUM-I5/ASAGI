@@ -60,7 +60,7 @@ private:
 	unsigned int m_totalDomains;
 
 	/** List of all cache managers */
-	cache::CacheManager<allocator::Default>** m_cacheManager;
+	cache::CacheManager** m_cacheManager;
 
 public:
 	NumaFullCache()
@@ -81,7 +81,7 @@ public:
 			const types::Type &type,
 			const mpi::MPIComm &mpiComm,
 			numa::NumaComm &numaComm,
-			cache::CacheManager<allocator::Default> &cacheManager)
+			cache::CacheManager &cacheManager)
 	{
 		asagi::Grid::Error err = NumaFull::init(data, blockCount, blockSize,
 				type, mpiComm, numaComm, cacheManager);
@@ -92,9 +92,8 @@ public:
 		m_totalDomains = numaComm.totalDomains();
 
 		// Create shared object and broadcast pointer
-		if (m_domainId == 0) {
-			m_cacheManager = new cache::CacheManager<allocator::Default>*[numaComm.totalDomains()];
-		}
+		if (m_domainId == 0)
+			m_cacheManager = new cache::CacheManager*[numaComm.totalDomains()];
 		err = numaComm.broadcast(m_cacheManager);
 		if (err != asagi::Grid::SUCCESS)
 			return err;

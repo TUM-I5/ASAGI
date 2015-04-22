@@ -88,15 +88,6 @@ private:
 #endif
 
 public:
-	Blocked(const Blocked<Type> &other)
-		: Level<Type>(other),
-		  m_totalBlocks(other.m_totalBlocks),
-		  m_totalBlockSize(other.m_totalBlockSize)
-	{
-		// We do not copy m_blocks and m_blockSize here
-		// Since they should not be filled anyway at this point
-	}
-
 	Blocked(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)

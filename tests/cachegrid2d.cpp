@@ -48,7 +48,7 @@ using namespace asagi;
 int main(int argc, char** argv)
 {
 	Grid* grid = Grid::create();
-	grid->setParam("GRID", "CACHED");
+	grid->setParam("GRID", "CACHE");
 	
 	if (grid->open(NC_2D) != Grid::SUCCESS) {
 		logError() << "Could not open file";
