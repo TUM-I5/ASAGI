@@ -117,15 +117,6 @@ public:
 
 		return true;
 	}
-
-protected:
-	/**
-	 * @return The size of one block (in bytes)
-	 */
-	unsigned long blockSize() const
-	{
-		return m_blockSize;
-	}
 };
 
 }

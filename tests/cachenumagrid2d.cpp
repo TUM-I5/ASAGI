@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- *
+ * 
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,86 +31,85 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- *
+ * 
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef TRANSFER_NUMANO_H
-#define TRANSFER_NUMANO_H
+#include <asagi.h>
 
-namespace transfer
+// Do not abort to get real failure
+#define LOG_ABORT
+#include "utils/logger.h"
+
+#include "tests.h"
+
+using namespace asagi;
+
+void* work(void *p);
+
+int main(int argc, char** argv)
 {
+	Grid* grid = Grid::create();
+	grid->setThreads(2);
+	grid->setParam("GRID", "CACHE");
 
-/**
- * Disables all NUMA copies
- */
-class NumaNo
-{
-private:
+	pthread_t thread;
+	pthread_create(&thread, 0L, &work, grid);
 
-public:
-	NumaNo()
-	{
+	void* ret = work(grid);
+	if (ret != 0)
+		return reinterpret_cast<std::intptr_t>(ret);
+
+	pthread_join(thread, &ret);
+	if (ret != 0)
+		return reinterpret_cast<std::intptr_t>(ret);
+
+	unsigned long accesses = grid->getCounter("accesses");
+	if (accesses == 0 || accesses > NC_WIDTH * NC_LENGTH * 2) {
+		logError() << "Counter \"accesses\" should be less than" << (NC_WIDTH*NC_LENGTH * 2)
+				<< "but is" << accesses;
+		return 1;
 	}
 
-	virtual ~NumaNo()
-	{
+#if 0
+	// Does not work in these small tests
+	if (grid->getCounter("numa_transfers") == 0) {
+		logError() << "Counter \"numa_transfers\" should be greater than zero";
+		return 1;
 	}
+#endif
 
-	/**
-	 * Initialize the transfer class
-	 *
-	 * Stub for {@link NumaFull::init}
-	 */
-	asagi::Grid::Error init(const unsigned char* data,
-			unsigned long blockCount,
-			unsigned long blockSize,
-			const types::Type &type,
-			const mpi::MPIComm &mpiComm,
-			const numa::NumaComm &numaComm,
-			cache::CacheManager &cacheManager)
-	{
-		return asagi::Grid::SUCCESS;
-	}
+	delete grid;
 
-	/**
-	 * Initialize the transfer class
-	 *
-	 * Stub for {@link NumaCache::init}
-	 */
-	asagi::Grid::Error init(unsigned long blockSize,
-			const types::Type &type,
-			numa::NumaComm &numaComm,
-			cache::CacheManager &cacheManager)
-	{
-		return asagi::Grid::SUCCESS;
-	}
-
-	/**
-	 * Stub for {@link NumaFull::transfer}
-	 *
-	 * @return Always false
-	 */
-	bool transfer(unsigned long blockId,
-			int remoteRank, unsigned int domainId, unsigned long offset,
-			unsigned char *cache)
-	{
-		return false;
-	}
-
-	/**
-	 * Stub for {@link NumaCache::transfer}
-	 *
-	 * @return Always false
-	 */
-	bool transfer(unsigned long blockId,
-			unsigned char* cache)
-	{
-		return false;
-	}
-};
-
+	return 0;
 }
 
-#endif // TRANSFER_NUMANO_H
+void* work(void* p)
+{
+	Grid* grid = static_cast<Grid*>(p);
 
+	if (grid->open(NC_2D) != Grid::SUCCESS) {
+		logError() << "Could not open file";
+		return reinterpret_cast<void*>(1L);
+	}
+
+	int value;
+
+	double coords[2];
+	for (int i = 0; i < NC_WIDTH; i++) {
+		coords[0] = i;
+
+		for (int j = 0; j < NC_LENGTH; j++) {
+			coords[1] = j;
+
+			value = j * NC_WIDTH + i;
+			if (grid->getInt(coords) != value) {
+				logError() << "Value at" << i << j << "should be"
+					<< value << "but is" << grid->getInt(coords);
+				return reinterpret_cast<void*>(1L);
+			}
+		}
+	}
+
+	return reinterpret_cast<void*>(0L);
+}

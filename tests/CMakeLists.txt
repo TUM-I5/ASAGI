@@ -74,7 +74,9 @@ add_test_executable( fullmpinumagrid2d YES )
 add_test_executable( fullmpinumacachegrid2d YES )
 
 add_test_executable( cachegrid2d )
+add_test_executable( cachenumagrid2d )
 add_test_executable( cachempigrid2d YES )
+add_test_executable( cachempinumagrid2d YES )
 
 add_test_executable( passthroughgrid2d )
 
@@ -95,6 +97,8 @@ add_test_run( FullMPINumaGrid2D test_fullmpinumagrid2d 2 )
 add_test_run( FullMPINumaCacheGrid2D test_fullmpinumacachegrid2d 2 )
 
 add_test_run( CacheGrid2D test_cachegrid2d )
+add_test_run( CacheNumaGrid2D test_cachenumagrid2d )
 add_test_run( CacheMPIGrid2D test_cachempigrid2d 2 )
+add_test_run( CacheMPINumaGrid2D test_cachempinumagrid2d 2 )
 
 add_test_run( PassThroughGrid2D test_passthroughgrid2d )

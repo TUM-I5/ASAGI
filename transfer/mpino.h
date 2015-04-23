@@ -59,6 +59,8 @@ public:
 
 	/**
 	 * Initialize the transfer class
+	 *
+	 * Stub for {@link MPIFull::init}
 	 */
 	asagi::Grid::Error init(unsigned char* data,
 			unsigned long blockCount,
@@ -71,12 +73,70 @@ public:
 	}
 
 	/**
+	 * Initialize the transfer class
+	 *
+	 * Stub for {@link MPICache::init}
+	 */
+	asagi::Grid::Error init(unsigned char* cache,
+			unsigned int cacheSize,
+			unsigned long blockCount,
+			unsigned long blockSize,
+			const types::Type &type,
+			const mpi::MPIComm &mpiComm,
+			numa::NumaComm &numaComm)
+	{
+		return asagi::Grid::SUCCESS;
+	}
+
+	/**
 	 * Should never be called
+	 *
+	 * Stub for {@link MPIFull::transfer}
 	 */
 	void transfer(int remoteRank, unsigned long offset,
 			unsigned char *cache)
 	{
 		assert(false);
+	}
+
+	/**
+	 * Starts the transfer of a new block.
+	 *
+	 * Stub for {@link MPICache::startTransfer}
+	 */
+	long startTransfer(unsigned long blockId, int dictRank,
+			unsigned long dictOffset, unsigned long offset)
+	{
+		return -1;
+	}
+
+	/**
+	 * Will not transfer anything
+	 *
+	 * Stub for {@link MPICache::transfer}
+	 */
+	bool transfer(long entry, unsigned char *cache)
+	{
+		return false;
+	}
+
+	/**
+	 * Ends a transfer phase started with {@link startTransfer}
+	 *
+	 * Stub for {@link MPICache::endTransfer}
+	 */
+	void endTransfer(unsigned long blockId)
+	{
+	}
+
+	/**
+	 * Deletes information about a local stored block
+	 *
+	 * Stub for {@link MPICache::deleteBlock}
+	 */
+	void deleteBlock(long blockId, int dictRank, unsigned long dictOffset,
+			unsigned long offset)
+	{
 	}
 };
 

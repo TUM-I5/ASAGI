@@ -182,33 +182,6 @@ public:
 		// Free the block in the cache
 		m_cacheManager.unlock(cacheOffset);
 	}
-
-#if 0
-public:
-	DistStaticGrid(const GridContainer &container,
-		unsigned int hint = asagi::Grid::NO_HINT);
-	virtual ~DistStaticGrid();
-	
-protected:
-	asagi::Grid::Error init();
-	
-	void getAt(void* buf, types::Type::converter_t converter,
-		unsigned long x, unsigned long y = 0, unsigned long z = 0);
-
-	void getBlock(unsigned long block,
-		long oldBlock,
-		unsigned long cacheIndex,
-		unsigned char* cache);
-
-	/**
-	 * We can free all netCDF related resources, because we use MPI to
-	 * transfer blocks
-	 */
-	bool keepFileOpen() const
-	{
-		return false;
-	}
-#endif
 };
 
 template<class MPITrans, class NumaTrans, class Type>

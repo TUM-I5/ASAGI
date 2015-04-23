@@ -40,6 +40,8 @@
 
 #include <cstring>
 
+#include "numafull.h"
+#include "numacache.h"
 #include "cache/cachemanager.h"
 #include "threads/mutex.h"
 
@@ -50,30 +52,16 @@ namespace transfer
  * Copies blocks between NUMA assuming full storage.
  * Will also copy blocks from other caches.
  */
-class NumaFullCache : public NumaFull
+class NumaFullCache : public NumaFull, public NumaCache
 {
-private:
-	/** NUMA domain ID of this instance */
-	unsigned int m_domainId;
-
-	/** Total number of domains */
-	unsigned int m_totalDomains;
-
-	/** List of all cache managers */
-	cache::CacheManager** m_cacheManager;
-
 public:
 	NumaFullCache()
-		: m_domainId(0), m_totalDomains(0), m_cacheManager(0L)
 	{
 	}
 
 	virtual ~NumaFullCache()
 	{
-		if (m_domainId == 0)
-			delete [] m_cacheManager;
 	}
-
 
 	asagi::Grid::Error init(const unsigned char* data,
 			unsigned long blockCount,
@@ -88,22 +76,17 @@ public:
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
-		m_domainId = numaComm.domainId();
-		m_totalDomains = numaComm.totalDomains();
-
-		// Create shared object and broadcast pointer
-		if (m_domainId == 0)
-			m_cacheManager = new cache::CacheManager*[numaComm.totalDomains()];
-		err = numaComm.broadcast(m_cacheManager);
+		err = NumaCache::init(blockSize, type, numaComm, cacheManager);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
-
-		// Set the cache manager
-		m_cacheManager[m_domainId] = &cacheManager;
 
 		return asagi::Grid::SUCCESS;
 	}
 
+	/**
+	 * @copydoc NumaFill:transfer
+	 * Will also lock into other NUMA caches
+	 */
 	bool transfer(unsigned long blockId,
 			int remoteRank, unsigned int domainId, unsigned long offset,
 			unsigned char* cache)
@@ -111,20 +94,7 @@ public:
 		if (NumaFull::transfer(blockId, remoteRank, domainId, offset, cache))
 			return true;
 
-		for (unsigned int i = 0; i < m_totalDomains; i++) {
-			if (i == m_domainId)
-				continue;
-
-			unsigned long cacheId;
-			const unsigned char* remoteCache;
-			if (m_cacheManager[i]->tryGet(blockId, cacheId, remoteCache)) {
-				memcpy(cache, remoteCache, blockSize());
-				m_cacheManager[i]->unlock(cacheId);
-				return true;
-			}
-		}
-
-		return false;
+		return NumaCache::transfer(blockId, cache);
 	}
 };
 

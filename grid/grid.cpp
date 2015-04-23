@@ -55,6 +55,7 @@
 #include "transfer/mpicache.h"
 #include "transfer/mpino.h"
 #include "transfer/numafull.h"
+#include "transfer/numacache.h"
 #include "transfer/numafullcache.h"
 #include "transfer/numano.h"
 #include "types/arraytype.h"
@@ -276,14 +277,16 @@ void grid::Grid::init()
 void grid::Grid::initContainers()
 {
 	enum {
-		FULL,
 		CACHE,
+		CACHE_NUMA,
 		CACHE_MPI,
-		PASS_THROUGH,
+		CACHE_MPI_NUMA,
+		FULL,
 		FULL_NUMA,
 		FULL_MPI,
 		FULL_MPI_NUMA,
 		FULL_MPI_NUMACACHE,
+		PASS_THROUGH,
 		UNKNOWN
 	} containerType = UNKNOWN;
 
@@ -308,8 +311,12 @@ void grid::Grid::initContainers()
 	// Select the container type
 	std::string gridType = param("GRID", "FULL");
 	if (gridType == "CACHE") {
-		if (m_comm.size() > 1 && m_numa.totalDomains() == 1)
+		if (m_comm.size() == 1 && m_numa.totalDomains() > 1)
+			containerType = CACHE_NUMA;
+		else if (m_comm.size() > 1 && m_numa.totalDomains() == 1)
 			containerType = CACHE_MPI;
+		else if (m_comm.size() > 1 && m_numa.totalDomains() > 1)
+			containerType = CACHE_MPI_NUMA;
 		else {
 			assert(m_comm.size() == 1);
 			assert(m_numa.totalDomains() == 1);
@@ -344,18 +351,23 @@ void grid::Grid::initContainers()
 	for (std::vector<Container*>::iterator it = m_containers.begin();
 			it != m_containers.end(); it++) {
 		switch (containerType) {
-		case FULL:
-			*it = TypeSelector<SimpleContainer, level::FullDefault, magic::NullType, magic::NullType, typelist>::createContainer(*this);
-			break;
 		case CACHE:
 			*it = TypeSelector<SimpleContainer, level::CacheDefault, magic::NullType, magic::NullType, typelist>::createContainer(*this);
 			break;
+		case CACHE_NUMA:
+			*it = TypeSelector<SimpleContainer, level::CacheDistDefault,
+				transfer::MPINo, transfer::NumaCache, typelist>::createContainer(*this);
+			break;
 		case CACHE_MPI:
 			*it = TypeSelector<SimpleContainer, level::CacheDistMPI,
-				transfer::MPICache, magic::NullType, typelist>::createContainer(*this);
+				transfer::MPICache, transfer::NumaNo, typelist>::createContainer(*this);
 			break;
-		case PASS_THROUGH:
-			*it = TypeSelector<SimpleContainer, level::PassThrough, magic::NullType, magic::NullType, typelist>::createContainer(*this);
+		case CACHE_MPI_NUMA:
+			*it = TypeSelector<SimpleContainer, level::CacheDistMPI,
+				transfer::MPICache, transfer::NumaCache, typelist>::createContainer(*this);
+			break;
+		case FULL:
+			*it = TypeSelector<SimpleContainer, level::FullDefault, magic::NullType, magic::NullType, typelist>::createContainer(*this);
 			break;
 		case FULL_NUMA:
 			*it = TypeSelector<SimpleContainer, level::FullDistDefault,
@@ -372,6 +384,9 @@ void grid::Grid::initContainers()
 		case FULL_MPI_NUMACACHE:
 			*it = TypeSelector<SimpleContainer, level::FullDistMPI,
 				transfer::MPIFull, transfer::NumaFullCache, typelist>::createContainer(*this);
+			break;
+		case PASS_THROUGH:
+			*it = TypeSelector<SimpleContainer, level::PassThrough, magic::NullType, magic::NullType, typelist>::createContainer(*this);
 			break;
 		default:
 			*it = 0L;

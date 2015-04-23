@@ -61,6 +61,9 @@ private:
 	/** The MPI transfer class */
 	MPITrans m_mpiTrans;
 
+	/** The NUMA transfer class */
+	NumaTrans m_numaTrans;
+
 	/** Number of blocks in the cache */
 	unsigned int m_cacheSize;
 
@@ -103,16 +106,18 @@ public:
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
+		// Initialize the NUMA transfer class
+		err = m_numaTrans.init(this->totalBlockSize(),
+				this->type(), this->numa(), this->cacheManager());
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
 		return asagi::Grid::SUCCESS;
 	}
 
 	template<typename T>
 	void getAt(T* buf, const double* pos)
 	{
-#if 0
-		Cache<MPITrans, NumaTrans, Type, Allocator>::getAt(buf, pos);
-#endif
-
 		this->incCounter(perf::Counter::ACCESS);
 
 		// Get the index from the position
@@ -142,7 +147,9 @@ public:
 					cacheOffset + m_cacheSize * this->numaDomainId());
 
 			// Fill the cache now
-			if (m_mpiTrans.transfer(entry, data))
+			if (m_numaTrans.transfer(globalBlockId, data))
+				this->incCounter(perf::Counter::NUMA);
+			else if (m_mpiTrans.transfer(entry, data))
 				this->incCounter(perf::Counter::MPI);
 			else
 				this->loadBlock(index, data);
@@ -162,6 +169,9 @@ public:
 		this->cacheManager().unlock(cacheOffset);
 	}
 };
+
+template<class MPITrans, class NumaTrans, class Type>
+using CacheDistDefault = CacheDist<MPITrans, NumaTrans, Type, allocator::Default>;
 
 template<class MPITrans, class NumaTrans, class Type>
 using CacheDistMPI = CacheDist<MPITrans, NumaTrans, Type, allocator::MPIAlloc>;
