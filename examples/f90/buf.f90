@@ -14,12 +14,12 @@ program buf
   
   grid_id = asagi_grid_create( ASAGI_FLOAT )
 
+  call asagi_grid_set_comm( grid_id, MPI_COMM_WORLD )
+
   if( asagi_grid_open( grid_id, "tests/2dgrid.nc" ) /= ASAGI_SUCCESS ) then
     write (*,*) 'Could not load file'
     call exit(1)
   end if
-
-  call asagi_grid_set_comm( grid_id, MPI_COMM_WORLD )
 
   allocate( value )
   pos(1) = 1.0
