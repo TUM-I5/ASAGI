@@ -120,14 +120,13 @@ module asagi
     end subroutine asagi_grid_set_threads
 
     !> @internal
-    function asagi_grid_set_param_c( grid_id, name, value, level ) bind( c, name="f90asagi_grid_set_param" )
+    subroutine asagi_grid_set_param_c( grid_id, name, value, level ) bind( c, name="f90asagi_grid_set_param" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value                       :: grid_id
       character( kind=c_char ), dimension(*), intent(in) :: name
       character( kind=c_char ), dimension(*), intent(in) :: value
       integer( kind=c_int ), value                       :: level
-      integer( kind=c_int )                              :: asagi_grid_set_param_c
-    end function asagi_grid_set_param_c
+    end subroutine asagi_grid_set_param_c
     
     !> @internal
     function asagi_grid_open_c( grid_id, filename, level ) bind( c, name="f90asagi_grid_open" )
@@ -285,13 +284,12 @@ module asagi
     !> @ingroup f_interface
     !!
     !! @see asagi::Grid::setParam()
-    function asagi_grid_set_param( grid_id, name, value, level )
+    subroutine asagi_grid_set_param( grid_id, name, value, level )
       use, intrinsic :: iso_c_binding
       integer, intent(in)           :: grid_id
       character*(*), intent(in)     :: name
       character*(*), intent(in)     :: value
       integer, optional, intent(in) :: level
-      integer                       :: asagi_grid_set_param
 
       integer :: l !level send to asagi
 
@@ -301,9 +299,9 @@ module asagi
         l = 0
       endif
 
-      asagi_grid_set_param = asagi_grid_set_param_c( grid_id, name // c_null_char, &
+      call asagi_grid_set_param_c( grid_id, name // c_null_char, &
         value // c_null_char, l )
-    end function asagi_grid_set_param
+    end subroutine asagi_grid_set_param
 
     !> @ingroup f_interface
     !!
