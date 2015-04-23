@@ -64,6 +64,27 @@ public:
 		TS_ASSERT_EQUALS(value, 5);
 	}
 
+	void testWaitBarrier(void)
+	{
+		pthread_t thread;
+		pthread_create(&thread, 0L, &SyncTest::thread2_waitBarrier, this);
+
+		value = 42;
+
+		TS_ASSERT(sync.startBarrier());
+		TS_ASSERT(sync.waitBarrier(2, true));
+
+		TS_ASSERT_EQUALS(value, 0);
+		value = 3;
+
+		TS_ASSERT(sync.endBarrier());
+
+		TS_ASSERT_EQUALS(value, 3);
+
+		pthread_join(thread, 0L);
+		TS_ASSERT(ret2);
+	}
+
 	void testBroadcast(void)
 	{
 		pthread_t thread;
@@ -96,6 +117,27 @@ private:
 			return 0L;
 
 		ref2->value = 5;
+
+		return 0L;
+	}
+
+	static void* thread2_waitBarrier(void *ref)
+	{
+		SyncTest* ref2 = static_cast<SyncTest*>(ref);
+
+		ref2->ret2 = ref2->sync.startBarrier();
+		if (!ref2->ret2)
+			return 0L;
+
+		ref2->ret2 = ref2->sync.waitBarrier(2);
+		if (!ref2->ret2)
+			return 0L;
+
+		ref2->value = 0;
+
+		ref2->ret2 = ref2->sync.endBarrier();
+		if (!ref2->ret2)
+			return 0L;
 
 		return 0L;
 	}

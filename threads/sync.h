@@ -63,6 +63,12 @@ private:
 	/** Condition variable to wait for all threads */
 	pthread_cond_t m_condition;
 
+	/** Number of threads that should finish last */
+	unsigned int m_lastThreads;
+
+	/** Condition variable for waiting "last threads" */
+	pthread_cond_t m_lastCondition;
+
 	/** True if we are in the finishing phase */
 	bool m_finishing;
 
@@ -77,6 +83,8 @@ public:
 		: m_syncedThreads(0),
 		  m_mutex(PTHREAD_MUTEX_INITIALIZER),
 		  m_condition(PTHREAD_COND_INITIALIZER),
+		  m_lastThreads(0),
+		  m_lastCondition(PTHREAD_COND_INITIALIZER),
 		  m_finishing(false),
 		  m_finishCondition(PTHREAD_COND_INITIALIZER),
 		  m_data(0L)
@@ -87,6 +95,7 @@ public:
 	{
 		pthread_cond_destroy(&m_condition);
 		pthread_mutex_destroy(&m_mutex);
+		pthread_cond_destroy(&m_lastCondition);
 		pthread_cond_destroy(&m_finishCondition);
 	}
 
@@ -111,11 +120,15 @@ public:
 	 * Waits in the barrier synchronization
 	 *
 	 * @param numThreads Number of threads that should wait in the barrier
+	 * @param last All threads with the last flag will leave this function
+	 *  after all threads without this flag
 	 * @return True on success, false otherwise
 	 */
-	bool waitBarrier(unsigned int numThreads)
+	bool waitBarrier(unsigned int numThreads, bool last = false)
 	{
 		m_syncedThreads++;
+		if (last)
+			m_lastThreads++;
 
 		if (m_syncedThreads == numThreads) {
 			// We start the finishing phase now
@@ -132,7 +145,27 @@ public:
 			}
 		}
 
+		// If this is a last, wait for all other threads
+		if (last && m_syncedThreads > m_lastThreads) {
+			if (pthread_cond_wait(&m_lastCondition, &m_mutex) != 0) {
+				pthread_mutex_unlock(&m_mutex);
+				return false;
+			}
+		}
+
+		// The thread finished waiting
 		m_syncedThreads--;
+		if (last)
+			m_lastThreads--;
+
+		if (m_syncedThreads == m_lastThreads && !last) {
+			// The last "not-last" thread can wake up all last threads
+			if (pthread_cond_broadcast(&m_lastCondition) != 0) {
+				pthread_mutex_unlock(&m_mutex);
+				return false;
+			}
+		}
+
 		if (m_syncedThreads == 0) {
 			// Last synchronized threads
 			m_finishing = false;
@@ -163,7 +196,7 @@ public:
 	}
 
 	/**
-	 * Same as calling {@link startBarrier()} and {@link endBarrier()}
+	 * Same as calling {@link startBarrier()}, {@link waitBarrier()} and {@link endBarrier()}
 	 */
 	bool barrier(unsigned int numThreads)
 	{
@@ -184,18 +217,18 @@ public:
 	 * @return True on success, false otherwise
 	 */
 	template<typename T>
-	bool broadcast(T* &data, unsigned int numThreads, unsigned int current, unsigned int root = 0)
+	bool broadcast(T &data, unsigned int numThreads, unsigned int current, unsigned int root = 0)
 	{
 		if (!startBarrier())
 			return false;
 
 		if (current == root)
-			m_data = data;
+			m_data = &data;
 
-		if (!waitBarrier(numThreads))
+		if (!waitBarrier(numThreads, current == root))
 			return false;
 
-		data = static_cast<T*>(m_data);
+		data = *static_cast<T*>(m_data);
 
 		return endBarrier();
 	}
