@@ -77,10 +77,17 @@ protected:
 
 public:
 	Container(const mpi::MPIComm &comm,
-		const numa::Numa &numa,
-		int timeDimension,
-		ValuePosition valuePos);
-	virtual ~Container();
+			const numa::Numa &numa,
+			int timeDimension,
+			ValuePosition valuePos)
+		: m_comm(comm), m_numa(numa),
+		  m_timeDimension(timeDimension), m_valuePos(valuePos)
+	{
+	}
+
+	virtual ~Container()
+	{
+	}
 	
 	/**
 	 * @brief Initialize a level of the container
@@ -122,18 +129,10 @@ public:
 		return m_max[n];
 	}
 	
-	double getDelta(unsigned int n, unsigned int level) const
-	{
-		// TODO
-		return 0;
-	}
-
-#if 0
-	unsigned int getVarSize() const
-	{
-		return m_type->getSize();
-	}
-#endif
+	/**
+	 * @return The difference between to grid cells
+	 */
+	virtual double getDelta(unsigned int n, unsigned int level) const = 0;
 
 	/**
 	 * @see getBuf
@@ -176,57 +175,6 @@ public:
 			unsigned int level = 0) const = 0;
 
 protected:
-	/*
-	unsigned char getByte1D(double x, unsigned int level = 0)
-	{
-		return getByte3D(x, 0, 0, level);
-	}
-	int getInt1D(double x, unsigned int level = 0)
-	{
-		return getInt3D(x, 0, 0, level);
-	}
-	long getLong1D(double x, unsigned int level = 0)
-	{
-		return getLong3D(x, 0, 0, level);
-	}
-	float getFloat1D(double x, unsigned int level = 0)
-	{
-		return getFloat3D(x, 0, 0, level);
-	}
-	double getDouble1D(double x, unsigned int level = 0)
-	{
-		return getDouble3D(x, 0, 0, level);
-	}
-	void getBuf1D(void* buf, double x, unsigned int level = 0)
-	{
-		getBuf3D(buf, x, 0, 0, level);
-	}
-	
-	unsigned char getByte2D(double x, double y, unsigned int level = 0)
-	{
-		return getByte3D(x, y, 0, level);
-	}
-	int getInt2D(double x, double y, unsigned int level = 0)
-	{
-		return getInt3D(x, y, 0, level);
-	}
-	long getLong2D(double x, double y, unsigned int level = 0)
-	{
-		return getLong3D(x, y, 0, level);
-	}
-	float getFloat2D(double x, double y, unsigned int level = 0)
-	{
-		return getFloat3D(x, y, 0, level);
-	}
-	double getDouble2D(double x, double y, unsigned int level = 0)
-	{
-		return getDouble3D(x, y, 0, level);
-	}
-	void getBuf2D(void* buf, double x, double y, unsigned int level = 0)
-	{
-		getBuf3D(buf, x, y, 0, level);
-	}*/
-	
 	/**
 	 * @return The communicator for this container
 	 */

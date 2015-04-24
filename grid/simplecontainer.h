@@ -103,6 +103,14 @@ public:
 		return asagi::Grid::SUCCESS;
 	}
 
+	double getDelta(unsigned int n, unsigned int level) const
+	{
+		assert(n < MAX_DIMENSIONS);
+		assert(level < m_levels.size());
+
+		return m_levels[level].delta(n);
+	}
+
 	CONTAINER_GETVAR
 
 	template<typename T>
@@ -116,19 +124,6 @@ public:
 	double getXDelta() const;
 	double getYDelta() const;
 	double getZDelta() const;
-
-	unsigned char getByte3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	int getInt3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	long getLong3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	float getFloat3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	double getDouble3D(double x, double y = 0, double z = 0,
-		unsigned int level = 0);
-	void getBuf3D(void* buf, double x, double y = 0, double z = 0,
-		unsigned int level = 0);
 
 	unsigned long getCounter(perf::Counter::CounterType type,
 			unsigned int level = 0) const

@@ -51,11 +51,6 @@
 #include "numa/numacomm.h"
 #include "perf/counter.h"
 
-namespace types
-{
-class Type;
-}
-
 namespace grid
 {
 
@@ -102,6 +97,9 @@ private:
 	/** Offset of the grid */
 	double m_offset[MAX_DIMENSIONS];
 	
+	/** The difference between to grid points */
+	double m_scaling[MAX_DIMENSIONS];
+
 	/** Minimum possible coordinate in each dimension */
 	double m_min[MAX_DIMENSIONS];
 	/** Maximum possible coordinate in each dimension */
@@ -179,6 +177,13 @@ public:
 		return m_max[n];
 	}
 
+	double delta(unsigned int n) const
+	{
+		assert(n < dimensions());
+
+		return m_scaling[n];
+	}
+
 protected:
 	/**
 	 * Initialize the grid level
@@ -194,8 +199,6 @@ protected:
 
 		asagi::Grid::Error err;
 
-		double scaling[MAX_DIMENSIONS];
-
 		// Open NetCDF file
 		m_inputFile = new io::NetCdfReader(filename, comm().rank());
 		if ((err = m_inputFile->open(varname)) != asagi::Grid::SUCCESS)
@@ -210,72 +213,33 @@ protected:
 			// Get offset and scaling
 			m_offset[i] = m_inputFile->getOffset(i);
 
-			scaling[i] = m_inputFile->getScaling(i);
+			m_scaling[i] = m_inputFile->getScaling(i);
 		}
-
-#if 0
-		// Set time dimension
-		if (m_timeDimension == -1) {
-			// Time grid, but time dimension not specified
-			m_timeDimension = m_inputFile->getDimensions() - 1;
-			logDebug(getMPIRank()) << "Assuming time dimension"
-				<< DIMENSION_NAMES[m_timeDimension];
-		}
-
-		// Set block size in time dimension
-		if ((m_timeDimension >= 0) && (m_blockSize[m_timeDimension] == 0)) {
-			logDebug(getMPIRank()) << "Setting block size in time dimension"
-				<< DIMENSION_NAMES[m_timeDimension] << "to 1";
-			m_blockSize[m_timeDimension] = 1;
-		}
-#endif
 
 		// Set default block size and calculate number of blocks
 		for (unsigned int i = 0; i < m_dims; i++) {
-#if 0
-			if (m_blockSize[i] == 0)
-				// Setting default block size, if not yet set
-				m_blockSize[i] = 50;
-
-			// A block size large than the dimension does not make any sense
-			if (m_dim[i] < m_blockSize[i]) {
-				logDebug(getMPIRank()) << "Shrinking" << DIMENSION_NAMES[i]
-					<< "block size to" << m_dim[i];
-				m_blockSize[i] = m_dim[i];
-			}
-
-			// Integer way of rounding up
-			m_blocks[i] = (m_dim[i] + m_blockSize[i] - 1) / m_blockSize[i];
-#endif
-
-			m_scalingInv[i] = getInvScaling(scaling[i]);
+			m_scalingInv[i] = getInvScaling(m_scaling[i]);
 
 			// Set min/max
-			if (std::isinf(scaling[i])) {
+			if (std::isinf(m_scaling[i])) {
 				m_min[i] = -std::numeric_limits<double>::infinity();
 				m_max[i] = std::numeric_limits<double>::infinity();
 			} else {
 				// Warning: min and max are inverted of scaling is negative
 				double min = m_offset[i];
-				double max = m_offset[i] + scaling[i] * (m_dim[i] - 1);
+				double max = m_offset[i] + m_scaling[i] * (m_dim[i] - 1);
 
 				if (valuePos == grid::CELL_CENTERED) {
 					// Add half a cell on both ends
-					min -= scaling[i] * (0.5 - NUMERIC_PRECISION);
-					max += scaling[i] * (0.5 - NUMERIC_PRECISION);
+					min -= m_scaling[i] * (0.5 - NUMERIC_PRECISION);
+					max += m_scaling[i] * (0.5 - NUMERIC_PRECISION);
 				}
 
 				m_min[i] = std::min(min, max);
 				m_max[i] = std::max(min, max);
+				m_scaling[i] = std::abs(m_scaling[i]);
 			}
 		}
-
-#if 0
-		// Set default cache size
-		if (m_blocksPerNode < 0)
-			// Default value
-			m_blocksPerNode = 80;
-#endif
 
 		// Init type
 		err = m_type->check(*m_inputFile);
@@ -286,12 +250,6 @@ protected:
 
 		return asagi::Grid::SUCCESS;
 	}
-
-#if 0
-private:
-	void getAt(void* buf, types::Type::converter_t converter,
-		   double x, double y = 0, double z = 0);
-#endif
 
 	/**
 	 * @return The MPI communicator
@@ -384,129 +342,6 @@ private:
 			index[i] = x;
 		}
 	}
-
-#if 0
-	/**
-	 * @return The number of blocks we should store on this node
-	 */
-	unsigned long getBlocksPerNode() const
-	{
-		return m_blocksPerNode;
-	}
-	
-	/**
-	 * @return The difference of the 2 hands in the clock algorithm
-	 *  configured by the user
-	 */
-	long getHandsDiff() const
-	{
-		return m_handSpread;
-	}
-	
-	/**
-	 * @return The number of values in each direction in a block
-	 */
-	const size_t* getBlockSize() const
-	{
-		return m_blockSize;
-	}
-	
-	/**
-	 * @return The number of values in direction i in a block
-	 */
-	size_t getBlockSize(unsigned int i) const
-	{
-		return m_blockSize[i];
-	}
-
-	/**
-	 * @return The number of values in each block
-	 */
-	unsigned long getTotalBlockSize() const
-	{
-		return m_blockSize[0] * m_blockSize[1] * m_blockSize[2];
-	}
-	
-	/**
-	 * @return The number of blocks in the grid
-	 */
-	unsigned long getBlockCount() const
-	{
-		return m_blocks[0] * m_blocks[1] * m_blocks[2];
-	}
-	
-	/**
-	 * @return The of blocks that are stored on this node
-	 */
-	unsigned long getLocalBlockCount()
-	{
-		//return (getBlockCount() + getMPISize() - 1) / getMPISize();
-	}
-	
-	/**
-	 * Calculates the position of <code>block</code> in the grid
-	 * 
-	 * @param block The global block id
-	 * @param[out] pos Position (offset) of the block in each dimension
-	 */
-	void getBlockPos(unsigned long block,
-		size_t *pos) const
-	{
-		pos[0] = block % m_blocks[0];
-		pos[1] = (block / m_blocks[0]) % m_blocks[1];
-		pos[2] = block / (m_blocks[0] * m_blocks[1]);
-	}
-	
-	/**
-	 * @return The global block id that stores the value at (x, y, z)
-	 */
-	unsigned long getBlockByCoords(unsigned long x, unsigned long y,
-		unsigned long z) const
-	{
-		return (((z / m_blockSize[2]) * m_blocks[1]
-			+ (y / m_blockSize[1])) * m_blocks[0])
-			+ (x / m_blockSize[0]);
-	}
-	
-	/**
-	 * @param id Global block id
-	 * @return The rank, that stores the block
-	 */
-	int getBlockRank(unsigned long id) const
-	{
-#ifdef ROUND_ROBIN
-		//return id % getMPISize();
-#else // ROUND_ROBIN
-		return id / getLocalBlockCount();
-#endif // ROUND_ROBIN
-	}
-	
-	/**
-	 * @param id Global block id
-	 * @return The offset of the block on the rank
-	 */
-	unsigned long getBlockOffset(unsigned long id) const
-	{
-#ifdef ROUND_ROBIN
-		//return id / getMPISize();
-#else // ROUND_ROBIN
-		return id % getLocalBlockCount();
-#endif // ROUND_ROBIN
-	}
-	
-	/**
-	 * @param id Local block id
-	 * @return The corresponding global id
-	 */
-	unsigned long getGlobalBlock(unsigned long id) const
-	{
-#ifdef ROUND_ROBIN
-		//return id * getMPISize() + getMPIRank();
-#else // ROUND_ROBIN
-		return id + getMPIRank() * getLocalBlockCount();
-#endif // ROUND_ROBIN
-	}
-#endif
 
 	/**
 	 * Close the input file immediately

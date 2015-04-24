@@ -1,6 +1,5 @@
 ##### Files #####
 set( gridSources
-    container.cpp
 	grid.cpp )
 
 ##### Add subdirectory #####

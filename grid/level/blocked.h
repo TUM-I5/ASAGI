@@ -65,28 +65,6 @@ private:
 	/** Total number of values in each block */
 	size_t m_totalBlockSize;
 
-#if 0
-	/** Number of cached blocks on each node */
-	long m_blocksPerNode;
-	
-	/**
-	 * Difference between the hands of the 2-handed clock algorithm.
-	 * Subclasses my require this to initialize the
-	 * {@link blocks::BlockManager}.
-	 */
-	long m_handSpread;
-	
-	/**
-	 * 0, 1 or 2 if x, y or z is a time dimension (z is default if
-	 * the HAS_TIME hint is specified);
-	 * -2 if we don't have any time dimension;
-	 * -1 if the time dimension is not (yet) specified
-	 * <br>
-	 * Declare as signed, to remove compiler warning
-	 */
-	signed char m_timeDimension;
-#endif
-
 public:
 	Blocked(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
@@ -153,26 +131,6 @@ protected:
 			// Total number of blocks
 			m_totalBlocks *= m_blocks[i];
 		}
-
-	#if 0
-		// Set default cache size
-		if (m_blocksPerNode < 0)
-			// Default value
-			m_blocksPerNode = 80;
-
-		// Init type
-		if ((error = getType().check(*m_inputFile)) != asagi::Grid::SUCCESS)
-			return error;
-
-		// Init subclass
-		error = init();
-
-		if (!keepFileOpen()) {
-			// input file no longer needed, so we close
-			delete m_inputFile;
-			m_inputFile = 0L;
-		}
-	#endif
 
 		return asagi::Grid::SUCCESS;
 	}

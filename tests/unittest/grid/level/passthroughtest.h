@@ -77,13 +77,13 @@ public:
 		TS_ASSERT_EQUALS(grid->numaDomainId(), grid->numa().domainId());
 	}
 
-	void testGetXMax(void)
+	void testMax(void)
 	{
-		//TS_ASSERT_EQUALS(c->getFloat1D(c->getXMax()), NC_WIDTH-1);
+		TS_ASSERT_DELTA(grid->max(0), NC_WIDTH-1 + 0.5, 0.0001);
 	}
 
-	void testGetXDelta(void)
+	void testDelta(void)
 	{
-		//TS_ASSERT_DELTA(c->getXDelta(), 1.0, 0.001);
+		TS_ASSERT_DELTA(grid->delta(0), 1.0, 0.0001);
 	}
 };
