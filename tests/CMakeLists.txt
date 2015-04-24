@@ -7,18 +7,44 @@ function( add_test_executable name )
 		# MPI test without MPI?
 		return()
 	endif( ARGV1 AND NOMPI )
+	if( ARGV2 AND NOT FORTRAN_SUPPORT )
+	    # Fortran test without Fortran?
+	    return()
+	endif( ARGV2 AND NOT FORTRAN_SUPPORT )
+	
+	if( ARGV2 )
+	    set( sourceFiles
+	        ${name}.f90 
+	        ${CMAKE_SOURCE_DIR}/include/asagi.f90 )
+	else( ARGV2 )
+	    set( sourceFiles
+	        ${name}.cpp )
+	endif( ARGV2 )
 
 	# Create the executable
-	add_executable( test_${name} ${name}.cpp )
+	
+	
+	add_executable( test_${name} ${sourceFiles} )
+	
 	# Link with asagi
 	target_link_libraries( test_${name} ${asagiTarget} ${asagiLibs} )
 	if( ARGV1 )
 		# Link with mpi library
-		target_link_libraries( test_${name} ${MPI_C_LIBRARIES} )
+		target_link_libraries( test_${name}
+		    ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES} )
 	endif( ARGV1 )
-	# Tests require tests.h (the generated header)
-	set_source_files_properties( ${name}.cpp
-	    PROPERTIES OBJECT_DEPENDS ${test_header} )
+	
+	# Fortran linker?
+	if( ARGV2 )
+        set_target_properties( test_${name} PROPERTIES
+	        LINKER_LANGUAGE Fortran )
+	endif( ARGV2 )
+	
+	if( NOT ARGV2 )
+	    # Tests require tests.h (the generated header)
+	    set_source_files_properties( ${name}.cpp
+	        PROPERTIES OBJECT_DEPENDS ${test_header} )
+    endif( NOT ARGV2 )
     add_dependencies( test_${name} generate_test_header )
 endfunction( add_test_executable )
 
@@ -80,6 +106,8 @@ add_test_executable( cachempinumagrid2d YES )
 
 add_test_executable( passthroughgrid2d )
 
+add_test_executable( fortran2d YES YES )
+
 # Unit Tests
 add_subdirectory( unittest )
 
@@ -102,3 +130,5 @@ add_test_run( CacheMPIGrid2D test_cachempigrid2d 2 )
 add_test_run( CacheMPINumaGrid2D test_cachempinumagrid2d 2 )
 
 add_test_run( PassThroughGrid2D test_passthroughgrid2d )
+
+add_test_run( Fortran2D test_fortran2d 2 )
