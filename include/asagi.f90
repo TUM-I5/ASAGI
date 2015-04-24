@@ -160,12 +160,13 @@ module asagi
     !> @ingroup f_interface
     !!
     !! @see asagi::Grid::getDelta()
-    function asagi_grid_delta( grid_id, n ) bind( c, name="f90asagi_grid_delta" )
+    function asagi_grid_delta_c( grid_id, n, level ) bind( c, name="f90asagi_grid_delta" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id
       integer( kind=c_int ), value :: n
-      real( kind=c_double )        :: asagi_grid_delta
-    end function asagi_grid_delta
+      integer( kind=c_int ), value :: level
+      real( kind=c_double )        :: asagi_grid_delta_c
+    end function asagi_grid_delta_c
 
     !> @ingroup f_interface
     !!
@@ -324,6 +325,27 @@ module asagi
       asagi_grid_open = asagi_grid_open_c( grid_id, filename // c_null_char, l )
     end function asagi_grid_open
     
+    !> @ingroup f_interface
+    !!
+    !! @see asagi::Grid::getDelta()
+    function asagi_grid_delta( grid_id, n, level )
+      use, intrinsic :: iso_c_binding
+      integer, intent(in)           :: grid_id
+      integer, intent(in)           :: n
+      integer, optional, intent(in) :: level
+      real( kind=c_double )         :: asagi_grid_delta
+
+      integer :: l !level send to asagi
+
+      if( present( level ) ) then
+        l = level
+      else
+        l = 0
+      endif
+
+      asagi_grid_delta = asagi_grid_delta_c( grid_id, n, l )
+    end function asagi_grid_delta
+
     !> @ingroup f_interface
     !!
     !! @see asagi::Grid::getByte()
