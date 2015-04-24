@@ -54,7 +54,7 @@ function( add_test_run name command )
         # MPI run
         if ( NOT NOMPI )
 	        add_test( NAME ${name} COMMAND ${MPIEXEC} ${MPIEXEC_PREFLAGS}
-		        ${MPIEXEC_NUMPROC_FLAG} ${ARGV2} ${command}
+		        ${MPIEXEC_NUMPROC_FLAG} ${ARGV2} "./${command}"
 		        ${MPIEXEC_POSTFLAGS} )
 		endif( NOT NOMPI )
 	else( ARGV2 )
