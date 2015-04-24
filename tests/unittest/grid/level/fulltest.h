@@ -45,30 +45,46 @@
 
 class FullTest : public CxxTest::TestSuite
 {
-	grid::Grid* c;
-	grid::level::FullDefault<magic::NullType, magic::NullType, types::BasicType<float>>* grid;
+	grid::Grid* c0;
+	grid::level::FullDefault<magic::NullType, magic::NullType, types::BasicType<float>>* grid0;
+
+	grid::Grid* c1;
+	grid::level::FullDefault<magic::NullType, magic::NullType, types::BasicType<float>>* grid1;
 public:
 	void setUp(void)
 	{
 		// Set up a 1d grid
-		c = new grid::Grid(asagi::Grid::FLOAT);
-		c->open("../../../" NC_1D);
-		grid = &dynamic_cast<grid::SimpleContainer<grid::level::FullDefault<magic::NullType,
+		c0 = new grid::Grid(asagi::Grid::FLOAT);
+		c0->open("../../../" NC_1D);
+		grid0 = &dynamic_cast<grid::SimpleContainer<grid::level::FullDefault<magic::NullType,
 					magic::NullType, types::BasicType<float>>,
 				magic::NullType, magic::NullType,
-				types::BasicType<float>>*>(c->m_containers[0])->m_levels[0];
+				types::BasicType<float>>*>(c0->m_containers[0])->m_levels[0];
 
-		TS_ASSERT(grid);
+		TS_ASSERT(grid0);
+
+		c1 = new grid::Grid(asagi::Grid::FLOAT);
+		c1->setParam("BLOCK_SIZE_0", "12");
+		c1->open("../../../" NC_1D);
+		grid1 = &dynamic_cast<grid::SimpleContainer<grid::level::FullDefault<magic::NullType,
+					magic::NullType, types::BasicType<float>>,
+				magic::NullType, magic::NullType,
+				types::BasicType<float>>*>(c1->m_containers[0])->m_levels[0];
+
+		TS_ASSERT(grid1);
 	}
 	
 	void tearDown(void)
 	{
-		delete c;
+		delete c0;
+		delete c1;
 	}
 	
 	void testTotalBlockSize(void)
 	{
-		TS_ASSERT_EQUALS(grid->totalBlockSize(), 64ul);
+		TS_ASSERT_EQUALS(grid0->totalBlockSize(), 64ul);
+
+		TS_ASSERT_EQUALS(grid1->totalBlockSize(), 12ul);
 		/*
 		TS_ASSERT_EQUALS(grid->m_blockSize[0], 5u);
 		
@@ -86,8 +102,8 @@ public:
 
 	void testLocal2global(void)
 	{
-		TS_ASSERT_EQUALS(grid->local2global(0), 0ul);
-		TS_ASSERT_EQUALS(grid->local2global(1), 1ul);
+		TS_ASSERT_EQUALS(grid0->local2global(0), 0ul);
+		TS_ASSERT_EQUALS(grid0->local2global(1), 1ul);
 	}
 
 	void testGetXMax(void)
