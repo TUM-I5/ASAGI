@@ -107,6 +107,7 @@ add_test_executable( cachempinumagrid2d YES )
 add_test_executable( passthroughgrid2d )
 
 add_test_executable( fullgrid2dbs )
+add_test_executable( fullmpinumagrid2d2 YES )
 
 add_test_executable( fortran2d YES YES )
 
@@ -134,5 +135,6 @@ add_test_run( CacheMPINumaGrid2D test_cachempinumagrid2d 2 )
 add_test_run( PassThroughGrid2D test_passthroughgrid2d )
 
 add_test_run( FullGrid2DBlockSize test_fullgrid2dbs ) 
+add_test_run( FullMPINumaGrid2D2 test_fullmpinumagrid2d2 2 )
 
 add_test_run( Fortran2D test_fortran2d 2 )
