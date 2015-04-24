@@ -131,7 +131,7 @@ public:
 		unsigned char* data;
 		long oldGlobalBlockId = this->cacheManager().get(globalBlockId, cacheOffset, data);
 
-		assert(cacheOffset < cacheSize);
+		assert(cacheOffset < m_cacheSize);
 
 		if (static_cast<long>(globalBlockId) != oldGlobalBlockId) {
 			// Delete the old block from the dictionary
