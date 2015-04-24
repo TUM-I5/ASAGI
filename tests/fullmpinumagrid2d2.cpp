@@ -41,7 +41,7 @@
 #define LOG_ABORT
 #include "utils/logger.h"
 
-#include "tests.h"
+#include "testdefines.h"
 
 using namespace asagi;
 
@@ -75,8 +75,8 @@ int main(int argc, char** argv)
 
 	for (int g = 0; g < 2; g++) {
 		unsigned long accesses = grids[g]->getCounter("accesses");
-		if (accesses == 0 || accesses > NC_WIDTH * NC_LENGTH * 2) {
-			logError() << "Counter \"accesses\" should be less than" << (NC_WIDTH*NC_LENGTH * 2)
+		if (accesses == 0 || accesses > WIDTH * LENGTH * 2) {
+			logError() << "Counter \"accesses\" should be less than" << (WIDTH*LENGTH * 2)
 						<< "but is" << accesses;
 			return 1;
 		}
@@ -112,13 +112,13 @@ void* work(void* p)
 		int value;
 
 		double coords[2];
-		for (int i = 0; i < NC_WIDTH; i++) {
+		for (int i = 0; i < WIDTH; i++) {
 			coords[0] = i;
 
-			for (int j = 0; j < NC_LENGTH; j++) {
+			for (int j = 0; j < LENGTH; j++) {
 				coords[1] = j;
 
-				value = j * NC_WIDTH + i;
+				value = j * WIDTH + i;
 				if (grids[g]->getInt(coords) != value) {
 					logError() << "Value at" << i << j << "should be"
 						<< value << "but is" << grids[g]->getInt(coords);

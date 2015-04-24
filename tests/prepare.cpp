@@ -35,20 +35,9 @@
  * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include <fstream>
-#include <iostream>
 #include <netcdf.h>
 
-#define NC_1D "1dgrid.nc"
-#define NC_1DPSEUDO "1dpseudogrid.nc"
-#define NC_2D "2dgrid.nc"
-#define NC_3D "3dgrid.nc"
-#define NC_PERFTEST NC_2D
-#define HEADER_FILENAME "tests.h"
-
-#define WIDTH 70
-#define LENGTH 70
-#define HEIGHT 70
+#include "testdefines.h"
 
 int main()
 {
@@ -104,6 +93,36 @@ int main()
 
 	nc_close(file);
 	
+	// 2d scaled
+	nc_create(NC_2DSCALE, NC_NETCDF4, &file);
+
+	nc_def_dim(file, "y", LENGTH, &dim[0]);
+	nc_def_dim(file, "x", WIDTH, &dim[1]);
+
+	nc_def_var(file, "z", NC_FLOAT, 2, dim, &var);
+
+	int varx, vary;
+	nc_def_var(file, "y", NC_FLOAT, 1, &dim[1], &vary);
+	nc_def_var(file, "x", NC_FLOAT, 1, &dim[0], &varx);
+
+	for (unsigned int i = 0; i < LENGTH; i++)
+		for (unsigned int j = 0; j < WIDTH; j++)
+			values_2d[i][j] = i * WIDTH + j;
+
+	nc_put_var_float(file, var, reinterpret_cast<float*>(values_2d));
+
+	for (unsigned int i = 0; i < LENGTH; i++)
+		values_1d[i] = i;
+
+	nc_put_var_float(file, vary, values_1d);
+
+	for (unsigned int i = 0; i < WIDTH; i++)
+		values_1d[i] = i * 1.0/(WIDTH-1);
+
+	nc_put_var_float(file, varx, values_1d);
+
+	nc_close(file);
+
 	// 3d
 	nc_create(NC_3D, NC_NETCDF4, &file);
 	
@@ -127,24 +146,6 @@ int main()
 	}
 	
 	nc_close(file);
-
-	// Create the header file
-	std::ofstream headerFile;
-	headerFile.open(HEADER_FILENAME);
-	headerFile << "#ifndef TESTS_H\n";
-	headerFile << "#define TESTS_H\n";
-	
-	headerFile << "#define NC_1D \"" << NC_1D << "\"\n";
-	headerFile << "#define NC_1DPSEUDO \"" << NC_1DPSEUDO << "\"\n";
-	headerFile << "#define NC_2D \"" << NC_2D << "\"\n";
-	headerFile << "#define NC_3D \"" << NC_3D << "\"\n";
-	headerFile << "#define NC_PERFTEST \"" << NC_PERFTEST << "\"\n";
-	headerFile << "#define NC_WIDTH " << WIDTH << "\n";
-	headerFile << "#define NC_LENGTH " << LENGTH << "\n";
-	headerFile << "#define NC_HEIGHT " << HEIGHT << "\n";
-	
-	headerFile << "#endif // TESTS_H\n";
-	headerFile.close();
 	
 	return 0;
 }

@@ -36,7 +36,7 @@
  */
 
 #include "globaltest.h"
-#include "tests.h"
+#include "testdefines.h"
 
 #include "grid/grid.h"
 #include "grid/simplecontainer.h"

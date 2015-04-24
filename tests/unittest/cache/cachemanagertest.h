@@ -36,7 +36,6 @@
  */
 
 #include "globaltest.h"
-#include "tests.h"
 
 #include "allocator/default.h"
 #include "cache/cachemanager.h"

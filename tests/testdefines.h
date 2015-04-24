@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,63 +31,22 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
+ *
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include <asagi.h>
+#ifndef TESTS_TESTDEFINES_H
+#define TESTS_TESTDEFINES_H
 
-// Do not abort to get real failure
-#define LOG_ABORT
-#include "utils/logger.h"
+#define NC_1D "1dgrid.nc"
+#define NC_1DPSEUDO "1dpseudogrid.nc"
+#define NC_2D "2dgrid.nc"
+#define NC_2DSCALE "2dgridscale.nc"
+#define NC_3D "3dgrid.nc"
+#define NC_PERFTEST NC_2D
 
-#include "testdefines.h"
+#define WIDTH 70
+#define LENGTH 70
+#define HEIGHT 70
 
-using namespace asagi;
-
-int main(int argc, char** argv)
-{
-	MPI_Init(&argc, &argv);
-
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-	Grid* grid = Grid::create();
-	grid->setComm(MPI_COMM_WORLD);
-
-	if (grid->open(NC_2D) != Grid::SUCCESS) {
-		logError() << "Could not open file";
-		return 1;
-	}
-
-	int value;
-
-	double coords[2];
-	for (int i = 0; i < WIDTH; i++) {
-		coords[0] = i;
-
-		for (int j = 0; j < LENGTH; j++) {
-			coords[1] = j;
-
-			value = j * WIDTH + i;
-			if (grid->getInt(coords) != value) {
-				logError() << "Value at" << i << j << "should be"
-					<< value << "but is" << grid->getInt(coords);
-				return 1;
-			}
-		}
-	}
-
-	unsigned long accesses = grid->getCounter("accesses");
-	if (accesses == 0 || accesses > WIDTH * LENGTH * 2) {
-		logError() << "Counter \"accesses\" should be less than" << (WIDTH*LENGTH * 2)
-				<< "but is" << accesses;
-		return 1;
-	}
-	
-	delete grid;
-	
-	MPI_Finalize();
-
-	return 0;
-}
+#endif // TESTS_TESTDEFINES_H

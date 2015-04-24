@@ -17,10 +17,10 @@ function( unittest_add_test name header )
 		${CMAKE_CURRENT_SOURCE_DIR}/${header} )
 	target_link_libraries( ${name} ${asagiTarget} ${asagiLibs} )
 	
-	# Add test header dependencies
-	set_source_files_properties( ${basename}.cpp
-	    PROPERTIES OBJECT_DEPENDS ${test_header} )
-	add_dependencies( ${name} generate_test_header )
+	# Add grid dependencies?
+	if( ARGV2 )
+	    set_tests_properties( ${name} PROPERTIES DEPENDS prepare )
+	endif( ARGV2 )
 endfunction( unittest_add_test )
 
 if( CXXTEST_FOUND )

@@ -36,7 +36,7 @@
  */
 
 #include "globaltest.h"
-#include "tests.h"
+#include "testdefines.h"
 
 #include "grid/grid.h"
 #include "grid/simplecontainer.h"
@@ -79,7 +79,7 @@ public:
 
 	void testMax(void)
 	{
-		TS_ASSERT_DELTA(grid->max(0), NC_WIDTH-1 + 0.5, 0.0001);
+		TS_ASSERT_DELTA(grid->max(0), WIDTH-1 + 0.5, 0.0001);
 	}
 
 	void testDelta(void)

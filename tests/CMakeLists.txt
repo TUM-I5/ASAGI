@@ -39,13 +39,6 @@ function( add_test_executable name )
         set_target_properties( test_${name} PROPERTIES
 	        LINKER_LANGUAGE Fortran )
 	endif( ARGV2 )
-	
-	if( NOT ARGV2 )
-	    # Tests require tests.h (the generated header)
-	    set_source_files_properties( ${name}.cpp
-	        PROPERTIES OBJECT_DEPENDS ${test_header} )
-    endif( NOT ARGV2 )
-    add_dependencies( test_${name} generate_test_header )
 endfunction( add_test_executable )
 
 # Adds an MPI test
@@ -60,6 +53,9 @@ function( add_test_run name command )
 	else( ARGV2 )
 	    add_test( NAME ${name} COMMAND ${command} )
 	endif( ARGV2 )
+	
+	# Depend on the prepare test
+	set_tests_properties( ${name} PROPERTIES DEPENDS prepare )
 endfunction( add_test_run )
 
 ##### Prepare tests #####
@@ -73,21 +69,14 @@ add_executable( test_prepare
 target_link_libraries( test_prepare
 	${NETCDF_LIBRARIES} )
 
-# Add rule to generate test header
-add_custom_command( OUTPUT tests.h
-	COMMAND test_prepare
-	DEPENDS test_prepare )
-add_custom_target( generate_test_header
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests.h )
+# Test that generates the grid files
+add_test( NAME prepare COMMAND test_prepare )
 
-# Define test header location
-set( test_header ${CMAKE_CURRENT_BINARY_DIR}/tests.h )
-
-# Add directory for generated header files
-include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+# Add directory for test header file
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 # Create test executables
-add_test_executable( grid1d YES )
+#add_test_executable( grid1d YES )
 #add_test_executable( grid1dpseudo YES )
 #add_test_executable( grid2d YES )
 #add_test_executable( grid3d YES )
@@ -106,7 +95,9 @@ add_test_executable( cachempinumagrid2d YES )
 
 add_test_executable( passthroughgrid2d )
 
+add_test_executable( fullgrid3d )
 add_test_executable( fullgrid2dbs )
+add_test_executable( fullgrid2dscale )
 add_test_executable( fullmpinumagrid2d2 YES )
 
 add_test_executable( fortran2d YES YES )
@@ -121,7 +112,7 @@ add_subdirectory( unittest )
 #add_test_run( Grid3D test_grid3d 2 )
 #add_test_run( LargeGrid1D test_largegrid1d 2 )
 #add_test_run( AdaptiveGrid2D test_adaptivegrid2d 2 )
-add_test_run( FullGrid2D test_fullgrid2d ) 
+add_test_run( FullGrid2D test_fullgrid2d )
 add_test_run( FullNumaGrid2D test_fullnumagrid2d )
 add_test_run( FullMPIGrid2D test_fullmpigrid2d 2 )
 add_test_run( FullMPINumaGrid2D test_fullmpinumagrid2d 2 )
@@ -134,7 +125,9 @@ add_test_run( CacheMPINumaGrid2D test_cachempinumagrid2d 2 )
 
 add_test_run( PassThroughGrid2D test_passthroughgrid2d )
 
-add_test_run( FullGrid2DBlockSize test_fullgrid2dbs ) 
+add_test_run( FullGrid3D test_fullgrid3d )
+add_test_run( FullGrid2DBlockSize test_fullgrid2dbs )
+add_test_run( FullGrid2DScaled test_fullgrid2dscale )
 add_test_run( FullMPINumaGrid2D2 test_fullmpinumagrid2d2 2 )
 
 add_test_run( Fortran2D test_fortran2d 2 )

@@ -36,7 +36,7 @@
  */
 
 #include "globaltest.h"
-#include "tests.h"
+#include "testdefines.h"
 
 #undef NDEBUG
 
@@ -65,11 +65,11 @@ public:
 	void testGetSize(void)
 	{
 		TS_ASSERT_EQUALS(file3d->getSize(0),
-			static_cast<unsigned long>(NC_WIDTH));
+			static_cast<unsigned long>(WIDTH));
 		TS_ASSERT_EQUALS(file3d->getSize(1),
-			static_cast<unsigned long>(NC_LENGTH));
+			static_cast<unsigned long>(LENGTH));
 		TS_ASSERT_EQUALS(file3d->getSize(2),
-			static_cast<unsigned long>(NC_HEIGHT));
+			static_cast<unsigned long>(HEIGHT));
 	}
 	
 	/**
@@ -89,7 +89,7 @@ public:
 		
 		size_t offsets2[3] = {9, 4, 63};
 		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values, offsets2, sizes));
-		for (int i = 0; i < NC_HEIGHT-63; i++)
+		for (int i = 0; i < HEIGHT-63; i++)
 			for (int j = 0; j < 10; j++)
 				for (int k = 0; k < 10; k++)
 					TS_ASSERT_EQUALS(values[i][j][k], calcValueAt(i, j, k, offsets2));
@@ -97,7 +97,7 @@ public:
 		size_t offsets3[3] = {0, 62, 21};
 		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values, offsets3, sizes));
 		for (int i = 0; i < 10; i++)
-			for (int j = 0; j < NC_LENGTH-62; j++)
+			for (int j = 0; j < LENGTH-62; j++)
 				for (int k = 0; k < 10; k++)
 					TS_ASSERT_EQUALS(values[i][j][k], calcValueAt(i, j, k, offsets3));
 
@@ -105,7 +105,7 @@ public:
 		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values, offsets4, sizes));
 		for (int i = 0; i < 10; i++)
 			for (int j = 0; j < 10; j++)
-				for (int k = 0; k < NC_LENGTH-65; k++)
+				for (int k = 0; k < LENGTH-65; k++)
 					TS_ASSERT_EQUALS(values[i][j][k], calcValueAt(i, j, k, offsets4));
 
 		float values2[64][64][64];
@@ -113,23 +113,23 @@ public:
 		size_t sizes2[3] = {64, 64, 64};
 		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<float>(values2, offsets5, sizes2));
 		for (int i = 0; i < 64; i++)
-			for (int j = 0; j < NC_LENGTH-55; j++)
-				for (int k = 0; k < NC_WIDTH-55; k++)
+			for (int j = 0; j < LENGTH-55; j++)
+				for (int k = 0; k < WIDTH-55; k++)
 					TS_ASSERT_EQUALS(values2[i][j][k], calcValueAt(i, j, k, offsets5));
 
 		// Test float to double conversion
 		double values3[10][10][10];
 		TS_ASSERT_THROWS_NOTHING(file3d->getBlock<double>(values3, offsets3, sizes));
 		for (int i = 0; i < 10; i++)
-			for (int j = 0; j < NC_LENGTH-62; j++)
+			for (int j = 0; j < LENGTH-62; j++)
 				for (int k = 0; k < 10; k++)
 					TS_ASSERT_EQUALS(values3[i][j][k], calcValueAt(i, j, k, offsets3));
 
 		// Test void
 		/*TS_ASSERT_THROWS_NOTHING*/(file3d->getBlock<void>(values2, offsets5, sizes2));
 		for (int i = 0; i < 64; i++)
-			for (int j = 0; j < NC_LENGTH-55; j++)
-				for (int k = 0; k < NC_WIDTH-55; k++)
+			for (int j = 0; j < LENGTH-55; j++)
+				for (int k = 0; k < WIDTH-55; k++)
 					TS_ASSERT_EQUALS(values2[i][j][k], calcValueAt(i, j, k, offsets5));
 	}
 
@@ -139,6 +139,6 @@ private:
 	 */
 	float calcValueAt(int z, int y, int x, size_t offsets[3])
 	{
-		return ((z+offsets[2]) * NC_LENGTH + (y+offsets[1])) * NC_WIDTH + (x+offsets[0]);
+		return ((z+offsets[2]) * LENGTH + (y+offsets[1])) * WIDTH + (x+offsets[0]);
 	}
 };

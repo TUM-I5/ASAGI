@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include <asagi.h>
@@ -45,65 +45,20 @@
 
 using namespace asagi;
 
-void* work(void *p);
-
 int main(int argc, char** argv)
 {
-	MPI_Init(&argc, &argv);
-
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
 	Grid* grid = Grid::create();
-	grid->setComm(MPI_COMM_WORLD);
-	grid->setThreads(2);
-
-	pthread_t thread;
-	pthread_create(&thread, 0L, &work, grid);
-
-	void* ret = work(grid);
-	if (ret != 0)
-		return reinterpret_cast<std::intptr_t>(ret);
-
-	pthread_join(thread, &ret);
-	if (ret != 0)
-		return reinterpret_cast<std::intptr_t>(ret);
-
-	unsigned long accesses = grid->getCounter("accesses");
-	if (accesses == 0 || accesses > WIDTH * LENGTH * 2) {
-		logError() << "Counter \"accesses\" should be less than" << (WIDTH*LENGTH * 2)
-				<< "but is" << accesses;
-		return 1;
-	}
-
-#ifdef DEBUG_NUMA
-	if (grid->getCounter("numa_transfers") == 0) {
-		logError() << "Counter \"numa_transfers\" should be greater than zero";
-		return 1;
-	}
-#endif // DEBUG_NUMA
-
-	delete grid;
-
-	MPI_Finalize();
-
-	return 0;
-}
-
-void* work(void* p)
-{
-	Grid* grid = static_cast<Grid*>(p);
-
-	if (grid->open(NC_2D) != Grid::SUCCESS) {
+	
+	if (grid->open(NC_2DSCALE) != Grid::SUCCESS) {
 		logError() << "Could not open file";
-		return reinterpret_cast<void*>(1L);
+		return 1;
 	}
 
 	int value;
 
 	double coords[2];
 	for (int i = 0; i < WIDTH; i++) {
-		coords[0] = i;
+		coords[0] = i * 1.0/(WIDTH-1);
 
 		for (int j = 0; j < LENGTH; j++) {
 			coords[1] = j;
@@ -112,10 +67,12 @@ void* work(void* p)
 			if (grid->getInt(coords) != value) {
 				logError() << "Value at" << i << j << "should be"
 					<< value << "but is" << grid->getInt(coords);
-				return reinterpret_cast<void*>(1L);
+				return 1;
 			}
 		}
 	}
-
-	return reinterpret_cast<void*>(0L);
+	
+	delete grid;
+	
+	return 0;
 }

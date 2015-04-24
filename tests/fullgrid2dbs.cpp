@@ -41,7 +41,7 @@
 #define LOG_ABORT
 #include "utils/logger.h"
 
-#include "tests.h"
+#include "testdefines.h"
 
 using namespace asagi;
 
@@ -54,18 +54,18 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	grid->setParam("BLOCK_SIZE_0", "2");
+	grid->setParam("BLOCK_SIZE_0", "3");
 
 	int value;
 
 	double coords[2];
-	for (int i = 0; i < NC_WIDTH; i++) {
+	for (int i = 0; i < WIDTH; i++) {
 		coords[0] = i;
 
-		for (int j = 0; j < NC_LENGTH; j++) {
+		for (int j = 0; j < LENGTH; j++) {
 			coords[1] = j;
 
-			value = j * NC_WIDTH + i;
+			value = j * WIDTH + i;
 			if (grid->getInt(coords) != value) {
 				logError() << "Value at" << i << j << "should be"
 					<< value << "but is" << grid->getInt(coords);
@@ -74,14 +74,14 @@ int main(int argc, char** argv)
 		}
 	}
 
-	if (grid->getCounter("accesses") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"accesses\" should be" << (NC_WIDTH*NC_LENGTH)
+	if (grid->getCounter("accesses") != WIDTH * LENGTH) {
+		logError() << "Counter \"accesses\" should be" << (WIDTH*LENGTH)
 				<< "but is" << grid->getCounter("accesses");
 		return 1;
 	}
 
-	if (grid->getCounter("local_hits") != NC_WIDTH * NC_LENGTH) {
-		logError() << "Counter \"file_loads\" should be" << (NC_WIDTH*NC_LENGTH)
+	if (grid->getCounter("local_hits") != WIDTH * LENGTH) {
+		logError() << "Counter \"file_loads\" should be" << (WIDTH*LENGTH)
 				<< "but is" << grid->getCounter("file_loads");
 		return 1;
 	}
