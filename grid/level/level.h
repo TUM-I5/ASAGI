@@ -92,7 +92,7 @@ private:
 	unsigned int m_dims;
 
 	/** Total number of elements in each dimension */
-	unsigned long m_dim[MAX_DIMENSIONS];
+	unsigned long m_size[MAX_DIMENSIONS];
 
 	/** Offset of the grid */
 	double m_offset[MAX_DIMENSIONS];
@@ -104,7 +104,7 @@ private:
 	double m_min[MAX_DIMENSIONS];
 	/** Maximum possible coordinate in each dimension */
 	double m_max[MAX_DIMENSIONS];
-	
+
 	/**
 	 * 1/scaling in most cases (exceptions: scaling = 0
 	 * and scaling = inf), used to convert coordinates to indices
@@ -208,7 +208,7 @@ protected:
 
 		for (unsigned int i = 0; i < m_dims; i++) {
 			// Get dimension size
-			m_dim[i] = m_inputFile->getSize(i);
+			m_size[i] = m_inputFile->getSize(i);
 
 			// Get offset and scaling
 			m_offset[i] = m_inputFile->getOffset(i);
@@ -227,7 +227,7 @@ protected:
 			} else {
 				// Warning: min and max are inverted of scaling is negative
 				double min = m_offset[i];
-				double max = m_offset[i] + m_scaling[i] * (m_dim[i] - 1);
+				double max = m_offset[i] + m_scaling[i] * (m_size[i] - 1);
 
 				if (valuePos == grid::CELL_CENTERED) {
 					// Add half a cell on both ends
@@ -316,7 +316,7 @@ protected:
 	 */
 	unsigned long size(unsigned int n) const
 	{
-		return m_dim[n];
+		return m_size[n];
 	}
 
 	/**
@@ -331,7 +331,7 @@ protected:
 		for (unsigned int i = 0; i < m_dims; i++) {
 			double x = round((pos[i] - m_offset[i]) * m_scalingInv[i]);
 
-			if (x < 0 || x >= m_max[i]) {
+			if (x < 0 || x >= m_size[i]) {
 				logWarning() << "ASAGI: Coordinate in dimension" << i << " is out of range. Fixing.";
 				if (x < 0)
 					x = 0;
