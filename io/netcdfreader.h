@@ -190,16 +190,9 @@ public:
 		const size_t *offset,
 		const size_t *size)
 	{
-		// The netCDF standard (Coords convention) uses Fortran
-		// dimension ordering -> reverse offset and size arrays
-		size_t actOffset[MAX_DIMENSIONS];
-		std::reverse_copy(offset, offset+m_dimensions, actOffset);
-		size_t actSize[MAX_DIMENSIONS];
-		//memcpy(actSize, size, m_dimensions*sizeof(size_t));
-		//std::reverse_copy(size, size+m_dimensions, actSize);
-
 		// Make sure we do not read more than the available data
 		// in each dimension
+		size_t actSize[MAX_DIMENSIONS];
 		for (int i = 0; i < m_dimensions; i++) {
 			if (offset[i] + size[i] > getSize(i))
 				actSize[i] = getSize(i) - offset[i];
