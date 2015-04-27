@@ -42,6 +42,8 @@
 
 #include "typedcontainer.h"
 
+#include "utils/logger.h"
+
 namespace grid
 {
 

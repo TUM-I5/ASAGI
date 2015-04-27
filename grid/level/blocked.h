@@ -192,7 +192,7 @@ protected:
 	 */
 	void calcBlockPosition(unsigned long block, size_t *pos) const
 	{
-		for (unsigned int i = 0; i < this->dimensions(); i++) {
+		for (int i = this->dimensions()-1; i >= 0; i--) {
 			pos[i] = block % m_blocks[i];
 			block /= m_blocks[i];
 		}
@@ -205,7 +205,7 @@ protected:
 	{
 		unsigned long blockId = 0;
 
-		for (int i = this->dimensions()-1; i >= 0; i--) {
+		for (unsigned int i = 0; i < this->dimensions(); i++) {
 			blockId *= m_blocks[i];
 			blockId += index[i] / m_blockSize[i];
 		}
@@ -289,7 +289,7 @@ protected:
 	unsigned long calcOffsetInBlock(const size_t *coords)
 	{
 		unsigned long offset = 0;
-		for (int i = this->dimensions()-1; i >= 0; i--) {
+		for (unsigned int i = 0; i < this->dimensions(); i++) {
 			offset *= blockSize(i);
 			offset += coords[i] % blockSize(i);
 		}

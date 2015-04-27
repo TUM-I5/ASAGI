@@ -140,7 +140,6 @@ public:
 
 		// The offset of the block
 		unsigned long localBlockId = this->blockOffset(globalBlockId);
-
 		assert(localBlockId < this->localBlockCount());
 
 		// Compute the offset of the value in the block

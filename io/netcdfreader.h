@@ -205,10 +205,10 @@ public:
 		}
 
 		// The distance between 2 values in the internal representation
-		ptrdiff_t imap[m_dimensions];
-		imap[m_dimensions-1] = getBasicSize<T>();
-		for (int i = m_dimensions-2; i >= 0; i--)
-			imap[i] = imap[i+1] * size[m_dimensions-i-1];
+		ptrdiff_t imap[MAX_DIMENSIONS];
+		imap[0] = getBasicSize<T>();
+		for (int i = 1; i < m_dimensions; i++)
+			imap[i] = imap[i-1] * size[m_dimensions-i-1];
 
 		std::lock_guard<threads::Mutex> lock(netcdfLock);
 		getVar(actOffset, actSize, imap,
