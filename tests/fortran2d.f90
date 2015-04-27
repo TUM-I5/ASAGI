@@ -64,7 +64,7 @@ program fortran2d
     do j=0,69
         pos(2) = j
 
-        value = j * 70 + i
+        value = j + i * 70
         if( asagi_grid_get_int( grid_id, pos) /= value ) then
             write (*,*) "Value at", i, j, "should be", value, "but is", asagi_grid_get_int( grid_id, pos )
             call exit(1)

@@ -110,7 +110,7 @@ void* work(void* p)
 		for (int j = 0; j < LENGTH; j++) {
 			coords[1] = j;
 
-			value = j * WIDTH + i;
+			value = j + i * LENGTH;
 			if (grid->getInt(coords) != value) {
 				logError() << "Value at" << i << j << "should be"
 					<< value << "but is" << grid->getInt(coords);

@@ -195,23 +195,26 @@ public:
 		size_t actOffset[MAX_DIMENSIONS];
 		std::reverse_copy(offset, offset+m_dimensions, actOffset);
 		size_t actSize[MAX_DIMENSIONS];
-		std::reverse_copy(size, size+m_dimensions, actSize);
+		//memcpy(actSize, size, m_dimensions*sizeof(size_t));
+		//std::reverse_copy(size, size+m_dimensions, actSize);
 
 		// Make sure we do not read more than the available data
 		// in each dimension
 		for (int i = 0; i < m_dimensions; i++) {
-			if (actOffset[i] + actSize[i] > getSize(m_dimensions-i-1))
-				actSize[i] = getSize(m_dimensions-i-1) - actOffset[i];
+			if (offset[i] + size[i] > getSize(i))
+				actSize[i] = getSize(i) - offset[i];
+			else
+				actSize[i] = size[i];
 		}
 
 		// The distance between 2 values in the internal representation
 		ptrdiff_t imap[MAX_DIMENSIONS];
-		imap[0] = getBasicSize<T>();
-		for (int i = 1; i < m_dimensions; i++)
-			imap[i] = imap[i-1] * size[m_dimensions-i-1];
+		imap[m_dimensions-1] = getBasicSize<T>();
+		for (int i = m_dimensions-2; i >= 0; i--)
+			imap[i] = imap[i+1] * size[i+1];
 
 		std::lock_guard<threads::Mutex> lock(netcdfLock);
-		getVar(actOffset, actSize, imap,
+		getVar(offset, actSize, imap,
 			static_cast<T*>(block));
 	}
 	

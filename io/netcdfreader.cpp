@@ -37,8 +37,9 @@
 
 #include "cloak/cloak.h"
 
-#include "netcdfreader.h"
 #include "utils/logger.h"
+
+#include "netcdfreader.h"
 
 #define ONE_COMMA(s,i,_) 1,
 
@@ -109,16 +110,17 @@ asagi::Grid::Error io::NetCdfReader::open(const char* varname)
 	m_size = new size_t[m_dimensions];
 
 	logDebug(m_rank) << "Dimension mapping:";
-	for (int i = 0; i < m_dimensions; i++) {
+	for (int i = m_dimensions-1; i >= 0; i--) {
 		// Translates dimension order from Fortran to C/C++
 		char name[NC_MAX_NAME+1];
 		size_t size;
 
-		nc_inq_dim(m_file, dimIds[m_dimensions - i - 1], name, &size);
+		nc_inq_dim(m_file, dimIds[i], name, &size);
 		m_names[i] = name;
 		m_size[i] = size;
 		
-		logDebug(m_rank) << "\t dimension" << i << ":="
+		// Output C order since Level will reverse the order for the end-user
+		logDebug(m_rank) << "\t dimension" << (m_dimensions-i-1) << ":="
 			<< m_names[i];
 	}
 	

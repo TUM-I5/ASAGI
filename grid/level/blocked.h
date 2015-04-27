@@ -118,7 +118,7 @@ protected:
 			// A block size large than the dimension does not make any sense
 			if (m_blockSize[i] > this->size(i)) {
 				logDebug(this->comm().rank()) << "Shrinking block size in dimension"
-						<< i << "to" << this->size(i);
+						<< (this->dimensions()-i-1) << "to" << this->size(i);
 				m_blockSize[i] = this->size(i);
 			}
 

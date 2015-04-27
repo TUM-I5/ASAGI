@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 			for (int k = 0; k < HEIGHT; k++) {
 				coords[2] = k;
 
-				value = (k * LENGTH + j) * WIDTH + i;
+				value = k + HEIGHT * (j + i * LENGTH);
 				if (grid->getInt(coords) != value) {
 					logError() << "Value at" << i << j << "should be"
 							<< value << "but is" << grid->getInt(coords);

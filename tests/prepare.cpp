@@ -85,9 +85,9 @@ int main()
 	
 	float values_2d[LENGTH][WIDTH];
 	
-	for (unsigned int i = 0; i < LENGTH; i++)
-		for (unsigned int j = 0; j < WIDTH; j++)
-			values_2d[i][j] = i * WIDTH + j;
+	for (unsigned int i = 0; i < WIDTH; i++)
+		for (unsigned int j = 0; j < LENGTH; j++)
+			values_2d[j][i] = i * LENGTH + j;
 	
 	nc_put_var_float(file, var, reinterpret_cast<float*>(values_2d));
 
@@ -104,10 +104,6 @@ int main()
 	int varx, vary;
 	nc_def_var(file, "y", NC_FLOAT, 1, &dim[1], &vary);
 	nc_def_var(file, "x", NC_FLOAT, 1, &dim[0], &varx);
-
-	for (unsigned int i = 0; i < LENGTH; i++)
-		for (unsigned int j = 0; j < WIDTH; j++)
-			values_2d[i][j] = i * WIDTH + j;
 
 	nc_put_var_float(file, var, reinterpret_cast<float*>(values_2d));
 
@@ -134,15 +130,16 @@ int main()
 	
 	size_t offset_3d[3] = {0, 0, 0};
 	size_t size_3d[3] = {1, LENGTH, WIDTH};
-	
-	for (unsigned int i = 0; i < HEIGHT; i++) {
-		offset_3d[0] = i;
+
+	for (unsigned int k = 0; k < HEIGHT; k++) {
+		offset_3d[0] = k;
+
+		for (unsigned int i = 0; i < WIDTH; i++) {
+			for (unsigned int j = 0; j < LENGTH; j++)
+				values_2d[j][i] = (i * LENGTH + j) * HEIGHT + k;
 		
-		for (unsigned int j = 0; j < LENGTH; j++)
-			for (unsigned int k = 0; k < WIDTH; k++)
-				values_2d[j][k] = (i * LENGTH + j) * WIDTH + k;
-		
-		nc_put_vara_float(file, var, offset_3d, size_3d, reinterpret_cast<float*>(values_2d));
+				nc_put_vara_float(file, var, offset_3d, size_3d, reinterpret_cast<float*>(values_2d));
+		}
 	}
 	
 	nc_close(file);

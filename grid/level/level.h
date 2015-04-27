@@ -62,6 +62,9 @@ namespace level
 
 /**
  * @brief Base class for a grid level
+ *
+ * @warning This class also helps mapping from the Fortran order of the
+ *  internal representation to the C order of the public interface.
  */
 template<class Type>
 class Level
@@ -159,29 +162,38 @@ public:
 
 	/**
 	 * The minimum range of the grid in dimension <code>n</code>
+	 *
+	 * @warning Dimensions are in C order
 	 */
 	double min(unsigned int n) const
 	{
 		assert(n < dimensions());
 
-		return m_min[n];
+		return m_min[dimensions()-n-1];
 	}
 
 	/**
 	 * The maximum range of the grid in dimension <code>n</code>
+	 *
+	 * @warning Dimensions are in C order
 	 */
 	double max(unsigned int n) const
 	{
 		assert(n < dimensions());
 
-		return m_max[n];
+		return m_max[dimensions()-n-1];
 	}
 
+	/**
+	 * The difference between to variables in dimension <code>n</code>
+	 *
+	 * @warning Dimensions are in C order
+	 */
 	double delta(unsigned int n) const
 	{
 		assert(n < dimensions());
 
-		return m_scaling[n];
+		return m_scaling[dimensions()-n-1];
 	}
 
 protected:
@@ -323,20 +335,20 @@ protected:
 	 * Converts from the real world coordinates to the indices
 	 * of the file.
 	 *
-	 * @param pos The real world coordinates
-	 * @param index The indices in the file
+	 * @param pos The real world coordinates (in C order)
+	 * @param index The indices in the file (in Fortran order)
 	 */
 	void pos2index(const double* pos, size_t* index)
 	{
-		for (unsigned int i = 0; i < m_dims; i++) {
-			double x = round((pos[i] - m_offset[i]) * m_scalingInv[i]);
+		for (int i = m_dims-1; i >= 0; i--) {
+			double x = round((pos[m_dims-i-1] - m_offset[i]) * m_scalingInv[i]);
 
 			if (x < 0 || x >= m_size[i]) {
-				logWarning() << "ASAGI: Coordinate in dimension" << i << " is out of range. Fixing.";
+				logWarning() << "ASAGI: Coordinate in dimension" << (m_dims-i-1) << " is out of range. Fixing.";
 				if (x < 0)
 					x = 0;
 				else
-					x = m_max[i]-1;
+					x = m_size[i]-1;
 			}
 
 			index[i] = x;
