@@ -53,7 +53,7 @@ namespace level
  * Does not store all blocks of the grid.
  * Any blocks not in the cache will be loaded from file.
  */
-template<class MPITrans, class NumaTrans, class Type, class Allocator>
+template<class Type, class Allocator>
 class Cache : public Blocked<Type>
 {
 private:
@@ -64,6 +64,9 @@ private:
 	cache::CacheManager m_cacheManager;
 
 public:
+	/**
+	 * @copydoc Blocked::Blocked
+	 */
 	Cache(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
@@ -78,6 +81,9 @@ public:
 	{
 	}
 
+	/**
+	 * @copydoc Blocked::open
+	 */
 	asagi::Grid::Error open(
 		const char* filename,
 		const char* varname,
@@ -107,6 +113,9 @@ public:
 		return asagi::Grid::SUCCESS;
 	}
 
+	/**
+	 * @copydoc Full::getAt
+	 */
 	template<typename T>
 	void getAt(T* buf, const double* pos)
 	{
@@ -144,7 +153,6 @@ public:
 	 *
 	 * @param index The coordinates of the value
 	 * @param data Memory where the block should be stored
-	 * @param cachePos The position in the cache very the block should be stored
 	 */
 	void loadBlock(const size_t *index, unsigned char* data)
 	{
@@ -180,8 +188,9 @@ protected:
 	}
 };
 
-template<class MPITrans, class NumaTrans, class Type>
-using CacheDefault = Cache<MPITrans, NumaTrans, Type, allocator::Default>;
+/** Cached level with default allocator */
+template<class Type>
+using CacheDefault = Cache<Type, allocator::Default>;
 
 }
 

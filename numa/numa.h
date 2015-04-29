@@ -46,12 +46,14 @@
 
 #include "threads/sync.h"
 
-// Define the size of thread and numa id so we can store 2 ids
-// in one pointer
+/**
+ * Defines the size of thread and NUMA id so we can store
+ * 2 IDs in one pointer
+ */
 #ifdef _LP64
 typedef uint32_t id_t;
 #else // _LP64
-typedef id_t uint16_t;
+typedef uint16_t id_t;
 #endif // _LP64
 
 namespace numa

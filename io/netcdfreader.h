@@ -35,8 +35,8 @@
  * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef IO_NETCDF_H
-#define IO_NETCDF_H
+#ifndef IO_NETCDFREADER_H
+#define IO_NETCDFREADER_H
 
 #include "asagi.h"
 
@@ -181,9 +181,9 @@ public:
 	 *  to T.
 	 * 
 	 * @param block The buffer where the values are written to
-	 * @param offset Offset of the block (at least {@link getDimensions() values}
+	 * @param offset Offset of the block (at least {@link dimensions() values}
 	 *  values)
-	 * @param size Size of the block (at least {@link getDimensions()} values)
+	 * @param size Size of the block (at least {@link dimensions()} values)
 	 */
 	template<typename T>
 	void getBlock(void *block,
@@ -246,12 +246,19 @@ private:
 	static const ptrdiff_t STRIDE[MAX_DIMENSIONS];
 };
 
+/**
+ * For void types, this functions returns the actual size of the elements
+ * in bytes.
+ */
 template<> inline
 size_t NetCdfReader::getBasicSize<void>()
 {
 	return getVarSize();
 }
 
+/**
+ * @copydoc getVar\<T\>
+ */
 template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, unsigned char *buffer)
@@ -259,6 +266,9 @@ void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 	nc_get_varm_uchar(m_file, m_variable, offset, size, STRIDE, imap, buffer);
 }
 
+/**
+ * @copydoc getVar\<T\>
+ */
 template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, int *buffer)
@@ -266,6 +276,9 @@ void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 	nc_get_varm_int(m_file, m_variable, offset, size, STRIDE, imap, buffer);
 }
 
+/**
+ * @copydoc getVar\<T\>
+ */
 template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, long *buffer)
@@ -273,6 +286,9 @@ void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 	nc_get_varm_long(m_file, m_variable, offset, size, STRIDE, imap, buffer);
 }
 
+/**
+ * @copydoc getVar\<T\>
+ */
 template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, float *buffer)
@@ -280,6 +296,9 @@ void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 	nc_get_varm_float(m_file, m_variable, offset, size, STRIDE, imap, buffer);
 }
 
+/**
+ * @copydoc getVar\<T\>
+ */
 template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, double *buffer)
@@ -287,6 +306,9 @@ void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 	nc_get_varm_double(m_file, m_variable, offset, size, STRIDE, imap, buffer);
 }
 
+/**
+ * @copydoc getVar\<T\>
+ */
 template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, void *buffer)
@@ -296,4 +318,4 @@ void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 
 }
 
-#endif // IO_NETCDF_H
+#endif // IO_NETCDFREADER_H

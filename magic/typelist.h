@@ -74,7 +74,7 @@ struct Typelist
 };
 
 /**
- * Creates a new typelist
+ * Creates a new type list
  */
 template
 <
@@ -88,6 +88,7 @@ template
 struct MakeTypelist
 {
 private:
+	/** The tail of the type list (everything except the first element) */
 	typedef typename MakeTypelist
 	<
 		T2 , T3 , T4 ,
@@ -100,9 +101,13 @@ private:
 	::result TailResult;
 
 public:
+	/** The type list (the first element + tail) */
 	typedef magic::Typelist<T1, TailResult> result;
 };
 
+/**
+ * The tail of the type list (equivalent to a null pointer)
+ */
 template<>
 struct MakeTypelist<>
 {

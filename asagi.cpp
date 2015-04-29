@@ -113,7 +113,7 @@ double asagi_grid_max(asagi_grid* handle, unsigned int n)
 	return handle->getMax(n);
 }
 
-double asagi_grid_delta_x(asagi_grid* handle, unsigned int n,
+double asagi_grid_delta(asagi_grid* handle, unsigned int n,
 		unsigned int level)
 {
 	return handle->getDelta(n, level);

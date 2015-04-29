@@ -44,17 +44,22 @@
 module asagi
   implicit none
 
+  !> @cond ignore
+  !! currently not supported with Doxygen
   !> @ingroup f_interface
   !!
   !! @see asagi::Grid::Type
+  !! @endcond ignore
   enum, bind( c )
     enumerator :: ASAGI_BYTE, ASAGI_INT, ASAGI_LONG, ASAGI_FLOAT, ASAGI_DOUBLE
   end enum
   
+  !> @cond ignore
+  !! currently not supported with Doxygen
   !> @ingroup f_interface
   !!
   !! @see asagi::Grid::Error
-  !! @todo update
+  !! @endcond ignore
   enum, bind( c )
     enumerator :: &
       ASAGI_SUCCESS = 0, &
@@ -67,7 +72,6 @@ module asagi
       ASAGI_VAR_NOT_FOUND, &
       ASAGI_WRONG_SIZE, &
       ASAGI_UNSUPPORTED_DIMENSIONS, &
-      ASAGI_MULTIPLE_TOPGRIDS, &
       ASAGI_INVALID_VAR_SIZE
   end enum
   
@@ -157,9 +161,7 @@ module asagi
       real( kind=c_double )        :: asagi_grid_max
     end function asagi_grid_max
 
-    !> @ingroup f_interface
-    !!
-    !! @see asagi::Grid::getDelta()
+    !> @internal
     function asagi_grid_delta_c( grid_id, n, level ) bind( c, name="f90asagi_grid_delta" )
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id

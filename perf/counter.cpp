@@ -50,7 +50,7 @@ perf::Counter::Counter()
 /**
  * Get the current value of a counter
  *
- * @param name The name of the counter (can be a non-native type)
+ * @param type The counter type (can be a non-native type)
  * @return The value of the counter or 0 if the name is unknown
  *
  * @see name2type
@@ -78,7 +78,7 @@ unsigned long perf::Counter::get(CounterType type) const
  * Converts a string representation of the counter to the counter type
  *
  * @param name The name of the type
- * @return The type
+ * @return The corresponding type
  */
 perf::Counter::CounterType perf::Counter::name2type(const char* name)
 {

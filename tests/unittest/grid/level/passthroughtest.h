@@ -46,7 +46,7 @@
 class PassThroughTest : public CxxTest::TestSuite
 {
 	grid::Grid* c;
-	grid::level::PassThrough<magic::NullType, magic::NullType, types::BasicType<float>>* grid;
+	grid::level::PassThrough<types::BasicType<float>>* grid;
 public:
 	void setUp(void)
 	{
@@ -54,9 +54,7 @@ public:
 		c = new grid::Grid(asagi::Grid::FLOAT);
 		c->setParam("GRID", "PASS_THROUGH");
 		c->open("../../../" NC_1D);
-		grid = &dynamic_cast<grid::SimpleContainer<grid::level::PassThrough<magic::NullType,
-					magic::NullType, types::BasicType<float>>,
-				magic::NullType, magic::NullType,
+		grid = &dynamic_cast<grid::SimpleContainer<grid::level::PassThrough<types::BasicType<float>>,
 				types::BasicType<float>>*>(c->m_containers[0])->m_levels[0];
 
 		TS_ASSERT(grid);

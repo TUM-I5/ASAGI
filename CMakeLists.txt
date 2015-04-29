@@ -12,12 +12,12 @@ option( STATIC_LIB "Compile the static library" OFF )
 option( FORTRAN_SUPPORT "Enable Fortran support" ON )
 set( MAX_DIMENSIONS 4 CACHE STRING "Maximum number of dimension supported" )
 option( THREADSAFE "Enable support for multiple threads on each node" ON )
-option( THREADSAFE_COUNTER "Make performance counter thread safe" OFF )
+option( THREADSAFE_COUNTER "Make access counters thread-safe" OFF )
+option( THREADSAFE_MPI "Make MPI calls thread-safe (required for non thread-safe MPI libraries)" ON )
 option( NOMPI "Compile without MPI" OFF )
 option( NONUMA "Compile without NUMA support" OFF )
-option( THREADSAFE_MPI "Make MPI calls threads safe (required for non threadsafe MPI libraries" ON )
+option( TESTS "Enable tests" OFF )
 option( EXAMPLES "Compile examples" OFF )
-option( TESTS "Test library" OFF )
 option( ROUND_ROBIN "Distribute blocks round robin on nodes" ON )
 mark_as_advanced( ROUND_ROBIN )
 option( DEBUG_NUMA "Overrides CPU NUMA information (each core gets its own NUMA domain" OFF )
@@ -190,6 +190,16 @@ add_subdirectory( types )
 # Add sources
 add_sources( ${mainSources} )
 
+# List libraries required by ASAGI (and library directories)
+set( asagiLibs ${NETCDF_LIBRARIES} )
+
+if( THREAD_FOUND )
+    set( asagiLibs ${asagiLibs} ${CMAKE_THREAD_LIBS_INIT} )
+endif( THREAD_FOUND )
+if( NOT NONUMA )
+    set( asagiLibs ${asagiLibs} ${NUMA_LIBRARY} )
+endif( NOT NONUMA )
+
 # Set rpath
 # use, i.e. don't skip the full RPATH for the build tree
 SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
@@ -205,53 +215,40 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 # which point to directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-# Documentation
-add_subdirectory( documentation )
-
 ##### Libraries #####
+# Set name for the library file
+if( NOMPI )
+    set( asagiOutputName "asagi_nompi" )
+else( NOMPI )
+    set( asagiOutputName "asagi" )
+endif( NOMPI )
+
 # Libraries (static and shared)
 if( SHARED_LIB )
     add_library( asagi SHARED ${LibSources} )
+    target_link_libraries( asagi ${asagiLibs} )
+    set_target_properties( asagi
+        PROPERTIES OUTPUT_NAME ${asagiOutputName}
+        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}
+        SOVERSION ${ASAGI_VERSION_MAJOR} )
+    
+    # Unset asagiLibs since we already linked them
+    unset( asagiLibs )
 endif( SHARED_LIB )
 if( STATIC_LIB )
     add_library( asagi-static STATIC ${LibSources} )
     set_target_properties( asagi-static
-        PROPERTIES OUTPUT_NAME asagi )
+        PROPERTIES OUTPUT_NAME ${asagiOutputName} )
 endif( STATIC_LIB )
 
-# Set static and shared libary output name to "nompi"
-if( NOMPI )
-    # Shared library
-    if( SHARED_LIB )
-	    set_target_properties( asagi
-		    PROPERTIES OUTPUT_NAME asagi_nompi )
-    endif( SHARED_LIB )
-		
-    # Static library
-    if( STATIC_LIB )
-        set_target_properties( asagi-static
-            PROPERTIES OUTPUT_NAME asagi_nompi )
-    endif( STATIC_LIB )
-endif( NOMPI )
-
 # Set the target that can be used to link programs with ASAGI
+# and ink libraries
 if( SHARED_LIB )
     set( asagiTarget asagi )
 else( SHARED_LIB )
     # We assume at least one of shared/static is build
     set( asagiTarget asagi-static )
 endif( SHARED_LIB )
-
-# Additional libs required to link with asagi
-set( asagiLibs ${NETCDF_LIBRARIES} )
-
-if( THREAD_FOUND )
-    set( asagiLibs ${asagiLibs} ${CMAKE_THREAD_LIBS_INIT} )
-endif( THREAD_FOUND )
-if( NOT NONUMA )
-    link_directories( ${NUMA_LIBRARY_DIR} )
-    set( asagiLibs ${asagiLibs} ${NUMA_LIBRARY} )
-endif( NOT NONUMA )
 
 ##### Excecutables #####
 # Tests
@@ -268,6 +265,46 @@ if( NOT NOMPI )
 	endif( EXAMPLES )
 endif( NOT NOMPI )
 
+##### Documentation #####
+# Documentation and examples included in the doc 
+add_subdirectory( documentation )
+
+##### pkg-config #####
+find_package( PkgConfig )
+if( PKGCONFIG_FOUND )
+    # Detect private libs and directories
+
+    set( _PKG_CONFIG_PROJECT_NAME ${PROJECT_NAME} )
+    set( _PKG_CONFIG_DESCRIPTION "a pArallel Server for Adaptive GeoInformation" )
+    set( _PKG_CONFIG_URL "https://github.com/TUM-I5/ASAGI" )
+    set( _PKG_CONFIG_VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR} )
+    
+    set( _PKG_CONFIG_PREFIX ${CMAKE_INSTALL_PREFIX} )
+    set( _PKG_CONFIG_LIBDIR "\${prefix}/lib" )
+    set( _PKG_CONFIG_INCLUDEDIR "\${prefix}/include" )
+
+    set( _PKG_CONFIG_REQUIRES "netcdf" )
+    set( _PKG_CONFIG_CONFLICTS "" )
+    set( _PKG_CONFIG_LIBS "${CMAKE_LIBRARY_PATH_FLAG}\${libdir} ${CMAKE_LINK_LIBRARY_FLAG}${asagiOutputName}" )
+    
+    if( NOT NONUMA )
+        set( _PKG_CONFIG_LIBS_PRIVATE "${CMAKE_LINK_LIBRARY_FLAG}numa" )
+        set( _PKG_CONFIG_LIBDIRS_PRIVATE ${CMAKE_LIBRARY_PATH_FLAG}${NUMA_LIBRARY_DIR} )
+    endif( NOT NONUMA )
+    set( _PKG_CONFIG_LIBS_PRIVATE  "${_PKG_CONFIG_LIBDIRS_PRIVATE} ${_PKG_CONFIG_LIBS_PRIVATE}" )
+    set( _PKG_CONFIG_CFLAGS "-I\${includedir}" )
+
+    # Where to install the pkg-config file?
+    set( _PKG_CONFIG_DIR ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig )
+    
+    # Configure the pkgconfig file
+    string( TOLOWER "${asagiOutputName}.pc" _PKG_FILENAME )
+    configure_file( CMake/pkg-config.pc.in ${_PKG_FILENAME} )
+    
+    # Install the pkg file
+    install( FILES ${CMAKE_CURRENT_BINARY_DIR}/${_PKG_FILENAME}	DESTINATION lib/pkgconfig )
+endif( PKGCONFIG_FOUND )
+
 ##### Installation #####
 if( SHARED_LIB )
     install( TARGETS asagi DESTINATION lib )
@@ -280,7 +317,7 @@ install( FILES include/asagi.h include/asagi.f90
 
 
 ##### Packaging #####
-INCLUDE(InstallRequiredSystemLibraries)
+include( InstallRequiredSystemLibraries )
 
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${CMAKE_PROJECT_NAME})
 SET(CPACK_PACKAGE_VENDOR "Sebastian Rettenberger")
@@ -290,7 +327,6 @@ SET(CPACK_PACKAGE_VERSION_MAJOR ${ASAGI_VERSION_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${ASAGI_VERSION_MINOR})
 SET(CPACK_PACKAGE_VERSION_PATCH "0")
 set(CPACK_SOURCE_IGNORE_FILES
-	"\\\\.svn/"
 	"\\\\.git/"
 	"\\\\.kdev4"
 	"~$"
@@ -299,4 +335,4 @@ set(CPACK_SOURCE_IGNORE_FILES
 )
 
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
-INCLUDE(CPack)
+include( CPack )

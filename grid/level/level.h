@@ -118,6 +118,9 @@ private:
 	perf::Counter m_counter;
 
 public:
+	/**
+	 * Specialized copy constructor
+	 */
 	Level(const Level &other)
 		: m_mpiComm(other.m_mpiComm), m_numaComm(other.m_numaComm->copy()),
 		  m_numaDomainId(other.m_numaDomainId), m_type(other.m_type),
@@ -127,6 +130,9 @@ public:
 		assert(m_numaDomainId == m_numaComm->domainId());
 	}
 
+	/**
+	 * Constructs a new grid level
+	 */
 	Level(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
@@ -375,7 +381,6 @@ protected:
 private:
 	/** The smallest number we can represent in a double */
 	static constexpr double NUMERIC_PRECISION = 1e-10;
-
 
 	/**
 	 * Calculates 1/scaling, except for scaling = 0 and scaling = inf. In this

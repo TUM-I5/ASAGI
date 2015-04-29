@@ -110,8 +110,6 @@ public:
 		WRONG_SIZE,
 		/** Unsupported number of dimensions input file */
 		UNSUPPORTED_DIMENSIONS,
-		/** More than one topmost grid specified */
-		MULTIPLE_TOPGRIDS,
 		/** Variable size in the input file does not match the type */
 		INVALID_VAR_SIZE
 	};
@@ -154,26 +152,7 @@ public:
 	 * This function allows you to change ASAGI's configuration. It must
 	 * be called before calling {@link open(const char*, unsigned int)}.
 	 * 
-	 * The following parameters are supported:
-	 * @li @b value-position The value should be either @c cell-centered
-	 *  (default) or @c vertex-centered. <br> Note: This parameter does not
-	 *  depend on the level.
-	 * @li @b variable-name The name of the variable in the NetCDF file
-	 *  (default: "z")
-	 * @li @b time-dimension The dimension that holds the time. Only useful
-	 *  with the hint HAS_TIME. Should be either "x", "y" or "z". (Default:
-	 *  the last dimension of the grid)
-	 * @li @b x-block-size The block size in x dimension (Default: 50)
-	 * @li @b y-block-size The block size in y dimension (Default: 50 or
-	 *  1 if it is an 1-dimensional grid)
-	 * @li @b z-block-size The block size in z dimension (Default: 50 or
-	 *  1 if it is an 1- or 2-dimensional grid)
-	 * @li @b block-cache-size Number of blocks cached on each node
-	 *  (Default: 80)
-	 * @li @b cache-hand-spread The difference between the hands of the
-	 *  2-handed clock algorithm (Default: block-cache-size/2)
-	 * @li @b multigrid-size Sets the number of grids for the level.
-	 *  Call this before setting any other parameter. (Default 1)
+	 * See @ref Parameters for a list of supported parameters.
 	 * 
 	 * @param name The name of the parameter
 	 * @param value The new value for the parameter
@@ -198,6 +177,7 @@ public:
 	/**
 	 * @ingroup cxx_interface
 	 * 
+	 * @param n The dimension
 	 * @return The minimum allowed coordinate in dimension <code>n</code>
 	 */
 	virtual double getMin(unsigned int n) const = 0;
@@ -205,6 +185,7 @@ public:
 	/**
 	 * @ingroup cxx_interface
 	 * 
+	 * @param n The dimension
 	 * @return The maximum allowed coordinate in dimension <code>n</code>
 	 */
 	virtual double getMax(unsigned int n) const = 0;
@@ -212,6 +193,8 @@ public:
 	/**
 	 * @ingroup cxx_interface
 	 * 
+	 * @param n The dimension
+	 * @param level The level for which the difference is requested
 	 * @return The difference of two coordinates in dimension <code>n</code>
 	 */
 	virtual double getDelta(unsigned int n, unsigned int level = 0) const = 0;
@@ -231,6 +214,7 @@ public:
 	 * 
 	 * @param pos The coordinates of the value, the array must have at least
 	 *  the size of the dimension of the grid
+	 * @param level The level from which the data should be fetched
 	 * @return The element at <code>pos</code> as a char
 	 */
 	virtual unsigned char getByte(const double* pos, unsigned int level = 0) = 0;
@@ -239,6 +223,7 @@ public:
 	 * 
 	 * @param pos The coordinates of the value, the array must have at least
 	 *  the size of the dimension of the grid
+	 * @param level The level from which the data should be fetched
 	 * @return The element at <code>pos</code> as an integer
 	 * 
 	 * @see getByte
@@ -249,6 +234,7 @@ public:
 	 * 
 	 * @param pos The coordinates of the value, the array must have at least
 	 *  the size of the dimension of the grid
+	 * @param level The level from which the data should be fetched
 	 * @return The element at <code>pos</code> as a long
 	 * 
 	 * @see getByte
@@ -259,6 +245,7 @@ public:
 	 * 
 	 * @param pos The coordinates of the value, the array must have at least
 	 *  the size of the dimension of the grid
+	 * @param level The level from which the data should be fetched
 	 * @return The element at <code>pos</code> as a float
 	 * 
 	 * @see getByte
@@ -269,6 +256,7 @@ public:
 	 * 
 	 * @param pos The coordinates of the value, the array must have at least
 	 *  the size of the dimension of the grid
+	 * @param level The level from which the data should be fetched
 	 * @return The element at <code>pos</code> as a double
 	 * 
 	 * @see getByte
@@ -280,8 +268,10 @@ public:
 	 * Copys the element at <code>pos</code> into buf. The buffer size has to be
 	 * (at least) {@link getVarSize()} bytes.
 	 * 
+	 * @param buf Pointer to the buffer where the data should be written
 	 * @param pos The coordinates of the value, the array must have at least
 	 *  the size of the dimension of the grid
+	 * @param level The level from which the data should be fetched
 	 */
 	virtual void getBuf(void* buf, const double* pos, unsigned int level = 0) = 0;
 
@@ -290,19 +280,13 @@ public:
 	 *
 	 * Gets the current value of a counter for a grid level.
 	 *
-	 * Possible counter names:
-	 * @li @b accesses Total number of data accesses
-	 * @li @b mpi_transfers Number of blocks transfered between processes
-	 * @li @b file_load Number of blocks loaded from file
-	 *  (after initialization)
-	 * @li @b local_hits Number values that where already in local memory
-	 * @li @b local_misses Number of values that where not already in
-	 *  local memory
+	 * See @ref accesscounter for a list of all counters.
 	 *
-	 *  @return The current counter value or 0 if the name is not defined
+	 * @return The current counter value or 0 if the name is not defined
 	 *
-	 *  @warning The performance counters are not threadsafe for performance reason.
-	 *   You may get wrong result when using more than one thread.
+	 * @warning The performance counters are by default not thread-safe for
+	 *  performance reason. You may get wrong result when using more than one
+	 *  thread.
 	 */
 	virtual unsigned long getCounter(const char *name,
 		unsigned int level = 0) = 0;
@@ -345,13 +329,13 @@ public:
 	/**
 	 * @ingroup cxx_interface
 	 * 
-	 * Frees all memory resources assciated with @c grid. After a grid is
+	 * Frees all memory resources associated with @c grid. After a grid is
 	 * closed you cannot access any values and you can not reopen another
 	 * NetCDF file.
 	 * <br>
 	 * This function does the same as calling <code>delete grid;</code> and
-	 * it is the C++ equivalent to {@link grid_close(asagi_grid*)} and
-	 * {@link ASAGI::grid_close}
+	 * it is the C++ equivalent to {@link asagi_grid_close(asagi_grid*)} and
+	 * {@link asagi::asagi_grid_close}
 	 * 
 	 * @param grid The grid that should be closed.
 	 */
@@ -362,7 +346,13 @@ public:
 };
 
 typedef asagi::Grid asagi_grid;
+/**
+ * @see asagi::Grid::Type
+ */
 typedef asagi::Grid::Type asagi_type;
+/**
+ * @see asagi::Grid::Error
+ */
 typedef asagi::Grid::Error asagi_error;
 
 #else

@@ -125,8 +125,9 @@ public:
 	 * @param cacheSize Number of blocks in the cache
 	 * @param blockCount Number local blocks
 	 * @param blockSize Number of elements in one block
-	 * @param elementSize Size of one element (in bytes)
-	 * @param comm The communicator object
+	 * @param type The data type of the elements
+	 * @param mpiComm The MPI communicator
+	 * @param numaComm The NUMA communicator
 	 */
 	asagi::Grid::Error init(unsigned char* cache,
 			unsigned int cacheSize,

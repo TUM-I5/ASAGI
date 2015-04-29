@@ -40,18 +40,27 @@
 
 // Init functions
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 int f90asagi_grid_create(asagi_type type)
 {
 	return static_cast<grid::Grid*>(
 		asagi::Grid::create(type))->c2f();
 }
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 int f90asagi_grid_create_array(asagi_type basic_type)
 {
 	return static_cast<grid::Grid*>(
 		asagi::Grid::createArray(basic_type))->c2f();
 }
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 int f90asagi_grid_create_struct(int count,
 	int blockLength[],
 	long displacements[],
@@ -65,6 +74,9 @@ int f90asagi_grid_create_struct(int count,
 			types))->c2f();
 }
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 void f90asagi_grid_set_comm(int grid_id, int comm)
 {
 	// This function is a no-op if called on a version without MPI support
@@ -75,17 +87,26 @@ void f90asagi_grid_set_comm(int grid_id, int comm)
 #endif // ASAGI_NOMPI
 }
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 void f90asagi_grid_set_threads(int grid_id, int threads)
 {
 	grid::Grid::f2c(grid_id)->setThreads(threads);
 }
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 void f90asagi_grid_set_param(int grid_id, const char* name,
 	const char* value, int level)
 {
 	grid::Grid::f2c(grid_id)->setParam(name, value, level);
 }
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 asagi_error f90asagi_grid_open(int grid_id, const char* filename,
 	int level)
 {
@@ -94,20 +115,32 @@ asagi_error f90asagi_grid_open(int grid_id, const char* filename,
 
 // Min/Max functions
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 double f90asagi_grid_min(int grid_id, int n)
 {
 	return grid::Grid::f2c(grid_id)->getMin(n);
 }
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 double f90asagi_grid_max(int grid_id, int n)
 {
 	return grid::Grid::f2c(grid_id)->getMax(n);
 }
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 double f90asagi_grid_delta(int grid_id, int n, int level)
 {
 	return grid::Grid::f2c(grid_id)->getDelta(n, level);
 }
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 int f90asagi_grid_var_size (int grid_id)
 {
 	return grid::Grid::f2c(grid_id)->getVarSize();
@@ -115,26 +148,44 @@ int f90asagi_grid_var_size (int grid_id)
 
 // Getters
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 unsigned char f90asagi_grid_get_byte(int grid_id, double* pos, int level)
 {
 	return grid::Grid::f2c(grid_id)->getByte(pos, level);
 }
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 int f90asagi_grid_get_int(int grid_id, double* pos, int level)
 {
 	return grid::Grid::f2c(grid_id)->getInt(pos, level);
 }
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 long f90asagi_grid_get_long(int grid_id, double* pos, int level)
 {
 	return grid::Grid::f2c(grid_id)->getLong(pos, level);
 }
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 float f90asagi_grid_get_float(int grid_id, double* pos, int level)
 {
 	return grid::Grid::f2c(grid_id)->getFloat(pos, level);
 }
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 double f90asagi_grid_get_double(int grid_id, double* pos, int level)
 {
 	return grid::Grid::f2c(grid_id)->getDouble(pos, level);
 }
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 void f90asagi_grid_get_buf(int grid_id, void* buf, double* pos,
 	int level)
 {
@@ -143,6 +194,9 @@ void f90asagi_grid_get_buf(int grid_id, void* buf, double* pos,
 
 // destructor
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
 void f90asagi_grid_close(int grid_id)
 {
 	delete grid::Grid::f2c(grid_id);

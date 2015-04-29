@@ -51,13 +51,6 @@
 #include "level/full.h"
 #include "level/fulldist.h"
 #include "level/passthrough.h"
-#include "transfer/mpifull.h"
-#include "transfer/mpicache.h"
-#include "transfer/mpino.h"
-#include "transfer/numafull.h"
-#include "transfer/numacache.h"
-#include "transfer/numafullcache.h"
-#include "transfer/numano.h"
 #include "types/arraytype.h"
 #include "types/basictype.h"
 #include "types/structtype.h"
@@ -65,10 +58,9 @@
 /**
  * Creates the container depending on the type of the <code>grid</code>
  */
-template<template<class Level, class MPIComm, class NumaComm, class Type> class Container,
-	template<class MPIComm, class NumaComm, class Type> class Level,
-	class MPIComm, class NumaComm, class TypeList>
-grid::Container* grid::Grid::TypeSelector<Container, Level, MPIComm, NumaComm, TypeList>
+template<template<class Level, class Type> class Container,
+	template<class Type> class Level, class TypeList>
+grid::Container* grid::Grid::TypeSelector<Container, Level, TypeList>
 	::createContainer(Grid &grid)
 {
 	typedef typename TypeList::Head Head;
@@ -92,17 +84,16 @@ grid::Container* grid::Grid::TypeSelector<Container, Level, MPIComm, NumaComm, T
 		}
 
 		// Create the container
-		return new Container<Level<MPIComm, NumaComm, Head>, MPIComm, NumaComm, Head>(grid.m_comm, grid.m_numa,
+		return new Container<Level<Head>, Head>(grid.m_comm, grid.m_numa,
 				*type, timeDimension, valuePos);
 	}
 
-	return TypeSelector<Container, Level, MPIComm, NumaComm, Tail>::createContainer(grid);
+	return TypeSelector<Container, Level, Tail>::createContainer(grid);
 }
 
-template<template<class Level, class MPIComm, class NumaComm, class Type> class Container,
-	template<class MPIComm, class NumaComm, class Type> class Level,
-	class MPIComm, class NumaComm>
-grid::Container* grid::Grid::TypeSelector<Container, Level, MPIComm, NumaComm, magic::NullType>
+template<template<class Level, class Type> class Container,
+	template<class Type> class Level>
+grid::Container* grid::Grid::TypeSelector<Container, Level, magic::NullType>
 	::createContainer(Grid &grid)
 {
 	assert(false);
@@ -352,41 +343,34 @@ void grid::Grid::initContainers()
 			it != m_containers.end(); it++) {
 		switch (containerType) {
 		case CACHE:
-			*it = TypeSelector<SimpleContainer, level::CacheDefault, magic::NullType, magic::NullType, typelist>::createContainer(*this);
+			*it = TypeSelector<SimpleContainer, level::CacheDefault, typelist>::createContainer(*this);
 			break;
 		case CACHE_NUMA:
-			*it = TypeSelector<SimpleContainer, level::CacheDistDefault,
-				transfer::MPINo, transfer::NumaCache, typelist>::createContainer(*this);
+			*it = TypeSelector<SimpleContainer, level::CacheDistNuma, typelist>::createContainer(*this);
 			break;
 		case CACHE_MPI:
-			*it = TypeSelector<SimpleContainer, level::CacheDistMPI,
-				transfer::MPICache, transfer::NumaNo, typelist>::createContainer(*this);
+			*it = TypeSelector<SimpleContainer, level::CacheDistMPI, typelist>::createContainer(*this);
 			break;
 		case CACHE_MPI_NUMA:
-			*it = TypeSelector<SimpleContainer, level::CacheDistMPI,
-				transfer::MPICache, transfer::NumaCache, typelist>::createContainer(*this);
+			*it = TypeSelector<SimpleContainer, level::CacheDistMPINuma, typelist>::createContainer(*this);
 			break;
 		case FULL:
-			*it = TypeSelector<SimpleContainer, level::FullDefault, magic::NullType, magic::NullType, typelist>::createContainer(*this);
+			*it = TypeSelector<SimpleContainer, level::FullDefault, typelist>::createContainer(*this);
 			break;
 		case FULL_NUMA:
-			*it = TypeSelector<SimpleContainer, level::FullDistDefault,
-				transfer::MPINo, transfer::NumaFull, typelist>::createContainer(*this);
+			*it = TypeSelector<SimpleContainer, level::FullDistNuma, typelist>::createContainer(*this);
 			break;
 		case FULL_MPI:
-			*it = TypeSelector<SimpleContainer, level::FullDistMPI,
-				transfer::MPIFull, transfer::NumaNo, typelist>::createContainer(*this);
+			*it = TypeSelector<SimpleContainer, level::FullDistMPI, typelist>::createContainer(*this);
 			break;
 		case FULL_MPI_NUMA:
-			*it = TypeSelector<SimpleContainer, level::FullDistMPI,
-				transfer::MPIFull, transfer::NumaFull, typelist>::createContainer(*this);
+			*it = TypeSelector<SimpleContainer, level::FullDistMPINuma, typelist>::createContainer(*this);
 			break;
 		case FULL_MPI_NUMACACHE:
-			*it = TypeSelector<SimpleContainer, level::FullDistMPI,
-				transfer::MPIFull, transfer::NumaFullCache, typelist>::createContainer(*this);
+			*it = TypeSelector<SimpleContainer, level::FullDistMPINumaCache, typelist>::createContainer(*this);
 			break;
 		case PASS_THROUGH:
-			*it = TypeSelector<SimpleContainer, level::PassThrough, magic::NullType, magic::NullType, typelist>::createContainer(*this);
+			*it = TypeSelector<SimpleContainer, level::PassThrough, typelist>::createContainer(*this);
 			break;
 		default:
 			*it = 0L;

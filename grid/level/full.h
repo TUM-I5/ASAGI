@@ -55,7 +55,7 @@ namespace level
  * 
  * If compiled without MPI, all blocks are local.
  */
-template<class MPITrans, class NumaTrans, class Type, class Allocator>
+template<class Type, class Allocator>
 class Full : public Blocked<Type>
 {
 private:
@@ -63,6 +63,9 @@ private:
 	unsigned char* m_data;
 
 public:
+	/**
+	 * @copydoc Blocked::Blocked
+	 */
 	Full(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
@@ -77,6 +80,9 @@ public:
 			this->numa().template free<Allocator>(m_data);
 	}
 	
+	/**
+	 * @copydoc Blocked::open
+	 */
 	asagi::Grid::Error open(
 		const char* filename,
 		const char* varname,
@@ -123,6 +129,10 @@ public:
 		return asagi::Grid::SUCCESS;
 	}
 	
+	/**
+	 * Writes the value at position <code>pos</code> into the buffer
+	 * <code>buf</code>.
+	 */
 	template<typename T>
 	void getAt(T* buf, const double* pos)
 	{
@@ -162,8 +172,9 @@ protected:
 	}
 };
 
-template<class MPITrans, class NumaTrans, class Type>
-using FullDefault = Full<MPITrans, NumaTrans, Type, allocator::Default>;
+/** Full level with default allocator */
+template<class Type>
+using FullDefault = Full<Type, allocator::Default>;
 
 }
 

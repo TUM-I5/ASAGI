@@ -42,6 +42,11 @@
 #include "allocator/default.h"
 #include "allocator/mpialloc.h"
 #include "cache/cachemanager.h"
+#include "transfer/numafull.h"
+#include "transfer/numafullcache.h"
+#include "transfer/numano.h"
+#include "transfer/mpifull.h"
+#include "transfer/mpino.h"
 
 namespace grid
 {
@@ -55,7 +60,7 @@ namespace level
  * MPI and stored in a cache.
  */
 template<class MPITrans, class NumaTrans, class Type, class Allocator>
-class FullDist : public Full<MPITrans, NumaTrans, Type, Allocator>
+class FullDist : public Full<Type, Allocator>
 {
 private:
 	/** The memory for the cache */
@@ -71,10 +76,13 @@ private:
 	NumaTrans m_numaTrans;
 
 public:
+	/**
+	 * @copydoc Full::Full
+	 */
 	FullDist(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
-		: Full<MPITrans, NumaTrans, Type, Allocator>(comm, numa, type),
+		: Full<Type, Allocator>(comm, numa, type),
 		  m_cache(0L)
 	{
 	}
@@ -84,6 +92,9 @@ public:
 		Allocator::free(m_cache);
 	}
 
+	/**
+	 * @copydoc Full::open
+	 */
 	asagi::Grid::Error open(
 		const char* filename,
 		const char* varname,
@@ -93,7 +104,7 @@ public:
 		int cacheHandSpread,
 		grid::ValuePosition valuePos)
 	{
-		asagi::Grid::Error err = Full<MPITrans, NumaTrans, Type, Allocator>::open(
+		asagi::Grid::Error err = Full<Type, Allocator>::open(
 				filename, varname,
 				blockSize, timeDimension,
 				cacheSize, cacheHandSpread,
@@ -131,6 +142,9 @@ public:
 		return asagi::Grid::SUCCESS;
 	}
 
+	/**
+	 * @copydoc Full::getAt
+	 */
 	template<typename T>
 	void getAt(T* buf, const double* pos)
 	{
@@ -143,7 +157,7 @@ public:
 
 		if (this->blockRank(globalBlockId) == this->comm().rank()
 				&& this->blockDomain(globalBlockId) == this->numaDomainId()) {
-			Full<MPITrans, NumaTrans, Type, Allocator>::getAt(buf, pos);
+			Full<Type, Allocator>::getAt(buf, pos);
 			return;
 		}
 
@@ -184,11 +198,21 @@ public:
 	}
 };
 
-template<class MPITrans, class NumaTrans, class Type>
-using FullDistDefault = FullDist<MPITrans, NumaTrans, Type, allocator::Default>;
+/** Full distributed level with NUMA */
+template<class Type>
+using FullDistNuma = FullDist<transfer::MPINo, transfer::NumaFull, Type, allocator::Default>;
 
-template<class MPITrans, class NumaTrans, class Type>
-using FullDistMPI = FullDist<MPITrans, NumaTrans, Type, allocator::MPIAlloc>;
+/** Full distributed level with MPI */
+template<class Type>
+using FullDistMPI = FullDist<transfer::MPIFull, transfer::NumaNo, Type, allocator::MPIAlloc>;
+
+/** Full distributed level with MPI and NUMA */
+template<class Type>
+using FullDistMPINuma = FullDist<transfer::MPIFull, transfer::NumaFull, Type, allocator::MPIAlloc>;
+
+/** Full distributed level with MPI, NUMA and NUMA cache lookup */
+template<class Type>
+using FullDistMPINumaCache = FullDist<transfer::MPIFull, transfer::NumaFullCache, Type, allocator::MPIAlloc>;
 
 }
 

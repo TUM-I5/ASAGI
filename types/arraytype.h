@@ -49,9 +49,9 @@
 namespace types {
 
 /**
- * We use {@link types::BasicType}. This way {@link #convertByte} and similar
- * functions convert the first element of the array to the correct datatype. One
- * can use {@link #convertBuffer} to get the whole array.
+ * We use {@link types::BasicType}. This way {@link #convert\<B\>}  convert
+ * the first element of the array to the correct data type. One
+ * can use {@link #convert} to get the whole array.
  */
 template<typename T> class ArrayType : public BasicType<T>
 {
@@ -82,7 +82,10 @@ public:
 		MPI_Type_free(&m_mpiType);
 #endif // ASAGI_NOMPI
 	}
-	
+
+	/**
+	 * @copydoc BasicType::check(const io::NetCdfReader&)
+	 */
 	asagi::Grid::Error check(const io::NetCdfReader &file)
 	{
 		if (file.getVarSize() % sizeof(T) != 0)
@@ -128,6 +131,9 @@ public:
 	}
 #endif // ASAGI_NOMPI
 
+	/**
+	 * @copydoc BasicType::load
+	 */
 	void load(io::NetCdfReader &file,
 		const size_t *offset,
 		const size_t *size,

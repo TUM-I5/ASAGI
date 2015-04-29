@@ -47,6 +47,7 @@ namespace allocator
 {
 
 #ifdef ASAGI_NOMPI
+/** Use the default allocator if MPI is not available */
 typedef MPIAlloc Default;
 #else // ASAGI_NOMPI
 

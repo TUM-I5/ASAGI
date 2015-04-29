@@ -51,6 +51,7 @@
 namespace mpi
 {
 
+/** Type of the global MPI lock */
 #ifdef THREADSAFE_MPI
 typedef threads::Mutex Lock;
 #else // THREADSAFE_MPI

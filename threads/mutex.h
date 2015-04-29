@@ -45,6 +45,7 @@
 
 namespace threads
 {
+/** Mutex type depending on the compilation flags */
 typedef PthreadMutex Mutex;
 }
 

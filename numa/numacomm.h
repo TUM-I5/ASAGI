@@ -59,6 +59,10 @@ private:
 	threads::Sync m_sync;
 
 public:
+	/**
+	 * Use {@link Numa::createComm()} to create an instance of
+	 * this class.
+	 */
 	NumaComm(const Numa& numa)
 		: m_numa(numa)
 	{
@@ -105,7 +109,7 @@ public:
 	 * This is a collective operation among the NUMA masters.
 	 *
 	 * @param value The value that should be broadcasted
-	 * @param root The thread (domainId of the thread) that holds
+	 * @param rootDomain The thread (domainId of the thread) that holds
 	 *  the value
 	 */
 	template<typename T>
@@ -148,7 +152,6 @@ public:
 	/**
 	 * Frees the the memory allocated with {@link allocate()}
 	 *
-	 * @param size Number of elements allocated for each NUMA domain
 	 * @param data Pointer to the allocated memory
 	 *
 	 * @warning The caller has to make sure that is is only called from one thread.

@@ -43,6 +43,7 @@
 namespace threads
 {
 
+/** Rename of {@link std::mutex} to match the ASAGI names. */
 typedef std::mutex CxxMutex;
 
 }

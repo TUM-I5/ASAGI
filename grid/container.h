@@ -76,6 +76,9 @@ protected:
 	double m_max[MAX_DIMENSIONS];
 
 public:
+	/**
+	 * Constructs a new container
+	 */
 	Container(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			int timeDimension,
@@ -96,9 +99,9 @@ public:
 	 *
 	 * @param filename The name of the file for this level
 	 * @param varname The variable name in the file
-	 * @param blockSizes Size of the blocks in each dimension
+	 * @param blockSize Size of the blocks in each dimension
 	 * @param cacheSize Number of blocks stored in the cache
-	 * @param Difference between the two hands in the LRU algorithm
+	 * @param cacheHandSpread Difference between the two hands in the LRU algorithm
 	 * @param level The level that should be initialized
 	 * @return
 	 */
@@ -206,9 +209,6 @@ protected:
 	{
 		return m_valuePos;
 	}
-
-protected:
-	grid::Grid* createGrid(unsigned int hint, unsigned int id) const;
 };
 
 }

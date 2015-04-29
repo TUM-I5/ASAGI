@@ -16,7 +16,8 @@
  * when fabric is set to "ofa" or "shm:ofa". Selecting a different fabric by
  * changing the environment variable "I_MPI_FABRICS" solves the problem.
  *
- * @section mappedmemory The program fails with "PMPI_Win_create: Assertion 'winptr-\>lock_table[i]' failed" or "function:MPI_WIN_LOCK, Invalid win argument"
+ * @section mappedmemory The program fails with "PMPI_Win_create: Assertion
+ *  'winptr-\>lock_table[i]' failed" or "function:MPI_WIN_LOCK, Invalid win argument"
  *
  * The SGI Message Passing Toolkit uses a special mapped memory for one-sided
  * communication. For large grids the default size of mapped memory may be too

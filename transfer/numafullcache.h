@@ -63,6 +63,9 @@ public:
 	{
 	}
 
+	/**
+	 * @copydoc NumaFull::init
+	 */
 	asagi::Grid::Error init(const unsigned char* data,
 			unsigned long blockCount,
 			unsigned long blockSize,

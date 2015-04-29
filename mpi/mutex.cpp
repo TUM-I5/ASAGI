@@ -37,11 +37,6 @@
 
 #include "mutex.h"
 
-/**
- * @param tag The tag, we should use for send and recv operations. Make sure
- *  the tag is unique within the communicator. For performance reason, the
- *  communicator set in {@link init(MPIComm)} is not duplicated!
- */
 mpi::Mutex::Mutex()
 	: m_comm(0L),
 	  m_homeRank(-1),

@@ -66,6 +66,10 @@ private:
 	size_t m_totalBlockSize;
 
 public:
+	/**
+	 * @copydoc Level::Level(const mpi::MPIComm&,
+	 *  const numa::Numa&, Type&)
+	 */
 	Blocked(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
@@ -80,7 +84,7 @@ public:
 	
 protected:
 	/**
-	 * Initialize the grid level
+	 * @copydoc Level::open
 	 */
 	asagi::Grid::Error open(
 			const char* filename,
@@ -102,18 +106,20 @@ protected:
 		// Set block size in time dimension
 		if ((timeDimension >= 0) && (blockSize[timeDimension] == 0)) {
 			logDebug(this->comm().rank()) << "Setting block size in time dimension to 1";
-			m_blockSize[timeDimension] = 1;
+			// C to Fortran mapping
+			m_blockSize[this->dimensions() - timeDimension - 1] = 1;
 		}
 
 		// Set default block size and calculate number of blocks and total block size
 		m_totalBlocks = 1;
 		m_totalBlockSize = 1;
 		for (unsigned int i = 0; i < this->dimensions(); i++) {
-			if (blockSize[i] == 0)
+			if (blockSize[this->dimensions() - i - 1] == 0)
 				// Setting default block size, if not yet set
 				m_blockSize[i] = 64;
 			else
-				m_blockSize[i] = blockSize[i];
+				// C to Fortran mapping
+				m_blockSize[i] = blockSize[this->dimensions() - i - 1];
 
 			// A block size large than the dimension does not make any sense
 			if (m_blockSize[i] > this->size(i)) {
@@ -286,12 +292,12 @@ protected:
 	 * @param index The coordinates of the value
 	 * @return The offset of the value in the block
 	 */
-	unsigned long calcOffsetInBlock(const size_t *coords)
+	unsigned long calcOffsetInBlock(const size_t *index)
 	{
 		unsigned long offset = 0;
 		for (unsigned int i = 0; i < this->dimensions(); i++) {
 			offset *= blockSize(i);
-			offset += coords[i] % blockSize(i);
+			offset += index[i] % blockSize(i);
 		}
 
 		assert(offset < totalBlockSize());

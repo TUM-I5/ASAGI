@@ -135,7 +135,10 @@ public:
 		delete [] m_types;
 #endif // ASAGI_NOMPI
 	}
-	
+
+	/**
+	 * @copydoc BasicType::check(const io::NetCdfReader&)
+	 */
 	asagi::Grid::Error check(const io::NetCdfReader &file)
 	{
 		unsigned int size = file.getVarSize();
@@ -194,6 +197,9 @@ public:
 	}
 #endif // ASAGI_NOMPI
 
+	/**
+	 * @copydoc BasicType::load
+	 */
 	void load(io::NetCdfReader &file,
 		const size_t *offset,
 		const size_t *size,

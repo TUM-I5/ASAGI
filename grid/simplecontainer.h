@@ -50,7 +50,7 @@ namespace grid
 /**
  * Simple container that stores the whole grid for each level.
  */
-template<class Level, class MPIComm, class NumaComm, class Type>
+template<class Level, class Type>
 class SimpleContainer : public TypedContainer<Type>
 {
 private:
@@ -58,6 +58,9 @@ private:
 	std::vector<Level> m_levels;
 
 public:
+	/**
+	 * @copydoc TypedContainer::TypedContainer
+	 */
 	SimpleContainer(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type,
@@ -115,6 +118,11 @@ public:
 
 	CONTAINER_GETVAR
 
+	/**
+	 * Template function that is called by {@link getFloat}, etc.
+	 * This function calls the correct <code>getAt</code> from the
+	 * level.
+	 */
 	template<typename T>
 	void getAt(T* buf, const double* pos, unsigned int level = 0)
 	{
@@ -122,10 +130,6 @@ public:
 
 		m_levels[level].getAt(buf, pos);
 	}
-	
-	double getXDelta() const;
-	double getYDelta() const;
-	double getZDelta() const;
 
 	unsigned long getCounter(perf::Counter::CounterType type,
 			unsigned int level = 0) const

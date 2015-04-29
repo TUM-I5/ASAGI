@@ -43,6 +43,9 @@
 namespace grid
 {
 
+/**
+ * A container with a specific element type
+ */
 template<class Type>
 class TypedContainer : public Container
 {
@@ -54,6 +57,9 @@ private:
 	Type &m_type;
 
 public:
+	/**
+	 * @copydoc Container::Container
+	 */
 	TypedContainer(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type,

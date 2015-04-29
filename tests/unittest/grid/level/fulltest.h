@@ -46,19 +46,17 @@
 class FullTest : public CxxTest::TestSuite
 {
 	grid::Grid* c0;
-	grid::level::FullDefault<magic::NullType, magic::NullType, types::BasicType<float>>* grid0;
+	grid::level::FullDefault<types::BasicType<float>>* grid0;
 
 	grid::Grid* c1;
-	grid::level::FullDefault<magic::NullType, magic::NullType, types::BasicType<float>>* grid1;
+	grid::level::FullDefault<types::BasicType<float>>* grid1;
 public:
 	void setUp(void)
 	{
 		// Set up a 1d grid
 		c0 = new grid::Grid(asagi::Grid::FLOAT);
 		c0->open("../../../" NC_1D);
-		grid0 = &dynamic_cast<grid::SimpleContainer<grid::level::FullDefault<magic::NullType,
-					magic::NullType, types::BasicType<float>>,
-				magic::NullType, magic::NullType,
+		grid0 = &dynamic_cast<grid::SimpleContainer<grid::level::FullDefault<types::BasicType<float>>,
 				types::BasicType<float>>*>(c0->m_containers[0])->m_levels[0];
 
 		TS_ASSERT(grid0);
@@ -66,9 +64,7 @@ public:
 		c1 = new grid::Grid(asagi::Grid::FLOAT);
 		c1->setParam("BLOCK_SIZE_0", "12");
 		c1->open("../../../" NC_1D);
-		grid1 = &dynamic_cast<grid::SimpleContainer<grid::level::FullDefault<magic::NullType,
-					magic::NullType, types::BasicType<float>>,
-				magic::NullType, magic::NullType,
+		grid1 = &dynamic_cast<grid::SimpleContainer<grid::level::FullDefault<types::BasicType<float>>,
 				types::BasicType<float>>*>(c1->m_containers[0])->m_levels[0];
 
 		TS_ASSERT(grid1);

@@ -42,6 +42,10 @@
 
 #include "cache.h"
 #include "allocator/mpialloc.h"
+#include "transfer/numacache.h"
+#include "transfer/numano.h"
+#include "transfer/mpicache.h"
+#include "transfer/mpino.h"
 
 namespace grid
 {
@@ -55,7 +59,7 @@ namespace level
  * or the file.
  */
 template<class MPITrans, class NumaTrans, class Type, class Allocator>
-class CacheDist : public Cache<MPITrans, NumaTrans, Type, Allocator>
+class CacheDist : public Cache<Type, Allocator>
 {
 private:
 	/** The MPI transfer class */
@@ -68,10 +72,13 @@ private:
 	unsigned int m_cacheSize;
 
 public:
+	/**
+	 * @copydoc Cache::Cache
+	 */
 	CacheDist(const mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
-		: Cache<MPITrans, NumaTrans, Type, Allocator>(comm, numa, type),
+		: Cache<Type, Allocator>(comm, numa, type),
 		  m_cacheSize(0)
 	{
 	}
@@ -80,6 +87,9 @@ public:
 	{
 	}
 
+	/**
+	 * @copydoc Cache::open
+	 */
 	asagi::Grid::Error open(
 		const char* filename,
 		const char* varname,
@@ -89,7 +99,7 @@ public:
 		int cacheHandSpread,
 		grid::ValuePosition valuePos)
 	{
-		asagi::Grid::Error err = Cache<MPITrans, NumaTrans, Type, Allocator>::open(
+		asagi::Grid::Error err = Cache<Type, Allocator>::open(
 				filename, varname,
 				blockSize, timeDimension,
 				cacheSize, cacheHandSpread,
@@ -115,6 +125,9 @@ public:
 		return asagi::Grid::SUCCESS;
 	}
 
+	/**
+	 * @copydoc Cache::getAt
+	 */
 	template<typename T>
 	void getAt(T* buf, const double* pos)
 	{
@@ -170,11 +183,17 @@ public:
 	}
 };
 
-template<class MPITrans, class NumaTrans, class Type>
-using CacheDistDefault = CacheDist<MPITrans, NumaTrans, Type, allocator::Default>;
+/** Cached distributed level with NUMA */
+template<class Type>
+using CacheDistNuma = CacheDist<transfer::MPINo, transfer::NumaCache, Type, allocator::Default>;
 
-template<class MPITrans, class NumaTrans, class Type>
-using CacheDistMPI = CacheDist<MPITrans, NumaTrans, Type, allocator::MPIAlloc>;
+/** Cached distributed level with MPI */
+template<class Type>
+using CacheDistMPI = CacheDist<transfer::MPICache, transfer::NumaNo, Type, allocator::MPIAlloc>;
+
+/** Cached distributed level with MPI and NUMA */
+template<class Type>
+using CacheDistMPINuma = CacheDist<transfer::MPICache, transfer::NumaCache, Type, allocator::MPIAlloc>;
 
 }
 

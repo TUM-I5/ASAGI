@@ -51,7 +51,7 @@ namespace level
  * A simple grid that passes every access directly to the underlying
  * I/O layer.
  */
-template<class MPIComm, class NumaComm, class Type>
+template<class Type>
 class PassThrough : public Level<Type>
 {
 private:
@@ -59,6 +59,10 @@ private:
 	unsigned char* m_buf;
 
 public:
+	/**
+	 * @copydoc Level::Level(const mpi::MPIComm&,
+	 *  const numa::Numa&, Type&)
+	 */
 	PassThrough(
 			const mpi::MPIComm &comm,
 			const numa::Numa &numa,
@@ -73,6 +77,9 @@ public:
 		delete [] m_buf;
 	}
 
+	/**
+	 * @copydoc Level::open
+	 */
 	asagi::Grid::Error open(
 			const char* filename,
 			const char* varname,
@@ -92,6 +99,9 @@ public:
 		return asagi::Grid::SUCCESS;
 	}
 
+	/**
+	 * @copydoc Full::getAt
+	 */
 	template<typename T>
 	void getAt(T* buf, const double* pos)
 	{
