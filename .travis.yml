@@ -9,7 +9,7 @@ before_install:
  - sudo apt-get update -qq
 
 install:
- - sudo apt-get install -qq g++-4.7 gfortran openmpi-bin openmpi-common openmpi-dev libnetcdf6 libnetcdf-dev libnuma1 libnuma-dev cmake doxygen graphviz texlive-fonts-recommended
+ - sudo apt-get install -qq g++-4.7 gfortran openmpi-bin openmpi-common openmpi-dev libnetcdf6 libnetcdf-dev libnuma1 libnuma-dev cmake doxygen graphviz texlive-fonts-recommended texlive-font-utils
  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.7 50 --slave /usr/bin/g++ g++ /usr/bin/g++-4.7
  - sudo update-alternatives --set gcc /usr/bin/gcc-4.7
 
