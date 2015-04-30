@@ -36,7 +36,7 @@
  */
 
 #include "globaltest.h"
-#include "tests.h"
+#include "testdefines.h"
 
 #include "types/arraytype.h"
 
@@ -60,6 +60,6 @@ public:
 		types::ArrayType<float> type;
 		type.check(*file);
 		
-		TS_ASSERT_EQUALS(type.getSize(), sizeof(float));
+		TS_ASSERT_EQUALS(type.size(), sizeof(float));
 	}
 };

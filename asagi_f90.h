@@ -32,84 +32,49 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef ASAGI_F95_H
 #define ASAGI_F95_H
 
-#include <asagi.h>
+#include "asagi.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int f90grid_create(grid_type type, int hint,
-	int levels);
+int f90asagi_grid_create(asagi_type type);
 
-int f90grid_create_array(grid_type basic_type, int hint,
-	int levels);
+int f90asagi_grid_create_array(asagi_type basic_type);
 
-int f90grid_create_struct(int count,
+int f90asagi_grid_create_struct(int count,
 	int blockLength[],
 	long displacements[],
-	grid_type types[],
-	int hint, int levels);
+	asagi_type types[]);
 
-grid_error f90grid_set_comm(int grid_id, int comm);
-grid_error f90grid_set_param(int grid_id, const char* name,
+void f90asagi_grid_set_comm(int grid_id, int comm);
+void f90asagi_grid_set_threads(int grid_id, int threads);
+void f90asagi_grid_set_param(int grid_id, const char* name,
 	const char* value, int level);
-grid_error f90grid_open(int grid_id, const char* filename,
+asagi_error f90asagi_grid_open(int grid_id, const char* filename,
 	int level);
 
-double f90grid_min_x(int grid_id);
-double f90grid_min_y(int grid_id);
-double f90grid_min_z(int grid_id);
-double f90grid_max_x(int grid_id);
-double f90grid_max_y(int grid_id);
-double f90grid_max_z(int grid_id);
+double f90asagi_grid_min(int grid_id, int n);
+double f90asagi_grid_max(int grid_id, int n);
 
-double f90grid_delta_x(int grid_id);
-double f90grid_delta_y(int grid_id);
-double f90grid_delta_z(int grid_id);
+double f90asagi_grid_delta(int grid_id, int n, int level);
 
-int f90grid_var_size(int grid_id);
+int f90asagi_grid_var_size(int grid_id);
 
-unsigned char f90grid_get_byte_1d(int grid_id, double x, int level);
-int f90grid_get_int_1d(int grid_id, double x, int level);
-long f90grid_get_long_1d(int grid_id, double x, int level);
-float f90grid_get_float_1d(int grid_id, double x, int level);
-double f90grid_get_double_1d(int grid_id, double x, int level);
-void f90grid_get_buf_1d(int grid_id,void* buf, double x,
-	int level);
+unsigned char f90asagi_grid_get_byte(int grid_id, double* pos, int level);
+int f90asagi_grid_get_int(int grid_id, double* pos, int level);
+long f90asagi_grid_get_long(int grid_id, double* pos, int level);
+float f90asagi_grid_get_float(int grid_id, double* pos, int level);
+double f90asagi_grid_get_double(int grid_id, double* pos, int level);
+void f90asagi_grid_get_buf(int grid_id, void* buf, double* pos, int level);
 
-unsigned char f90grid_get_byte_2d(int grid_id, double x, double y,
-	int level);
-int f90grid_get_int_2d(int grid_id, double x, double y,
-	int level);
-long f90grid_get_long_2d(int grid_id, double x, double y,
-	int level);
-float f90grid_get_float_2d(int grid_id, double x, double y,
-	int level);
-double f90grid_get_double_2d(int grid_id, double x, double y,
-	int level);
-void f90grid_get_buf_2d(int grid_id,void* buf, double x, double y,
-	int level);
-
-unsigned char f90grid_get_byte_3d(int grid_id, double x, double y, double z,
-	int level);
-int f90grid_get_int_3d(int grid_id, double x, double y, double z,
-	int level);
-long f90grid_get_long_3d(int grid_id, double x, double y, double z,
-	int level);
-float f90grid_get_float_3d(int grid_id, double x, double y, double z,
-	int level);
-double f90grid_get_double_3d(int grid_id, double x, double y, double z,
-	int level);
-void f90grid_get_buf_3d(int grid_id,void* buf, double x, double y, double z,
-	int level);
-
-void f90grid_close(int grid_id);
+void f90asagi_grid_close(int grid_id);
 
 #ifdef __cplusplus
 }	// end extern "C"

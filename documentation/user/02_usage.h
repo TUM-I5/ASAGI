@@ -1,4 +1,39 @@
 /**
+ * @file
+ *  This file is part of ASAGI.
+ *
+ *  ASAGI is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as
+ *  published by the Free Software Foundation, either version 3 of
+ *  the License, or  (at your option) any later version.
+ *
+ *  ASAGI is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with ASAGI.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Diese Datei ist Teil von ASAGI.
+ *
+ *  ASAGI ist Freie Software: Sie koennen es unter den Bedingungen
+ *  der GNU Lesser General Public License, wie von der Free Software
+ *  Foundation, Version 3 der Lizenz oder (nach Ihrer Option) jeder
+ *  spaeteren veroeffentlichten Version, weiterverbreiten und/oder
+ *  modifizieren.
+ *
+ *  ASAGI wird in der Hoffnung, dass es nuetzlich sein wird, aber
+ *  OHNE JEDE GEWAEHELEISTUNG, bereitgestellt; sogar ohne die implizite
+ *  Gewaehrleistung der MARKTFAEHIGKEIT oder EIGNUNG FUER EINEN BESTIMMTEN
+ *  ZWECK. Siehe die GNU Lesser General Public License fuer weitere Details.
+ *
+ *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
+ *  mit diesem Programm erhalten haben. Wenn nicht, siehe
+ *  <http://www.gnu.org/licenses/>.
+ *
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
  * @page usage Using ASAGI
  *
  * @section minexamples Minimal examples
@@ -16,14 +51,38 @@
  * Fortran example:
  * @include minimal.f90
  *
+ * @section gridtypes Grid types
+ *
+ * ASAGI distinguishes between three different grid types:
+ * @li <b>FULL</b> The whole grid will be loaded during the initialization. The
+ *  file is not accessed during runtime. (default)
+ * @li <b>CACHE</b> ASAGI is used as a cache. After initialization, the cache
+ *  will be empty. Each access to an element, will put the corresponding block
+ *  into the cache for later usage.
+ * @li <b>PASS-THROUGH</b> ASAGI will pass each access to the underlying file
+ *  system without any caching, etc.
+ *
+ * Full storage does not automatically mean, that the full grid is stored on
+ * every CPU. If {@link asagi::Grid::setComm()} and/or
+ * {@link asagi::Grid::setThreads()} are called, the initial grid will be
+ * distributed among all nodes resp. CPUs.
+ * If the cache-grid is used and {@link asagi::Grid::setThreads()} and/or
+ * {@link asagi::Grid::setComm()} are set, ASAGI will copy the data from
+ * other NUMA domains and/or other MPI processes. Only if it is not available
+ * in another cache, the data will be fetched from the file.
+ *
  * @section Dimensions
  *
- * ASAGI supports grids with up to three dimensions. The number of dimension
- * cannot be specified by calling an ASAGI function but depends on the NetCDF
- * input file. For example, to access an integer of a 2-dimensional grid in C++,
- * use <code>getInt2D</code>. For a 3-dimensional grid, the corresponding call
- * is <code>getInt3D</code>.
+ * ASAGI supports grids with up to <code>MAX_DIMENSIONS</code> dimensions.
+ * (<code>MAX_DIMENSIONS</code> is 4 by default, but can be changed during
+ * compilation of ASAGI.) The number of actual dimensions in the grid
+ * cannot be specified by calling an ASAGI function but depends on the netCDF
+ * input file.
  * 
+ * @remark The order in the dimension in the netCDF file is in Fortran style
+ * (column-major, see @ref netcdffiles) but the ASAGI interface uses C/C++
+ * ordering (row-major).
+ *
  * @section lod Level of detail
  *
  * A grid can have multiple resolutions. Each resolution is identified by a
@@ -52,13 +111,13 @@
  * mapping is omitted. After the mapping, the coordinate is rounded to the
  * nearest array index. ASAGI does not interpolate between array values.
  *
- * The actual range of the grid can be obtained with the
- * <code>getMin</code>/<code>getMax</code> functions. They also return
+ * The actual range of the grid can be obtained with
+ * {@link asagi::Grid::getMin()}/{@link asagi::Grid::getMax()}. They also return
  * coordinates, not array indexes. It is erroneous to access values outside
  * range of the grid.
  *
  * The range of a dimension can be @f$(-\infty,\infty)@f$. This is the case if
- * the size of the dimension in the NetCDF file is one.
+ * the size of the dimension in the netCDF file is one.
  *
  * @section valuepos Value position
  *
@@ -69,6 +128,7 @@
  * @image latex valueposition.eps "Cell-centered and vertex-centered grids"
  * 
  * @section netcdffiles NetCDF files
+ *
  * All NetCDF files opened with ASAGI should respect the COARDS conventions
  * (http://ferret.wrc.noaa.gov/noaa_coop/coop_cdf_profile.html). However, ASAGI
  * has some further limitations:
@@ -89,10 +149,133 @@
  *
  * @section multithread Multi-thread support
  *
- * When compiled with <code>THREADSAFTY=ON</code> (see section @ref Compilation)
+ * When compiled with <code>THREADSAFE=ON</code> (see section @ref Compilation)
  * all functions are thread-safe. However, there are some restrictions due to
- * MPI implementations. To receive values from a grid with different threads MPI
- * must support at least <code>MPI_THREAD_SERIALIZED</code>. If you want to
- * <code>open</code> or <code>close</code> several grids at the same time,
- * support for <code>MPI_THREAD_MULTIPLE</code> is required.
+ * MPI implementations. If your MPI library is not thread-safe, you have to add
+ * the additional flag <code>THREADSAFE_MPI=ON</code> which will mare sure that
+ * ASAGI does not call MPI functions from different threads at the same time.
+ * However, in this case, you are not allowed to call MPI <b>and</b> ASAGI
+ * functions at the same time.
+ *
+ * Multi-thread support is required if you want to use ASAGI's NUMA
+ * functionality (see @ref NUMA).
+ *
+ * @section NUMA
+ *
+ * ASAGI is able to detect the NUMA domains of your node. If more than one NUMA
+ * domain is detected, ASAGI will place a cache on each NUMA domain to increase
+ * locality. To enable the NUMA detection, call
+ * {@link asagi::Grid::setThreads()} with the <b>total</b> number of threads
+ * you are using. In this case, {@link asagi::Grid::open()} has to be called by
+ * all threads and is a collective operation.
+ *
+ * @section Parameters
+ *
+ * ASAGI supports several parameters for each grid:
+ *
+ * <table>
+ *  <tr>
+ *   <th>Name</th>
+ *   <th>Values</th>
+ *   <th>Description</th>
+ *   <th>Grid-global @ref gridglobal "(*)"</th>
+ *  </tr>
+ *  <tr>
+ *   <td>GRID</td>
+ *   <td>FULL | CACHE | PASS-THROUGH</td>
+ *   <td>The grid type (see @ref gridtypes)</td>
+ *   <td>yes</td>
+ *  </tr>
+ *  <tr>
+ *   <td>NUMA-CACHE</td>
+ *   <td>YES | NO</td>
+ *   <td>For full-grids, try local caches before using MPI</td>
+ *   <td>yes</td>
+ *  </tr>
+ *  <tr>
+ *   <td>VALUE-POSITION</td>
+ *   <td>CELL-CENTERED | VERTEX-CENTERED</td>
+ *   <td>The value position (see @ref valuepos)</td>
+ *   <td>yes</td>
+ *  </tr>
+ *  <tr>
+ *   <td>TIME-DIMENSION</td>
+ *   <td>int</td>
+ *   <td>The dimension that holds the time (default is -1 which means no time
+ *    dimension exists). ASAGI treats time dimension specially.</td>
+ *   <td>yes</td>
+ *  </tr>
+ *  <tr>
+ *   <td>VARIABLE</td>
+ *   <td>string</td>
+ *   <td>The variable name in the netCDf file. (default: z)</td>
+ *   <td>no</td>
+ *  </tr>
+ *  <tr>
+ *   <td>BLOCK-SIZE-<i>X</i></td>
+ *   <td>int</td>
+ *   <td>The size of a block in dimension <i>X</i>.</td>
+ *   <td>no</td>
+ *  </tr>
+ *  <tr>
+ *   <td>CACHE-SIZE</td>
+ *   <td>int</td>
+ *   <td>The size of the cache (in blocks) on each CPU.</td>
+ *   <td>no</td>
+ *  </tr>
+ *  <tr>
+ *   <td>CACHE-HAND-SPREAD</td>
+ *   <td>int</td>
+ *   <td>ASAGI uses the clock algorithm to approx. LRU. This parameter
+ *    specifies the difference of the 2 hands in the clock. Lower values
+ *    result in a faster algorithm but a worse approximation.</td>
+ *   <td>no</td>
+ *  </tr>
+ * </table>
+ *
+ * @anchor gridglobal (*) If yes, the parameter can only be set for all levels
+ *  at the same time. Set the parameter <code>level</code> in
+ *  {@link asagi::Grid::setParam()} to 0 to change value.
+ *
+ * @section accesscounter Access counters
+ *
+ * ASAGI supports several access counters to measure the throughput of the
+ * library and get information about effectiveness of the caches:
+ *
+ * <table>
+ *  <tr>
+ *   <th>Name</th>
+ *   <th>Description</th>
+ *  </tr>
+ *  <tr>
+ *   <td>accesses</td>
+ *   <td>Total number of data accesses</td>
+ *  </tr>
+ *  <tr>
+ *    <td>numa_transfers</td>
+ *    <td>Number of blocks transfered between CPUs</td>
+ *  <tr>
+ *   <td>mpi_transfers</td>
+ *   <td>Number of blocks transfered between processes</td>
+ *  </tr>
+ *  <tr>
+ *   <td>file_load</td>
+ *   <td>Number of blocks loaded from file (after initialization)</td>
+ *  </tr>
+ *  <tr>
+ *   <td>local_hits</td>
+ *   <td>Number values that where already in local NUMA domain</td>
+ *  </tr>
+ *  <tr>
+ *   <td>node_hits</td>
+ *   <td>Number values that where already on the local node</td>
+ *  </tr>
+ *  <tr>
+ *   <td>local_misses</td>
+ *   <td>Number of values that where not already in local memory</td>
+ *  </tr>
+ * </table>
+ *
+ * @remark If more than one thread is used and ASAGI is not compiled with
+ *  <code>THREADSAFE_COUNTER=ON</code>, the counters might be inaccurate.
  */

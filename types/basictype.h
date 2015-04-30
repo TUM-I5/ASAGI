@@ -32,14 +32,13 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TYPES_BASICTYPE_H
 #define TYPES_BASICTYPE_H
 
 #include "type.h"
-
 #include "io/netcdfreader.h"
 
 namespace types {
@@ -50,76 +49,80 @@ namespace types {
 template<typename T> class BasicType : public Type
 {   
 public:
-	virtual unsigned int getSize()
+	/**
+	 * Check compatibility of the input file with this type.
+	 */
+	asagi::Grid::Error check(const io::NetCdfReader &file)
+	{
+		return asagi::Grid::SUCCESS;
+	}
+
+	unsigned int size() const
 	{
 		return sizeof(T);
 	}
-	
-	virtual void load(io::NetCdfReader &file,
+
+	/**
+	 * Loads a block form the netCDF file into the buffer
+	 */
+	void load(io::NetCdfReader &file,
 		const size_t *offset,
 		const size_t *size,
-		void *buf)
+		void *buf) const
 	{
 		file.getBlock<T>(buf, offset, size);
 	}
-	
+
 #ifndef ASAGI_NOMPI
-	virtual MPI_Datatype getMPIType();
+	virtual MPI_Datatype getMPIType() const;
 #endif // ASAGI_NOMPI
 	
-	void convertByte(const void* data, void* buf)
+	/**
+	 * The value is copied from data to buf, doing transformations between
+	 * basic types.
+	 */
+	template<typename B>
+	void convert(const void* data, B* buf) const
 	{
-		*static_cast<unsigned char*>(buf) = *static_cast<const T*>(data);
+		*buf = *static_cast<const T*>(data);
 	}
-	
-	void convertInt(const void* data, void* buf)
+
+	/**
+	 * Uses the "no-conversion" function for void pointers
+	 */
+	void convert(const void* data, void* buf) const
 	{
-		*static_cast<int*>(buf) = *static_cast<const T*>(data);
-	}
-	
-	void convertLong(const void* data, void* buf)
-	{
-		*static_cast<long*>(buf) = *static_cast<const T*>(data);
-	}
-	
-	void convertFloat(const void* data, void* buf)
-	{
-		*static_cast<float*>(buf) = *static_cast<const T*>(data);
-	}
-	
-	void convertDouble(const void* data, void* buf)
-	{
-		*static_cast<double*>(buf) = *static_cast<const T*>(data);
+		Type::copy(data, buf, sizeof(T));
 	}
 };
 
 #ifndef ASAGI_NOMPI
 template<> inline
-MPI_Datatype BasicType<unsigned char>::getMPIType()
+MPI_Datatype BasicType<unsigned char>::getMPIType() const
 {
 	return MPI_BYTE;
 }
 
 template<> inline
-MPI_Datatype BasicType<int>::getMPIType()
+MPI_Datatype BasicType<int>::getMPIType() const
 {
 	return MPI_INT;
 }
 
 template<> inline
-MPI_Datatype BasicType<long>::getMPIType()
+MPI_Datatype BasicType<long>::getMPIType() const
 {
 	return MPI_LONG;
 }
 
 template<> inline
-MPI_Datatype BasicType<float>::getMPIType()
+MPI_Datatype BasicType<float>::getMPIType() const
 {
 	return MPI_FLOAT;
 }
 
 template<> inline
-MPI_Datatype BasicType<double>::getMPIType()
+MPI_Datatype BasicType<double>::getMPIType() const
 {
 	return MPI_DOUBLE;
 }

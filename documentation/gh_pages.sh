@@ -46,7 +46,7 @@ if [ "$TRAVIS_BRANCH" == "master" ]; then
 	cd gh-pages
 	
 	git rm -rf .
-	cp -r ../build/documentation/apidoc/* .
+	cp -r ../build/documentation/devdoc/* .
 	cp ../build/documentation/doc.pdf .
 	git add -f .
 	git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"

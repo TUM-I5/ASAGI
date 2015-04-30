@@ -1,3 +1,6 @@
 [submodule "submodules/utils"]
 	path = submodules/utils
 	url = https://github.com/TUM-I5/utils.git
+[submodule "submodules/cloak"]
+	path = submodules/cloak
+	url = https://github.com/pfultz2/Cloak.git

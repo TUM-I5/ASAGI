@@ -61,85 +61,30 @@ class Type
 {
 public:
 	/**
-	 * Describes a function that converts form one basic type to another.
-	 * @see convertByte
-	 * @see convertInt
-	 * @see convertLong
-	 * @see convertFloat
-	 * @see convertDouble
-	 * @see convertBuffer
-	 */
-	typedef void (Type::*converter_t)(const void*, void*);
-	
-public:
-	/**
 	 * Empty destructor, makes sure constructor
 	 * of child classes is called
 	 */
 	virtual ~Type() { }
 	
 	/**
-	 * Check compatibility of the input file with this type.
-	 */
-	virtual asagi::Grid::Error check(const io::NetCdfReader &file)
-	{
-		// Default: everything is okay
-		return asagi::Grid::SUCCESS;
-	}
-	
-	/**
 	 * @return The size of the variable
 	 */
-	virtual unsigned int getSize() = 0;
-	
-	/**
-	 * Loads a block form the netcdf file into the buffer
-	 */
-	virtual void load(io::NetCdfReader &file,
-		const size_t *offset,
-		const size_t *size,
-		void *buf) = 0;
+	virtual unsigned int size() const = 0;
 	
 #ifndef ASAGI_NOMPI
 	/**
 	 * @return The corresponding MPI_Datatype for this type
 	 */
-	virtual MPI_Datatype getMPIType() = 0;
+	virtual MPI_Datatype getMPIType() const = 0;
 #endif // ASAGI_NOMPI
 	
+protected:
 	/**
-	 * Conversation functions:
-	 * The value is copied from data to buf, doing transformations between
-	 * basic types.<br>
-	 * E.g.: If the type of this class is "float" and the "convertDouble" is
-	 * called, *data should be a float and *buf a double.<br>
-	 * All these functions have the type "converter_t". This way it is
-	 * possible to pass them arround as pointers.
+	 * Copies the data from <code>data</code> to <code>buf</code>
 	 */
-	virtual void convertByte(const void* data, void* buf) = 0;
-	/**
-	 * @see convertByte
-	 */
-	virtual void convertInt(const void* data, void* buf) = 0;
-	/**
-	 * @see convertByte
-	 */
-	virtual void convertLong(const void* data, void* buf) = 0;
-	/**
-	 * @see convertByte
-	 */
-	virtual void convertFloat(const void* data, void* buf) = 0;
-	/**
-	 * @see convertByte
-	 */
-	virtual void convertDouble(const void* data, void* buf) = 0;
-	/**
-	 * This is the "no-conversation" function. It simple copys a whole
-	 * variable from data to buf
-	 */
-	void convertBuffer(const void* data, void* buf)
+	static void copy(const void* data, void* buf, unsigned int size)
 	{
-		memcpy(buf, data, getSize());
+		memcpy(buf, data, size);
 	}
 };
 

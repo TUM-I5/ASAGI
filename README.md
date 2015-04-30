@@ -1,7 +1,7 @@
 ![logo](documentation/images/asagi.png "ASAGI") ASAGI
 =====================================================
 
-A parallel server for adaptive geoinformation.
+a pArallel Server for Adaptive GeoInformation.
 
 Documentation
 -------------

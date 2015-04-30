@@ -32,13 +32,18 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TYPES_STRUCTTYPE_H
 #define TYPES_STRUCTTYPE_H
 
+#include "asagi.h"
+
+#include <mutex>
+
 #include "basictype.h"
+#include "threads/mutex.h"
 
 namespace types {
 
@@ -71,6 +76,9 @@ private:
 	MPI_Datatype m_mpiType;
 #endif // ASAGI_NOMPI
 
+	/** Lock for calling check */
+	threads::Mutex m_lock;
+
 private:
 	/**
 	 * @param count Number of elements in the struct
@@ -81,6 +89,8 @@ private:
 	StructType(unsigned int count, unsigned int blockLength[],
 		unsigned long displacements[], asagi::Grid::Type types[])
 	{
+		m_size = 0;
+
 #ifndef ASAGI_NOMPI
 		m_count = count;
 		// We can not create the final mpi datatype, because we do not
@@ -110,6 +120,8 @@ private:
 				break;
 			}
 		}
+
+		m_mpiType = MPI_DATATYPE_NULL;
 #endif // ASAGI_NOMPI
 	}
 public:
@@ -123,62 +135,86 @@ public:
 		delete [] m_types;
 #endif // ASAGI_NOMPI
 	}
-	
+
+	/**
+	 * @copydoc BasicType::check(const io::NetCdfReader&)
+	 */
 	asagi::Grid::Error check(const io::NetCdfReader &file)
 	{
-		m_size = file.getVarSize();
+		unsigned int size = file.getVarSize();
+
+		m_lock.lock();
+
+		if (m_size == 0) {
+			m_size = size;
+
+			m_lock.unlock();
 		
 #ifndef ASAGI_NOMPI
-		m_blockLength[m_count] = m_size;
-		m_displacements[m_count] = 1;
-		m_types[m_count] = MPI_UB;
+			m_blockLength[m_count] = m_size;
+			m_displacements[m_count] = 1;
+			m_types[m_count] = MPI_UB;
 		
-		// Create the mpi datatype
-		if (MPI_Type_create_struct(
-			m_count+1,
-			m_blockLength,
-			m_displacements,
-			m_types,
-			&m_mpiType) != MPI_SUCCESS)
-			return asagi::Grid::MPI_ERROR;
-		if (MPI_Type_commit(&m_mpiType) != MPI_SUCCESS)
-			return asagi::Grid::MPI_ERROR;
+			// Create the mpi datatype
+			if (MPI_Type_create_struct(
+					m_count+1,
+					m_blockLength,
+					m_displacements,
+					m_types,
+					&m_mpiType) != MPI_SUCCESS)
+				return asagi::Grid::MPI_ERROR;
+			if (MPI_Type_commit(&m_mpiType) != MPI_SUCCESS)
+				return asagi::Grid::MPI_ERROR;
 		
-		// We do not need them anymore
-		delete [] m_blockLength;
-		delete [] m_displacements;
-		delete [] m_types;
+			// We do not need them anymore
+			delete [] m_blockLength;
+			delete [] m_displacements;
+			delete [] m_types;
 		
-		m_blockLength = 0L;
-		m_displacements = 0L;
-		m_types = 0L;
+			m_blockLength = 0L;
+			m_displacements = 0L;
+			m_types = 0L;
 #endif // ASAGI_NOMPI
+		} else {
+			std::lock_guard<threads::Mutex> lock(m_lock, std::adopt_lock);
+
+			if (size != m_size)
+				return asagi::Grid::WRONG_SIZE;
+		}
 		
 		return asagi::Grid::SUCCESS;
 	}
-	
-	unsigned int getSize()
+
+	unsigned int size() const
 	{
 		return m_size;
 	}
 	
-	void load(io::NetCdfReader &file,
-		const size_t *offset,
-		const size_t *size,
-		void *buf)
-	{
-		file.getBlock<void>(buf, offset, size);
-	}
-	
 #ifndef ASAGI_NOMPI
-	MPI_Datatype getMPIType()
+	MPI_Datatype getMPIType() const
 	{
 		return m_mpiType;
 	}
 #endif // ASAGI_NOMPI
 
-public:
+	/**
+	 * @copydoc BasicType::load
+	 */
+	void load(io::NetCdfReader &file,
+		const size_t *offset,
+		const size_t *size,
+		void *buf) const
+	{
+		file.getBlock<void>(buf, offset, size);
+	}
 
+	/**
+	 * @copydoc BasicType::convert(const void*, void*)
+	 */
+	void convert(const void* data, void* buf) const
+	{
+		Type::copy(data, buf, m_size);
+	}
 };
 
 Type* createStruct(
