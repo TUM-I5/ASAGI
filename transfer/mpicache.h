@@ -38,6 +38,9 @@
 #ifndef TRANSFER_MPICACHE_H
 #define TRANSFER_MPICACHE_H
 
+#ifdef ASAGI_NOMPI
+#include "mpino.h"
+#else // ASAGI_NOMPI
 #include "asagi.h"
 
 #include <algorithm>
@@ -46,9 +49,15 @@
 #include "allocator/mpialloc.h"
 #include "mpi/mpicomm.h"
 #include "mpi/mutex.h"
+#endif // ASAGI_NOMPI
 
 namespace transfer
 {
+
+#ifdef ASAGI_NOMPI
+/** No MPI transfers with MPI */
+typedef MPINo MPICache;
+#else // ASAGI_NOMPI
 
 /**
  * Copies blocks between MPI processes assuming cache storage
@@ -454,6 +463,8 @@ private:
 	/** Maximum allowed dictionary size */
 	const static unsigned int MAX_DICT_SIZE = 8;
 };
+
+#endif // ASAGI_NOMPI
 
 }
 

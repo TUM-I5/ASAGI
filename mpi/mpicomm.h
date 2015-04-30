@@ -38,9 +38,13 @@
 #ifndef MPI_MPICOMM_H
 #define MPI_MPICOMM_H
 
+#ifdef ASAGI_NOMPI
+#include "nompicomm.h"
+#else // ASAGI_NOMPI
 #include "asagi.h"
 
 #include <mutex>
+#endif // ASAGI_NOMPI
 
 #ifdef THREADSAFE_MPI
 #include "threads/mutex.h"
@@ -57,6 +61,11 @@ typedef threads::Mutex Lock;
 #else // THREADSAFE_MPI
 typedef threads::NoopMutex Lock;
 #endif // THREADSAFE_MPI
+
+#ifdef ASAGI_NOMPI
+/** MPI Communicator replacement if MPI is disabled */
+typedef NoMPIComm MPIComm;
+#else // ASAGI_NOMPI
 
 /**
  * Small wrapper around the MPI communicator
@@ -132,6 +141,8 @@ public:
 public:
 	static Lock mpiLock;
 };
+
+#endif // ASAGI_NOMPI
 
 }
 

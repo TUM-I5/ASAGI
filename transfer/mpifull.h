@@ -38,6 +38,9 @@
 #ifndef TRANSFER_MPIFULL_H
 #define TRANSFER_MPIFULL_H
 
+#ifdef ASAGI_NOMPI
+#include "mpino.h"
+#else // ASAGI_NOMPI
 #include "asagi.h"
 
 #include <cassert>
@@ -45,12 +48,18 @@
 
 #include "mpi/mpicomm.h"
 #include "types/type.h"
+#endif // ASAGI_NOMPI
 
 /**
  * @brief Transfer classes can copy blocks between MPI/NUMA domains
  */
 namespace transfer
 {
+
+#ifdef ASAGI_NOMPI
+/** No MPI transfers with MPI */
+typedef MPINo MPIFull;
+#else // ASAGI_NOMPI
 
 /**
  * Copies blocks between MPI processes assuming full storage
@@ -160,6 +169,8 @@ public:
 		assert(mpiResult == MPI_SUCCESS);
 	}
 };
+
+#endif // ASAGI_NOMPI
 
 }
 

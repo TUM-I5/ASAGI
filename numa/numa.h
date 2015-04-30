@@ -40,6 +40,7 @@
 
 #include "asagi.h"
 
+#include <cstdint>
 #include <map>
 #include <pthread.h>
 #include <vector>

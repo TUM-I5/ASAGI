@@ -90,7 +90,9 @@ function( add_test_run name command )
 	endif( ARGV2 )
 	
 	# Depend on the prepare test
-	set_tests_properties( ${name} PROPERTIES DEPENDS prepare )
+	if( NOT NOMPI OR NOT ARGV2 )
+	    set_tests_properties( ${name} PROPERTIES DEPENDS prepare )
+	endif( NOT NOMPI OR NOT ARGV2 )
 endfunction( add_test_run )
 
 ##### Prepare tests #####
