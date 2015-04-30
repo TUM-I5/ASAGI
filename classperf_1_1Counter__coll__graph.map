@@ -1,3 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node2" href="$classperf_1_1Counter_1_1NameToCounterMap.xhtml" title="perf::Counter::NameToCounterMap" alt="" coords="5,5,232,35"/>
+<map id="perf::Counter" name="perf::Counter">
+<area shape="rect" id="node2" href="$classperf_1_1Counter_1_1NameToCounterMap.xhtml" title="perf::Counter::NameToCounterMap" alt="" coords="5,200,232,229"/>
+<area shape="rect" id="node4" title="STL class. " alt="" coords="25,102,212,149"/>
 </map>

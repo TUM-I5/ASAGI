@@ -1,3 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$interfaceasagi_1_1grid__get__byte.xhtml" title="Interface for arbitrary dimensions." alt="" coords="5,5,144,35"/>
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classasagi_1_1Grid.xhtml" title="C++ Interface for ASAGI grids. " alt="" coords="5,5,91,35"/>
+<area shape="rect" id="node3" href="$classgrid_1_1Grid.xhtml" title="grid::Grid" alt="" coords="139,5,213,35"/>
 </map>

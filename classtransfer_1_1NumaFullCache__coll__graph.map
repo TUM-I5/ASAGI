@@ -1,0 +1,8 @@
+<map id="transfer::NumaFullCache" name="transfer::NumaFullCache">
+<area shape="rect" id="node2" href="$classtransfer_1_1NumaFull.xhtml" title="transfer::NumaFull" alt="" coords="5,328,136,357"/>
+<area shape="rect" id="node4" href="$classtransfer_1_1NumaCache.xhtml" title="transfer::NumaCache" alt="" coords="160,328,307,357"/>
+<area shape="rect" id="node6" href="$classcache_1_1CacheManager.xhtml" title="Manages a block cache. " alt="" coords="157,232,309,261"/>
+<area shape="rect" id="node8" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="83,136,237,165"/>
+<area shape="rect" id="node10" href="$classcache_1_1CacheList.xhtml" title="Controls a list of blocks. " alt="" coords="261,136,384,165"/>
+<area shape="rect" id="node12" href="$classcache_1_1LRU.xhtml" title="cache::LRU" alt="" coords="199,23,289,52"/>
+</map>

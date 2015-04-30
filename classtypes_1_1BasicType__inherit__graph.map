@@ -1,4 +1,4 @@
-<map id="G" name="G">
+<map id="types::BasicType&lt; T &gt;" name="types::BasicType&lt; T &gt;">
 <area shape="rect" id="node5" href="$classtypes_1_1ArrayType.xhtml" title="types::ArrayType\&lt; T \&gt;" alt="" coords="5,160,160,189"/>
 <area shape="rect" id="node7" href="$classtypes_1_1StructType.xhtml" title="types::StructType\&lt; T \&gt;" alt="" coords="184,160,341,189"/>
 <area shape="rect" id="node2" href="$classtypes_1_1Type.xhtml" title="types::Type" alt="" coords="127,5,217,35"/>

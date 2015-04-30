@@ -1,0 +1,5 @@
+<map id="cache::CacheManager" name="cache::CacheManager">
+<area shape="rect" id="node2" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="5,136,160,165"/>
+<area shape="rect" id="node4" href="$classcache_1_1CacheList.xhtml" title="Controls a list of blocks. " alt="" coords="184,136,307,165"/>
+<area shape="rect" id="node6" href="$classcache_1_1LRU.xhtml" title="cache::LRU" alt="" coords="121,23,212,52"/>
+</map>
