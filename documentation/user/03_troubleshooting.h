@@ -33,46 +33,29 @@
  *  <http://www.gnu.org/licenses/>.
  *
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @page Troubleshooting Troubleshooting
+ * 
+ * @section cmakempi CMake does not find MPI
+ * 
+ * On some plattforms, CMake has problems finding MPI. Try to set the
+ * environment variable <code>CMAKE_PREFIX_PATH</code> (see section @ref build)
+ * or select the MPI compiler before running CMake by setting the enviroment
+ * variable <code>CXX</code>.
+ *
+ * @section hang The program hangs
+ *
+ * Due to a bug (http://software.intel.com/en-us/forums/showthread.php?t=103456)
+ * in the Intel MPI library (version 4.0 update 3 and probably earlier versions)
+ * the remote memory access in ASAGI does not work properly. This only happens
+ * when fabric is set to "ofa" or "shm:ofa". Selecting a different fabric by
+ * changing the environment variable "I_MPI_FABRICS" solves the problem.
+ *
+ * @section mappedmemory The program fails with "PMPI_Win_create: Assertion
+ *  'winptr-\>lock_table[i]' failed" or "function:MPI_WIN_LOCK, Invalid win argument"
+ *
+ * The SGI Message Passing Toolkit uses a special mapped memory for one-sided
+ * communication. For large grids the default size of mapped memory may be too
+ * small. It is possible to increase the size by setting the environment
+ * variable <code>MPI_MAPPED_HEAP_SIZE</code>.
  */
-
-#include <asagi.h>
-#include <mpi.h>
-#include <stdlib.h>
-#include <stdio.h>
-// #include <sys/unistd.h>
-
-int main (int argc, char** argv)
-{
-	MPI_Init(&argc, &argv);
-	
-	asagi_grid* grid = asagi_grid_create(ASAGI_FLOAT);
-	
-	if (asagi_grid_open(grid, "tests/2dgrid.nc", 0) != ASAGI_SUCCESS) {
-		printf("Could not load file\n");
-		return 1;
-	}
-	
-	printf("Range X: %f-%f\n", asagi_grid_min(grid, 0), asagi_grid_max(grid, 0));
-	printf("Range Y: %f-%f\n", asagi_grid_min(grid, 1), asagi_grid_max(grid, 1));
-	
-	double pos[] = {5, 10};
-	printf("Value at 5x10: %f\n", asagi_grid_get_float(grid, pos, 0));
-	
-	// Print memory usage
-// 	char status_path[100];
-// 	snprintf(status_path, 99, "/proc/%d/status", getpid());
-// 	
-// 	FILE* f = fopen(status_path, "r");
-// 	
-// 	char buf[256];
-// 	while (fgets(buf, sizeof buf, f)) {
-// 		printf("%s", buf);
-// 	}
-// 	fclose(f);
-	
-	asagi_grid_close(grid);
-	
-	MPI_Finalize();
-	
-	return 0;
-}
