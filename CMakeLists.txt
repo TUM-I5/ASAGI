@@ -61,7 +61,7 @@ mark_as_advanced( DEBUG_NUMA )
 ##### Default build type #####
 if( NOT CMAKE_BUILD_TYPE )
 	set( CMAKE_BUILD_TYPE "Release" CACHE STRING
-		"Choose the type of build, options are: Debug Release" FORCE)
+		"Choose the type of build, options are: Debug Release" FORCE )
 endif( NOT CMAKE_BUILD_TYPE )
 
 ##### Macros #####
@@ -318,7 +318,8 @@ if( PKGCONFIG_FOUND )
     set( _PKG_CONFIG_LIBDIR "\${prefix}/lib" )
     set( _PKG_CONFIG_INCLUDEDIR "\${prefix}/include" )
 
-    set( _PKG_CONFIG_REQUIRES "netcdf" )
+    set( _PKG_CONFIG_REQUIRES "" )
+    set( _PKG_CONFIG_REQUIRES_PRIVATE "netcdf" )
     set( _PKG_CONFIG_CONFLICTS "" )
     set( _PKG_CONFIG_LIBS "${CMAKE_LIBRARY_PATH_FLAG}\${libdir} ${CMAKE_LINK_LIBRARY_FLAG}${asagiOutputName}" )
     
