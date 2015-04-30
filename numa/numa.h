@@ -38,6 +38,9 @@
 #ifndef NUMA_NUMA_H
 #define NUMA_NUMA_H
 
+#ifdef ASAGI_NONUMA
+#include "nonuma.h"
+#else // ASAGI_NONUMA
 #include "asagi.h"
 
 #include <cstdint>
@@ -56,9 +59,15 @@ typedef uint32_t id_t;
 #else // _LP64
 typedef uint16_t id_t;
 #endif // _LP64
+#endif // ASAGI_NONUMA
 
 namespace numa
 {
+
+#ifdef ASAGI_NONUMA
+/** NUMA dummy implementation if NUMA is disabled */
+typedef NoNuma Numa;
+#else // ASAGI_NONUMA
 
 class NumaComm;
 
@@ -153,6 +162,8 @@ public:
 
 	NumaComm* createComm() const;
 };
+
+#endif // ASAGI_NONUMA
 
 }
 

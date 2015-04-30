@@ -34,8 +34,13 @@
 # @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
 
 ##### Files #####
-set( numaSources
-	numa.cpp )
+if( NONUMA )
+    set( numaSources
+        nonuma.cpp )
+else( NONUMA )
+    set( numaSources
+	    numa.cpp )
+endif( NONUMA )
 
 ##### Add to library #####
 add_sources( ${numaSources} )

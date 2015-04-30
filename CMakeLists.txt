@@ -168,6 +168,7 @@ endif( NOMPI )
 
 # Find pthread
 if( NONUMA )
+    add_definitions( -DASAGI_NONUMA )
     find_package( Threads )
 else( NONUMA )
     find_package( Threads REQUIRED )

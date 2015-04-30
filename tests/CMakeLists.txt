@@ -38,23 +38,27 @@ include_directories( ${CMAKE_SOURCE_DIR} )
 
 # Add test executable
 function( add_test_executable name )
-	if( ARGV1 AND NOMPI )
+    if( ARGV1 AND NONUMA )
+        # NUMA test without NUMA?
+        return()
+    endif( ARGV1 AND NONUMA )
+	if( ARGV2 AND NOMPI )
 		# MPI test without MPI?
 		return()
-	endif( ARGV1 AND NOMPI )
-	if( ARGV2 AND NOT FORTRAN_SUPPORT )
+	endif( ARGV2 AND NOMPI )
+	if( ARGV3 AND NOT FORTRAN_SUPPORT )
 	    # Fortran test without Fortran?
 	    return()
-	endif( ARGV2 AND NOT FORTRAN_SUPPORT )
+	endif( ARGV3 AND NOT FORTRAN_SUPPORT )
 	
-	if( ARGV2 )
+	if( ARGV3 )
 	    set( sourceFiles
 	        ${name}.f90 
 	        ${CMAKE_SOURCE_DIR}/include/asagi.f90 )
-	else( ARGV2 )
+	else( ARGV3 )
 	    set( sourceFiles
 	        ${name}.cpp )
-	endif( ARGV2 )
+	endif( ARGV3 )
 
 	# Create the executable
 	
@@ -63,36 +67,42 @@ function( add_test_executable name )
 	
 	# Link with asagi
 	target_link_libraries( test_${name} ${asagiTarget} ${asagiLibs} )
-	if( ARGV1 )
+	if( ARGV2 )
 		# Link with mpi library
 		target_link_libraries( test_${name}
 		    ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES} )
-	endif( ARGV1 )
+	endif( ARGV2 )
 	
 	# Fortran linker?
-	if( ARGV2 )
+	if( ARGV3 )
         set_target_properties( test_${name} PROPERTIES
 	        LINKER_LANGUAGE Fortran )
-	endif( ARGV2 )
+	endif( ARGV3 )
 endfunction( add_test_executable )
 
 # Adds an MPI test
 function( add_test_run name command )
     if( ARGV2 )
+        # NUMA run
+        if( NONUMA )
+            return()
+        endif( NONUMA )
+    endif( ARGV2 )
+    
+    if( ARGV3 )
         # MPI run
-        if ( NOT NOMPI )
-	        add_test( NAME ${name} COMMAND ${MPIEXEC} ${MPIEXEC_PREFLAGS}
-		        ${MPIEXEC_NUMPROC_FLAG} ${ARGV2} "./${command}"
-		        ${MPIEXEC_POSTFLAGS} )
-		endif( NOT NOMPI )
-	else( ARGV2 )
+        if ( NOMPI )
+            return()
+        endif( NOMPI )
+        add_test( NAME ${name} COMMAND ${MPIEXEC} ${MPIEXEC_PREFLAGS}
+	        ${MPIEXEC_NUMPROC_FLAG} ${ARGV2} "./${command}"
+	        ${MPIEXEC_POSTFLAGS} )
+	else( ARGV3 )
 	    add_test( NAME ${name} COMMAND ${command} )
-	endif( ARGV2 )
+	endif( ARGV3 )
 	
 	# Depend on the prepare test
-	if( NOT NOMPI OR NOT ARGV2 )
-	    set_tests_properties( ${name} PROPERTIES DEPENDS prepare )
-	endif( NOT NOMPI OR NOT ARGV2 )
+	set_tests_properties( ${name} PROPERTIES DEPENDS prepare )
 endfunction( add_test_run )
 
 ##### Prepare tests #####
@@ -120,24 +130,24 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 #add_test_executable( largegrid1d YES )
 #add_test_executable( adaptivegrid2d YES )
 add_test_executable( fullgrid2d )
-add_test_executable( fullnumagrid2d )
-add_test_executable( fullmpigrid2d YES )
-add_test_executable( fullmpinumagrid2d YES )
-add_test_executable( fullmpinumacachegrid2d YES )
+add_test_executable( fullnumagrid2d YES )
+add_test_executable( fullmpigrid2d NO YES )
+add_test_executable( fullmpinumagrid2d YES YES )
+add_test_executable( fullmpinumacachegrid2d YES YES )
 
 add_test_executable( cachegrid2d )
-add_test_executable( cachenumagrid2d )
-add_test_executable( cachempigrid2d YES )
-add_test_executable( cachempinumagrid2d YES )
+add_test_executable( cachenumagrid2d YES )
+add_test_executable( cachempigrid2d NO YES )
+add_test_executable( cachempinumagrid2d YES YES )
 
 add_test_executable( passthroughgrid2d )
 
 add_test_executable( fullgrid3d )
 add_test_executable( fullgrid2dbs )
 add_test_executable( fullgrid2dscale )
-add_test_executable( fullmpinumagrid2d2 YES )
+add_test_executable( fullmpinumagrid2d2 YES YES )
 
-add_test_executable( fortran2d YES YES )
+add_test_executable( fortran2d NO YES YES )
 
 # Unit Tests
 add_subdirectory( unittest )
@@ -150,21 +160,21 @@ add_subdirectory( unittest )
 #add_test_run( LargeGrid1D test_largegrid1d 2 )
 #add_test_run( AdaptiveGrid2D test_adaptivegrid2d 2 )
 add_test_run( FullGrid2D test_fullgrid2d )
-add_test_run( FullNumaGrid2D test_fullnumagrid2d )
-add_test_run( FullMPIGrid2D test_fullmpigrid2d 2 )
-add_test_run( FullMPINumaGrid2D test_fullmpinumagrid2d 2 )
-add_test_run( FullMPINumaCacheGrid2D test_fullmpinumacachegrid2d 2 )
+add_test_run( FullNumaGrid2D test_fullnumagrid2d YES )
+add_test_run( FullMPIGrid2D test_fullmpigrid2d NO 2 )
+add_test_run( FullMPINumaGrid2D test_fullmpinumagrid2d YES 2 )
+add_test_run( FullMPINumaCacheGrid2D test_fullmpinumacachegrid2d YES 2 )
 
 add_test_run( CacheGrid2D test_cachegrid2d )
-add_test_run( CacheNumaGrid2D test_cachenumagrid2d )
-add_test_run( CacheMPIGrid2D test_cachempigrid2d 2 )
-add_test_run( CacheMPINumaGrid2D test_cachempinumagrid2d 2 )
+add_test_run( CacheNumaGrid2D test_cachenumagrid2d YES )
+add_test_run( CacheMPIGrid2D test_cachempigrid2d NO 2 )
+add_test_run( CacheMPINumaGrid2D test_cachempinumagrid2d YES 2 )
 
 add_test_run( PassThroughGrid2D test_passthroughgrid2d )
 
 add_test_run( FullGrid3D test_fullgrid3d )
 add_test_run( FullGrid2DBlockSize test_fullgrid2dbs )
 add_test_run( FullGrid2DScaled test_fullgrid2dscale )
-add_test_run( FullMPINumaGrid2D2 test_fullmpinumagrid2d2 2 )
+add_test_run( FullMPINumaGrid2D2 test_fullmpinumagrid2d2 YES 2 )
 
-add_test_run( Fortran2D test_fortran2d 2 )
+add_test_run( Fortran2D test_fortran2d NO 2 )
