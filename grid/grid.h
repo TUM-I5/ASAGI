@@ -38,6 +38,11 @@
 #ifndef GRID_GRID_H
 #define GRID_GRID_H
 
+#ifdef ECLIPSE_INDEXER
+// Workaround for stupid Eclipse indexer
+#include <bits/allocator.h>
+#endif // ECLIPSE_INDEXER
+
 #include "asagi.h"
 
 #include <map>
