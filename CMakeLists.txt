@@ -307,7 +307,7 @@ add_subdirectory( documentation )
 
 ##### pkg-config #####
 find_package( PkgConfig )
-if( PKGCONFIG_FOUND )
+if( PKG_CONFIG_FOUND )
     # Detect private libs and directories
 
     set( _PKG_CONFIG_PROJECT_NAME ${PROJECT_NAME} )
@@ -343,7 +343,7 @@ if( PKGCONFIG_FOUND )
     
     # Install the pkg file
     install( FILES ${CMAKE_CURRENT_BINARY_DIR}/${_PKG_FILENAME}	DESTINATION lib/pkgconfig )
-endif( PKGCONFIG_FOUND )
+endif( PKG_CONFIG_FOUND )
 
 ##### Installation #####
 if( SHARED_LIB )
