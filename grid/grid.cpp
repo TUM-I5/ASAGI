@@ -191,14 +191,17 @@ void grid::Grid::setParam(const char* name, const char* value, unsigned int leve
 	if (m_params.size() <= level)
 		m_params.resize(level+1);
 
-	// Convert everything to uppercase
+	// Convert name to upper case
 	std::string n = name;
 	utils::StringUtils::toUpper(n);
 	std::replace(n.begin(), n.end(), '-', '_');
 
+	// Convert non name values to upper case
 	std::string v = value;
-	utils::StringUtils::toUpper(v);
-	std::replace(v.begin(), v.end(), '-', '_');
+	if (n != "VARIABLE") {
+		utils::StringUtils::toUpper(v);
+		std::replace(v.begin(), v.end(), '-', '_');
+	}
 
 	m_params[level][n] = v;
 }
