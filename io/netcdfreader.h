@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef IO_NETCDFREADER_H
@@ -241,9 +241,6 @@ private:
 	template<typename T>
 	void getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, T *buffer);
-
-private:
-	static const ptrdiff_t STRIDE[MAX_DIMENSIONS];
 };
 
 /**
@@ -263,7 +260,7 @@ template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, unsigned char *buffer)
 {
-	nc_get_varm_uchar(m_file, m_variable, offset, size, STRIDE, imap, buffer);
+	nc_get_varm_uchar(m_file, m_variable, offset, size, 0L, imap, buffer);
 }
 
 /**
@@ -273,7 +270,7 @@ template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, int *buffer)
 {
-	nc_get_varm_int(m_file, m_variable, offset, size, STRIDE, imap, buffer);
+	nc_get_varm_int(m_file, m_variable, offset, size, 0L, imap, buffer);
 }
 
 /**
@@ -283,7 +280,7 @@ template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, long *buffer)
 {
-	nc_get_varm_long(m_file, m_variable, offset, size, STRIDE, imap, buffer);
+	nc_get_varm_long(m_file, m_variable, offset, size, 0L, imap, buffer);
 }
 
 /**
@@ -293,7 +290,7 @@ template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, float *buffer)
 {
-	nc_get_varm_float(m_file, m_variable, offset, size, STRIDE, imap, buffer);
+	nc_get_varm_float(m_file, m_variable, offset, size, 0L, imap, buffer);
 }
 
 /**
@@ -303,7 +300,7 @@ template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, double *buffer)
 {
-	nc_get_varm_double(m_file, m_variable, offset, size, STRIDE, imap, buffer);
+	nc_get_varm_double(m_file, m_variable, offset, size, 0L, imap, buffer);
 }
 
 /**
@@ -313,7 +310,7 @@ template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
 		const ptrdiff_t *imap, void *buffer)
 {
-	nc_get_varm(m_file, m_variable, offset, size, STRIDE, imap, buffer);
+	nc_get_varm(m_file, m_variable, offset, size, 0L, imap, buffer);
 }
 
 }

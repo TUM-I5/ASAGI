@@ -32,16 +32,12 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
-
-#include "cloak/cloak.h"
 
 #include "utils/logger.h"
 
 #include "netcdfreader.h"
-
-#define ONE_COMMA(s,i,_) 1,
 
 /**
  * @param filename The name of the netcdf file
@@ -131,8 +127,3 @@ asagi::Grid::Error io::NetCdfReader::open(const char* varname)
  * Make netCDF accesses thread safe
  */
 threads::Mutex io::NetCdfReader::netcdfLock;
-
-/**
- * The stride is always 1 in each dimension, thus we define the stride array only once.
- */
-const ptrdiff_t io::NetCdfReader::STRIDE[MAX_DIMENSIONS] = {EXPR_S(0)(REPEAT_S(0, DEC(MAX_DIMENSIONS), ONE_COMMA, ~))};
