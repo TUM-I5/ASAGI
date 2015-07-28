@@ -27,7 +27,19 @@ script:
  - make test
  - make doc
  - make devdoc
+ - cd ..
+ - mkdir build_nonuma && cd build_nonuma && cmake ../ -DTESTS=ON -DNONUMA=ON
+ - make
+ - make test
+ - cd ..
+ - mkdir build_nompi && cd build_nompi && cmake ../ -DTESTS=ON -DNOMPI=ON
+ - make
+ - make test
+ - cd ..
+ - mkdir build_nonuma_nompi && cd build_nonuma_nompi && cmake ../ -DTESTS=ON -DNONUMA=ON -DNOMPI=ON
+ - make
+ - make test
+ - cd ..
 
 after_success:
- - cd ..
  - documentation/gh_pages.sh
