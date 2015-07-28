@@ -24,7 +24,7 @@ var searchData=
   ['not_5fopen',['NOT_OPEN',['../group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a7e8e0ef2b9b8505adf98d9d479349c0e',1,'asagi::Grid']]],
   ['nulltype',['NullType',['../namespacemagic.xhtml#classmagic_1_1NullType',1,'magic']]],
   ['nulltype_2eh',['nulltype.h',['../nulltype_8h.xhtml',1,'']]],
-  ['numa',['numa',['../classgrid_1_1Container.xhtml#af8822836f4c5747293c03c6ec9182f3e',1,'grid::Container::numa()'],['../classgrid_1_1level_1_1Level.xhtml#a41f1b84829c0f2e613a80907b596bb75',1,'grid::level::Level::numa()'],['../classgrid_1_1level_1_1Level.xhtml#ae8e1af1c90e512d0268b2c665ba7d5c9',1,'grid::level::Level::numa() const '],['../classperf_1_1Counter.xhtml#a19ab3ea97990707e1787a16dbc70790fa724e191bcbbddda6228f644c2038973d',1,'perf::Counter::NUMA()']]],
+  ['numa',['NUMA',['../classperf_1_1Counter.xhtml#a19ab3ea97990707e1787a16dbc70790fa724e191bcbbddda6228f644c2038973d',1,'perf::Counter::NUMA()'],['../classgrid_1_1Container.xhtml#af8822836f4c5747293c03c6ec9182f3e',1,'grid::Container::numa()'],['../classgrid_1_1level_1_1Level.xhtml#a41f1b84829c0f2e613a80907b596bb75',1,'grid::level::Level::numa()'],['../classgrid_1_1level_1_1Level.xhtml#ae8e1af1c90e512d0268b2c665ba7d5c9',1,'grid::level::Level::numa() const ']]],
   ['numa',['Numa',['../classnuma_1_1Numa.xhtml',1,'numa']]],
   ['numa_2ecpp',['numa.cpp',['../numa_8cpp.xhtml',1,'']]],
   ['numa_2eh',['numa.h',['../numa_8h.xhtml',1,'']]],

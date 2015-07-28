@@ -154,15 +154,15 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:a702b5b375fa58a22d8d5ab22be7af1ea"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a702b5b375fa58a22d8d5ab22be7af1ea"><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classio_1_1NetCdfReader.xhtml#a702b5b375fa58a22d8d5ab22be7af1ea">getBasicSize</a> ()</td></tr>
-<tr class="separator:a702b5b375fa58a22d8d5ab22be7af1ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a462fc0d60c9a6030932c3dfe2e473ee3"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a462fc0d60c9a6030932c3dfe2e473ee3"><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classio_1_1NetCdfReader.xhtml#a462fc0d60c9a6030932c3dfe2e473ee3">getBasicSize</a> () const </td></tr>
+<tr class="separator:a462fc0d60c9a6030932c3dfe2e473ee3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc045f60e2f43534e3fe745974cd359a"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:abc045f60e2f43534e3fe745974cd359a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classio_1_1NetCdfReader.xhtml#abc045f60e2f43534e3fe745974cd359a">getVar</a> (const size_t *offset, const size_t *size, const ptrdiff_t *imap, T *buffer)</td></tr>
 <tr class="separator:abc045f60e2f43534e3fe745974cd359a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1842a429f9370fa4e6430b5d2b741be2"><td class="memTemplParams" colspan="2">template&lt;&gt; </td></tr>
-<tr class="memitem:a1842a429f9370fa4e6430b5d2b741be2"><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classio_1_1NetCdfReader.xhtml#a1842a429f9370fa4e6430b5d2b741be2">getBasicSize</a> ()</td></tr>
-<tr class="separator:a1842a429f9370fa4e6430b5d2b741be2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68e6775076eedbedf90702662a591375"><td class="memTemplParams" colspan="2">template&lt;&gt; </td></tr>
+<tr class="memitem:a68e6775076eedbedf90702662a591375"><td class="memTemplItemLeft" align="right" valign="top">size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classio_1_1NetCdfReader.xhtml#a68e6775076eedbedf90702662a591375">getBasicSize</a> () const </td></tr>
+<tr class="separator:a68e6775076eedbedf90702662a591375"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -185,8 +185,6 @@ Private Attributes</h2></td></tr>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:a4c5c0e8aafe666ee055003848e070a0f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classthreads_1_1PthreadMutex.xhtml">threads::Mutex</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classio_1_1NetCdfReader.xhtml#a4c5c0e8aafe666ee055003848e070a0f">netcdfLock</a></td></tr>
 <tr class="separator:a4c5c0e8aafe666ee055003848e070a0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a960200a2b6f6d7d305377bfdd409d475"><td class="memItemLeft" align="right" valign="top">static const ptrdiff_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classio_1_1NetCdfReader.xhtml#a960200a2b6f6d7d305377bfdd409d475">STRIDE</a> [MAX_DIMENSIONS] = {EXPR_S(0)(REPEAT_S(0, DEC(MAX_DIMENSIONS), ONE_COMMA, ~))}</td></tr>
-<tr class="separator:a960200a2b6f6d7d305377bfdd409d475"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides access to <b>one</b> grid in a netCDF file </p>
@@ -224,7 +222,7 @@ Static Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="netcdfreader_8cpp_source.xhtml#l00050">50</a> of file <a class="el" href="netcdfreader_8cpp_source.xhtml">netcdfreader.cpp</a>.</p>
+<p>Definition at line <a class="el" href="netcdfreader_8cpp_source.xhtml#l00046">46</a> of file <a class="el" href="netcdfreader_8cpp_source.xhtml">netcdfreader.cpp</a>.</p>
 
 </div>
 </div>
@@ -255,7 +253,7 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a702b5b375fa58a22d8d5ab22be7af1ea"></a>
+<a class="anchor" id="a462fc0d60c9a6030932c3dfe2e473ee3"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -268,7 +266,7 @@ template&lt;typename T &gt; </div>
           <td class="memname">size_t io::NetCdfReader::getBasicSize </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -283,7 +281,7 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a1842a429f9370fa4e6430b5d2b741be2"></a>
+<a class="anchor" id="a68e6775076eedbedf90702662a591375"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -296,7 +294,7 @@ template&lt;&gt; </div>
           <td class="memname">size_t io::NetCdfReader::getBasicSize </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -307,7 +305,7 @@ template&lt;&gt; </div>
 </div><div class="memdoc">
 <p>For void types, this functions returns the actual size of the elements in bytes. </p>
 
-<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00254">254</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
+<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00251">251</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
 
 </div>
 </div>
@@ -543,7 +541,7 @@ template&lt;&gt; </div>
 
 <p></p>
 
-<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00263">263</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
+<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00260">260</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
 
 </div>
 </div>
@@ -595,7 +593,7 @@ template&lt;&gt; </div>
 
 <p></p>
 
-<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00273">273</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
+<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00270">270</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
 
 </div>
 </div>
@@ -647,7 +645,7 @@ template&lt;&gt; </div>
 
 <p></p>
 
-<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00283">283</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
+<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00280">280</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
 
 </div>
 </div>
@@ -699,7 +697,7 @@ template&lt;&gt; </div>
 
 <p></p>
 
-<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00293">293</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
+<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00290">290</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
 
 </div>
 </div>
@@ -751,7 +749,7 @@ template&lt;&gt; </div>
 
 <p></p>
 
-<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00303">303</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
+<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00300">300</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
 
 </div>
 </div>
@@ -803,7 +801,7 @@ template&lt;&gt; </div>
 
 <p></p>
 
-<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00313">313</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
+<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00310">310</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
 
 </div>
 </div>
@@ -880,7 +878,7 @@ template&lt;&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="netcdfreader_8cpp_source.xhtml#l00077">77</a> of file <a class="el" href="netcdfreader_8cpp_source.xhtml">netcdfreader.cpp</a>.</p>
+<p>Definition at line <a class="el" href="netcdfreader_8cpp_source.xhtml#l00073">73</a> of file <a class="el" href="netcdfreader_8cpp_source.xhtml">netcdfreader.cpp</a>.</p>
 
 </div>
 </div>
@@ -1066,29 +1064,6 @@ template&lt;&gt; </div>
 <p>Make netCDF accesses thread safe </p>
 
 <p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00098">98</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a960200a2b6f6d7d305377bfdd409d475"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const ptrdiff_t io::NetCdfReader::STRIDE = {EXPR_S(0)(REPEAT_S(0, DEC(MAX_DIMENSIONS), ONE_COMMA, ~))}</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>The stride is always 1 in each dimension, thus we define the stride array only once. </p>
-
-<p>Definition at line <a class="el" href="netcdfreader_8h_source.xhtml#l00246">246</a> of file <a class="el" href="netcdfreader_8h_source.xhtml">netcdfreader.h</a>.</p>
 
 </div>
 </div>

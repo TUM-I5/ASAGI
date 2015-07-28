@@ -10,7 +10,6 @@ var searchData=
   ['size',['size',['../classgrid_1_1level_1_1Level.xhtml#a1a38d9eb1cc23be24f96d23af30d5394',1,'grid::level::Level::size()'],['../classmpi_1_1MPIComm.xhtml#a2499a3f76a00ce668c90263cf811c9d3',1,'mpi::MPIComm::size()'],['../classmpi_1_1NoMPIComm.xhtml#a9311cc816df31dfd01a6ef458dd15e3c',1,'mpi::NoMPIComm::size()'],['../classtypes_1_1ArrayType.xhtml#a478cb7751d10aa8b07c8c70417f28125',1,'types::ArrayType::size()'],['../classtypes_1_1BasicType.xhtml#afc445b5f726d586ba8036f8270e3eafb',1,'types::BasicType::size()'],['../classtypes_1_1StructType.xhtml#acb7979a18bc4ca37f8750dfdc44637a9',1,'types::StructType::size()'],['../classtypes_1_1Type.xhtml#af81d967271adf9556b7cec1f3a78fd9b',1,'types::Type::size()']]],
   ['startbarrier',['startBarrier',['../classthreads_1_1Sync.xhtml#a293095df8ddc97312797ed56f9123764',1,'threads::Sync']]],
   ['starttransfer',['startTransfer',['../classtransfer_1_1MPICache.xhtml#adddedb31af62b4dcda388beeac95aec1',1,'transfer::MPICache::startTransfer()'],['../classtransfer_1_1MPINo.xhtml#a2faedeb7fb7869660544f86a5fbad336',1,'transfer::MPINo::startTransfer()']]],
-  ['stride',['STRIDE',['../classio_1_1NetCdfReader.xhtml#a960200a2b6f6d7d305377bfdd409d475',1,'io::NetCdfReader']]],
   ['structtype',['StructType',['../classtypes_1_1StructType.xhtml#a09ed66e0919cc4694fecf62520bb40af',1,'types::StructType']]],
   ['structtype',['StructType',['../classtypes_1_1StructType.xhtml',1,'types']]],
   ['structtype_2ecpp',['structtype.cpp',['../structtype_8cpp.xhtml',1,'']]],
