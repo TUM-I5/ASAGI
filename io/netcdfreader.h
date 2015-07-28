@@ -230,7 +230,7 @@ private:
 	 * @return The size of one value in a hyperslab
 	 */
 	template<typename T>
-	size_t getBasicSize()
+	size_t getBasicSize() const
 	{
 		return 1;
 	}
@@ -251,7 +251,7 @@ private:
  * in bytes.
  */
 template<> inline
-size_t NetCdfReader::getBasicSize<void>()
+size_t NetCdfReader::getBasicSize<void>() const
 {
 	return getVarSize();
 }

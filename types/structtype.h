@@ -95,9 +95,9 @@ private:
 		m_count = count;
 		// We can not create the final mpi datatype, because we do not
 		// now, the size yet
-		m_blockLength = new int[count+1];
-		m_displacements = new MPI_Aint[count+1];
-		m_types = new MPI_Datatype[count+1];
+		m_blockLength = new int[count];
+		m_displacements = new MPI_Aint[count];
+		m_types = new MPI_Datatype[count];
 		
 		for (unsigned int i = 0; i < count; i++) {
 			m_blockLength[i] = blockLength[i];
@@ -151,19 +151,24 @@ public:
 			m_lock.unlock();
 		
 #ifndef ASAGI_NOMPI
-			m_blockLength[m_count] = m_size;
-			m_displacements[m_count] = 1;
-			m_types[m_count] = MPI_UB;
+			MPI_Datatype tmpType;
 		
 			// Create the mpi datatype
 			if (MPI_Type_create_struct(
-					m_count+1,
+					m_count,
 					m_blockLength,
 					m_displacements,
 					m_types,
-					&m_mpiType) != MPI_SUCCESS)
+					&tmpType) != MPI_SUCCESS)
 				return asagi::Grid::MPI_ERROR;
+			if (MPI_Type_create_resized(tmpType, 0, size, &m_mpiType)
+					!= MPI_SUCCESS)
+				return asagi::Grid::MPI_ERROR;
+
 			if (MPI_Type_commit(&m_mpiType) != MPI_SUCCESS)
+				return asagi::Grid::MPI_ERROR;
+
+			if (MPI_Type_free(&tmpType) != MPI_SUCCESS)
 				return asagi::Grid::MPI_ERROR;
 		
 			// We do not need them anymore
