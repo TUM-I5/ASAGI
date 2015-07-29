@@ -10,6 +10,7 @@ var searchData=
   ['close',['close',['../group__cxx__interface.xhtml#gaa28e13bf58bc6dc2f86ea3f8c43047c6',1,'asagi::Grid']]],
   ['closeinputfile',['closeInputFile',['../classgrid_1_1level_1_1Level.xhtml#aa1601e955fc455d4dcd87808c0724675',1,'grid::level::Level']]],
   ['comm',['comm',['../classgrid_1_1Container.xhtml#a598fd8ac8f41dfc39036fad6a23d4202',1,'grid::Container::comm()'],['../classgrid_1_1level_1_1Level.xhtml#ab86834726c50a16fb88944a8692ad294',1,'grid::level::Level::comm()'],['../classmpi_1_1MPIComm.xhtml#a4a20ee50b25a8736c14c2f0c1f851cc3',1,'mpi::MPIComm::comm()']]],
+  ['commthreadhandler',['commThreadHandler',['../classmpi_1_1CommThread.xhtml#af30e475a610cffb53185f7fede038efe',1,'mpi::CommThread']]],
   ['container',['Container',['../classgrid_1_1Container.xhtml#a33b858d3a2810af21e679027fde2e634',1,'grid::Container']]],
   ['convert',['convert',['../classtypes_1_1ArrayType.xhtml#abaae0ac16b5a4ba706ba4510665ca206',1,'types::ArrayType::convert()'],['../classtypes_1_1BasicType.xhtml#a7b7fb9c62ab168319e2fb23cc9424ff4',1,'types::BasicType::convert(const void *data, B *buf) const '],['../classtypes_1_1BasicType.xhtml#a7a09bff1447e3654ff41772fbd8d1e4e',1,'types::BasicType::convert(const void *data, void *buf) const '],['../classtypes_1_1StructType.xhtml#a70d5232beec3c8f997f02cce775f6fb0',1,'types::StructType::convert()']]],
   ['copy',['copy',['../classnuma_1_1NumaComm.xhtml#aa2cb6a456174919c3a900a50d87024df',1,'numa::NumaComm::copy()'],['../classtypes_1_1Type.xhtml#a85bda95db5a174347e34c4c7deb108c3',1,'types::Type::copy()']]],

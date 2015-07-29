@@ -5,7 +5,8 @@ var searchData=
   ['mpialloc',['MPIAlloc',['../classallocator_1_1MPIAlloc.xhtml',1,'allocator']]],
   ['mpicache',['MPICache',['../classtransfer_1_1MPICache.xhtml',1,'transfer']]],
   ['mpicomm',['MPIComm',['../classmpi_1_1MPIComm.xhtml',1,'mpi']]],
-  ['mpifull',['MPIFull',['../classtransfer_1_1MPIFull.xhtml',1,'transfer']]],
   ['mpino',['MPINo',['../classtransfer_1_1MPINo.xhtml',1,'transfer']]],
+  ['mpithreadfull',['MPIThreadFull',['../classtransfer_1_1MPIThreadFull.xhtml',1,'transfer']]],
+  ['mpiwinfull',['MPIWinFull',['../classtransfer_1_1MPIWinFull.xhtml',1,'transfer']]],
   ['mutex',['Mutex',['../classmpi_1_1Mutex.xhtml',1,'mpi']]]
 ];

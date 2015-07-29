@@ -88,7 +88,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">mpi Namespace Reference</div>  </div>
 </div><!--header-->
@@ -99,19 +100,30 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1CommThread.xhtml">CommThread</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1MPIComm.xhtml">MPIComm</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1Mutex.xhtml">Mutex</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1NoMPIComm.xhtml">NoMPIComm</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1Receiver.xhtml">Receiver</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:aa5ad89dda9b56594501214333118359d"><td class="memItemLeft" align="right" valign="top">typedef unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacempi.xhtml#aa5ad89dda9b56594501214333118359d">message_t</a></td></tr>
+<tr class="separator:aa5ad89dda9b56594501214333118359d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0703a974a59133c4a796489641002ddb"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classthreads_1_1PthreadMutex.xhtml">threads::Mutex</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacempi.xhtml#a0703a974a59133c4a796489641002ddb">Lock</a></td></tr>
 <tr class="separator:a0703a974a59133c4a796489641002ddb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e6a6e41eae8637dd3694e7066950eb4"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classmpi_1_1NoMPIComm.xhtml">NoMPIComm</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacempi.xhtml#a7e6a6e41eae8637dd3694e7066950eb4">MPIComm</a></td></tr>
 <tr class="separator:a7e6a6e41eae8637dd3694e7066950eb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a9cac4a0d6d07f3bf99c0b19e0cf5f26a"><td class="memItemLeft" align="right" valign="top">const MPI_Datatype&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacempi.xhtml#a9cac4a0d6d07f3bf99c0b19e0cf5f26a">MPI_MESSAGE</a> = MPI_UNSIGNED_LONG</td></tr>
+<tr class="separator:a9cac4a0d6d07f3bf99c0b19e0cf5f26a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Extends the functionality of MPI. </p>
@@ -131,6 +143,21 @@ Typedefs</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aa5ad89dda9b56594501214333118359d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef unsigned long <a class="el" href="namespacempi.xhtml#aa5ad89dda9b56594501214333118359d">mpi::message_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The data type that is transfered via the communication thread </p>
+
+<p>Definition at line <a class="el" href="commthread_8h_source.xhtml#l00056">56</a> of file <a class="el" href="commthread_8h_source.xhtml">commthread.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a7e6a6e41eae8637dd3694e7066950eb4"></a>
 <div class="memitem">
 <div class="memproto">
@@ -143,6 +170,22 @@ Typedefs</h2></td></tr>
 <p>MPI Communicator replacement if MPI is disabled </p>
 
 <p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00067">67</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="a9cac4a0d6d07f3bf99c0b19e0cf5f26a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const MPI_Datatype mpi::MPI_MESSAGE = MPI_UNSIGNED_LONG</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The corresponding MPI data type </p>
+
+<p>Definition at line <a class="el" href="commthread_8h_source.xhtml#l00058">58</a> of file <a class="el" href="commthread_8h_source.xhtml">commthread.h</a>.</p>
 
 </div>
 </div>

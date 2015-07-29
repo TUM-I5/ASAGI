@@ -101,9 +101,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml">MPICache</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIFull.xhtml">MPIFull</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPINo.xhtml">MPINo</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadFull.xhtml">MPIThreadFull</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinFull.xhtml">MPIWinFull</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1NumaCache.xhtml">NumaCache</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -118,8 +120,10 @@ Classes</h2></td></tr>
 Typedefs</h2></td></tr>
 <tr class="memitem:af67ba4318f8f5f7a137ae6ecc8afa6c9"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classtransfer_1_1MPINo.xhtml">MPINo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetransfer.xhtml#af67ba4318f8f5f7a137ae6ecc8afa6c9">MPICache</a></td></tr>
 <tr class="separator:af67ba4318f8f5f7a137ae6ecc8afa6c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad22392ad99fa6d8e16c457f9a4ce242"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classtransfer_1_1MPINo.xhtml">MPINo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetransfer.xhtml#aad22392ad99fa6d8e16c457f9a4ce242">MPIFull</a></td></tr>
-<tr class="separator:aad22392ad99fa6d8e16c457f9a4ce242"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f076360e741ffabc120bd44172ae22b"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classtransfer_1_1MPINo.xhtml">MPINo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetransfer.xhtml#a3f076360e741ffabc120bd44172ae22b">MPIThreadFull</a></td></tr>
+<tr class="separator:a3f076360e741ffabc120bd44172ae22b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac35618a8ea1701d4a23de22185b9b532"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="classtransfer_1_1MPINo.xhtml">MPINo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetransfer.xhtml#ac35618a8ea1701d4a23de22185b9b532">MPIWinFull</a></td></tr>
+<tr class="separator:ac35618a8ea1701d4a23de22185b9b532"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Transfer classes can copy blocks between MPI/NUMA domains. </p>
@@ -139,18 +143,33 @@ Typedefs</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aad22392ad99fa6d8e16c457f9a4ce242"></a>
+<a class="anchor" id="a3f076360e741ffabc120bd44172ae22b"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="classtransfer_1_1MPINo.xhtml">MPINo</a> <a class="el" href="classtransfer_1_1MPIFull.xhtml">transfer::MPIFull</a></td>
+          <td class="memname">typedef <a class="el" href="classtransfer_1_1MPINo.xhtml">MPINo</a> <a class="el" href="classtransfer_1_1MPIThreadFull.xhtml">transfer::MPIThreadFull</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>No MPI transfers with MPI </p>
 
-<p>Definition at line <a class="el" href="mpifull_8h_source.xhtml#l00061">61</a> of file <a class="el" href="mpifull_8h_source.xhtml">mpifull.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadfull_8h_source.xhtml#l00064">64</a> of file <a class="el" href="mpithreadfull_8h_source.xhtml">mpithreadfull.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac35618a8ea1701d4a23de22185b9b532"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classtransfer_1_1MPINo.xhtml">MPINo</a> <a class="el" href="classtransfer_1_1MPIWinFull.xhtml">transfer::MPIWinFull</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>No MPI transfers with MPI </p>
+
+<p>Definition at line <a class="el" href="mpiwinfull_8h_source.xhtml#l00061">61</a> of file <a class="el" href="mpiwinfull_8h_source.xhtml">mpiwinfull.h</a>.</p>
 
 </div>
 </div>

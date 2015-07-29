@@ -146,12 +146,15 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<b>ASAGI_UNKNOWN_PARAM</b>, 
 <b>ASAGI_INVALID_VALUE</b>, 
-<b>ASAGI_NOT_OPEN</b>, 
-<b>ASAGI_VAR_NOT_FOUND</b>, 
+<b>ASAGI_NOT_INITIALIZED</b>, 
+<b>ASAGI_ALREADY_INITIALIZED</b>, 
 <br />
-&#160;&#160;<b>ASAGI_WRONG_SIZE</b>, 
+&#160;&#160;<b>ASAGI_NOT_OPEN</b>, 
+<b>ASAGI_VAR_NOT_FOUND</b>, 
+<b>ASAGI_WRONG_SIZE</b>, 
 <b>ASAGI_UNSUPPORTED_DIMENSIONS</b>, 
-<b>ASAGI_MULTIPLE_TOPGRIDS</b>, 
+<br />
+&#160;&#160;<b>ASAGI_MULTIPLE_TOPGRIDS</b>, 
 <b>ASAGI_INVALID_VAR_SIZE</b>
 <br />
  }</td></tr>
@@ -195,6 +198,10 @@ Functions</h2></td></tr>
 <tr class="separator:ga1bf1c5ee5d04496ad76fb342bff1d365"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4d7e60291ef33ea84718a500314063e6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__c__interface.xhtml#ga4d7e60291ef33ea84718a500314063e6">asagi_grid_close</a> (<a class="el" href="group__c__interface.xhtml#gaca5b276ab96af8e47c5ccf5a33a6e9f4">asagi_grid</a> *handle)</td></tr>
 <tr class="separator:ga4d7e60291ef33ea84718a500314063e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga39bb7cbec6687e3ad8f0185221a9b6a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__c__interface.xhtml#ga514acfad187426dc608d171a7d3bd721">asagi_error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__c__interface.xhtml#ga39bb7cbec6687e3ad8f0185221a9b6a8">asagi_start_comm_thread</a> (int sched_cpu, MPI_Comm comm)</td></tr>
+<tr class="separator:ga39bb7cbec6687e3ad8f0185221a9b6a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7ff9d706d7336cda5fecda8819a97e5f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__c__interface.xhtml#ga7ff9d706d7336cda5fecda8819a97e5f">asagi_stop_comm_thread</a> ()</td></tr>
+<tr class="separator:ga7ff9d706d7336cda5fecda8819a97e5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Include file for C and C++ API. </p>
@@ -221,7 +228,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8h_source.xhtml#l00356">356</a> of file <a class="el" href="asagi_8h_source.xhtml">asagi.h</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8h_source.xhtml#l00386">386</a> of file <a class="el" href="asagi_8h_source.xhtml">asagi.h</a>.</p>
 
 </div>
 </div>
@@ -236,7 +243,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga26042863b1e4f739f16b0cdbe5639d9b">asagi::Grid::Type</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8h_source.xhtml#l00352">352</a> of file <a class="el" href="asagi_8h_source.xhtml">asagi.h</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8h_source.xhtml#l00382">382</a> of file <a class="el" href="asagi_8h_source.xhtml">asagi.h</a>.</p>
 
 </div>
 </div>

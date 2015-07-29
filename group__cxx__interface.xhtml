@@ -115,12 +115,15 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a8c22b48a4d2426224c3d9d52001ea693">asagi::Grid::UNKNOWN_PARAM</a>, 
 <a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5aff343faffab82831cdc66ce0f8f4b400">asagi::Grid::INVALID_VALUE</a>, 
-<a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a7e8e0ef2b9b8505adf98d9d479349c0e">asagi::Grid::NOT_OPEN</a>, 
-<a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a76f8d7e5feb2773f99401cc35eef7d43">asagi::Grid::VAR_NOT_FOUND</a>, 
+<a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad1de55870ea7a06c00e35e66a0cc064a">asagi::Grid::NOT_INITIALIZED</a>, 
+<a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a15cd796c3a9ee5e49922cf238911cf49">asagi::Grid::ALREADY_INITIALIZED</a>, 
 <br />
-&#160;&#160;<a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ab1057a3562c9eb489bb0932d345f606d">asagi::Grid::WRONG_SIZE</a>, 
+&#160;&#160;<a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a7e8e0ef2b9b8505adf98d9d479349c0e">asagi::Grid::NOT_OPEN</a>, 
+<a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a76f8d7e5feb2773f99401cc35eef7d43">asagi::Grid::VAR_NOT_FOUND</a>, 
+<a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ab1057a3562c9eb489bb0932d345f606d">asagi::Grid::WRONG_SIZE</a>, 
 <a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a91572f88ea95128fc91f150a3542fa66">asagi::Grid::UNSUPPORTED_DIMENSIONS</a>, 
-<a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5af835330b3c4157a99d0a9d6c9032dd20">asagi::Grid::INVALID_VAR_SIZE</a>
+<br />
+&#160;&#160;<a class="el" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5af835330b3c4157a99d0a9d6c9032dd20">asagi::Grid::INVALID_VAR_SIZE</a>
 <br />
  }</td></tr>
 <tr class="separator:gac1191f4df7554b1b99e515962ebc2bb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -170,6 +173,10 @@ Functions</h2></td></tr>
 <tr class="separator:gab566aecf321f4d6bd240fa4d9c68f0ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa28e13bf58bc6dc2f86ea3f8c43047c6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cxx__interface.xhtml#gaa28e13bf58bc6dc2f86ea3f8c43047c6">asagi::Grid::close</a> (<a class="el" href="classasagi_1_1Grid.xhtml">asagi::Grid</a> *grid)</td></tr>
 <tr class="separator:gaa28e13bf58bc6dc2f86ea3f8c43047c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0aab15297b382bad7031937533af7974"><td class="memItemLeft" align="right" valign="top">static Error&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cxx__interface.xhtml#ga0aab15297b382bad7031937533af7974">asagi::Grid::startCommThread</a> (int schedCPU=-1, MPI_Comm comm=MPI_COMM_WORLD)</td></tr>
+<tr class="separator:ga0aab15297b382bad7031937533af7974"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga91fcbf09ab71b095bbd7f8851af250b3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cxx__interface.xhtml#ga91fcbf09ab71b095bbd7f8851af250b3">asagi::Grid::stopCommThread</a> ()</td></tr>
+<tr class="separator:ga91fcbf09ab71b095bbd7f8851af250b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
@@ -201,6 +208,12 @@ Functions</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ggac1191f4df7554b1b99e515962ebc2bb5aff343faffab82831cdc66ce0f8f4b400"></a>INVALID_VALUE&#160;</td><td class="fielddoc">
 <p>Invalid configuration value </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ggac1191f4df7554b1b99e515962ebc2bb5ad1de55870ea7a06c00e35e66a0cc064a"></a>NOT_INITIALIZED&#160;</td><td class="fielddoc">
+<p>Function is not yet initialized </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ggac1191f4df7554b1b99e515962ebc2bb5a15cd796c3a9ee5e49922cf238911cf49"></a>ALREADY_INITIALIZED&#160;</td><td class="fielddoc">
+<p>Function already initialized </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ggac1191f4df7554b1b99e515962ebc2bb5a7e8e0ef2b9b8505adf98d9d479349c0e"></a>NOT_OPEN&#160;</td><td class="fielddoc">
 <p>Could not open input file </p>
@@ -286,7 +299,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="asagi_8h_source.xhtml#l00342">342</a> of file <a class="el" href="asagi_8h_source.xhtml">asagi.h</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8h_source.xhtml#l00346">346</a> of file <a class="el" href="asagi_8h_source.xhtml">asagi.h</a>.</p>
 
 </div>
 </div>
@@ -320,7 +333,7 @@ Functions</h2></td></tr>
 </dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="minimal_8cpp-example.xhtml#a2">minimal.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00043">43</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00046">46</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
 
 </div>
 </div>
@@ -354,7 +367,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00048">48</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00051">51</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
 
 </div>
 </div>
@@ -412,7 +425,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00053">53</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00056">56</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
 
 </div>
 </div>
@@ -1018,6 +1031,78 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ga0aab15297b382bad7031937533af7974"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a> asagi::Grid::startCommThread </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>schedCPU</em> = <code>-1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MPI_Comm&#160;</td>
+          <td class="paramname"><em>comm</em> = <code>MPI_COMM_WORLD</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Starts the communication thread. This must be done before a grid with the option <code>MPI_COMMUNICATION = THREAD</code> is opened.</p>
+<p>This is a collective operation within <code>comm</code>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">schedCPU</td><td>The id of the CPU on which the communication thread should run. Use negative values to select the last, second last, ... CPU. If the id is invalid, the thread will not be pinned to a CPU. </td></tr>
+    <tr><td class="paramname">comm</td><td>The communicator specifying which processes will be involved in any communication </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>SUCCESS</code> or an error </dd></dl>
+
+<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00063">63</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ga91fcbf09ab71b095bbd7f8851af250b3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void asagi::Grid::stopCommThread </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Stops the communication thread </p>
+
+<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00068">68</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="ga2b63ab481f2bfc777ca831bff4e8502c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1042,7 +1127,7 @@ Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classgrid_1_1Grid.xhtml#ab8715bd1370efe398214bd45c6fc0b34">grid::Grid</a>.</p>
 
-<p>Definition at line <a class="el" href="asagi_8h_source.xhtml#l00123">123</a> of file <a class="el" href="asagi_8h_source.xhtml">asagi.h</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8h_source.xhtml#l00127">127</a> of file <a class="el" href="asagi_8h_source.xhtml">asagi.h</a>.</p>
 
 </div>
 </div>

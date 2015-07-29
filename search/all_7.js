@@ -29,5 +29,6 @@ var searchData=
   ['grid',['Grid',['../classasagi_1_1Grid.xhtml',1,'asagi']]],
   ['grid_2ecpp',['grid.cpp',['../grid_8cpp.xhtml',1,'']]],
   ['grid_2eh',['grid.h',['../grid_8h.xhtml',1,'']]],
+  ['group',['group',['../classmpi_1_1CommThread.xhtml#a2df0231742d70d29d68f281fce023801',1,'mpi::CommThread::ReceiverDetail']]],
   ['level',['level',['../namespacegrid_1_1level.xhtml',1,'grid']]]
 ];

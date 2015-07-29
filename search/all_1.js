@@ -4,6 +4,7 @@ var searchData=
   ['acquire',['acquire',['../classmpi_1_1Mutex.xhtml#a0db04740982b3ab67eeeab038221d509',1,'mpi::Mutex']]],
   ['add',['add',['../classfortran_1_1PointerArray.xhtml#af29c02b89c6ec5fbdc24d86efd9ab38a',1,'fortran::PointerArray']]],
   ['allocate',['allocate',['../classallocator_1_1Default.xhtml#a45e26d676b509e5fab2a0f642fd4e694',1,'allocator::Default::allocate()'],['../classallocator_1_1MPIAlloc.xhtml#a1b1acf801d4f51c0a35bc293a2978887',1,'allocator::MPIAlloc::allocate()'],['../classnuma_1_1NumaComm.xhtml#ad215a4182c54252a5105b88bf879ae71',1,'numa::NumaComm::allocate()']]],
+  ['already_5finitialized',['ALREADY_INITIALIZED',['../group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a15cd796c3a9ee5e49922cf238911cf49',1,'asagi::Grid']]],
   ['arraytype',['ArrayType',['../classtypes_1_1ArrayType.xhtml',1,'types']]],
   ['arraytype_2ecpp',['arraytype.cpp',['../arraytype_8cpp.xhtml',1,'']]],
   ['arraytype_2eh',['arraytype.h',['../arraytype_8h.xhtml',1,'']]],
@@ -45,5 +46,7 @@ var searchData=
   ['asagi_5fgrid_5fset_5fparam_5fc',['asagi_grid_set_param_c',['../classasagi.xhtml#a26dd48473382e4b76f8baa09bd115ead',1,'asagi']]],
   ['asagi_5fgrid_5fset_5fthreads',['asagi_grid_set_threads',['../group__f__interface.xhtml#gaaca578520dc355914e1c115c2407afae',1,'asagi::asagi_grid_set_threads()'],['../group__c__interface.xhtml#ga6fff12023eb9b7384aa5c626893869c3',1,'asagi_grid_set_threads(asagi_grid *handle, unsigned int threads):&#160;asagi.cpp'],['../group__c__interface.xhtml#ga6fff12023eb9b7384aa5c626893869c3',1,'asagi_grid_set_threads(asagi_grid *handle, unsigned int threads):&#160;asagi.cpp']]],
   ['asagi_5fgrid_5fvar_5fsize',['asagi_grid_var_size',['../group__f__interface.xhtml#ga69213aecf915a32e2bf7ae3d49a5fb1a',1,'asagi::asagi_grid_var_size()'],['../group__c__interface.xhtml#ga73aadc05bc8ac9eacae77f5b005787ed',1,'asagi_grid_var_size(asagi_grid *handle):&#160;asagi.cpp'],['../group__c__interface.xhtml#ga73aadc05bc8ac9eacae77f5b005787ed',1,'asagi_grid_var_size(asagi_grid *handle):&#160;asagi.cpp']]],
+  ['asagi_5fstart_5fcomm_5fthread',['asagi_start_comm_thread',['../group__f__interface.xhtml#gae1d0a5dd8b6fc7baaa60abdb7313bb9b',1,'asagi::asagi_start_comm_thread()'],['../group__c__interface.xhtml#ga39bb7cbec6687e3ad8f0185221a9b6a8',1,'asagi_start_comm_thread(int sched_cpu, MPI_Comm comm):&#160;asagi.cpp'],['../group__c__interface.xhtml#ga39bb7cbec6687e3ad8f0185221a9b6a8',1,'asagi_start_comm_thread(int sched_cpu, MPI_Comm comm):&#160;asagi.cpp']]],
+  ['asagi_5fstop_5fcomm_5fthread',['asagi_stop_comm_thread',['../group__f__interface.xhtml#ga9919f2f4a1972870a19a5c9272169bcd',1,'asagi::asagi_stop_comm_thread()'],['../group__c__interface.xhtml#ga7ff9d706d7336cda5fecda8819a97e5f',1,'asagi_stop_comm_thread():&#160;asagi.cpp'],['../group__c__interface.xhtml#ga7ff9d706d7336cda5fecda8819a97e5f',1,'asagi_stop_comm_thread():&#160;asagi.cpp']]],
   ['asagi_5ftype',['asagi_type',['../group__c__interface.xhtml#ga0208e651759a1daff088e4019c86a874',1,'asagi_type():&#160;asagi.h'],['../asagi_8h.xhtml#a9daba98aa97ada156b9735684bfd7bc2',1,'asagi_type():&#160;asagi.h']]]
 ];
