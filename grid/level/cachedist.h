@@ -44,7 +44,7 @@
 #include "allocator/mpialloc.h"
 #include "transfer/numacache.h"
 #include "transfer/numano.h"
-#include "transfer/mpicache.h"
+#include "transfer/mpiwincache.h"
 #include "transfer/mpino.h"
 
 namespace grid
@@ -189,11 +189,11 @@ using CacheDistNuma = CacheDist<transfer::MPINo, transfer::NumaCache, Type, allo
 
 /** Cached distributed level with MPI */
 template<class Type>
-using CacheDistMPI = CacheDist<transfer::MPICache, transfer::NumaNo, Type, allocator::MPIAlloc>;
+using CacheDistMPI = CacheDist<transfer::MPIWinCache, transfer::NumaNo, Type, allocator::MPIAlloc>;
 
 /** Cached distributed level with MPI and NUMA */
 template<class Type>
-using CacheDistMPINuma = CacheDist<transfer::MPICache, transfer::NumaCache, Type, allocator::MPIAlloc>;
+using CacheDistMPINuma = CacheDist<transfer::MPIWinCache, transfer::NumaCache, Type, allocator::MPIAlloc>;
 
 }
 
