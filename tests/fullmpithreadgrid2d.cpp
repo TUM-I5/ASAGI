@@ -32,55 +32,72 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef ASAGI_F95_H
-#define ASAGI_F95_H
+#include <asagi.h>
 
-#include "asagi.h"
+// Do not abort to get real failure
+#define LOG_ABORT
+#include "utils/logger.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "testdefines.h"
 
-int f90asagi_grid_create(asagi_type type);
+using namespace asagi;
 
-int f90asagi_grid_create_array(asagi_type basic_type);
+int main(int argc, char** argv)
+{
+	int support;
+	MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &support);
+	if (support != MPI_THREAD_MULTIPLE)
+		logError() << "MPI_THREAD_MULTIPLE not supported by this MPI implementation";
 
-int f90asagi_grid_create_struct(int count,
-	int blockLength[],
-	long displacements[],
-	asagi_type types[]);
+	int rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-void f90asagi_grid_set_comm(int grid_id, int comm);
-void f90asagi_grid_set_threads(int grid_id, int threads);
-void f90asagi_grid_set_param(int grid_id, const char* name,
-	const char* value, int level);
-asagi_error f90asagi_grid_open(int grid_id, const char* filename,
-	int level);
+	Grid::startCommThread(-1-rank);
 
-double f90asagi_grid_min(int grid_id, int n);
-double f90asagi_grid_max(int grid_id, int n);
+	Grid* grid = Grid::create();
+	grid->setComm(MPI_COMM_WORLD);
+	grid->setParam("MPI_COMMUNICATION", "THREAD");
 
-double f90asagi_grid_delta(int grid_id, int n, int level);
+	if (grid->open(NC_2D) != Grid::SUCCESS) {
+		logError() << "Could not open file";
+		return 1;
+	}
 
-int f90asagi_grid_var_size(int grid_id);
+	int value;
 
-unsigned char f90asagi_grid_get_byte(int grid_id, double* pos, int level);
-int f90asagi_grid_get_int(int grid_id, double* pos, int level);
-long f90asagi_grid_get_long(int grid_id, double* pos, int level);
-float f90asagi_grid_get_float(int grid_id, double* pos, int level);
-double f90asagi_grid_get_double(int grid_id, double* pos, int level);
-void f90asagi_grid_get_buf(int grid_id, void* buf, double* pos, int level);
+	double coords[2];
+	for (int i = 0; i < WIDTH; i++) {
+		coords[0] = i;
 
-void f90asagi_grid_close(int grid_id);
+		for (int j = 0; j < LENGTH; j++) {
+			coords[1] = j;
 
-asagi_error f90asagi_start_comm_thread(int sched_cpu, int comm);
-void f90asagi_stop_comm_thread();
+			value = j + i * LENGTH;
+			if (grid->getInt(coords) != value) {
+				logError() << "Value at" << i << j << "should be"
+					<< value << "but is" << grid->getInt(coords);
+				return 1;
+			}
+		}
+	}
 
-#ifdef __cplusplus
-}	// end extern "C"
-#endif
+	unsigned long accesses = grid->getCounter("accesses");
+	if (accesses == 0 || accesses > WIDTH * LENGTH * 2) {
+		logError() << "Counter \"accesses\" should be less than" << (WIDTH*LENGTH * 2)
+				<< "but is" << accesses;
+		return 1;
+	}
+	
+	MPI_Barrier(MPI_COMM_WORLD);
 
-#endif // ifndef ASAGI_F95_H
+	delete grid;
+	
+	Grid::stopCommThread();
+
+	MPI_Finalize();
+
+	return 0;
+}

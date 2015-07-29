@@ -102,6 +102,10 @@ public:
 		UNKNOWN_PARAM,
 		/** Invalid configuration value */
 		INVALID_VALUE,
+		/** Function is not yet initialized */
+		NOT_INITIALIZED,
+		/** Function already initialized */
+		ALREADY_INITIALIZED,
 		/** Could not open input file */
 		NOT_OPEN,
 		/** netCDF variable not found */
@@ -343,6 +347,32 @@ public:
 	{
 		delete grid;
 	}
+
+#ifndef ASAGI_NOMPI
+	/**
+	 * @ingroup cxx_interface
+	 *
+	 * Starts the communication thread. This must be done before a grid with the option
+	 * <code>MPI_COMMUNICATION = THREAD</code> is opened.
+	 *
+	 * This is a collective operation within <code>comm</code>.
+	 *
+	 * @param schedCPU The id of the CPU on which the communication thread should run.
+	 *  Use negative values to select the last, second last, ... CPU. If the id is
+	 *  invalid, the thread will not be pinned to a CPU.
+	 * @param comm The communicator specifying which processes will be involved in
+	 *  any communication
+	 * @return <code>SUCCESS</code> or an error
+	 */
+	static Error startCommThread(int schedCPU = -1, MPI_Comm comm = MPI_COMM_WORLD);
+
+	/**
+	 * @ingroup cxx_interface
+	 *
+	 * Stops the communication thread
+	 */
+	static void stopCommThread();
+#endif // ASAGI_NOMPI
 };
 
 typedef asagi::Grid asagi_grid;
@@ -382,6 +412,8 @@ typedef enum {
 	ASAGI_NUMA_ERROR,
 	ASAGI_UNKNOWN_PARAM,
 	ASAGI_INVALID_VALUE,
+	ASAGI_NOT_INITIALIZED,
+	ASAGI_ALREADY_INITIALIZED,
 	ASAGI_NOT_OPEN,
 	ASAGI_VAR_NOT_FOUND,
 	ASAGI_WRONG_SIZE,
@@ -527,6 +559,22 @@ void asagi_grid_get_buf(asagi_grid* handle,void* buf, const double* pos,
  * @see asagi::Grid::close(asagi::Grid*)
  */
 void asagi_grid_close(asagi_grid* handle);
+
+#ifndef ASAGI_NOMPI
+/**
+ * @ingroup c_interface
+ *
+ * @see asagi::Grid::startCommThread(int, MPI_Comm)
+ */
+asagi_error asagi_start_comm_thread(int sched_cpu, MPI_Comm comm);
+
+/**
+ * @ingroup c_interface
+ *
+ * @see asagi::Grid::stopCommThread()
+ */
+void asagi_stop_comm_thread();
+#endif
 
 #ifdef __cplusplus
 }

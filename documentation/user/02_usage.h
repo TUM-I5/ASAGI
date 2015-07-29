@@ -193,6 +193,12 @@
  *   <td>yes</td>
  *  </tr>
  *  <tr>
+ *   <td>MPI_COMMUNICATION</td>
+ *   <td>THREAD | WINDOW</td>
+ *   <td>Use a communication thread or MPI RMA (windows) for MPI communication (default: WINDOW, see @ref mpicommunication)</td>
+ *   <td>yes</td>
+ *  </tr>
+ *  <tr>
  *   <td>VALUE-POSITION</td>
  *   <td>CELL-CENTERED | VERTEX-CENTERED</td>
  *   <td>The value position (see @ref valuepos)</td>
@@ -236,6 +242,26 @@
  * @anchor gridglobal (*) If yes, the parameter can only be set for all levels
  *  at the same time. Set the parameter <code>level</code> in
  *  {@link asagi::Grid::setParam()} to 0 to change value.
+ *
+ * @subsection mpicommunication MPI Communication
+ *
+ * ASAGI supports two different MPI communication patterns: Via MPI remote
+ * memory access (MPI windows) or a separate communication thread. The MPI
+ * windows are used by default since they do not have any special requirement
+ * and are easy to use. However, in some MPI libraries, RMA is poorly tested
+ * and does not work well, especially with hybrid parallelization.
+ *
+ * Therefore, you can use the communication thread. In this mode, a separate
+ * thread is required which is responsible for answering remote requests. You
+ * have to start the thread with {@link asagi::Grid::startCommThread}
+ * <b>before</b> any grid using the communication thread is opened. Multiple
+ * grids will share one communication thread does you must not start more than
+ * communication. However, you have to make sure that the MPI communicator
+ * for the communication thread includes all grid communicators. Once the last
+ * grid using the communication thread is closed, you should stop the
+ * additional with {@link asagi::Grid::stopCommThread}. To use the
+ * communication thread it is also necessary to have a thread-safe MPI
+ * implementation.
  *
  * @section accesscounter Access counters
  *

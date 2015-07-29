@@ -38,6 +38,9 @@
 #include "asagi.h"
 
 #include "grid/grid.h"
+#ifndef ASAGI_NOMPI
+#include "mpi/commthread.h"
+#endif // ASAGI_NOMPI
 
 // Static c++ functions
 asagi::Grid* asagi::Grid::create(Type type)
@@ -55,6 +58,18 @@ asagi::Grid* asagi::Grid::createStruct(unsigned int count,
 {
 	return new grid::Grid(count, blockLength, displacements, types);
 }
+
+#ifndef ASAGI_NOMPI
+asagi::Grid::Error asagi::Grid::startCommThread(int schedCPU, MPI_Comm comm)
+{
+	return mpi::CommThread::commThread.init(schedCPU, comm);
+}
+
+void asagi::Grid::stopCommThread()
+{
+	mpi::CommThread::commThread.finialize();
+}
+#endif // ASAGI_NOMPI
 
 // C interfae
 
@@ -163,3 +178,15 @@ void asagi_grid_close(asagi_grid* handle)
 {
 	delete handle;
 }
+
+#ifndef ASAGI_NOMPI
+asagi_error asagi_start_comm_thread(int sched_cpu, MPI_Comm comm)
+{
+	return asagi::Grid::startCommThread(sched_cpu, comm);
+}
+
+void asagi_stop_comm_thread()
+{
+	asagi::Grid::stopCommThread();
+}
+#endif // ASAGI_NOMPI

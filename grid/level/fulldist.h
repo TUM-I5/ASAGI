@@ -45,8 +45,9 @@
 #include "transfer/numafull.h"
 #include "transfer/numafullcache.h"
 #include "transfer/numano.h"
-#include "transfer/mpifull.h"
 #include "transfer/mpino.h"
+#include "transfer/mpithreadfull.h"
+#include "transfer/mpiwinfull.h"
 
 namespace grid
 {
@@ -202,17 +203,29 @@ public:
 template<class Type>
 using FullDistNuma = FullDist<transfer::MPINo, transfer::NumaFull, Type, allocator::Default>;
 
-/** Full distributed level with MPI */
+/** Full distributed level with MPI (communication thread) */
 template<class Type>
-using FullDistMPI = FullDist<transfer::MPIFull, transfer::NumaNo, Type, allocator::MPIAlloc>;
+using FullDistMPIThread = FullDist<transfer::MPIThreadFull, transfer::NumaNo, Type, allocator::MPIAlloc>;
 
-/** Full distributed level with MPI and NUMA */
+/** Full distributed level with MPI windows */
 template<class Type>
-using FullDistMPINuma = FullDist<transfer::MPIFull, transfer::NumaFull, Type, allocator::MPIAlloc>;
+using FullDistMPIWin = FullDist<transfer::MPIWinFull, transfer::NumaNo, Type, allocator::MPIAlloc>;
 
-/** Full distributed level with MPI, NUMA and NUMA cache lookup */
+/** Full distributed level with MPI (communication thread) and NUMA */
 template<class Type>
-using FullDistMPINumaCache = FullDist<transfer::MPIFull, transfer::NumaFullCache, Type, allocator::MPIAlloc>;
+using FullDistMPIThreadNuma = FullDist<transfer::MPIThreadFull, transfer::NumaFull, Type, allocator::MPIAlloc>;
+
+/** Full distributed level with MPI windows and NUMA */
+template<class Type>
+using FullDistMPIWinNuma = FullDist<transfer::MPIWinFull, transfer::NumaFull, Type, allocator::MPIAlloc>;
+
+/** Full distributed level with MPI (communication thread), NUMA and NUMA cache lookup */
+template<class Type>
+using FullDistMPIThreadNumaCache = FullDist<transfer::MPIThreadFull, transfer::NumaFullCache, Type, allocator::MPIAlloc>;
+
+/** Full distributed level with MPI windows, NUMA and NUMA cache lookup */
+template<class Type>
+using FullDistMPIWinNumaCache = FullDist<transfer::MPIWinFull, transfer::NumaFullCache, Type, allocator::MPIAlloc>;
 
 }
 

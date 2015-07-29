@@ -201,3 +201,28 @@ void f90asagi_grid_close(int grid_id)
 {
 	delete grid::Grid::f2c(grid_id);
 }
+
+// Communication thread
+
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
+asagi_error f90asagi_start_comm_thread(int sched_cpu, int comm)
+{
+	// This function is a no-op if called on a version without MPI support
+#ifndef ASAGI_NOMPI
+	return grid::Grid::startCommThread(sched_cpu, MPI_Comm_f2c(comm));
+#endif // ASAGI_NOMPI
+	return asagi::Grid::SUCCESS;
+}
+
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
+void f90asagi_stop_comm_thread()
+{
+	// This function is a no-op if called on a version without MPI support
+#ifndef ASAGI_NOMPI
+	grid::Grid::stopCommThread();
+#endif // ASAGI_NOMPI
+}

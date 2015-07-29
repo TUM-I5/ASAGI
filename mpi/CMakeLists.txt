@@ -35,6 +35,7 @@
 
 ##### Files #####
 set( mpiSources
+    commthread.cpp
     mpicomm.cpp
 	mutex.cpp )
 

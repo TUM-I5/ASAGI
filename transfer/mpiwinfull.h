@@ -35,8 +35,8 @@
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef TRANSFER_MPIFULL_H
-#define TRANSFER_MPIFULL_H
+#ifndef TRANSFER_MPIWINFULL_H
+#define TRANSFER_MPIWINFULL_H
 
 #ifdef ASAGI_NOMPI
 #include "mpino.h"
@@ -58,13 +58,14 @@ namespace transfer
 
 #ifdef ASAGI_NOMPI
 /** No MPI transfers with MPI */
-typedef MPINo MPIFull;
+typedef MPINo MPIWinFull;
 #else // ASAGI_NOMPI
 
 /**
- * Copies blocks between MPI processes assuming full storage
+ * Copies blocks between MPI processes using MPI windows and
+ * assuming full storage
  */
-class MPIFull
+class MPIWinFull
 {
 private:
 	/** The NUMA domain ID */
@@ -80,13 +81,13 @@ private:
 	MPI_Datatype m_mpiType;
 
 public:
-	MPIFull()
+	MPIWinFull()
 		: m_numaDomainId(0), m_window(MPI_WIN_NULL),
 		  m_blockSize(0), m_mpiType(MPI_DATATYPE_NULL)
 	{
 	}
 
-	virtual ~MPIFull()
+	virtual ~MPIWinFull()
 	{
 		if (m_numaDomainId == 0 && m_window != MPI_WIN_NULL) {
 			std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
@@ -174,5 +175,5 @@ public:
 
 }
 
-#endif // TRANSFER_MPIFULL_H
+#endif // TRANSFER_MPIWINFULL_H
 

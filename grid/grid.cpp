@@ -277,9 +277,12 @@ void grid::Grid::initContainers()
 		CACHE_MPI_NUMA,
 		FULL,
 		FULL_NUMA,
-		FULL_MPI,
-		FULL_MPI_NUMA,
-		FULL_MPI_NUMACACHE,
+		FULL_MPITHREAD,
+		FULL_MPIWIN,
+		FULL_MPITHREAD_NUMA,
+		FULL_MPIWIN_NUMA,
+		FULL_MPITHREAD_NUMACACHE,
+		FULL_MPIWIN_NUMACACHE,
 		PASS_THROUGH,
 		UNKNOWN
 	} containerType = UNKNOWN;
@@ -301,6 +304,15 @@ void grid::Grid::initContainers()
 			types::BasicType<float>,
 			types::BasicType<double>
 	>::result typelist;
+
+	// Select MPI communication
+	std::string mpiType = param("MPI_COMMUNICATION", "WINDOW");
+#ifdef THREADSAFE_MPI
+	if (mpiType != "WINDOW") {
+		logWarning(m_comm.rank()) << "ASAGI: Communication thread requires a thread-safe MPI library";
+		mpiType = "WINDOW";
+	}
+#endif // THREADSAFE_MPI
 
 	// Select the container type
 	std::string gridType = param("GRID", "FULL");
@@ -326,13 +338,23 @@ void grid::Grid::initContainers()
 
 		if (m_comm.size() == 1 && m_numa.totalDomains() > 1)
 			containerType = FULL_NUMA;
-		else if (m_comm.size() > 1 && m_numa.totalDomains() == 1)
-			containerType = FULL_MPI;
-		else if (m_comm.size() > 1 && m_numa.totalDomains() > 1) {
-			if (param("NUMA_CACHE", false))
-				containerType = FULL_MPI_NUMACACHE;
+		else if (m_comm.size() > 1 && m_numa.totalDomains() == 1) {
+			if (mpiType == "WINDOW")
+				containerType = FULL_MPIWIN;
 			else
-				containerType = FULL_MPI_NUMA;
+				containerType = FULL_MPITHREAD;
+		} else if (m_comm.size() > 1 && m_numa.totalDomains() > 1) {
+			if (param("NUMA_CACHE", false)) {
+				if (mpiType == "WINDOW")
+					containerType = FULL_MPIWIN_NUMACACHE;
+				else
+					containerType = FULL_MPITHREAD_NUMACACHE;
+			} else {
+				if (mpiType == "WINDOW")
+					containerType = FULL_MPIWIN_NUMA;
+				else
+					containerType = FULL_MPITHREAD_NUMA;
+			}
 		} else {
 			assert(m_comm.size() == 1);
 			assert(m_numa.totalDomains() == 1);
@@ -363,14 +385,23 @@ void grid::Grid::initContainers()
 		case FULL_NUMA:
 			*it = TypeSelector<SimpleContainer, level::FullDistNuma, typelist>::createContainer(*this);
 			break;
-		case FULL_MPI:
-			*it = TypeSelector<SimpleContainer, level::FullDistMPI, typelist>::createContainer(*this);
+		case FULL_MPITHREAD:
+			*it = TypeSelector<SimpleContainer, level::FullDistMPIThread, typelist>::createContainer(*this);
 			break;
-		case FULL_MPI_NUMA:
-			*it = TypeSelector<SimpleContainer, level::FullDistMPINuma, typelist>::createContainer(*this);
+		case FULL_MPIWIN:
+			*it = TypeSelector<SimpleContainer, level::FullDistMPIWin, typelist>::createContainer(*this);
 			break;
-		case FULL_MPI_NUMACACHE:
-			*it = TypeSelector<SimpleContainer, level::FullDistMPINumaCache, typelist>::createContainer(*this);
+		case FULL_MPITHREAD_NUMA:
+			*it = TypeSelector<SimpleContainer, level::FullDistMPIThreadNuma, typelist>::createContainer(*this);
+			break;
+		case FULL_MPIWIN_NUMA:
+			*it = TypeSelector<SimpleContainer, level::FullDistMPIWinNuma, typelist>::createContainer(*this);
+			break;
+		case FULL_MPITHREAD_NUMACACHE:
+			*it = TypeSelector<SimpleContainer, level::FullDistMPIThreadNumaCache, typelist>::createContainer(*this);
+			break;
+		case FULL_MPIWIN_NUMACACHE:
+			*it = TypeSelector<SimpleContainer, level::FullDistMPIWinNumaCache, typelist>::createContainer(*this);
 			break;
 		case PASS_THROUGH:
 			*it = TypeSelector<SimpleContainer, level::PassThrough, typelist>::createContainer(*this);

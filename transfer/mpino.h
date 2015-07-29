@@ -60,7 +60,7 @@ public:
 	/**
 	 * Initialize the transfer class
 	 *
-	 * Stub for {@link MPIFull::init}
+	 * Stub for {@link MPIWinFull::init} and {@link MPIThreadFull::init}
 	 */
 	asagi::Grid::Error init(unsigned char* data,
 			unsigned long blockCount,
@@ -91,7 +91,7 @@ public:
 	/**
 	 * Should never be called
 	 *
-	 * Stub for {@link MPIFull::transfer}
+	 * Stub for {@link MPIWinFull::transfer} and {@link MPIThreadFull::transfer}
 	 */
 	void transfer(int remoteRank, unsigned long offset,
 			unsigned char *cache)

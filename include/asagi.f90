@@ -68,6 +68,8 @@ module asagi
       ASAGI_NUMA_ERROR, &
       ASAGI_UNKNOWN_PARAM, &
       ASAGI_INVALID_VALUE, &
+      ASAGI_NOT_INITIALIZED, &
+      ASAGI_ALREADY_INITIALIZED, &
       ASAGI_NOT_OPEN, &
       ASAGI_VAR_NOT_FOUND, &
       ASAGI_WRONG_SIZE, &
@@ -240,6 +242,23 @@ module asagi
       use, intrinsic :: iso_c_binding
       integer( kind=c_int ), value :: grid_id
     end subroutine asagi_grid_close
+
+    !> @ingroup f_interface
+    !!
+    !! @see asagi::Grid::startCommThread
+    function asagi_start_comm_thread( sched_cpu, comm ) bind( c, name="f90asagi_start_comm_thread" )
+      use, intrinsic :: iso_c_binding
+      integer( kind=c_int ), value :: sched_cpu
+      integer( kind=c_int ), value :: comm
+      integer( kind=c_int )        :: asagi_start_comm_thread
+    end function asagi_start_comm_thread
+
+    !> @ingroup f_interface
+    !!
+    !! @see asagi::Grid::stopCommThread
+    subroutine asagi_stop_comm_thread() bind( c, name="f90asagi_stop_comm_thread" )
+      use, intrinsic :: iso_c_binding
+    end subroutine asagi_stop_comm_thread
 
   !> @cond ignore
   end interface
