@@ -1,5 +1,0 @@
-<map id="transfer::MPICache" name="transfer::MPICache">
-<area shape="rect" id="node2" href="$classmpi_1_1MPIComm.xhtml" title="mpi::MPIComm" alt="" coords="12,101,127,131"/>
-<area shape="rect" id="node6" href="$classmpi_1_1Mutex.xhtml" title="mpi::Mutex" alt="" coords="132,197,217,227"/>
-<area shape="rect" id="node4" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="52,5,207,35"/>
-</map>

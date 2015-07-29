@@ -145,8 +145,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>m_blockSize
 : <a class="el" href="classcache_1_1CacheManager.xhtml#add67a5942ef08ee0fcfc2332bc5b9879">cache::CacheManager</a>
 , <a class="el" href="classgrid_1_1level_1_1Blocked.xhtml#a23e646490b239d4de36f4b7666582ed6">grid::level::Blocked&lt; Type &gt;</a>
-, <a class="el" href="classtransfer_1_1MPICache.xhtml#a52648a953208e21ebc76a2f89230ffbd">transfer::MPICache</a>
 , <a class="el" href="classtransfer_1_1MPIThreadFull.xhtml#a41116e82c23002ba0698a618f0d07431">transfer::MPIThreadFull</a>
+, <a class="el" href="classtransfer_1_1MPIWinCache.xhtml#abbe5d3d9257d0ba795b8644eddbda8d2">transfer::MPIWinCache</a>
 , <a class="el" href="classtransfer_1_1MPIWinFull.xhtml#aedb76e581668877c86c8c28868bcd27c">transfer::MPIWinFull</a>
 , <a class="el" href="classtransfer_1_1NumaCache.xhtml#a07bbdb803308e161205888e6f5188f61">transfer::NumaCache</a>
 , <a class="el" href="classtransfer_1_1NumaFull.xhtml#a400c47bc4dcdd1d86800efb4ba42beca">transfer::NumaFull</a>
@@ -177,7 +177,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classgrid_1_1level_1_1CacheDist.xhtml#a4883b9342eac771aabafa7662c9fc9da">grid::level::CacheDist&lt; MPITrans, NumaTrans, Type, Allocator &gt;</a>
 </li>
 <li>m_cacheWin
-: <a class="el" href="classtransfer_1_1MPICache.xhtml#ac35b02c433c0657b59a5b7f196b4d67a">transfer::MPICache</a>
+: <a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a9d372fc3c747818e35a29a2af04c694b">transfer::MPIWinCache</a>
 </li>
 <li>m_comm
 : <a class="el" href="classgrid_1_1Container.xhtml#a0033a7b1d0c1667e90977bcfcf15ffab">grid::Container</a>
@@ -207,13 +207,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 , <a class="el" href="classtransfer_1_1NumaFull.xhtml#ab38735a447a9a23bab405f56c051332b">transfer::NumaFull</a>
 </li>
 <li>m_dictEntrySize
-: <a class="el" href="classtransfer_1_1MPICache.xhtml#abd0af0ca9fcdb46cd8a33eecec1e16fb">transfer::MPICache</a>
+: <a class="el" href="classtransfer_1_1MPICache.xhtml#a677736c7c25ce045777ee937183582e1">transfer::MPICache&lt; Allocator &gt;</a>
 </li>
 <li>m_dictionary
-: <a class="el" href="classtransfer_1_1MPICache.xhtml#a69f38dc4e2e388e3d66d69f63e8a7de5">transfer::MPICache</a>
+: <a class="el" href="classtransfer_1_1MPICache.xhtml#a22eb601e38eb9ce79c4fbd19e217e920">transfer::MPICache&lt; Allocator &gt;</a>
 </li>
 <li>m_dictWin
-: <a class="el" href="classtransfer_1_1MPICache.xhtml#af43feca18b07fbbeb4ac5042b4d78dae">transfer::MPICache</a>
+: <a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">transfer::MPIWinCache</a>
 </li>
 <li>m_dimensions
 : <a class="el" href="classio_1_1NetCdfReader.xhtml#a0131b1dc06f5d43730c1ac35d5496525">io::NetCdfReader</a>
@@ -241,6 +241,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>m_finishing
 : <a class="el" href="classthreads_1_1Sync.xhtml#add461d97c23289334420877b000155bd">threads::Sync</a>
+</li>
+<li>m_globalOffset
+: <a class="el" href="classtransfer_1_1MPICache.xhtml#a9b967fa58924d034274f01f28a9560d3">transfer::MPICache&lt; Allocator &gt;</a>
 </li>
 <li>m_group
 : <a class="el" href="classmpi_1_1CommThread.xhtml#a1277e2fc8ffe1a22c052f237f85a99e9">mpi::CommThread</a>
@@ -299,18 +302,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>m_mpiComm
 : <a class="el" href="classgrid_1_1level_1_1Level.xhtml#a12c6e35958becd81c43830e3237c95ec">grid::level::Level&lt; Type &gt;</a>
-, <a class="el" href="classtransfer_1_1MPICache.xhtml#a704ac7e66bdca8f29b47699524ef8265">transfer::MPICache</a>
+, <a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">transfer::MPIWinCache</a>
 </li>
 <li>m_mpiMutex
-: <a class="el" href="classtransfer_1_1MPICache.xhtml#ac261b4cdd2a462be9c677e6ac6e49c70">transfer::MPICache</a>
+: <a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a74ed3b471c3acf04be1701927a9bceac">transfer::MPIWinCache</a>
 </li>
 <li>m_mpiTrans
 : <a class="el" href="classgrid_1_1level_1_1CacheDist.xhtml#af19d1c95f10acd8875e971100e50bad0">grid::level::CacheDist&lt; MPITrans, NumaTrans, Type, Allocator &gt;</a>
 , <a class="el" href="classgrid_1_1level_1_1FullDist.xhtml#a9b321f9a2d007df539c84d06b23751a8">grid::level::FullDist&lt; MPITrans, NumaTrans, Type, Allocator &gt;</a>
 </li>
 <li>m_mpiType
-: <a class="el" href="classtransfer_1_1MPICache.xhtml#a599c537300b01ec2b49369c343b4f7db">transfer::MPICache</a>
-, <a class="el" href="classtransfer_1_1MPIThreadFull.xhtml#ac0ac8fab6c9a81ba2d8df289fbca28aa">transfer::MPIThreadFull</a>
+: <a class="el" href="classtransfer_1_1MPIThreadFull.xhtml#ac0ac8fab6c9a81ba2d8df289fbca28aa">transfer::MPIThreadFull</a>
+, <a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a2cb997e5d1533e96dd28caf59cbb1d8c">transfer::MPIWinCache</a>
 , <a class="el" href="classtransfer_1_1MPIWinFull.xhtml#abfe8ba4616285212ff5d79c6ceac7ab8">transfer::MPIWinFull</a>
 , <a class="el" href="classtypes_1_1ArrayType.xhtml#a661860042572eeaefcd580ebbad63d62">types::ArrayType&lt; T &gt;</a>
 , <a class="el" href="classtypes_1_1StructType.xhtml#aee51758a858eaef400ff0cfe9d3a7c11">types::StructType&lt; T &gt;</a>
@@ -342,8 +345,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>m_numaDomainId
 : <a class="el" href="classgrid_1_1level_1_1Level.xhtml#a63cd9280416166808749e625514de96e">grid::level::Level&lt; Type &gt;</a>
-, <a class="el" href="classtransfer_1_1MPICache.xhtml#a336bfd18361d3aec5bf199ff62a595d2">transfer::MPICache</a>
+, <a class="el" href="classtransfer_1_1MPICache.xhtml#a4ae299717ab8060bab5aebee9f201556">transfer::MPICache&lt; Allocator &gt;</a>
 , <a class="el" href="classtransfer_1_1MPIThreadFull.xhtml#a09ce126bc0df741bdc0285fa8f32a567">transfer::MPIThreadFull</a>
+, <a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a40629aac1716e091b061f17d00bfaed9">transfer::MPIWinCache</a>
 , <a class="el" href="classtransfer_1_1MPIWinFull.xhtml#a6ef6a34fec75f027cb07d7335137f0ac">transfer::MPIWinFull</a>
 </li>
 <li>m_numaTrans
@@ -373,7 +377,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 , <a class="el" href="classtransfer_1_1NumaFull.xhtml#af28d59fae2880f4b8e7299bb780a8601">transfer::NumaFull</a>
 </li>
 <li>m_rankCacheSize
-: <a class="el" href="classtransfer_1_1MPICache.xhtml#a54319f12268e7921976b1f7bf89af14c">transfer::MPICache</a>
+: <a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">transfer::MPIWinCache</a>
 </li>
 <li>m_receiver
 : <a class="el" href="classmpi_1_1CommThread.xhtml#a8b688f96c04fc92a8e6098b9261f475f">mpi::CommThread</a>
@@ -463,7 +467,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classgrid_1_1level_1_1Level.xhtml#afe2fd2ba00965f46942b3961886f3b58">grid::level::Level&lt; Type &gt;</a>
 </li>
 <li>MAX_DICT_SIZE
-: <a class="el" href="classtransfer_1_1MPICache.xhtml#adfd86ba59002f2cfc672c56cb2463579">transfer::MPICache</a>
+: <a class="el" href="classtransfer_1_1MPICache.xhtml#a3bdcf48c0ff57f28cbef3f88c97993dc">transfer::MPICache&lt; Allocator &gt;</a>
 </li>
 <li>min()
 : <a class="el" href="classgrid_1_1level_1_1Level.xhtml#a95403f1aadfc51df0aa7a6a3f86363f9">grid::level::Level&lt; Type &gt;</a>
