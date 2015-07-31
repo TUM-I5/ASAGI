@@ -138,8 +138,10 @@ add_test_executable( fullmpithreadnumacachegrid2d YES YES )
 
 add_test_executable( cachegrid2d )
 add_test_executable( cachenumagrid2d YES )
-add_test_executable( cachempigrid2d NO YES )
-add_test_executable( cachempinumagrid2d YES YES )
+add_test_executable( cachempiwingrid2d NO YES )
+add_test_executable( cachempiwinnumagrid2d YES YES )
+add_test_executable( cachempithreadgrid2d NO YES )
+add_test_executable( cachempithreadnumagrid2d YES YES )
 
 add_test_executable( passthroughgrid2d )
 
@@ -172,8 +174,12 @@ endif( NOT THREADSAFE_MPI )
 
 add_test_run( CacheGrid2D test_cachegrid2d )
 add_test_run( CacheNumaGrid2D test_cachenumagrid2d YES )
-add_test_run( CacheMPIGrid2D test_cachempigrid2d NO 2 )
-add_test_run( CacheMPINumaGrid2D test_cachempinumagrid2d YES 2 )
+add_test_run( CacheMPIWinGrid2D test_cachempiwingrid2d NO 2 )
+add_test_run( CacheMPIWinNumaGrid2D test_cachempiwinnumagrid2d YES 2 )
+if( NOT THREADSAFE_MPI )
+    add_test_run( CacheMPIThreadGrid2D test_cachempithreadgrid2d NO 2 )
+    add_test_run( CacheMPIThreadNumaGrid2D test_cachempithreadnumagrid2d YES 2 )
+endif( NOT THREADSAFE_MPI )
 
 add_test_run( PassThroughGrid2D test_passthroughgrid2d )
 

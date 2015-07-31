@@ -124,6 +124,7 @@ public:
 	 *
 	 * @param cache Pointer to the cache
 	 * @param cacheSize Number of blocks in the cache
+	 * @param cacheManager The cache manager
 	 * @param blockCount Number local blocks
 	 * @param blockSize Number of elements in one block
 	 * @param type The data type of the elements
@@ -132,6 +133,7 @@ public:
 	 */
 	asagi::Grid::Error init(unsigned char* cache,
 			unsigned int cacheSize,
+			const cache::CacheManager &cacheManager,
 			unsigned long blockCount,
 			unsigned long blockSize,
 			const types::Type &type,
@@ -146,8 +148,7 @@ public:
 		m_rankCacheSize = cacheSize * numaComm.totalDomains();
 
 		// Setup the parent
-		MPICache<allocator::MPIAlloc>::init(mpiComm.rank() * m_rankCacheSize,
-				blockCount, numaComm);
+		MPICache<allocator::MPIAlloc>::init(blockCount, numaComm);
 
 		if (m_numaDomainId == 0) {
 			std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
@@ -225,7 +226,8 @@ public:
 		long entry;
 
 		if (dictRank == m_mpiComm->rank())
-			entry = fetchAndUpdateBlockInfo(dictionary(dictOffset), offset);
+			entry = fetchAndUpdateBlockInfo(dictionary(dictOffset),
+					m_mpiComm->rank() * m_rankCacheSize + offset);
 		else {
 			// Local buffer for a dict entry
 			long dictEntry[MAX_DICT_SIZE];
@@ -243,7 +245,8 @@ public:
 			mpiResult = MPI_Win_unlock(dictRank, m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
 
-			entry = fetchAndUpdateBlockInfo(dictEntry, offset);
+			entry = fetchAndUpdateBlockInfo(dictEntry,
+					m_mpiComm->rank() * m_rankCacheSize + offset);
 
 			mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,
 					MPI_MODE_NOCHECK, m_dictWin);
@@ -270,11 +273,16 @@ public:
 	 * Tries to transfers a block via MPI
 	 *
 	 * @param entry The dictionary entry obtained from {@link startTransfer}
+	 * @param blockId The global id of the block
 	 * @param cache Pointer to the local cache for this block
+	 * @param[out] retry True of the transfer fails but MPI should be checked again
+	 *  (always false)
 	 * @return True if the block was fetched, false otherwise
 	 */
-	bool transfer(long entry, unsigned char *cache)
+	bool transfer(long entry, unsigned long blockId, unsigned char *cache, bool &retry)
 	{
+		retry = false;
+
 		if (entry < 0)
 			return false;
 
@@ -312,12 +320,33 @@ public:
 	 * Ends a transfer phase started with {@link startTransfer}
 	 *
 	 * @param blockId The ID of the block that was transfered
+	 * @param dictRank The rank where the dictionary entry is stored
+	 * @param dictOffset The offset of the dictionary entry on the rank
+	 * @param offset The offset on the local rank where the block should be stored
 	 */
-	void endTransfer(unsigned long blockId)
+	void endTransfer(unsigned long blockId, int dictRank,
+			unsigned long dictOffset, unsigned long offset)
 	{
 		m_mpiMutex->release(blockId);
 
 		mpi::MPIComm::mpiLock.unlock();
+	}
+
+	/**
+	 * Adds an entry to the dictionary
+	 *
+	 * @param blockId The ID of the block that should be transfered
+	 * @param dictRank The rank where the dictionary entry is stored
+	 * @param dictOffset The offset of the dictionary entry on the rank
+	 * @param offset The offset on the local rank where the block should be stored
+	 * @return A dictionary entry that has to be passed to {@link transfer} if
+	 *  the block should be fetched from a remote rank
+	 */
+	void addBlock(unsigned long blockId, int dictRank,
+			unsigned long dictOffset, unsigned long offset)
+	{
+		startTransfer(blockId, dictRank, dictOffset, offset);
+		endTransfer(blockId, dictRank, dictOffset, offset);
 	}
 
 	/**
@@ -346,7 +375,8 @@ public:
 		assert(mpiResult == MPI_SUCCESS);
 
 		if (dictRank == m_mpiComm->rank())
-			deleteBlockInfo(dictionary(dictOffset), offset);
+			deleteBlockInfo(dictionary(dictOffset),
+					m_mpiComm->rank() * m_rankCacheSize + offset);
 		else {
 			// Local buffer for a dict entry
 			long dictEntry[MAX_DICT_SIZE];
@@ -364,7 +394,8 @@ public:
 			mpiResult = MPI_Win_unlock(dictRank, m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
 
-			deleteBlockInfo(dictEntry, offset);
+			deleteBlockInfo(dictEntry,
+					m_mpiComm->rank() * m_rankCacheSize + offset);
 
 			mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,
 				MPI_MODE_NOCHECK, m_dictWin);

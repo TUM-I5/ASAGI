@@ -273,8 +273,10 @@ void grid::Grid::initContainers()
 	enum {
 		CACHE,
 		CACHE_NUMA,
-		CACHE_MPI,
-		CACHE_MPI_NUMA,
+		CACHE_MPITHREAD,
+		CACHE_MPIWIN,
+		CACHE_MPITHREAD_NUMA,
+		CACHE_MPIWIN_NUMA,
 		FULL,
 		FULL_NUMA,
 		FULL_MPITHREAD,
@@ -319,11 +321,17 @@ void grid::Grid::initContainers()
 	if (gridType == "CACHE") {
 		if (m_comm.size() == 1 && m_numa.totalDomains() > 1)
 			containerType = CACHE_NUMA;
-		else if (m_comm.size() > 1 && m_numa.totalDomains() == 1)
-			containerType = CACHE_MPI;
-		else if (m_comm.size() > 1 && m_numa.totalDomains() > 1)
-			containerType = CACHE_MPI_NUMA;
-		else {
+		else if (m_comm.size() > 1 && m_numa.totalDomains() == 1) {
+			if (mpiType == "WINDOW")
+				containerType = CACHE_MPIWIN;
+			else
+				containerType = CACHE_MPITHREAD;
+		} else if (m_comm.size() > 1 && m_numa.totalDomains() > 1) {
+			if (mpiType == "WINDOW")
+				containerType = CACHE_MPIWIN_NUMA;
+			else
+				containerType = CACHE_MPITHREAD_NUMA;
+		} else {
 			assert(m_comm.size() == 1);
 			assert(m_numa.totalDomains() == 1);
 			containerType = CACHE;
@@ -373,11 +381,17 @@ void grid::Grid::initContainers()
 		case CACHE_NUMA:
 			*it = TypeSelector<SimpleContainer, level::CacheDistNuma, typelist>::createContainer(*this);
 			break;
-		case CACHE_MPI:
-			*it = TypeSelector<SimpleContainer, level::CacheDistMPI, typelist>::createContainer(*this);
+		case CACHE_MPITHREAD:
+			*it = TypeSelector<SimpleContainer, level::CacheDistMPIThread, typelist>::createContainer(*this);
 			break;
-		case CACHE_MPI_NUMA:
-			*it = TypeSelector<SimpleContainer, level::CacheDistMPINuma, typelist>::createContainer(*this);
+		case CACHE_MPIWIN:
+			*it = TypeSelector<SimpleContainer, level::CacheDistMPIWin, typelist>::createContainer(*this);
+			break;
+		case CACHE_MPITHREAD_NUMA:
+			*it = TypeSelector<SimpleContainer, level::CacheDistMPIThreadNuma, typelist>::createContainer(*this);
+			break;
+		case CACHE_MPIWIN_NUMA:
+			*it = TypeSelector<SimpleContainer, level::CacheDistMPIWinNuma, typelist>::createContainer(*this);
 			break;
 		case FULL:
 			*it = TypeSelector<SimpleContainer, level::FullDefault, typelist>::createContainer(*this);

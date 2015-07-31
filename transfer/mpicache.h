@@ -56,9 +56,6 @@ private:
 	/** Number of dictionary entries per element */
 	unsigned int m_dictEntrySize;
 
-	/** Global offset of the rank */
-	unsigned long m_globalOffset;
-
 	/** Local part of the dictionary */
 	long* m_dictionary;
 
@@ -66,7 +63,6 @@ protected:
 	MPICache()
 		: m_numaDomainId(0),
 		  m_dictEntrySize(4), // Default (can not be changed at the moment)
-		  m_globalOffset(0),
 		  m_dictionary(0L)
 	{}
 
@@ -78,13 +74,10 @@ public:
 	}
 
 protected:
-	asagi::Grid::Error init(unsigned long globalOffset,
-			unsigned long blockCount,
+	asagi::Grid::Error init(unsigned long blockCount,
 			numa::NumaComm &numaComm)
 	{
 		m_numaDomainId = numaComm.domainId();
-
-		m_globalOffset = globalOffset;
 
 		// Allocate the memory and broadcast the pointer
 		if (m_numaDomainId == 0) {
@@ -106,44 +99,57 @@ protected:
 	}
 
 	/**
-	 * Fetch and update block info
+	 * Fetches an entry from a dictionary entry
 	 *
 	 * @param dictEntry The dictionary entry
-	 * @param offset The offset on this rank (where the block will be stored)
-	 * @return A dictionary entry from where the block can be transfered
+	 * @return The entry or -1 of the block is not stored anywhere
 	 */
-	long fetchAndUpdateBlockInfo(long* dictEntry, unsigned long offset)
+	long fetchBlockInfo(const long* dictEntry)
+	{
+		unsigned int count;
+		return fetchBlockInfo(dictEntry, count);
+	}
+
+	/**
+	 * Adds a new entry to the dictionary entry
+	 *
+	 * @param dictEntry The dictionary entry
+	 * @param newEntry The entry that should be added
+	 */
+	void updateBlockInfo(long* dictEntry, unsigned long newEntry)
 	{
 		unsigned int count;
 		for (count = 0; count < m_dictEntrySize; count++)
 			if (dictEntry[count] < 0)
 				break;
 
-		long entry = -1;
-		if (count > 0)
-			entry = dictEntry[rand() % count];
+		updateBlockInfo(dictEntry, newEntry, count);
+	}
 
-		count = std::min(count, m_dictEntrySize-1); // we don't need t move the last entry
-													// if the array is full
-		for (int i = count-1; i >= 0; i--)
-			dictEntry[i+1] = dictEntry[i];
-
-		// New entry
-		dictEntry[0] = m_globalOffset + offset;
+	/**
+	 * Fetch and update block info
+	 *
+	 * @param dictEntry The dictionary entry
+	 * @param newEntry The new entry that should be added
+	 * @return A dictionary entry from where the block can be transfered
+	 */
+	long fetchAndUpdateBlockInfo(long* dictEntry, unsigned long newEntry)
+	{
+		unsigned int count;
+		long entry = fetchBlockInfo(dictEntry, count);
+		updateBlockInfo(dictEntry, newEntry, count);
 
 		return entry;
 	}
 
 	/**
-	 * Remove the the current rank form the entry
+	 * Remove an entry from a dictionary entry
 	 *
 	 * @param dictEntry The dictionary entry
-	 * @param offset The offset on this rank
+	 * @param entry The entry that should be deleted
 	 */
-	void deleteBlockInfo(long* dictEntry, unsigned long offset)
+	void deleteBlockInfo(long* dictEntry, long entry)
 	{
-		long entry = m_globalOffset + offset;
-
 		unsigned int i;
 		for (i = 0; i < m_dictEntrySize; i++) {
 			if (dictEntry[i] == entry)
@@ -186,6 +192,45 @@ protected:
 	long* dictionary()
 	{
 		return m_dictionary;
+	}
+
+private:
+	/**
+	 * Fetches an entry from a dictionary entry
+	 *
+	 * @param dictEntry The dictionary entry
+	 * @param[out] count The current number of entries in the block
+	 * @return The entry or -1 of the block is not stored anywhere
+	 */
+	long fetchBlockInfo(const long* dictEntry, unsigned int &count)
+	{
+		for (count = 0; count < m_dictEntrySize; count++)
+			if (dictEntry[count] < 0)
+				break;
+
+		long entry = -1;
+		if (count > 0)
+			entry = dictEntry[rand() % count];
+
+		return entry;
+	}
+
+	/**
+	 * Fetch and update block info
+	 *
+	 * @param dictEntry The dictionary entry
+	 * @param newEntry The new entry that should be added
+	 * @param count The current number of entries
+	 */
+	void updateBlockInfo(long* dictEntry, unsigned long newEntry, unsigned int count)
+	{
+		count = std::min(count, m_dictEntrySize-1); // we don't need t move the last entry
+													// if the array is full
+		for (int i = count-1; i >= 0; i--)
+			dictEntry[i+1] = dictEntry[i];
+
+		// New entry
+		dictEntry[0] = newEntry;
 	}
 
 protected:

@@ -45,6 +45,7 @@
 #include "transfer/numacache.h"
 #include "transfer/numano.h"
 #include "transfer/mpiwincache.h"
+#include "transfer/mpithreadcache.h"
 #include "transfer/mpino.h"
 
 namespace grid
@@ -110,7 +111,7 @@ public:
 		m_cacheSize = cacheSize;
 
 		// Initialize the MPI transfer class
-		err = m_mpiTrans.init(this->cache(), cacheSize,
+		err = m_mpiTrans.init(this->cache(), cacheSize, this->cacheManager(),
 				this->localBlockCount(), this->totalBlockSize(),
 				this->type(), this->comm(), this->numa());
 		if (err != asagi::Grid::SUCCESS)
@@ -153,21 +154,48 @@ public:
 					this->blockNodeOffset(oldGlobalBlockId),
 					cacheOffset + m_cacheSize * this->numaDomainId());
 
-			// Update the MPI dictionary
-			long entry = m_mpiTrans.startTransfer(globalBlockId,
-					this->blockRank(globalBlockId),
-					this->blockNodeOffset(globalBlockId),
-					cacheOffset + m_cacheSize * this->numaDomainId());
-
-			// Fill the cache now
-			if (m_numaTrans.transfer(globalBlockId, data))
+			// Try NUMA first
+			if (m_numaTrans.transfer(globalBlockId, data)) {
 				this->incCounter(perf::Counter::NUMA);
-			else if (m_mpiTrans.transfer(entry, data))
-				this->incCounter(perf::Counter::MPI);
-			else
-				this->loadBlock(index, data);
+				m_mpiTrans.addBlock(globalBlockId,
+						this->blockRank(globalBlockId),
+						this->blockNodeOffset(globalBlockId),
+						cacheOffset + m_cacheSize * this->numaDomainId());
+			} else {
+				// MPI windows have collision avoidance, because the block will be locked
+				// during transfer and cannot be deleted.
+				// The communication thread uses error detection. Which means, a block
+				// might get deleted between startTransfer and transfer. In this case,
+				// retrying another MPI rank might be worthwhile.
 
-			m_mpiTrans.endTransfer(globalBlockId);
+				bool retry;
+				bool received = false;
+
+				do {
+					retry = false;
+
+					// Get the cache entry
+					long entry = m_mpiTrans.startTransfer(globalBlockId,
+							this->blockRank(globalBlockId),
+							this->blockNodeOffset(globalBlockId),
+							cacheOffset + m_cacheSize * this->numaDomainId());
+
+					// Fill the cache
+					if (m_mpiTrans.transfer(entry, globalBlockId, data, retry)) {
+						this->incCounter(perf::Counter::MPI);
+						received = true;
+					}
+				} while (retry);
+
+				if (!received)
+					this->loadBlock(index, data);
+
+				// Finalize the communication
+				m_mpiTrans.endTransfer(globalBlockId,
+						this->blockRank(globalBlockId),
+						this->blockNodeOffset(globalBlockId),
+						cacheOffset + m_cacheSize * this->numaDomainId());
+			}
 		}
 
 		// Compute the offset in the block
@@ -181,19 +209,33 @@ public:
 		// Free the block in the cache
 		this->cacheManager().unlock(cacheOffset);
 	}
+
+private:
+	void transfer()
+	{
+
+	}
 };
 
 /** Cached distributed level with NUMA */
 template<class Type>
 using CacheDistNuma = CacheDist<transfer::MPINo, transfer::NumaCache, Type, allocator::Default>;
 
-/** Cached distributed level with MPI */
+/** Cached distributed level with MPI (communication thread) */
 template<class Type>
-using CacheDistMPI = CacheDist<transfer::MPIWinCache, transfer::NumaNo, Type, allocator::MPIAlloc>;
+using CacheDistMPIThread = CacheDist<transfer::MPIThreadCache, transfer::NumaNo, Type, allocator::MPIAlloc>;
 
-/** Cached distributed level with MPI and NUMA */
+/** Cached distributed level with MPI windows */
 template<class Type>
-using CacheDistMPINuma = CacheDist<transfer::MPIWinCache, transfer::NumaCache, Type, allocator::MPIAlloc>;
+using CacheDistMPIWin = CacheDist<transfer::MPIWinCache, transfer::NumaNo, Type, allocator::MPIAlloc>;
+
+/** Cached distributed level with MPI (communication thread) and NUMA */
+template<class Type>
+using CacheDistMPIThreadNuma = CacheDist<transfer::MPIThreadCache, transfer::NumaCache, Type, allocator::MPIAlloc>;
+
+/** Cached distributed level with MPI windows and NUMA */
+template<class Type>
+using CacheDistMPIWinNuma = CacheDist<transfer::MPIWinCache, transfer::NumaCache, Type, allocator::MPIAlloc>;
 
 }
 
