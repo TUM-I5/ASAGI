@@ -1,3 +1,7 @@
 <map id="mpi::Receiver" name="mpi::Receiver">
-<area shape="rect" id="node3" href="$classtransfer_1_1MPIThreadFull.xhtml" title="transfer::MPIThreadFull" alt="" coords="5,83,163,112"/>
+<area shape="rect" id="node3" href="$classtransfer_1_1MPIThreadCache_1_1Adder.xhtml" title="transfer::MPIThreadCache\l::Adder" alt="" coords="157,5,333,51"/>
+<area shape="rect" id="node5" href="$classtransfer_1_1MPIThreadCache_1_1BlockInfoResponder.xhtml" title="transfer::MPIThreadCache\l::BlockInfoResponder" alt="" coords="157,74,333,121"/>
+<area shape="rect" id="node7" href="$classtransfer_1_1MPIThreadCache_1_1BlockTransferer.xhtml" title="transfer::MPIThreadCache\l::BlockTransferer" alt="" coords="157,143,333,190"/>
+<area shape="rect" id="node9" href="$classtransfer_1_1MPIThreadCache_1_1Deleter.xhtml" title="transfer::MPIThreadCache\l::Deleter" alt="" coords="157,213,333,259"/>
+<area shape="rect" id="node11" href="$classtransfer_1_1MPIThreadFull.xhtml" title="transfer::MPIThreadFull" alt="" coords="167,283,324,312"/>
 </map>

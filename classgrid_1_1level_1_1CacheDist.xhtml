@@ -94,6 +94,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classgrid_1_1level_1_1CacheDist-members.xhtml">List of all members</a>  </div>
   <div class="headertitle">
@@ -152,6 +153,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:afe2fd2ba00965f46942b3961886f3b58 inherit pub_methods_classgrid_1_1level_1_1Level"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a74d4194f36d934653a5f8d7036c2db4e inherit pub_methods_classgrid_1_1level_1_1Level"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1level_1_1Level.xhtml#a74d4194f36d934653a5f8d7036c2db4e">delta</a> (unsigned int n) const </td></tr>
 <tr class="separator:a74d4194f36d934653a5f8d7036c2db4e inherit pub_methods_classgrid_1_1level_1_1Level"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:a07bb59e3659675cbf147acd5bf339542"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a07bb59e3659675cbf147acd5bf339542"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>transfer</b> ()</td></tr>
+<tr class="separator:a07bb59e3659675cbf147acd5bf339542"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -232,7 +239,7 @@ class grid::level::CacheDist&lt; MPITrans, NumaTrans, Type, Allocator &gt;</h3>
 
 <p>Only caches blocks. Blocks not in the local cache will be fetched from other caches or the file. </p>
 
-<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00062">62</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
+<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00063">63</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a8a590eda6db7049cca989e3b8ddd6154"></a>
 <div class="memitem">
@@ -277,7 +284,7 @@ template&lt;class MPITrans , class NumaTrans , class Type , class Allocator &gt;
 <p></p>
 <p>Constructs a new grid level </p>
 
-<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00078">78</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
+<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00079">79</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
 
 </div>
 </div>
@@ -321,7 +328,7 @@ template&lt;typename T &gt; </div>
 <p></p>
 <p>Writes the value at position <code>pos</code> into the buffer <code>buf</code>. </p>
 
-<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00132">132</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
+<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00133">133</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
 
 </div>
 </div>
@@ -392,7 +399,7 @@ template&lt;class MPITrans , class NumaTrans , class Type , class Allocator &gt;
 <p></p>
 <p>Initialize the grid level </p>
 
-<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00093">93</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
+<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00094">94</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
 
 </div>
 </div>
@@ -418,7 +425,7 @@ template&lt;class MPITrans , class NumaTrans , class Type , class Allocator &gt;
 </div><div class="memdoc">
 <p>Number of blocks in the cache </p>
 
-<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00072">72</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
+<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00073">73</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
 
 </div>
 </div>
@@ -443,7 +450,7 @@ template&lt;class MPITrans , class NumaTrans , class Type , class Allocator &gt;
 </div><div class="memdoc">
 <p>The MPI transfer class </p>
 
-<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00066">66</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
+<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00067">67</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
 
 </div>
 </div>
@@ -468,7 +475,7 @@ template&lt;class MPITrans , class NumaTrans , class Type , class Allocator &gt;
 </div><div class="memdoc">
 <p>The NUMA transfer class </p>
 
-<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00069">69</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
+<p>Definition at line <a class="el" href="cachedist_8h_source.xhtml#l00070">70</a> of file <a class="el" href="cachedist_8h_source.xhtml">cachedist.h</a>.</p>
 
 </div>
 </div>

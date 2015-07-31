@@ -5,5 +5,6 @@ var searchData=
   ['unreg_5ftag',['UNREG_TAG',['../classmpi_1_1CommThread.xhtml#ac470280758d0e7f840e258fb7f901ad1',1,'mpi::CommThread']]],
   ['unregisterreceiver',['unregisterReceiver',['../classmpi_1_1CommThread.xhtml#aa14edac8d33c26d2bc880f5bc0027645',1,'mpi::CommThread']]],
   ['unsupported_5fdimensions',['UNSUPPORTED_DIMENSIONS',['../group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a91572f88ea95128fc91f150a3542fa66',1,'asagi::Grid']]],
+  ['updateblockinfo',['updateBlockInfo',['../classtransfer_1_1MPICache.xhtml#a24aba2787d37cd89a7b26fe409d940c9',1,'transfer::MPICache::updateBlockInfo(long *dictEntry, unsigned long newEntry)'],['../classtransfer_1_1MPICache.xhtml#aaf570c72e63191aac52e001198ace216',1,'transfer::MPICache::updateBlockInfo(long *dictEntry, unsigned long newEntry, unsigned int count)']]],
   ['using_20asagi',['Using ASAGI',['../usage.xhtml',1,'index']]]
 ];

@@ -117,14 +117,16 @@ Collaboration diagram for transfer::MPIWinCache:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa371c6b172bdd3867eb9cfcd1bd39c61"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#aa371c6b172bdd3867eb9cfcd1bd39c61">init</a> (unsigned char *cache, unsigned int cacheSize, unsigned long blockCount, unsigned long blockSize, const <a class="el" href="classtypes_1_1Type.xhtml">types::Type</a> &amp;type, const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> &amp;mpiComm, <a class="el" href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a> &amp;numaComm)</td></tr>
-<tr class="separator:aa371c6b172bdd3867eb9cfcd1bd39c61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41af9d01450ecfc84532d30b5df67b24"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a41af9d01450ecfc84532d30b5df67b24">init</a> (unsigned char *cache, unsigned int cacheSize, const <a class="el" href="classcache_1_1CacheManager.xhtml">cache::CacheManager</a> &amp;cacheManager, unsigned long blockCount, unsigned long blockSize, const <a class="el" href="classtypes_1_1Type.xhtml">types::Type</a> &amp;type, const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> &amp;mpiComm, <a class="el" href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a> &amp;numaComm)</td></tr>
+<tr class="separator:a41af9d01450ecfc84532d30b5df67b24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69e50e66835f7df560d70016930c3ca2"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a69e50e66835f7df560d70016930c3ca2">startTransfer</a> (unsigned long blockId, int dictRank, unsigned long dictOffset, unsigned long offset)</td></tr>
 <tr class="separator:a69e50e66835f7df560d70016930c3ca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4d3571eb76b08f54c3ed95ccdebc3d7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#ad4d3571eb76b08f54c3ed95ccdebc3d7">transfer</a> (long entry, unsigned char *cache)</td></tr>
-<tr class="separator:ad4d3571eb76b08f54c3ed95ccdebc3d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1da8d67e957e9a31ccb12c7f4bba3af2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a1da8d67e957e9a31ccb12c7f4bba3af2">endTransfer</a> (unsigned long blockId)</td></tr>
-<tr class="separator:a1da8d67e957e9a31ccb12c7f4bba3af2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac90d01490b39188b834c6205a4dad5a3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#ac90d01490b39188b834c6205a4dad5a3">transfer</a> (long entry, unsigned long blockId, unsigned char *cache, bool &amp;retry)</td></tr>
+<tr class="separator:ac90d01490b39188b834c6205a4dad5a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cca2be5fb4e8ec931ad16ba69829f7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a1cca2be5fb4e8ec931ad16ba69829f7e">endTransfer</a> (unsigned long blockId, int dictRank, unsigned long dictOffset, unsigned long offset)</td></tr>
+<tr class="separator:a1cca2be5fb4e8ec931ad16ba69829f7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0aad1154aed15663b142f0ef38fc702b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a0aad1154aed15663b142f0ef38fc702b">addBlock</a> (unsigned long blockId, int dictRank, unsigned long dictOffset, unsigned long offset)</td></tr>
+<tr class="separator:a0aad1154aed15663b142f0ef38fc702b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5dbe916fa64bc544ee63b9e7dfa561b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a5dbe916fa64bc544ee63b9e7dfa561b9">deleteBlock</a> (long blockId, int dictRank, unsigned long dictOffset, unsigned long offset)</td></tr>
 <tr class="separator:a5dbe916fa64bc544ee63b9e7dfa561b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -149,13 +151,17 @@ Private Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
-<tr class="memitem:ae5a0ffbf7a297ede26e4ad5631f24276 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae5a0ffbf7a297ede26e4ad5631f24276"></a>
-<a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (unsigned long globalOffset, unsigned long blockCount, <a class="el" href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a> &amp;numaComm)</td></tr>
-<tr class="separator:ae5a0ffbf7a297ede26e4ad5631f24276 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88572d1158a46a15de601561df3ced09 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a88572d1158a46a15de601561df3ced09">fetchAndUpdateBlockInfo</a> (long *dictEntry, unsigned long offset)</td></tr>
-<tr class="separator:a88572d1158a46a15de601561df3ced09 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a390aebce084cc7bbc6d04ccf00b4391f inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a390aebce084cc7bbc6d04ccf00b4391f">deleteBlockInfo</a> (long *dictEntry, unsigned long offset)</td></tr>
-<tr class="separator:a390aebce084cc7bbc6d04ccf00b4391f inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a123518183987e39b3023453991ebc604 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a123518183987e39b3023453991ebc604"></a>
+<a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (unsigned long blockCount, <a class="el" href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a> &amp;numaComm)</td></tr>
+<tr class="separator:a123518183987e39b3023453991ebc604 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a749103800a552ca4d10b5055b251e7ee inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a749103800a552ca4d10b5055b251e7ee">fetchBlockInfo</a> (const long *dictEntry)</td></tr>
+<tr class="separator:a749103800a552ca4d10b5055b251e7ee inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24aba2787d37cd89a7b26fe409d940c9 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a24aba2787d37cd89a7b26fe409d940c9">updateBlockInfo</a> (long *dictEntry, unsigned long newEntry)</td></tr>
+<tr class="separator:a24aba2787d37cd89a7b26fe409d940c9 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01348d5f73e0537c289d3ac78de9b7c1 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a01348d5f73e0537c289d3ac78de9b7c1">fetchAndUpdateBlockInfo</a> (long *dictEntry, unsigned long newEntry)</td></tr>
+<tr class="separator:a01348d5f73e0537c289d3ac78de9b7c1 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab98e65b988763e31a6590a0e36e3a0f inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#aab98e65b988763e31a6590a0e36e3a0f">deleteBlockInfo</a> (long *dictEntry, long entry)</td></tr>
+<tr class="separator:aab98e65b988763e31a6590a0e36e3a0f inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c0c93888345487e58ec9f8cd9fd2d9c inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a> () const</td></tr>
 <tr class="separator:a7c0c93888345487e58ec9f8cd9fd2d9c inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9b4179a7fefeec41c02516e27828040 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#af9b4179a7fefeec41c02516e27828040">dictionary</a> (unsigned long entry)</td></tr>
@@ -173,6 +179,65 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00067">67</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a0aad1154aed15663b142f0ef38fc702b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void transfer::MPIWinCache::addBlock </td>
+          <td>(</td>
+          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramname"><em>blockId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>dictRank</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramname"><em>dictOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramname"><em>offset</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Adds an entry to the dictionary</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">blockId</td><td>The ID of the block that should be transfered </td></tr>
+    <tr><td class="paramname">dictRank</td><td>The rank where the dictionary entry is stored </td></tr>
+    <tr><td class="paramname">dictOffset</td><td>The offset of the dictionary entry on the rank </td></tr>
+    <tr><td class="paramname">offset</td><td>The offset on the local rank where the block should be stored </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A dictionary entry that has to be passed to <a class="el" href="namespacetransfer.xhtml">transfer</a> if the block should be fetched from a remote rank </dd></dl>
+
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00345">345</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a5dbe916fa64bc544ee63b9e7dfa561b9"></a>
 <div class="memitem">
 <div class="memproto">
@@ -227,11 +292,11 @@ Additional Inherited Members</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00331">331</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00360">360</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a1da8d67e957e9a31ccb12c7f4bba3af2"></a>
+<a class="anchor" id="a1cca2be5fb4e8ec931ad16ba69829f7e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -242,8 +307,30 @@ Additional Inherited Members</h2></td></tr>
           <td class="memname">void transfer::MPIWinCache::endTransfer </td>
           <td>(</td>
           <td class="paramtype">unsigned long&#160;</td>
-          <td class="paramname"><em>blockId</em></td><td>)</td>
+          <td class="paramname"><em>blockId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>dictRank</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramname"><em>dictOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramname"><em>offset</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -256,15 +343,18 @@ Additional Inherited Members</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">blockId</td><td>The ID of the block that was transfered </td></tr>
+    <tr><td class="paramname">dictRank</td><td>The rank where the dictionary entry is stored </td></tr>
+    <tr><td class="paramname">dictOffset</td><td>The offset of the dictionary entry on the rank </td></tr>
+    <tr><td class="paramname">offset</td><td>The offset on the local rank where the block should be stored </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00316">316</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00327">327</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aa371c6b172bdd3867eb9cfcd1bd39c61"></a>
+<a class="anchor" id="a41af9d01450ecfc84532d30b5df67b24"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -282,6 +372,12 @@ Additional Inherited Members</h2></td></tr>
           <td></td>
           <td class="paramtype">unsigned int&#160;</td>
           <td class="paramname"><em>cacheSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classcache_1_1CacheManager.xhtml">cache::CacheManager</a> &amp;&#160;</td>
+          <td class="paramname"><em>cacheManager</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -330,6 +426,7 @@ Additional Inherited Members</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">cache</td><td>Pointer to the cache </td></tr>
     <tr><td class="paramname">cacheSize</td><td>Number of blocks in the cache </td></tr>
+    <tr><td class="paramname">cacheManager</td><td>The cache manager </td></tr>
     <tr><td class="paramname">blockCount</td><td>Number local blocks </td></tr>
     <tr><td class="paramname">blockSize</td><td>Number of elements in one block </td></tr>
     <tr><td class="paramname">type</td><td>The data type of the elements </td></tr>
@@ -339,7 +436,7 @@ Additional Inherited Members</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00133">133</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00134">134</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -387,7 +484,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Starts the transfer of a new block.</p>
-<p>This will lock the global dictionary. Use <a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a1da8d67e957e9a31ccb12c7f4bba3af2">endTransfer</a> To end the transfer phase and free the dictionary block.</p>
+<p>This will lock the global dictionary. Use <a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a1cca2be5fb4e8ec931ad16ba69829f7e">endTransfer</a> To end the transfer phase and free the dictionary block.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">blockId</td><td>The ID of the block that should be transfered </td></tr>
@@ -399,11 +496,11 @@ Additional Inherited Members</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A dictionary entry that has to be passed to <a class="el" href="namespacetransfer.xhtml">transfer</a> if the block should be fetched from a remote rank </dd></dl>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00209">209</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00210">210</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ad4d3571eb76b08f54c3ed95ccdebc3d7"></a>
+<a class="anchor" id="ac90d01490b39188b834c6205a4dad5a3"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -419,8 +516,20 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramname"><em>blockId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">unsigned char *&#160;</td>
-          <td class="paramname"><em>cache</em>&#160;</td>
+          <td class="paramname"><em>cache</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool &amp;&#160;</td>
+          <td class="paramname"><em>retry</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -437,14 +546,16 @@ Additional Inherited Members</h2></td></tr>
 <p>Tries to transfers a block via MPI</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">entry</td><td>The dictionary entry obtained from <a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a69e50e66835f7df560d70016930c3ca2">startTransfer</a> </td></tr>
-    <tr><td class="paramname">cache</td><td>Pointer to the local cache for this block </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">entry</td><td>The dictionary entry obtained from <a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a69e50e66835f7df560d70016930c3ca2">startTransfer</a> </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">blockId</td><td>The global id of the block </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">cache</td><td>Pointer to the local cache for this block </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">retry</td><td>True of the transfer fails but MPI should be checked again (always false) </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the block was fetched, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00276">276</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00282">282</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
