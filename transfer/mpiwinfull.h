@@ -164,9 +164,12 @@ public:
 
 		std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
 
+#ifndef THREADSAFE_MPI
 		// Lock the window to make sure no other thread interferes between
 		// MPI_Win_lock and MPI_Win_unlock
+		// Not required if we need to make MPI calls thread safe anyway
 		std::lock_guard<threads::Mutex> winLock(*m_winMutex);
+#endif // THREADSAFE_MPI
 
 		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, remoteRank,
 			MPI_MODE_NOCHECK, m_window);
