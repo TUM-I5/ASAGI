@@ -219,6 +219,9 @@ public:
 
 		int mpiResult; NDBG_UNUSED(mpiResult);
 
+		// We do not need to lock MPI_Win_lock/MPI_Win_unlock like in MPIWinFull
+		// since this is handled by the MPI mutex.
+
 		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,
 				MPI_MODE_NOCHECK, m_dictWin);
 		assert(mpiResult == MPI_SUCCESS);

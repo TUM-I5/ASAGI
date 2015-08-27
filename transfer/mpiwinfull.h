@@ -47,6 +47,7 @@
 #include <mutex>
 
 #include "mpi/mpicomm.h"
+#include "threads/mutex.h"
 #include "types/type.h"
 #endif // ASAGI_NOMPI
 
@@ -74,6 +75,9 @@ private:
 	/** The MPI window used to communicate */
 	MPI_Win m_window;
 
+	/** Mutex for the window */
+	threads::Mutex *m_winMutex;
+
 	/** Number of elements in one block */
 	unsigned long m_blockSize;
 
@@ -82,7 +86,7 @@ private:
 
 public:
 	MPIWinFull()
-		: m_numaDomainId(0), m_window(MPI_WIN_NULL),
+		: m_numaDomainId(0), m_window(MPI_WIN_NULL), m_winMutex(0L),
 		  m_blockSize(0), m_mpiType(MPI_DATATYPE_NULL)
 	{
 	}
@@ -90,6 +94,8 @@ public:
 	virtual ~MPIWinFull()
 	{
 		if (m_numaDomainId == 0 && m_window != MPI_WIN_NULL) {
+			delete m_winMutex;
+
 			std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
 			MPI_Win_free(&m_window);
 		}
@@ -119,6 +125,8 @@ public:
 		if (m_numaDomainId == 0) {
 			unsigned int typeSize = type.size();
 
+			m_winMutex = new threads::Mutex();
+
 			std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
 
 			// Create the mpi window for distributed blocks
@@ -131,7 +139,11 @@ public:
 				return asagi::Grid::MPI_ERROR;
 		}
 
-		asagi::Grid::Error err = numaComm.broadcast(m_window);
+		asagi::Grid::Error err = numaComm.broadcast(m_winMutex);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
+		err = numaComm.broadcast(m_window);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
@@ -151,6 +163,10 @@ public:
 		int mpiResult; NDBG_UNUSED(mpiResult);
 
 		std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
+
+		// Lock the window to make sure no other thread interferes between
+		// MPI_Win_lock and MPI_Win_unlock
+		std::lock_guard<threads::Mutex> winLock(*m_winMutex);
 
 		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, remoteRank,
 			MPI_MODE_NOCHECK, m_window);
