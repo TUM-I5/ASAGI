@@ -242,176 +242,179 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;</div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;                <span class="keywordtype">int</span> mpiResult; NDBG_UNUSED(mpiResult);</div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;                mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;                                MPI_MODE_NOCHECK, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;                <span class="keywordtype">long</span> entry;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;                <span class="keywordflow">if</span> (dictRank == <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">m_mpiComm</a>-&gt;<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>())</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;                        entry = <a class="code" href="classtransfer_1_1MPICache.xhtml#a01348d5f73e0537c289d3ac78de9b7c1">fetchAndUpdateBlockInfo</a>(<a class="code" href="classtransfer_1_1MPICache.xhtml#a7512cf1bbec259dbafff999a1e7ef465">dictionary</a>(dictOffset),</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;                                        <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">m_mpiComm</a>-&gt;<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() * <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a> + offset);</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;                <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;                        <span class="comment">// Local buffer for a dict entry</span></div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;                        <span class="keywordtype">long</span> dictEntry[<a class="code" href="classtransfer_1_1MPICache.xhtml#a3bdcf48c0ff57f28cbef3f88c97993dc">MAX_DICT_SIZE</a>];</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;                        mpiResult = MPI_Get(dictEntry,</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;                                        <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;                                        MPI_LONG,</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;                                        dictRank,</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;                                        dictOffset * <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;                                        <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;                                        MPI_LONG,</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;                                        <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;                        mpiResult = MPI_Win_unlock(dictRank, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;                <span class="comment">// We do not need to lock MPI_Win_lock/MPI_Win_unlock like in MPIWinFull</span></div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;                <span class="comment">// since this is handled by the MPI mutex.</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;                mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;                                MPI_MODE_NOCHECK, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;                <span class="keywordtype">long</span> entry;</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;                <span class="keywordflow">if</span> (dictRank == <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">m_mpiComm</a>-&gt;<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>())</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;                        entry = <a class="code" href="classtransfer_1_1MPICache.xhtml#a01348d5f73e0537c289d3ac78de9b7c1">fetchAndUpdateBlockInfo</a>(<a class="code" href="classtransfer_1_1MPICache.xhtml#a7512cf1bbec259dbafff999a1e7ef465">dictionary</a>(dictOffset),</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;                                        <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">m_mpiComm</a>-&gt;<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() * <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a> + offset);</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;                <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;                        <span class="comment">// Local buffer for a dict entry</span></div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;                        <span class="keywordtype">long</span> dictEntry[<a class="code" href="classtransfer_1_1MPICache.xhtml#a3bdcf48c0ff57f28cbef3f88c97993dc">MAX_DICT_SIZE</a>];</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;                        mpiResult = MPI_Get(dictEntry,</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;                                        <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;                                        MPI_LONG,</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;                                        dictRank,</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;                                        dictOffset * <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;                                        <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;                                        MPI_LONG,</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;                                        <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;                        entry = <a class="code" href="classtransfer_1_1MPICache.xhtml#a01348d5f73e0537c289d3ac78de9b7c1">fetchAndUpdateBlockInfo</a>(dictEntry,</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;                                        <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">m_mpiComm</a>-&gt;<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() * <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a> + offset);</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;                        mpiResult = MPI_Win_unlock(dictRank, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;                        mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;                                        MPI_MODE_NOCHECK, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;                        mpiResult = MPI_Put(dictEntry,</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;                                        <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;                                        MPI_LONG,</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;                                        dictRank,</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;                                        dictOffset * <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;                                        <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;                                        MPI_LONG,</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;                                        <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;                }</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;                mpiResult = MPI_Win_unlock(dictRank, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;                        entry = <a class="code" href="classtransfer_1_1MPICache.xhtml#a01348d5f73e0537c289d3ac78de9b7c1">fetchAndUpdateBlockInfo</a>(dictEntry,</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;                                        <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">m_mpiComm</a>-&gt;<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() * <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a> + offset);</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;                        mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;                                        MPI_MODE_NOCHECK, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;                        mpiResult = MPI_Put(dictEntry,</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;                                        <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;                                        MPI_LONG,</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;                                        dictRank,</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;                                        dictOffset * <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;                                        <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;                                        MPI_LONG,</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;                                        <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;                }</div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;                <span class="keywordflow">return</span> entry;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        }</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;                mpiResult = MPI_Win_unlock(dictRank, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;</div>
-<div class="line"><a name="l00282"></a><span class="lineno"><a class="line" href="classtransfer_1_1MPIWinCache.xhtml#ac90d01490b39188b834c6205a4dad5a3">  282</a></span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#ac90d01490b39188b834c6205a4dad5a3">transfer</a>(<span class="keywordtype">long</span> entry, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> blockId, <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *cache, <span class="keywordtype">bool</span> &amp;retry)</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        {</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;                retry = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;                <span class="keywordflow">if</span> (entry &lt; 0)</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;                        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;                <span class="keywordflow">return</span> entry;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;        }</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;</div>
+<div class="line"><a name="l00285"></a><span class="lineno"><a class="line" href="classtransfer_1_1MPIWinCache.xhtml#ac90d01490b39188b834c6205a4dad5a3">  285</a></span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#ac90d01490b39188b834c6205a4dad5a3">transfer</a>(<span class="keywordtype">long</span> entry, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> blockId, <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *cache, <span class="keywordtype">bool</span> &amp;retry)</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        {</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;                retry = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;                <span class="keywordtype">int</span> rank = entry / <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a>;</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;                <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> offset = entry % <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a>;</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;                <span class="keywordflow">if</span> (entry &lt; 0)</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;                        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;                assert(rank &gt;= 0);</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;                <span class="keywordtype">int</span> mpiResult; NDBG_UNUSED(mpiResult);</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;                <span class="comment">// Lock remote window</span></div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;                mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, rank,</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;                                MPI_MODE_NOCHECK, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a9d372fc3c747818e35a29a2af04c694b">m_cacheWin</a>);</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;                <span class="comment">// Transfer data</span></div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;                mpiResult = MPI_Get(cache,</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;                                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#abbe5d3d9257d0ba795b8644eddbda8d2">m_blockSize</a>,</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;                                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a2cb997e5d1533e96dd28caf59cbb1d8c">m_mpiType</a>,</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;                                rank,</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;                                offset * <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#abbe5d3d9257d0ba795b8644eddbda8d2">m_blockSize</a>,</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;                                m_blockSize,</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;                                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a2cb997e5d1533e96dd28caf59cbb1d8c">m_mpiType</a>,</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;                                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a9d372fc3c747818e35a29a2af04c694b">m_cacheWin</a>);</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;                <span class="comment">// Unlock remote window</span></div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;                mpiResult = MPI_Win_unlock(rank, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a9d372fc3c747818e35a29a2af04c694b">m_cacheWin</a>);</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;        }</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;                <span class="keywordtype">int</span> rank = entry / <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a>;</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;                <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> offset = entry % <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a>;</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;                assert(rank &gt;= 0);</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;                <span class="keywordtype">int</span> mpiResult; NDBG_UNUSED(mpiResult);</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;                <span class="comment">// Lock remote window</span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;                mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, rank,</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;                                MPI_MODE_NOCHECK, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a9d372fc3c747818e35a29a2af04c694b">m_cacheWin</a>);</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;                <span class="comment">// Transfer data</span></div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;                mpiResult = MPI_Get(cache,</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;                                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#abbe5d3d9257d0ba795b8644eddbda8d2">m_blockSize</a>,</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;                                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a2cb997e5d1533e96dd28caf59cbb1d8c">m_mpiType</a>,</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;                                rank,</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;                                offset * <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#abbe5d3d9257d0ba795b8644eddbda8d2">m_blockSize</a>,</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;                                m_blockSize,</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;                                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a2cb997e5d1533e96dd28caf59cbb1d8c">m_mpiType</a>,</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;                                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a9d372fc3c747818e35a29a2af04c694b">m_cacheWin</a>);</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;                <span class="comment">// Unlock remote window</span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;                mpiResult = MPI_Win_unlock(rank, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a9d372fc3c747818e35a29a2af04c694b">m_cacheWin</a>);</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
 <div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;</div>
-<div class="line"><a name="l00327"></a><span class="lineno"><a class="line" href="classtransfer_1_1MPIWinCache.xhtml#a1cca2be5fb4e8ec931ad16ba69829f7e">  327</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1cca2be5fb4e8ec931ad16ba69829f7e">endTransfer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> blockId, <span class="keywordtype">int</span> dictRank,</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;                        <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> dictOffset, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> offset)</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;        {</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a74ed3b471c3acf04be1701927a9bceac">m_mpiMutex</a>-&gt;<a class="code" href="classmpi_1_1Mutex.xhtml#a265ed8e7d45aa9a1aeab1529a7d9150c">release</a>(blockId);</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;                <a class="code" href="classmpi_1_1MPIComm.xhtml#a439184c276be1db707d982174de4bc00">mpi::MPIComm::mpiLock</a>.<a class="code" href="classthreads_1_1PthreadMutex.xhtml#a53610a9e94a7619563ac60eead3f792c">unlock</a>();</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;        }</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;        }</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;</div>
+<div class="line"><a name="l00330"></a><span class="lineno"><a class="line" href="classtransfer_1_1MPIWinCache.xhtml#a1cca2be5fb4e8ec931ad16ba69829f7e">  330</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1cca2be5fb4e8ec931ad16ba69829f7e">endTransfer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> blockId, <span class="keywordtype">int</span> dictRank,</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;                        <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> dictOffset, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> offset)</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;        {</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a74ed3b471c3acf04be1701927a9bceac">m_mpiMutex</a>-&gt;<a class="code" href="classmpi_1_1Mutex.xhtml#a265ed8e7d45aa9a1aeab1529a7d9150c">release</a>(blockId);</div>
 <div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;</div>
-<div class="line"><a name="l00345"></a><span class="lineno"><a class="line" href="classtransfer_1_1MPIWinCache.xhtml#a0aad1154aed15663b142f0ef38fc702b">  345</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a0aad1154aed15663b142f0ef38fc702b">addBlock</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> blockId, <span class="keywordtype">int</span> dictRank,</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;                        <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> dictOffset, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> offset)</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        {</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a69e50e66835f7df560d70016930c3ca2">startTransfer</a>(blockId, dictRank, dictOffset, offset);</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1cca2be5fb4e8ec931ad16ba69829f7e">endTransfer</a>(blockId, dictRank, dictOffset, offset);</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;        }</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;</div>
-<div class="line"><a name="l00360"></a><span class="lineno"><a class="line" href="classtransfer_1_1MPIWinCache.xhtml#a5dbe916fa64bc544ee63b9e7dfa561b9">  360</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a5dbe916fa64bc544ee63b9e7dfa561b9">deleteBlock</a>(<span class="keywordtype">long</span> blockId, <span class="keywordtype">int</span> dictRank, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> dictOffset,</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;                        <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> offset)</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;        {</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;                <span class="keywordflow">if</span> (blockId &lt; 0)</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;                        <span class="comment">// Invalid block id</span></div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;                        <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;                <span class="keywordtype">int</span> mpiResult; NDBG_UNUSED(mpiResult);</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;                std::lock_guard&lt;mpi::Lock&gt; lock(<a class="code" href="classmpi_1_1MPIComm.xhtml#a439184c276be1db707d982174de4bc00">mpi::MPIComm::mpiLock</a>);</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a74ed3b471c3acf04be1701927a9bceac">m_mpiMutex</a>-&gt;<a class="code" href="classmpi_1_1Mutex.xhtml#a0db04740982b3ab67eeeab038221d509">acquire</a>(blockId);</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;                mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;                        MPI_MODE_NOCHECK, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;                <span class="keywordflow">if</span> (dictRank == <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">m_mpiComm</a>-&gt;<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>())</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;                        <a class="code" href="classtransfer_1_1MPICache.xhtml#aab98e65b988763e31a6590a0e36e3a0f">deleteBlockInfo</a>(<a class="code" href="classtransfer_1_1MPICache.xhtml#a7512cf1bbec259dbafff999a1e7ef465">dictionary</a>(dictOffset),</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;                                        <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">m_mpiComm</a>-&gt;<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() * <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a> + offset);</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;                <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;                        <span class="comment">// Local buffer for a dict entry</span></div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;                        <span class="keywordtype">long</span> dictEntry[<a class="code" href="classtransfer_1_1MPICache.xhtml#a3bdcf48c0ff57f28cbef3f88c97993dc">MAX_DICT_SIZE</a>];</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;                        mpiResult = MPI_Get(dictEntry,</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;                                <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;                                MPI_LONG,</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;                                dictRank,</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;                                dictOffset * <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;                                <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;                                MPI_LONG,</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;                                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;                        mpiResult = MPI_Win_unlock(dictRank, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;                <a class="code" href="classmpi_1_1MPIComm.xhtml#a439184c276be1db707d982174de4bc00">mpi::MPIComm::mpiLock</a>.<a class="code" href="classthreads_1_1PthreadMutex.xhtml#a53610a9e94a7619563ac60eead3f792c">unlock</a>();</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;        }</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;</div>
+<div class="line"><a name="l00348"></a><span class="lineno"><a class="line" href="classtransfer_1_1MPIWinCache.xhtml#a0aad1154aed15663b142f0ef38fc702b">  348</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a0aad1154aed15663b142f0ef38fc702b">addBlock</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> blockId, <span class="keywordtype">int</span> dictRank,</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;                        <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> dictOffset, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> offset)</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;        {</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a69e50e66835f7df560d70016930c3ca2">startTransfer</a>(blockId, dictRank, dictOffset, offset);</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1cca2be5fb4e8ec931ad16ba69829f7e">endTransfer</a>(blockId, dictRank, dictOffset, offset);</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;        }</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;</div>
+<div class="line"><a name="l00363"></a><span class="lineno"><a class="line" href="classtransfer_1_1MPIWinCache.xhtml#a5dbe916fa64bc544ee63b9e7dfa561b9">  363</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a5dbe916fa64bc544ee63b9e7dfa561b9">deleteBlock</a>(<span class="keywordtype">long</span> blockId, <span class="keywordtype">int</span> dictRank, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> dictOffset,</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;                        <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> offset)</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        {</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;                <span class="keywordflow">if</span> (blockId &lt; 0)</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;                        <span class="comment">// Invalid block id</span></div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;                        <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;                <span class="keywordtype">int</span> mpiResult; NDBG_UNUSED(mpiResult);</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;                std::lock_guard&lt;mpi::Lock&gt; lock(<a class="code" href="classmpi_1_1MPIComm.xhtml#a439184c276be1db707d982174de4bc00">mpi::MPIComm::mpiLock</a>);</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a74ed3b471c3acf04be1701927a9bceac">m_mpiMutex</a>-&gt;<a class="code" href="classmpi_1_1Mutex.xhtml#a0db04740982b3ab67eeeab038221d509">acquire</a>(blockId);</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;                mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;                        MPI_MODE_NOCHECK, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;                <span class="keywordflow">if</span> (dictRank == <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">m_mpiComm</a>-&gt;<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>())</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;                        <a class="code" href="classtransfer_1_1MPICache.xhtml#aab98e65b988763e31a6590a0e36e3a0f">deleteBlockInfo</a>(<a class="code" href="classtransfer_1_1MPICache.xhtml#a7512cf1bbec259dbafff999a1e7ef465">dictionary</a>(dictOffset),</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;                                        <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">m_mpiComm</a>-&gt;<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() * <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a> + offset);</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;                <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;                        <span class="comment">// Local buffer for a dict entry</span></div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;                        <span class="keywordtype">long</span> dictEntry[<a class="code" href="classtransfer_1_1MPICache.xhtml#a3bdcf48c0ff57f28cbef3f88c97993dc">MAX_DICT_SIZE</a>];</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;                        mpiResult = MPI_Get(dictEntry,</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;                                <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;                                MPI_LONG,</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;                                dictRank,</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;                                dictOffset * <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;                                <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;                                MPI_LONG,</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;                                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
 <div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;                        <a class="code" href="classtransfer_1_1MPICache.xhtml#aab98e65b988763e31a6590a0e36e3a0f">deleteBlockInfo</a>(dictEntry,</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;                                        <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">m_mpiComm</a>-&gt;<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() * <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a> + offset);</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;                        mpiResult = MPI_Win_unlock(dictRank, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
 <div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;                        mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;                                MPI_MODE_NOCHECK, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;                        mpiResult = MPI_Put(dictEntry,</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;                                <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;                                MPI_LONG,</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;                                dictRank,</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;                                dictOffset * <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;                                <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;                                MPI_LONG,</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;                                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;                }</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;                mpiResult = MPI_Win_unlock(dictRank, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;                        <a class="code" href="classtransfer_1_1MPICache.xhtml#aab98e65b988763e31a6590a0e36e3a0f">deleteBlockInfo</a>(dictEntry,</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;                                        <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">m_mpiComm</a>-&gt;<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() * <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a> + offset);</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;                        mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;                                MPI_MODE_NOCHECK, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;                        mpiResult = MPI_Put(dictEntry,</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;                                <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;                                MPI_LONG,</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;                                dictRank,</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;                                dictOffset * <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;                                <a class="code" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a>(),</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;                                MPI_LONG,</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;                                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;                        assert(mpiResult == MPI_SUCCESS);</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;                }</div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a74ed3b471c3acf04be1701927a9bceac">m_mpiMutex</a>-&gt;<a class="code" href="classmpi_1_1Mutex.xhtml#a265ed8e7d45aa9a1aeab1529a7d9150c">release</a>(blockId);</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        }</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;};</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;<span class="preprocessor">#endif // ASAGI_NOMPI</span></div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;}</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;<span class="preprocessor">#endif // TRANSFER_MPIWINCACHE_H</span></div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;                mpiResult = MPI_Win_unlock(dictRank, <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a1dee5fe7f57f70535400522300e26150">m_dictWin</a>);</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;                assert(mpiResult == MPI_SUCCESS);</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;                <a class="code" href="classtransfer_1_1MPIWinCache.xhtml#a74ed3b471c3acf04be1701927a9bceac">m_mpiMutex</a>-&gt;<a class="code" href="classmpi_1_1Mutex.xhtml#a265ed8e7d45aa9a1aeab1529a7d9150c">release</a>(blockId);</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        }</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;};</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;<span class="preprocessor">#endif // ASAGI_NOMPI</span></div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;}</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;<span class="preprocessor">#endif // TRANSFER_MPIWINCACHE_H</span></div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;</div>
 <div class="ttc" id="classtransfer_1_1MPIWinCache_xhtml_a41af9d01450ecfc84532d30b5df67b24"><div class="ttname"><a href="classtransfer_1_1MPIWinCache.xhtml#a41af9d01450ecfc84532d30b5df67b24">transfer::MPIWinCache::init</a></div><div class="ttdeci">asagi::Grid::Error init(unsigned char *cache, unsigned int cacheSize, const cache::CacheManager &amp;cacheManager, unsigned long blockCount, unsigned long blockSize, const types::Type &amp;type, const mpi::MPIComm &amp;mpiComm, numa::NumaComm &amp;numaComm)</div><div class="ttdef"><b>Definition:</b> <a href="mpiwincache_8h_source.xhtml#l00134">mpiwincache.h:134</a></div></div>
 <div class="ttc" id="group__cxx__interface_xhtml_gac1191f4df7554b1b99e515962ebc2bb5"><div class="ttname"><a href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a></div><div class="ttdeci">Error</div><div class="ttdef"><b>Definition:</b> <a href="asagi_8h_source.xhtml#l00092">asagi.h:92</a></div></div>
 <div class="ttc" id="classmpi_1_1MPIComm_xhtml"><div class="ttname"><a href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a></div><div class="ttdef"><b>Definition:</b> <a href="mpicomm_8h_source.xhtml#l00073">mpicomm.h:73</a></div></div>
@@ -428,14 +431,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classtransfer_1_1MPICache_xhtml_a3bdcf48c0ff57f28cbef3f88c97993dc"><div class="ttname"><a href="classtransfer_1_1MPICache.xhtml#a3bdcf48c0ff57f28cbef3f88c97993dc">transfer::MPICache&lt; allocator::MPIAlloc &gt;::MAX_DICT_SIZE</a></div><div class="ttdeci">static const unsigned int MAX_DICT_SIZE</div><div class="ttdef"><b>Definition:</b> <a href="mpicache_8h_source.xhtml#l00238">mpicache.h:238</a></div></div>
 <div class="ttc" id="classtransfer_1_1MPICache_xhtml_a7512cf1bbec259dbafff999a1e7ef465"><div class="ttname"><a href="classtransfer_1_1MPICache.xhtml#a7512cf1bbec259dbafff999a1e7ef465">transfer::MPICache&lt; allocator::MPIAlloc &gt;::dictionary</a></div><div class="ttdeci">const long * dictionary() const</div><div class="ttdef"><b>Definition:</b> <a href="mpicache_8h_source.xhtml#l00184">mpicache.h:184</a></div></div>
 <div class="ttc" id="mpino_8h_xhtml"><div class="ttname"><a href="mpino_8h.xhtml">mpino.h</a></div></div>
-<div class="ttc" id="classtransfer_1_1MPIWinCache_xhtml_a5dbe916fa64bc544ee63b9e7dfa561b9"><div class="ttname"><a href="classtransfer_1_1MPIWinCache.xhtml#a5dbe916fa64bc544ee63b9e7dfa561b9">transfer::MPIWinCache::deleteBlock</a></div><div class="ttdeci">void deleteBlock(long blockId, int dictRank, unsigned long dictOffset, unsigned long offset)</div><div class="ttdef"><b>Definition:</b> <a href="mpiwincache_8h_source.xhtml#l00360">mpiwincache.h:360</a></div></div>
+<div class="ttc" id="classtransfer_1_1MPIWinCache_xhtml_a5dbe916fa64bc544ee63b9e7dfa561b9"><div class="ttname"><a href="classtransfer_1_1MPIWinCache.xhtml#a5dbe916fa64bc544ee63b9e7dfa561b9">transfer::MPIWinCache::deleteBlock</a></div><div class="ttdeci">void deleteBlock(long blockId, int dictRank, unsigned long dictOffset, unsigned long offset)</div><div class="ttdef"><b>Definition:</b> <a href="mpiwincache_8h_source.xhtml#l00363">mpiwincache.h:363</a></div></div>
 <div class="ttc" id="classtransfer_1_1MPINo_xhtml"><div class="ttname"><a href="classtransfer_1_1MPINo.xhtml">transfer::MPINo</a></div><div class="ttdef"><b>Definition:</b> <a href="mpino_8h_source.xhtml#l00049">mpino.h:49</a></div></div>
 <div class="ttc" id="group__cxx__interface_xhtml_ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69"><div class="ttname"><a href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69">asagi::Grid::MPI_ERROR</a></div><div class="ttdef"><b>Definition:</b> <a href="asagi_8h_source.xhtml#l00096">asagi.h:96</a></div></div>
 <div class="ttc" id="classtransfer_1_1MPICache_xhtml_aab98e65b988763e31a6590a0e36e3a0f"><div class="ttname"><a href="classtransfer_1_1MPICache.xhtml#aab98e65b988763e31a6590a0e36e3a0f">transfer::MPICache&lt; allocator::MPIAlloc &gt;::deleteBlockInfo</a></div><div class="ttdeci">void deleteBlockInfo(long *dictEntry, long entry)</div><div class="ttdef"><b>Definition:</b> <a href="mpicache_8h_source.xhtml#l00151">mpicache.h:151</a></div></div>
 <div class="ttc" id="classtransfer_1_1MPIWinCache_xhtml_a16a0d31bd98d9e020e6446bf38125673"><div class="ttname"><a href="classtransfer_1_1MPIWinCache.xhtml#a16a0d31bd98d9e020e6446bf38125673">transfer::MPIWinCache::m_mpiComm</a></div><div class="ttdeci">const mpi::MPIComm * m_mpiComm</div><div class="ttdef"><b>Definition:</b> <a href="mpiwincache_8h_source.xhtml#l00071">mpiwincache.h:71</a></div></div>
 <div class="ttc" id="classnuma_1_1NumaComm_xhtml"><div class="ttname"><a href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a></div><div class="ttdef"><b>Definition:</b> <a href="numacomm_8h_source.xhtml#l00052">numacomm.h:52</a></div></div>
-<div class="ttc" id="classtransfer_1_1MPIWinCache_xhtml_a1cca2be5fb4e8ec931ad16ba69829f7e"><div class="ttname"><a href="classtransfer_1_1MPIWinCache.xhtml#a1cca2be5fb4e8ec931ad16ba69829f7e">transfer::MPIWinCache::endTransfer</a></div><div class="ttdeci">void endTransfer(unsigned long blockId, int dictRank, unsigned long dictOffset, unsigned long offset)</div><div class="ttdef"><b>Definition:</b> <a href="mpiwincache_8h_source.xhtml#l00327">mpiwincache.h:327</a></div></div>
-<div class="ttc" id="classtransfer_1_1MPIWinCache_xhtml_a0aad1154aed15663b142f0ef38fc702b"><div class="ttname"><a href="classtransfer_1_1MPIWinCache.xhtml#a0aad1154aed15663b142f0ef38fc702b">transfer::MPIWinCache::addBlock</a></div><div class="ttdeci">void addBlock(unsigned long blockId, int dictRank, unsigned long dictOffset, unsigned long offset)</div><div class="ttdef"><b>Definition:</b> <a href="mpiwincache_8h_source.xhtml#l00345">mpiwincache.h:345</a></div></div>
+<div class="ttc" id="classtransfer_1_1MPIWinCache_xhtml_a1cca2be5fb4e8ec931ad16ba69829f7e"><div class="ttname"><a href="classtransfer_1_1MPIWinCache.xhtml#a1cca2be5fb4e8ec931ad16ba69829f7e">transfer::MPIWinCache::endTransfer</a></div><div class="ttdeci">void endTransfer(unsigned long blockId, int dictRank, unsigned long dictOffset, unsigned long offset)</div><div class="ttdef"><b>Definition:</b> <a href="mpiwincache_8h_source.xhtml#l00330">mpiwincache.h:330</a></div></div>
+<div class="ttc" id="classtransfer_1_1MPIWinCache_xhtml_a0aad1154aed15663b142f0ef38fc702b"><div class="ttname"><a href="classtransfer_1_1MPIWinCache.xhtml#a0aad1154aed15663b142f0ef38fc702b">transfer::MPIWinCache::addBlock</a></div><div class="ttdeci">void addBlock(unsigned long blockId, int dictRank, unsigned long dictOffset, unsigned long offset)</div><div class="ttdef"><b>Definition:</b> <a href="mpiwincache_8h_source.xhtml#l00348">mpiwincache.h:348</a></div></div>
 <div class="ttc" id="classthreads_1_1PthreadMutex_xhtml_a53610a9e94a7619563ac60eead3f792c"><div class="ttname"><a href="classthreads_1_1PthreadMutex.xhtml#a53610a9e94a7619563ac60eead3f792c">threads::PthreadMutex::unlock</a></div><div class="ttdeci">void unlock()</div><div class="ttdef"><b>Definition:</b> <a href="pthreadmutex_8h_source.xhtml#l00089">pthreadmutex.h:89</a></div></div>
 <div class="ttc" id="mpicache_8h_xhtml"><div class="ttname"><a href="mpicache_8h.xhtml">mpicache.h</a></div></div>
 <div class="ttc" id="asagi_8h_xhtml"><div class="ttname"><a href="asagi_8h.xhtml">asagi.h</a></div><div class="ttdoc">Include file for C and C++ API. </div></div>
@@ -453,7 +456,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classtypes_1_1Type_xhtml_a735f6252d36518929741f16ad029d46e"><div class="ttname"><a href="classtypes_1_1Type.xhtml#a735f6252d36518929741f16ad029d46e">types::Type::getMPIType</a></div><div class="ttdeci">virtual MPI_Datatype getMPIType() const =0</div></div>
 <div class="ttc" id="classtypes_1_1Type_xhtml"><div class="ttname"><a href="classtypes_1_1Type.xhtml">types::Type</a></div><div class="ttdef"><b>Definition:</b> <a href="type_8h_source.xhtml#l00060">type.h:60</a></div></div>
 <div class="ttc" id="classmpi_1_1MPIComm_xhtml_acd622dade32fc1ed4862e8935bf4a0dd"><div class="ttname"><a href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">mpi::MPIComm::rank</a></div><div class="ttdeci">int rank() const </div><div class="ttdef"><b>Definition:</b> <a href="mpicomm_8h_source.xhtml#l00128">mpicomm.h:128</a></div></div>
-<div class="ttc" id="classtransfer_1_1MPIWinCache_xhtml_ac90d01490b39188b834c6205a4dad5a3"><div class="ttname"><a href="classtransfer_1_1MPIWinCache.xhtml#ac90d01490b39188b834c6205a4dad5a3">transfer::MPIWinCache::transfer</a></div><div class="ttdeci">bool transfer(long entry, unsigned long blockId, unsigned char *cache, bool &amp;retry)</div><div class="ttdef"><b>Definition:</b> <a href="mpiwincache_8h_source.xhtml#l00282">mpiwincache.h:282</a></div></div>
+<div class="ttc" id="classtransfer_1_1MPIWinCache_xhtml_ac90d01490b39188b834c6205a4dad5a3"><div class="ttname"><a href="classtransfer_1_1MPIWinCache.xhtml#ac90d01490b39188b834c6205a4dad5a3">transfer::MPIWinCache::transfer</a></div><div class="ttdeci">bool transfer(long entry, unsigned long blockId, unsigned char *cache, bool &amp;retry)</div><div class="ttdef"><b>Definition:</b> <a href="mpiwincache_8h_source.xhtml#l00285">mpiwincache.h:285</a></div></div>
 <div class="ttc" id="classmpi_1_1MPIComm_xhtml_a439184c276be1db707d982174de4bc00"><div class="ttname"><a href="classmpi_1_1MPIComm.xhtml#a439184c276be1db707d982174de4bc00">mpi::MPIComm::mpiLock</a></div><div class="ttdeci">static Lock mpiLock</div><div class="ttdef"><b>Definition:</b> <a href="mpicomm_8h_source.xhtml#l00142">mpicomm.h:142</a></div></div>
 <div class="ttc" id="classtransfer_1_1MPIWinCache_xhtml_abbe5d3d9257d0ba795b8644eddbda8d2"><div class="ttname"><a href="classtransfer_1_1MPIWinCache.xhtml#abbe5d3d9257d0ba795b8644eddbda8d2">transfer::MPIWinCache::m_blockSize</a></div><div class="ttdeci">unsigned long m_blockSize</div><div class="ttdef"><b>Definition:</b> <a href="mpiwincache_8h_source.xhtml#l00089">mpiwincache.h:89</a></div></div>
 <div class="ttc" id="classmpi_1_1Mutex_xhtml_a0db04740982b3ab67eeeab038221d509"><div class="ttname"><a href="classmpi_1_1Mutex.xhtml#a0db04740982b3ab67eeeab038221d509">mpi::Mutex::acquire</a></div><div class="ttdeci">void acquire(unsigned long block)</div><div class="ttdoc">Acquire a lock for a block. </div><div class="ttdef"><b>Definition:</b> <a href="mpi_2mutex_8h_source.xhtml#l00109">mutex.h:109</a></div></div>
