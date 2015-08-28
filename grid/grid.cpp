@@ -261,10 +261,6 @@ void grid::Grid::init()
 	m_id = m_pointers.add(this);
 }
 
-
-//template<class Container, class Level, typename TypeList>
-//grid::Container* grid::Grid::test(types::Type* type)
-
 /**
  * Initializes all the containers
  */

@@ -287,10 +287,10 @@ public:
 		  m_numaDomainId(0),
 		  m_cacheManager(0L),
 		  m_mutexes(0L),
-		  m_blockInfoTag(0),
-		  m_transfererTag(0),
-		  m_adderTag(0),
-		  m_deleterTag(0),
+		  m_blockInfoTag(-1),
+		  m_transfererTag(-1),
+		  m_adderTag(-1),
+		  m_deleterTag(-1),
 		  m_rankCacheSize(0),
 		  m_blockSize(0),
 		  m_mpiType(MPI_DATATYPE_NULL)
@@ -299,7 +299,7 @@ public:
 
 	virtual ~MPIThreadCache()
 	{
-		if (m_numaDomainId == 0) {
+		if (m_numaDomainId == 0 && m_blockInfoTag >= 0) {
 			mpi::CommThread::commThread.unregisterReceiver(m_blockInfoTag);
 			mpi::CommThread::commThread.unregisterReceiver(m_transfererTag);
 			mpi::CommThread::commThread.unregisterReceiver(m_adderTag);
