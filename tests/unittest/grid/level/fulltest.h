@@ -50,6 +50,9 @@ class FullTest : public CxxTest::TestSuite
 
 	grid::Grid* c1;
 	grid::level::FullDefault<types::BasicType<float>>* grid1;
+
+	grid::Grid* c2;
+	grid::level::FullDefault<types::BasicType<float>>* grid2;
 public:
 	void setUp(void)
 	{
@@ -68,6 +71,14 @@ public:
 				types::BasicType<float>>*>(c1->m_containers[0])->m_levels[0];
 
 		TS_ASSERT(grid1);
+
+		c2 = new grid::Grid(asagi::Grid::FLOAT);
+		c2->setParam("BLOCK_SIZE_0", "-1");
+		c2->open("../../../" NC_2D);
+		grid2 = &dynamic_cast<grid::SimpleContainer<grid::level::FullDefault<types::BasicType<float>>,
+				types::BasicType<float>>*>(c2->m_containers[0])->m_levels[0];
+
+		TS_ASSERT(grid2);
 	}
 	
 	void tearDown(void)
@@ -81,19 +92,8 @@ public:
 		TS_ASSERT_EQUALS(grid0->totalBlockSize(), 64ul);
 
 		TS_ASSERT_EQUALS(grid1->totalBlockSize(), 12ul);
-		/*
-		TS_ASSERT_EQUALS(grid->m_blockSize[0], 5u);
 		
-		grid->setParam("y-block-size", "7");
-		TS_ASSERT_EQUALS(grid->m_blockSize[1], 7u);
-		
-		grid->setParam("z-block-size", "42");
-		TS_ASSERT_EQUALS(grid->m_blockSize[2], 42u);
-		
-		TS_ASSERT_EQUALS(grid->setParam("block-cache-size", "100"),
-			asagi::Grid::SUCCESS);
-		TS_ASSERT_EQUALS(grid->m_blocksPerNode, 100);
-		*/
+		TS_ASSERT_EQUALS(grid2->blockSize(1), static_cast<unsigned long>(WIDTH));
 	}
 
 	void testLocal2global(void)

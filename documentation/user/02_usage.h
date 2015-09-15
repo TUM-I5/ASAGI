@@ -220,7 +220,8 @@
  *  <tr>
  *   <td>BLOCK-SIZE-<i>X</i></td>
  *   <td>int</td>
- *   <td>The size of a block in dimension <i>X</i>.</td>
+ *   <td>The size of a block in dimension <i>X</i>. Use a negative value to
+ *    set the block size equal to the total number cells in this dimension.</td>
  *   <td>no</td>
  *  </tr>
  *  <tr>

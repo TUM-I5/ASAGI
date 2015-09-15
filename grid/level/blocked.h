@@ -89,7 +89,7 @@ protected:
 	asagi::Grid::Error open(
 			const char* filename,
 			const char* varname,
-			const unsigned int* blockSize,
+			const int* blockSize,
 			int timeDimension,
 			grid::ValuePosition valuePos)
 	{
@@ -117,6 +117,9 @@ protected:
 			if (blockSize[this->dimensions() - i - 1] == 0)
 				// Setting default block size, if not yet set
 				m_blockSize[i] = 64;
+			else if (blockSize[this->dimensions() - i - 1] < 0)
+				// Set block size to maximum
+				m_blockSize[i] = this->size(i);
 			else
 				// C to Fortran mapping
 				m_blockSize[i] = blockSize[this->dimensions() - i - 1];

@@ -77,7 +77,7 @@ public:
 	
 	asagi::Grid::Error init(const char* filename,
 			const char* varname,
-			const unsigned int* blockSize,
+			const int* blockSize,
 			unsigned int cacheSize,
 			int cacheHandSpread,
 			unsigned int level)

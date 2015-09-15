@@ -386,7 +386,7 @@ private:
 	 * Calculates 1/scaling, except for scaling = 0 and scaling = inf. In this
 	 * case it returns 0
 	 */
-	double getInvScaling(double scaling)
+	static double getInvScaling(double scaling)
 	{
 		if ((scaling == 0) || std::isinf(scaling))
 			return 0;
@@ -397,7 +397,7 @@ private:
 	/**
 	 * Implementation for round-to-nearest
 	 */
-	double round(double value)
+	static double round(double value)
 	{
 		return floor(value + 0.5);
 	}

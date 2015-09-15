@@ -198,7 +198,8 @@ void grid::Grid::setParam(const char* name, const char* value, unsigned int leve
 
 	// Convert non name values to upper case
 	std::string v = value;
-	if (n != "VARIABLE") {
+	if (n != "VARIABLE"
+			&& !utils::StringUtils::startsWith(n, "BLOCK_SIZE_")) {
 		utils::StringUtils::toUpper(v);
 		std::replace(v.begin(), v.end(), '-', '_');
 	}
@@ -217,10 +218,10 @@ asagi::Grid::Error grid::Grid::open(const char* filename, unsigned int level)
 		// Make sure the container has the correct size
 		m_resizeOnce.saveExec(*this, &Grid::initContainers);
 
-		unsigned int blockSizes[MAX_DIMENSIONS];
+		int blockSizes[MAX_DIMENSIONS];
 		for (unsigned int i = 0; i < MAX_DIMENSIONS; i++) {
 			std::string sizeName = "BLOCK_SIZE_" + utils::StringUtils::toString(i);
-			blockSizes[i] = param(sizeName.c_str(), 0u, level); // 0 -> use default
+			blockSizes[i] = param(sizeName.c_str(), 0, level); // 0 -> use default
 		}
 
 		err = m_containers[m_numa.domainId()]->init(filename,

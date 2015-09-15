@@ -86,7 +86,7 @@ public:
 	asagi::Grid::Error open(
 		const char* filename,
 		const char* varname,
-		const unsigned int* blockSize,
+		const int* blockSize,
 		int timeDimension,
 		unsigned int cacheSize,
 		int cacheHandSpread,
