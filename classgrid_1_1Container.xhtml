@@ -121,9 +121,9 @@ Collaboration diagram for grid::Container:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a33b858d3a2810af21e679027fde2e634"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1Container.xhtml#a33b858d3a2810af21e679027fde2e634">Container</a> (const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> &amp;<a class="el" href="classgrid_1_1Container.xhtml#a598fd8ac8f41dfc39036fad6a23d4202">comm</a>, const <a class="el" href="classnuma_1_1Numa.xhtml">numa::Numa</a> &amp;<a class="el" href="classgrid_1_1Container.xhtml#af8822836f4c5747293c03c6ec9182f3e">numa</a>, int <a class="el" href="classgrid_1_1Container.xhtml#aca44e91ec143b62f78c28142f68448c1">timeDimension</a>, ValuePosition valuePos)</td></tr>
 <tr class="separator:a33b858d3a2810af21e679027fde2e634"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1df6054036b19adf1c6e91cc35649ff4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1Container.xhtml#a1df6054036b19adf1c6e91cc35649ff4">init</a> (const char *filename, const char *varname, const unsigned int *blockSize, unsigned int cacheSize, int cacheHandSpread, unsigned int level)=0</td></tr>
-<tr class="memdesc:a1df6054036b19adf1c6e91cc35649ff4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a level of the container.  <a href="#a1df6054036b19adf1c6e91cc35649ff4">More...</a><br /></td></tr>
-<tr class="separator:a1df6054036b19adf1c6e91cc35649ff4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5532e50ac387d7a98facff8685dff0b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1Container.xhtml#ae5532e50ac387d7a98facff8685dff0b">init</a> (const char *filename, const char *varname, const int *blockSize, unsigned int cacheSize, int cacheHandSpread, unsigned int level)=0</td></tr>
+<tr class="memdesc:ae5532e50ac387d7a98facff8685dff0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a level of the container.  <a href="#ae5532e50ac387d7a98facff8685dff0b">More...</a><br /></td></tr>
+<tr class="separator:ae5532e50ac387d7a98facff8685dff0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31d23ab10ee912e710ae5391cca903cb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1Container.xhtml#a31d23ab10ee912e710ae5391cca903cb">getMin</a> (unsigned int n) const </td></tr>
 <tr class="separator:a31d23ab10ee912e710ae5391cca903cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb92535fa7c02d63e1e4c20dc9ddc820"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1Container.xhtml#abb92535fa7c02d63e1e4c20dc9ddc820">getMax</a> (unsigned int n) const </td></tr>
@@ -637,7 +637,7 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a1df6054036b19adf1c6e91cc35649ff4"></a>
+<a class="anchor" id="ae5532e50ac387d7a98facff8685dff0b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -659,7 +659,7 @@ Private Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const unsigned int *&#160;</td>
+          <td class="paramtype">const int *&#160;</td>
           <td class="paramname"><em>blockSize</em>, </td>
         </tr>
         <tr>
@@ -708,7 +708,7 @@ Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd></dd></dl>
 
-<p>Implemented in <a class="el" href="classgrid_1_1SimpleContainer.xhtml#a77bc38c4dae60ca669c981c35e8e4ab4">grid::SimpleContainer&lt; Level, Type &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classgrid_1_1SimpleContainer.xhtml#a65d4ca587a8473b3bfa8fb7c9b595798">grid::SimpleContainer&lt; Level, Type &gt;</a>.</p>
 
 </div>
 </div>

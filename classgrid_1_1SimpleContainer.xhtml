@@ -119,9 +119,9 @@ Collaboration diagram for grid::SimpleContainer&lt; Level, Type &gt;:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a3c852d343481163cea63574f11f1d7ed"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1SimpleContainer.xhtml#a3c852d343481163cea63574f11f1d7ed">SimpleContainer</a> (const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> &amp;<a class="el" href="classgrid_1_1Container.xhtml#a598fd8ac8f41dfc39036fad6a23d4202">comm</a>, const <a class="el" href="classnuma_1_1Numa.xhtml">numa::Numa</a> &amp;<a class="el" href="classgrid_1_1Container.xhtml#af8822836f4c5747293c03c6ec9182f3e">numa</a>, Type &amp;<a class="el" href="classgrid_1_1TypedContainer.xhtml#a741c1151ea12b95f912f303a18c378a8">type</a>, int <a class="el" href="classgrid_1_1Container.xhtml#aca44e91ec143b62f78c28142f68448c1">timeDimension</a>, ValuePosition valuePos)</td></tr>
 <tr class="separator:a3c852d343481163cea63574f11f1d7ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77bc38c4dae60ca669c981c35e8e4ab4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1SimpleContainer.xhtml#a77bc38c4dae60ca669c981c35e8e4ab4">init</a> (const char *filename, const char *varname, const unsigned int *blockSize, unsigned int cacheSize, int cacheHandSpread, unsigned int level)</td></tr>
-<tr class="memdesc:a77bc38c4dae60ca669c981c35e8e4ab4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a level of the container.  <a href="#a77bc38c4dae60ca669c981c35e8e4ab4">More...</a><br /></td></tr>
-<tr class="separator:a77bc38c4dae60ca669c981c35e8e4ab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65d4ca587a8473b3bfa8fb7c9b595798"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1SimpleContainer.xhtml#a65d4ca587a8473b3bfa8fb7c9b595798">init</a> (const char *filename, const char *varname, const int *blockSize, unsigned int cacheSize, int cacheHandSpread, unsigned int level)</td></tr>
+<tr class="memdesc:a65d4ca587a8473b3bfa8fb7c9b595798"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a level of the container.  <a href="#a65d4ca587a8473b3bfa8fb7c9b595798">More...</a><br /></td></tr>
+<tr class="separator:a65d4ca587a8473b3bfa8fb7c9b595798"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0ffee888db614cf63d00883e48dfb38"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1SimpleContainer.xhtml#ae0ffee888db614cf63d00883e48dfb38">getDelta</a> (unsigned int n, unsigned int level) const </td></tr>
 <tr class="separator:ae0ffee888db614cf63d00883e48dfb38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13bd03abc0350c7586aa72f1e615a671"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
@@ -376,7 +376,7 @@ template&lt;class Level , class Type &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a77bc38c4dae60ca669c981c35e8e4ab4"></a>
+<a class="anchor" id="a65d4ca587a8473b3bfa8fb7c9b595798"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -400,7 +400,7 @@ template&lt;class Level , class Type &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const unsigned int *&#160;</td>
+          <td class="paramtype">const int *&#160;</td>
           <td class="paramname"><em>blockSize</em>, </td>
         </tr>
         <tr>
@@ -449,7 +449,7 @@ template&lt;class Level , class Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd></dd></dl>
 
-<p>Implements <a class="el" href="classgrid_1_1Container.xhtml#a1df6054036b19adf1c6e91cc35649ff4">grid::Container</a>.</p>
+<p>Implements <a class="el" href="classgrid_1_1Container.xhtml#ae5532e50ac387d7a98facff8685dff0b">grid::Container</a>.</p>
 
 <p>Definition at line <a class="el" href="simplecontainer_8h_source.xhtml#l00078">78</a> of file <a class="el" href="simplecontainer_8h_source.xhtml">simplecontainer.h</a>.</p>
 
