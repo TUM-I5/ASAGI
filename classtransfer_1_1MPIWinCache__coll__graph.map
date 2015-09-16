@@ -1,6 +1,6 @@
 <map id="transfer::MPIWinCache" name="transfer::MPIWinCache">
-<area shape="rect" id="node2" href="$classtransfer_1_1MPICache.xhtml" title="transfer::MPICache\l\&lt; allocator::MPIAlloc \&gt;" alt="" coords="5,198,160,245"/>
-<area shape="rect" id="node4" href="$classmpi_1_1MPIComm.xhtml" title="mpi::MPIComm" alt="" coords="195,101,309,131"/>
-<area shape="rect" id="node8" href="$classmpi_1_1Mutex.xhtml" title="mpi::Mutex" alt="" coords="315,207,400,236"/>
-<area shape="rect" id="node6" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="235,5,389,35"/>
+<area shape="rect" id="node2" href="$classtransfer_1_1MPICache.xhtml" title="transfer::MPICache\l\&lt; allocator::MPIAlloc \&gt;" alt="" coords="540,5,695,51"/>
+<area shape="rect" id="node4" href="$classmpi_1_1MPIComm.xhtml" title="mpi::MPIComm" alt="" coords="261,141,376,171"/>
+<area shape="rect" id="node9" href="$classmpi_1_1Mutex.xhtml" title="mpi::Mutex" alt="" coords="575,191,660,220"/>
+<area shape="rect" id="node6" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="5,141,160,171"/>
 </map>

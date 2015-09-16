@@ -111,7 +111,7 @@ Inheritance diagram for transfer::MPIWinCache:</div>
 <div class="dynheader">
 Collaboration diagram for transfer::MPIWinCache:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classtransfer_1_1MPIWinCache__coll__graph.svg" width="447" height="347"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classtransfer_1_1MPIWinCache__coll__graph.svg" width="990" height="226"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.xhtml">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -142,6 +142,10 @@ Private Attributes</h2></td></tr>
 <tr class="separator:a1dee5fe7f57f70535400522300e26150"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d372fc3c747818e35a29a2af04c694b"><td class="memItemLeft" align="right" valign="top">MPI_Win&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a9d372fc3c747818e35a29a2af04c694b">m_cacheWin</a></td></tr>
 <tr class="separator:a9d372fc3c747818e35a29a2af04c694b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62c4a8a82bcf3f38efe3b1e60859d119"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classthreads_1_1PthreadMutex.xhtml">threads::Mutex</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a62c4a8a82bcf3f38efe3b1e60859d119">m_dictWinMutex</a></td></tr>
+<tr class="separator:a62c4a8a82bcf3f38efe3b1e60859d119"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d1cf4956942f5bb6da842fa3b59bc8c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classthreads_1_1PthreadMutex.xhtml">threads::Mutex</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a7d1cf4956942f5bb6da842fa3b59bc8c">m_cacheWinMutex</a></td></tr>
+<tr class="separator:a7d1cf4956942f5bb6da842fa3b59bc8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b4b77df7e92cddca7cb040af180027c"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#a3b4b77df7e92cddca7cb040af180027c">m_rankCacheSize</a></td></tr>
 <tr class="separator:a3b4b77df7e92cddca7cb040af180027c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abbe5d3d9257d0ba795b8644eddbda8d2"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIWinCache.xhtml#abbe5d3d9257d0ba795b8644eddbda8d2">m_blockSize</a></td></tr>
@@ -177,7 +181,7 @@ Additional Inherited Members</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Copies blocks between MPI processes assuming cache storage using MPI windows </p>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00067">67</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00068">68</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a0aad1154aed15663b142f0ef38fc702b"></a>
 <div class="memitem">
@@ -234,7 +238,7 @@ Additional Inherited Members</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A dictionary entry that has to be passed to <a class="el" href="namespacetransfer.xhtml">transfer</a> if the block should be fetched from a remote rank </dd></dl>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00348">348</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00384">384</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -292,7 +296,7 @@ Additional Inherited Members</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00363">363</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00399">399</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -350,7 +354,7 @@ Additional Inherited Members</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00330">330</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00366">366</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -436,7 +440,7 @@ Additional Inherited Members</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00134">134</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00145">145</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -496,7 +500,7 @@ Additional Inherited Members</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A dictionary entry that has to be passed to <a class="el" href="namespacetransfer.xhtml">transfer</a> if the block should be fetched from a remote rank </dd></dl>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00210">210</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00234">234</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -555,7 +559,7 @@ Additional Inherited Members</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the block was fetched, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00285">285</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00314">314</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -579,7 +583,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of elements in one block </p>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00089">89</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00096">96</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -602,7 +606,30 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 <p>The MPI window used to access the cache </p>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00083">83</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00084">84</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7d1cf4956942f5bb6da842fa3b59bc8c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classthreads_1_1PthreadMutex.xhtml">threads::Mutex</a>* transfer::MPIWinCache::m_cacheWinMutex</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Mutex for the cache window </p>
+
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00090">90</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -625,7 +652,30 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 <p>The MPI window for the dictionary </p>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00080">80</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00081">81</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a62c4a8a82bcf3f38efe3b1e60859d119"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classthreads_1_1PthreadMutex.xhtml">threads::Mutex</a>* transfer::MPIWinCache::m_dictWinMutex</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Mutex for the dictionary window </p>
+
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00087">87</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -648,7 +698,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 <p>The MPI communicator </p>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00071">71</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00072">72</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -671,7 +721,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 <p>The MPI mutex to lock the blocks </p>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00077">77</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00078">78</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -694,7 +744,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 <p>The type MPI type of an element </p>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00092">92</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00099">99</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -717,7 +767,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 <p>The NUMA domain ID </p>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00074">74</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00075">75</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
@@ -740,7 +790,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of blocks on one rank </p>
 
-<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00086">86</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpiwincache_8h_source.xhtml#l00093">93</a> of file <a class="el" href="mpiwincache_8h_source.xhtml">mpiwincache.h</a>.</p>
 
 </div>
 </div>
