@@ -50,6 +50,7 @@
 #include "mpi/mpicomm.h"
 #include "mpi/mutex.h"
 #include "transfer/mpicache.h"
+#include "threads/mutex.h"
 #endif // ASAGI_NOMPI
 
 namespace transfer
@@ -82,6 +83,12 @@ private:
 	/** The MPI window used to access the cache */
 	MPI_Win m_cacheWin;
 
+	/** Mutex for the dictionary window */
+	threads::Mutex *m_dictWinMutex;
+
+	/** Mutex for the cache window */
+	threads::Mutex *m_cacheWinMutex;
+
 	/** Number of blocks on one rank */
 	unsigned long m_rankCacheSize;
 
@@ -99,6 +106,8 @@ public:
 		  m_mpiMutex(0L),
 		  m_dictWin(MPI_WIN_NULL),
 		  m_cacheWin(MPI_WIN_NULL),
+		  m_dictWinMutex(0L),
+		  m_cacheWinMutex(0L),
 		  m_rankCacheSize(0),
 		  m_blockSize(0),
 		  m_mpiType(MPI_DATATYPE_NULL)
@@ -110,6 +119,8 @@ public:
 		if (m_numaDomainId == 0) {
 			mpi::MPIComm::mpiLock.lock();
 			delete m_mpiMutex;
+			delete m_dictWinMutex;
+			delete m_cacheWinMutex;
 
 			if (m_dictWin != MPI_WIN_NULL)
 				MPI_Win_free(&m_dictWin);
@@ -153,6 +164,8 @@ public:
 		if (m_numaDomainId == 0) {
 			std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
 
+			m_dictWinMutex = new threads::Mutex();
+
 			if (MPI_Win_create(dictionary(),
 				sizeof(long) * dictEntrySize() * blockCount,
 				sizeof(long),
@@ -167,6 +180,9 @@ public:
 			if (err != asagi::Grid::SUCCESS)
 				return err;
 
+			// Create cache window mutex
+			m_cacheWinMutex = new threads::Mutex();
+
 			// Create the window to access the cache
 			unsigned int typeSize = type.size();
 
@@ -179,11 +195,19 @@ public:
 				return asagi::Grid::MPI_ERROR;
 		}
 
-		asagi::Grid::Error err = numaComm.broadcast(m_dictWin);
+		asagi::Grid::Error err = numaComm.broadcast(m_dictWinMutex);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
+		err = numaComm.broadcast(m_dictWin);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
 		err = numaComm.broadcast(m_mpiMutex);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
+		err = numaComm.broadcast(m_cacheWinMutex);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
@@ -213,14 +237,19 @@ public:
 		// Only lock library once, to avoid deadlocks
 		mpi::MPIComm::mpiLock.lock();
 
+#ifndef THREADSAFE_MPI
+		// Lock the window to make sure no other thread interferes between
+		// MPI_Win_lock and MPI_Win_unlock
+		// Not required if we need to make MPI calls thread safe anyway
+		// Include acquire() to avoid potential deadlocks
+		std::lock_guard<threads::Mutex> winLock(*m_dictWinMutex);
+#endif // THREADSAFE_MPI
+
 		m_mpiMutex->acquire(blockId);
 
 		// Update the directory and get a potential rank that stores the data
 
 		int mpiResult; NDBG_UNUSED(mpiResult);
-
-		// We do not need to lock MPI_Win_lock/MPI_Win_unlock like in MPIWinFull
-		// since this is handled by the MPI mutex.
 
 		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, dictRank,
 				MPI_MODE_NOCHECK, m_dictWin);
@@ -296,6 +325,13 @@ public:
 
 		int mpiResult; NDBG_UNUSED(mpiResult);
 
+#ifndef THREADSAFE_MPI
+		// Lock the window to make sure no other thread interferes between
+		// MPI_Win_lock and MPI_Win_unlock
+		// Not required if we need to make MPI calls thread safe anyway
+		std::lock_guard<threads::Mutex> winLock(*m_cacheWinMutex);
+#endif // THREADSAFE_MPI
+
 		// Lock remote window
 		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, rank,
 				MPI_MODE_NOCHECK, m_cacheWin);
@@ -370,6 +406,14 @@ public:
 		int mpiResult; NDBG_UNUSED(mpiResult);
 
 		std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
+
+#ifndef THREADSAFE_MPI
+		// Lock the window to make sure no other thread interferes between
+		// MPI_Win_lock and MPI_Win_unlock
+		// Not required if we need to make MPI calls thread safe anyway
+		// Include acquire() to avoid potential deadlocks
+		std::lock_guard<threads::Mutex> winLock(*m_dictWinMutex);
+#endif // THREADSAFE_MPI
 
 		m_mpiMutex->acquire(blockId);
 

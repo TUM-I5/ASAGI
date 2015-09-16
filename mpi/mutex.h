@@ -41,7 +41,6 @@
 #include "asagi.h"
 
 #include <cassert>
-#include <mutex>
 
 #include "utils/logger.h"
 
@@ -90,10 +89,7 @@ private:
 	/** The tag we use for send/recv */
 	int m_tag;
 
-	/**
-	 * Make sure that {@link acquire} and {@link release} are only called
-	 * by one thread
-	 */
+	/** Make sure that the MPI window is only accessed by one thread */
 	threads::Mutex m_threadMutex;
 public:
 	Mutex();
@@ -108,9 +104,9 @@ public:
 	 */
 	void acquire(unsigned long block)
 	{
-		std::lock_guard<threads::Mutex> lock(m_threadMutex);
-
 		int mpiResult; NDBG_UNUSED(mpiResult);
+
+		m_threadMutex.lock();
 
 		// add self to lock list and get all other locks
 		mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, m_homeRank,
@@ -133,6 +129,8 @@ public:
 		assert(mpiResult == MPI_SUCCESS);
 
 		mpiResult = MPI_Win_unlock(m_homeRank, m_window);
+
+		m_threadMutex.unlock();
 
 		// check to see if lock is already held
 		int i;
@@ -157,9 +155,9 @@ public:
 	 */
 	void release(unsigned long block)
 	{
-		std::lock_guard<threads::Mutex> lock(m_threadMutex);
-
 		int mpiResult; NDBG_UNUSED(mpiResult);
+
+		m_threadMutex.lock();
 
 		// remove self from waitlist
 		mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, m_homeRank,
@@ -183,6 +181,8 @@ public:
 
 		mpiResult = MPI_Win_unlock(m_homeRank, m_window);
 		assert(mpiResult == MPI_SUCCESS);
+
+		m_threadMutex.unlock();
 
 		// find the next rank waiting for the lock (use round robin)
 		for (int i = m_comm->rank(); i < (m_comm->size() - 1); i++) {
