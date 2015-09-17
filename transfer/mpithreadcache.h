@@ -44,6 +44,7 @@
 #include "asagi.h"
 
 #include <cassert>
+#include <mutex>
 #include <vector>
 
 #include "allocator/default.h"
@@ -280,6 +281,9 @@ private:
 	/** The type MPI type of an element */
 	MPI_Datatype m_mpiType;
 
+	/** Lock send-receive pairs to avoid threading issues */
+	threads::Mutex* m_sendRecvMutex;
+
 
 public:
 	MPIThreadCache()
@@ -293,7 +297,8 @@ public:
 		  m_deleterTag(-1),
 		  m_rankCacheSize(0),
 		  m_blockSize(0),
-		  m_mpiType(MPI_DATATYPE_NULL)
+		  m_mpiType(MPI_DATATYPE_NULL),
+		  m_sendRecvMutex(0L)
 	{
 	}
 
@@ -306,6 +311,7 @@ public:
 			mpi::CommThread::commThread.unregisterReceiver(m_deleterTag);
 
 			delete [] m_mutexes;
+			delete m_sendRecvMutex;
 		}
 	}
 
@@ -369,6 +375,8 @@ public:
 				.registerReceiver(mpiComm.comm(), m_deleter, m_deleterTag);
 			if (err != asagi::Grid::SUCCESS)
 				return err;
+
+			m_sendRecvMutex = new threads::Mutex();
 		}
 
 		asagi::Grid::Error err = numaComm.broadcast(m_mutexes);
@@ -388,6 +396,10 @@ public:
 			return err;
 
 		err = numaComm.broadcast(m_deleterTag);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
+		err = numaComm.broadcast(m_sendRecvMutex);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
@@ -412,6 +424,8 @@ public:
 
 		// Ask remote process
 		int mpiResult; NDBG_UNUSED(mpiResult);
+
+		std::lock_guard<threads::Mutex> lock(*m_sendRecvMutex);
 
 		mpi::CommThread::commThread.send(m_blockInfoTag, dictRank, dictOffset);
 
@@ -444,6 +458,8 @@ public:
 
 		assert(rank >= 0);
 		assert(rank != m_mpiComm->rank());
+
+		std::lock_guard<threads::Mutex> lock(*m_sendRecvMutex);
 
 		// Send the message to the remote rank
 		mpi::CommThread::commThread.send(m_transfererTag, rank, blockId);
