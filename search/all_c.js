@@ -14,6 +14,7 @@ var searchData=
   ['nexttagmutex',['nextTagMutex',['../classmpi_1_1Mutex.xhtml#acfc716a6eae80a7c1c96c8e7b7d394ce',1,'mpi::Mutex']]],
   ['node_5fhit',['NODE_HIT',['../classperf_1_1Counter.xhtml#a19ab3ea97990707e1787a16dbc70790fa87f2640bd2fd2e19ac8225275a823935',1,'perf::Counter']]],
   ['nodeblockcount',['nodeBlockCount',['../classgrid_1_1level_1_1Blocked.xhtml#a56d3a27c3a2763490a735fd50ae02673',1,'grid::level::Blocked']]],
+  ['nodelocalrank',['nodeLocalRank',['../group__cxx__interface.xhtml#ga7a59f91949d3c0e7fcf4e94581f63072',1,'asagi::Grid']]],
   ['nompicomm',['NoMPIComm',['../classmpi_1_1NoMPIComm.xhtml',1,'mpi']]],
   ['nompicomm_2eh',['nompicomm.h',['../nompicomm_8h.xhtml',1,'']]],
   ['nonuma',['NoNuma',['../classnuma_1_1NoNuma.xhtml',1,'numa']]],

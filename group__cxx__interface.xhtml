@@ -177,6 +177,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga0aab15297b382bad7031937533af7974"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga91fcbf09ab71b095bbd7f8851af250b3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cxx__interface.xhtml#ga91fcbf09ab71b095bbd7f8851af250b3">asagi::Grid::stopCommThread</a> ()</td></tr>
 <tr class="separator:ga91fcbf09ab71b095bbd7f8851af250b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7a59f91949d3c0e7fcf4e94581f63072"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cxx__interface.xhtml#ga7a59f91949d3c0e7fcf4e94581f63072">asagi::Grid::nodeLocalRank</a> (MPI_Comm comm=MPI_COMM_WORLD)</td></tr>
+<tr class="separator:ga7a59f91949d3c0e7fcf4e94581f63072"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
@@ -333,7 +335,7 @@ Functions</h2></td></tr>
 </dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="minimal_8cpp-example.xhtml#a2">minimal.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00046">46</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00050">50</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
 
 </div>
 </div>
@@ -367,7 +369,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00051">51</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00055">55</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
 
 </div>
 </div>
@@ -425,7 +427,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00056">56</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00060">60</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
 
 </div>
 </div>
@@ -881,6 +883,40 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ga7a59f91949d3c0e7fcf4e94581f63072"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int asagi::Grid::nodeLocalRank </td>
+          <td>(</td>
+          <td class="paramtype">MPI_Comm&#160;</td>
+          <td class="paramname"><em>comm</em> = <code>MPI_COMM_WORLD</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Computes the rank of the process on the node. This function can be used to determine the core, to which the communication threads should be pinned in <a class="el" href="group__cxx__interface.xhtml#ga0aab15297b382bad7031937533af7974">startCommThread</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">comm</td><td>The communicator that should be used </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The node local rank </dd></dl>
+
+<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00077">77</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="gab609e54ddac89b43ed5288f352fed556"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1073,7 +1109,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>SUCCESS</code> or an error </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00063">63</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00067">67</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
 
 </div>
 </div>
@@ -1099,7 +1135,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Stops the communication thread </p>
 
-<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00068">68</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8cpp_source.xhtml#l00072">72</a> of file <a class="el" href="asagi_8cpp_source.xhtml">asagi.cpp</a>.</p>
 
 </div>
 </div>
