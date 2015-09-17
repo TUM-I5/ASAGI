@@ -8,6 +8,6 @@
 <area shape="rect" id="node8" href="$classcache_1_1CacheManager.xhtml" title="Manages a block cache. " alt="" coords="649,415,801,444"/>
 <area shape="rect" id="node10" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="331,415,485,444"/>
 <area shape="rect" id="node18" href="$classmpi_1_1MPIComm.xhtml" title="mpi::MPIComm" alt="" coords="668,361,783,391"/>
-<area shape="rect" id="node12" href="$classcache_1_1CacheList.xhtml" title="Controls a list of blocks. " alt="" coords="347,508,469,537"/>
-<area shape="rect" id="node14" href="$classcache_1_1LRU.xhtml" title="cache::LRU" alt="" coords="48,472,139,501"/>
+<area shape="rect" id="node12" href="$classcache_1_1CacheList.xhtml" title="Controls a list of blocks. " alt="" coords="347,525,469,555"/>
+<area shape="rect" id="node14" href="$classcache_1_1LRU.xhtml" title="cache::LRU" alt="" coords="48,489,139,519"/>
 </map>
