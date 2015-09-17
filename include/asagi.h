@@ -372,6 +372,18 @@ public:
 	 * Stops the communication thread
 	 */
 	static void stopCommThread();
+
+	/**
+	 * @ingroup cxx_interface
+	 *
+	 * Computes the rank of the process on the node. This function can be used to
+	 * determine the core, to which the communication threads should be pinned in
+	 * {@link startCommThread}.
+	 *
+	 * @param comm The communicator that should be used
+	 * @return The node local rank
+	 */
+	static int nodeLocalRank(MPI_Comm comm = MPI_COMM_WORLD);
 #endif // ASAGI_NOMPI
 };
 
@@ -574,6 +586,13 @@ asagi_error asagi_start_comm_thread(int sched_cpu, MPI_Comm comm);
  * @see asagi::Grid::stopCommThread()
  */
 void asagi_stop_comm_thread();
+
+/**
+ * @ingroup c_interface
+ *
+ * @see asagi::Grid::nodeLocalRank(MPI_Comm)
+ */
+int asagi_node_local_rank(MPI_Comm comm);
 #endif
 
 #ifdef __cplusplus

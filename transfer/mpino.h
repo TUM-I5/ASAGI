@@ -149,7 +149,7 @@ public:
 	/**
 	 * Deletes information about a local stored block
 	 *
-	 * Stub for {@link MPIWindCache::deleteBlock} and
+	 * Stub for {@link MPIWinCache::deleteBlock} and
 	 * {@link MPIThreadCache::deleteBlock}
 	 */
 	void deleteBlock(long blockId, int dictRank, unsigned long dictOffset,

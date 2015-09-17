@@ -37,6 +37,10 @@
 
 #include "asagi.h"
 
+#include <cassert>
+
+#include "utils/logger.h"
+
 #include "grid/grid.h"
 #ifndef ASAGI_NOMPI
 #include "mpi/commthread.h"
@@ -69,6 +73,76 @@ void asagi::Grid::stopCommThread()
 {
 	mpi::CommThread::commThread.finialize();
 }
+
+int asagi::Grid::nodeLocalRank(MPI_Comm comm)
+{
+	// The main idea for this function is taken from:
+	// https://blogs.fau.de/wittmann/2013/02/mpi-node-local-rank-determination/
+	// http://git.rrze.uni-erlangen.de/gitweb/?p=apsm.git;a=blob;f=MpiNodeRank.cpp;hb=HEAD
+
+	int mpiResult; NDBG_UNUSED(mpiResult);
+
+	typedef char procName_t[MPI_MAX_PROCESSOR_NAME+1];
+
+	// Get the processor name
+	procName_t procName;
+	int procNameLength;
+
+	MPI_Get_processor_name(procName, &procNameLength);
+	assert(procNameLength <= MPI_MAX_PROCESSOR_NAME);
+
+	procName[procNameLength] = '\0';
+
+	// Compute Adler32 hash
+	const uint8_t* buffer = reinterpret_cast<const uint8_t*>(procName);
+	uint32_t s1 = 1;
+	uint32_t s2 = 0;
+
+	for (int i = 0; i < procNameLength; i++) {
+		s1 = (s1 + buffer[i]) % 65521;
+		s2 = (s2 + s1) % 65521;
+	}
+
+	uint32_t hash = (s2 << 16) | s1;
+	int rank;
+	mpiResult = MPI_Comm_rank(comm, &rank);
+	assert(mpiResult == MPI_SUCCESS);
+
+	MPI_Comm nodeComm;
+	mpiResult = MPI_Comm_split(comm, hash, rank, &nodeComm);
+	assert(mpiResult == MPI_SUCCESS);
+
+	// Gather all proc names of this node to detect Adler32 collisions
+	int nodeSize;
+	mpiResult = MPI_Comm_size(nodeComm, &nodeSize);
+	assert(mpiResult == MPI_SUCCESS);
+
+	procName_t* procNames = new procName_t[nodeSize];
+
+	mpiResult = MPI_Allgather(procName, MPI_MAX_PROCESSOR_NAME+1, MPI_CHAR,
+    	procNames, MPI_MAX_PROCESSOR_NAME+1, MPI_CHAR, nodeComm);
+	assert(mpiResult == MPI_SUCCESS);
+
+	// recv contains now an array of hostnames from all MPI ranks of
+	// this communicator. They are sorted ascending by the MPI rank.
+	int nodeRank, realNodeRank = 0;
+	mpiResult = MPI_Comm_rank(comm, &nodeRank);
+	assert(mpiResult == MPI_SUCCESS);
+
+	for (int i = 0; i < nodeRank; i++) {
+		if (strcmp(procName, procNames[i]) == 0)
+			// Detect false hash collisions
+			realNodeRank++;
+	}
+
+	mpiResult = MPI_Comm_free(&nodeComm);
+	assert(mpiResult == MPI_SUCCESS);
+
+	delete [] procNames;
+
+	return realNodeRank;
+}
+
 #endif // ASAGI_NOMPI
 
 // C interfae
@@ -188,5 +262,10 @@ asagi_error asagi_start_comm_thread(int sched_cpu, MPI_Comm comm)
 void asagi_stop_comm_thread()
 {
 	asagi::Grid::stopCommThread();
+}
+
+int asagi_node_local_rank(MPI_Comm comm)
+{
+	return asagi::Grid::nodeLocalRank(comm);
 }
 #endif // ASAGI_NOMPI

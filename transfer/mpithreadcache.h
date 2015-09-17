@@ -243,6 +243,7 @@ private:
 	/** The NUMA domain ID */
 	unsigned int m_numaDomainId;
 
+	/** The cache manager (required to lock blocks in cache) */
 	cache::CacheManager* m_cacheManager;
 
 	/** A list of mutexes (one for each block) */

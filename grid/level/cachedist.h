@@ -209,12 +209,6 @@ public:
 		// Free the block in the cache
 		this->cacheManager().unlock(cacheOffset);
 	}
-
-private:
-	void transfer()
-	{
-
-	}
 };
 
 /** Cached distributed level with NUMA */

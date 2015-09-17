@@ -79,6 +79,8 @@ void f90asagi_grid_close(int grid_id);
 asagi_error f90asagi_start_comm_thread(int sched_cpu, int comm);
 void f90asagi_stop_comm_thread();
 
+int f90asagi_node_local_rank(int comm);
+
 #ifdef __cplusplus
 }	// end extern "C"
 #endif

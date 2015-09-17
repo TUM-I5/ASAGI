@@ -74,6 +74,9 @@ public:
 	}
 
 protected:
+	/**
+	 * Initialize the the dictionary
+	 */
 	asagi::Grid::Error init(unsigned long blockCount,
 			numa::NumaComm &numaComm)
 	{

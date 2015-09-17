@@ -271,10 +271,6 @@ public:
 		}
 	}
 
-	MPI_Comm comm() {
-		return m_comm;
-	}
-
 private:
 	/**
 	 * Main function of the communication thread

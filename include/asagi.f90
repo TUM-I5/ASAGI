@@ -260,6 +260,14 @@ module asagi
       use, intrinsic :: iso_c_binding
     end subroutine asagi_stop_comm_thread
 
+    !> @ingroup f_interface
+    !!
+    !! @see asagi::Grid::nodeLocalRank
+    function asagi_node_local_rank( comm ) bind( c, name="f90asagi_node_local_rank" )
+        use, intrinsic :: iso_c_binding
+        integer( kind=c_int ), value :: comm
+        integer( kind=c_int )        :: asagi_node_local_rank
+    end function
   !> @cond ignore
   end interface
   !> @endcond ignore

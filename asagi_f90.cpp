@@ -226,3 +226,14 @@ void f90asagi_stop_comm_thread()
 	grid::Grid::stopCommThread();
 #endif // ASAGI_NOMPI
 }
+
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
+int f90asagi_node_local_rank(int comm)
+{
+#ifndef ASAGI_NOMPI
+	return grid::Grid::nodeLocalRank(MPI_Comm_f2c(comm));
+#endif // ASAGI_NOMPI
+	return 0;
+}

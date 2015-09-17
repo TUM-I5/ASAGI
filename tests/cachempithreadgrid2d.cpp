@@ -55,7 +55,16 @@ int main(int argc, char** argv)
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	Grid::startCommThread(-1-rank);
+	int size;
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+	// Compute node local rank
+	int nodeRank = Grid::nodeLocalRank();
+	if (rank != nodeRank)
+		// We assume that we use only one node for this test
+		logError() << "Rank not equal to node rank. Using more than one node for this test?";
+
+	Grid::startCommThread(2*nodeRank+1);
 
 	Grid* grid = Grid::create();
 	grid->setComm(MPI_COMM_WORLD);
