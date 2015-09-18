@@ -41,7 +41,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <sched.h>
+#include <pthread.h>
 
 int main(int argc, char* argv[])
 {
@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 	#pragma omp parallel
 	{
 		cpu_set_t mask;
-		sched_getaffinity(0, sizeof(cpu_set_t), &mask);
+		pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &mask);
 
 		int cpus = CPU_COUNT(&mask);
 
