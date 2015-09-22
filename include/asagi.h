@@ -44,7 +44,10 @@
 #define _ASAGI_H
 
 #ifndef ASAGI_NOMPI
+// Do not include MPI C++ bindings
+#define OMPI_SKIP_MPICXX
 #include <mpi.h>
+#undef OMPI_SKIP_MPICXX
 #endif
 
 #ifdef __cplusplus
