@@ -98,6 +98,9 @@ public:
 			return err;
 
 		if (level == 0) {
+			// Set dimensions
+			this->m_dimensions = m_levels[0].dimensions();
+
 			// Set min/max/...
 			for (unsigned int i = 0; i < m_levels[0].dimensions(); i++) {
 				this->m_min[i] = m_levels[0].min(i);

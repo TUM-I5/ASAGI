@@ -113,6 +113,14 @@ asagi_error f90asagi_grid_open(int grid_id, const char* filename,
 	return grid::Grid::f2c(grid_id)->open(filename, level);
 }
 
+/**
+ * This function is part of the C++ <-> Fortran interface
+ */
+int f90asagi_grid_dimensions(int grid_id)
+{
+	return grid::Grid::f2c(grid_id)->getDimensions();
+}
+
 // Min/Max functions
 
 /**

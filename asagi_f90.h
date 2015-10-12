@@ -60,6 +60,8 @@ void f90asagi_grid_set_param(int grid_id, const char* name,
 asagi_error f90asagi_grid_open(int grid_id, const char* filename,
 	int level);
 
+int f90asagi_grid_dimensions(int grid_id);
+
 double f90asagi_grid_min(int grid_id, int n);
 double f90asagi_grid_max(int grid_id, int n);
 

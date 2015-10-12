@@ -126,6 +126,11 @@ public:
 
 	asagi::Grid::Error open(const char* filename, unsigned int level = 0);
 
+	unsigned int getDimensions() const
+	{
+		return m_containers[0]->getDimensions();
+	}
+
 	double getMin(unsigned int n) const
 	{
 		return m_containers[0]->getMin(n);

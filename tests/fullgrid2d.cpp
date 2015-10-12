@@ -54,6 +54,11 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
+	if (grid->getDimensions() != 2) {
+		logError() << "Wrong number of dimensions";
+		return 1;
+	}
+
 	int value;
 
 	double coords[2];

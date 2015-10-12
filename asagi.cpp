@@ -191,7 +191,10 @@ asagi_error asagi_grid_open(asagi_grid* handle, const char* filename,
 	return handle->open(filename, level);
 }
 
-// Min/Max functions
+unsigned int asagi_grid_dimensions(asagi_grid* handle)
+{
+	return handle->getDimensions();
+}
 
 double asagi_grid_min(asagi_grid* handle, unsigned int n)
 {

@@ -145,6 +145,15 @@ module asagi
     
     !> @ingroup f_interface
     !!
+    !! @see agagi::Grid::getDimensions()
+    function asagi_grid_dimensions( grid_id ) bind( c, name="f90asagi_grid_dimensions" )
+      use, intrinsic :: iso_c_binding
+      integer( kind=c_int ), value :: grid_id
+      integer( kind=c_int )        :: asagi_grid_dimensions
+    end function asagi_grid_dimensions
+
+    !> @ingroup f_interface
+    !!
     !! @see asagi::Grid::getMin()
     function asagi_grid_min( grid_id, n ) bind( c, name="f90asagi_grid_min" )
       use, intrinsic :: iso_c_binding

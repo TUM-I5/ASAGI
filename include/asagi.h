@@ -180,6 +180,14 @@ public:
 
 	/**
 	 * @ingroup cxx_interface
+	 *
+	 * @brief Returns the number of dimensions loaded from the file
+	 * @return The number of dimensions of the grid
+	 */
+	virtual unsigned int getDimensions() const = 0;
+
+	/**
+	 * @ingroup cxx_interface
 	 * 
 	 * @param n The dimension
 	 * @return The minimum allowed coordinate in dimension <code>n</code>
@@ -497,6 +505,12 @@ asagi_error asagi_grid_open(asagi_grid* handle, const char* filename,
 /**
  * @ingroup c_interface
  * 
+ * @see asagi::Grid::getDimensions()
+ */
+unsigned int asagi_grid_dimensions(asagi_grid* handle);
+/**
+ * @ingroup c_interface
+ *
  * @see asagi::Grid::getMin()
  */
 double asagi_grid_min(asagi_grid* handle, unsigned int n);

@@ -70,6 +70,8 @@ private:
 	const ValuePosition m_valuePos;
 
 protected:
+	/** The number of dimensions (set by subclasses) */
+	unsigned int m_dimensions;
 	/** Minimum in each dimension (set by subclasses) */
 	double m_min[MAX_DIMENSIONS];
 	/** Maximum in each dimension (set by subclasses) */
@@ -84,7 +86,8 @@ public:
 			int timeDimension,
 			ValuePosition valuePos)
 		: m_comm(comm), m_numa(numa),
-		  m_timeDimension(timeDimension), m_valuePos(valuePos)
+		  m_timeDimension(timeDimension), m_valuePos(valuePos),
+		  m_dimensions(0)
 	{
 	}
 
@@ -112,6 +115,14 @@ public:
 			int cacheHandSpread,
 			unsigned int level) = 0;
 	
+	/**
+	 * @return The number of dimensions in the grid
+	 */
+	unsigned int getDimensions() const
+	{
+		return m_dimensions;
+	}
+
 	/**
 	 * @return The minimum range of the grid in dimension <code>n</code>
 	 */
