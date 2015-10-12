@@ -102,6 +102,8 @@ Functions/Subroutines</h2></td></tr>
 <tr class="separator:ga2acce6f2160bf85841b68bc0b173134f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaaca578520dc355914e1c115c2407afae"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__f__interface.xhtml#gaaca578520dc355914e1c115c2407afae">asagi::asagi_grid_set_threads</a> (grid_id, threads)</td></tr>
 <tr class="separator:gaaca578520dc355914e1c115c2407afae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad353e02858f33d49730ce1a2cfba354d"><td class="memItemLeft" align="right" valign="top">integer(kind=c_int) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__f__interface.xhtml#gad353e02858f33d49730ce1a2cfba354d">asagi::asagi_grid_dimensions</a> (grid_id)</td></tr>
+<tr class="separator:gad353e02858f33d49730ce1a2cfba354d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga7b9a423a8552db2a56e368c4ba3b27fb"><td class="memItemLeft" align="right" valign="top">real(kind=c_double) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__f__interface.xhtml#ga7b9a423a8552db2a56e368c4ba3b27fb">asagi::asagi_grid_min</a> (grid_id, n)</td></tr>
 <tr class="separator:ga7b9a423a8552db2a56e368c4ba3b27fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafab8bdc2a3d4c20800172ba0c8dc0d15"><td class="memItemLeft" align="right" valign="top">real(kind=c_double) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__f__interface.xhtml#gafab8bdc2a3d4c20800172ba0c8dc0d15">asagi::asagi_grid_max</a> (grid_id, n)</td></tr>
@@ -156,7 +158,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#gaa28e13bf58bc6dc2f86ea3f8c43047c6">asagi::Grid::close(asagi::Grid*)</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00241">241</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00250">250</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -175,7 +177,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga4e784761804db6e37ef7b3f6e0892ece">asagi::Grid::create()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00279">279</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00288">288</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -194,7 +196,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga75e42997d6c956117fc6eb3952fb6e98">asagi::Grid::createArray()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00298">298</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00307">307</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -270,7 +272,26 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga02c99d3ffebbabb1d53be13b4d6d56d2">asagi::Grid::getDelta()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00360">360</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00369">369</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="gad353e02858f33d49730ce1a2cfba354d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer( kind=c_int ) function asagi::asagi_grid_dimensions </td>
+          <td>(</td>
+          <td class="paramtype">integer( kind=c_int )&#160;</td>
+          <td class="paramname"><em>grid_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section see"><dt>See also</dt><dd>agagi::Grid::getDimensions() </dd></dl>
+
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00149">149</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -311,7 +332,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#gac08815278ed38f43f717201a72c742ce">asagi::Grid::getBuf()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00486">486</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00495">495</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -346,7 +367,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga0a9f96c39268b74d8a412ecb6218014f">asagi::Grid::getByte()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00381">381</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00390">390</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -381,7 +402,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga0617625c96041c1c732afaf6c2624ed8">asagi::Grid::getDouble()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00465">465</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00474">474</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -416,7 +437,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#gacdb18690519c4df3ee13927998d412d5">asagi::Grid::getFloat()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00444">444</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00453">453</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -451,7 +472,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#gabb194a1dd819b62a4d52f5826debcc7a">asagi::Grid::getInt()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00402">402</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00411">411</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -486,7 +507,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga04debdd3a9884ad7266c756333dd623c">asagi::Grid::getLong()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00423">423</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00432">432</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -515,7 +536,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#gada74d5b6aa2d5d93ef4ef012b4a80d18">asagi::Grid::getMax()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00159">159</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00168">168</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -544,7 +565,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga55f03c25f353186444122c576e0f05c4">asagi::Grid::getMin()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00149">149</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00158">158</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -579,7 +600,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#gab609e54ddac89b43ed5288f352fed556" title="Loads values from a NetCDF file. ">asagi::Grid::open()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00339">339</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00348">348</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -649,7 +670,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga7079b291616d0ab9ffa5666ee5c25822" title="Changes a grid parameter. ">asagi::Grid::setParam()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00317">317</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00326">326</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -697,7 +718,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga64421cf13795e1c85e9218c6e3b87515">asagi::Grid::getVarSize()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00178">178</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00187">187</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -716,7 +737,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga7a59f91949d3c0e7fcf4e94581f63072">asagi::Grid::nodeLocalRank</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00266">266</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00275">275</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -745,7 +766,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga0aab15297b382bad7031937533af7974">asagi::Grid::startCommThread</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00249">249</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00258">258</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>
@@ -763,7 +784,7 @@ Functions/Subroutines</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__cxx__interface.xhtml#ga91fcbf09ab71b095bbd7f8851af250b3">asagi::Grid::stopCommThread</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00259">259</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8f90_source.xhtml#l00268">268</a> of file <a class="el" href="asagi_8f90_source.xhtml">asagi.f90</a>.</p>
 
 </div>
 </div>

@@ -143,6 +143,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gab609e54ddac89b43ed5288f352fed556"><td class="memItemLeft" align="right" valign="top">virtual Error&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cxx__interface.xhtml#gab609e54ddac89b43ed5288f352fed556">asagi::Grid::open</a> (const char *filename, unsigned int level=0)=0</td></tr>
 <tr class="memdesc:gab609e54ddac89b43ed5288f352fed556"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads values from a NetCDF file.  <a href="#gab609e54ddac89b43ed5288f352fed556">More...</a><br /></td></tr>
 <tr class="separator:gab609e54ddac89b43ed5288f352fed556"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabc91c13477bdddcb51129c9a22e0d4ea"><td class="memItemLeft" align="right" valign="top">virtual unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cxx__interface.xhtml#gabc91c13477bdddcb51129c9a22e0d4ea">asagi::Grid::getDimensions</a> () const =0</td></tr>
+<tr class="memdesc:gabc91c13477bdddcb51129c9a22e0d4ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of dimensions loaded from the file.  <a href="#gabc91c13477bdddcb51129c9a22e0d4ea">More...</a><br /></td></tr>
+<tr class="separator:gabc91c13477bdddcb51129c9a22e0d4ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga55f03c25f353186444122c576e0f05c4"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cxx__interface.xhtml#ga55f03c25f353186444122c576e0f05c4">asagi::Grid::getMin</a> (unsigned int n) const =0</td></tr>
 <tr class="separator:ga55f03c25f353186444122c576e0f05c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gada74d5b6aa2d5d93ef4ef012b4a80d18"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cxx__interface.xhtml#gada74d5b6aa2d5d93ef4ef012b4a80d18">asagi::Grid::getMax</a> (unsigned int n) const =0</td></tr>
@@ -301,7 +304,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="asagi_8h_source.xhtml#l00346">346</a> of file <a class="el" href="asagi_8h_source.xhtml">asagi.h</a>.</p>
+<p>Definition at line <a class="el" href="asagi_8h_source.xhtml#l00354">354</a> of file <a class="el" href="asagi_8h_source.xhtml">asagi.h</a>.</p>
 
 </div>
 </div>
@@ -608,6 +611,34 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The difference of two coordinates in dimension <code>n</code> </dd></dl>
 
 <p>Implemented in <a class="el" href="classgrid_1_1Grid.xhtml#a448ef291acb809cbdf0dbe549215aa57">grid::Grid</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="gabc91c13477bdddcb51129c9a22e0d4ea"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual unsigned int asagi::Grid::getDimensions </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the number of dimensions loaded from the file. </p>
+<dl class="section return"><dt>Returns</dt><dd>The number of dimensions of the grid </dd></dl>
+
+<p>Implemented in <a class="el" href="classgrid_1_1Grid.xhtml#a80f36b691168bc7a549d7f3b5790f5f2">grid::Grid</a>.</p>
 
 </div>
 </div>

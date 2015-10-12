@@ -124,6 +124,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae5532e50ac387d7a98facff8685dff0b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1Container.xhtml#ae5532e50ac387d7a98facff8685dff0b">init</a> (const char *filename, const char *varname, const int *blockSize, unsigned int cacheSize, int cacheHandSpread, unsigned int level)=0</td></tr>
 <tr class="memdesc:ae5532e50ac387d7a98facff8685dff0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a level of the container.  <a href="#ae5532e50ac387d7a98facff8685dff0b">More...</a><br /></td></tr>
 <tr class="separator:ae5532e50ac387d7a98facff8685dff0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba52e72021950a4ce8b14124ed86d60a"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1Container.xhtml#aba52e72021950a4ce8b14124ed86d60a">getDimensions</a> () const </td></tr>
+<tr class="separator:aba52e72021950a4ce8b14124ed86d60a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31d23ab10ee912e710ae5391cca903cb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1Container.xhtml#a31d23ab10ee912e710ae5391cca903cb">getMin</a> (unsigned int n) const </td></tr>
 <tr class="separator:a31d23ab10ee912e710ae5391cca903cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb92535fa7c02d63e1e4c20dc9ddc820"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1Container.xhtml#abb92535fa7c02d63e1e4c20dc9ddc820">getMax</a> (unsigned int n) const </td></tr>
@@ -158,6 +160,8 @@ Protected Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
+<tr class="memitem:aaee0a515548a20caa5efa553da2576e0"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1Container.xhtml#aaee0a515548a20caa5efa553da2576e0">m_dimensions</a></td></tr>
+<tr class="separator:aaee0a515548a20caa5efa553da2576e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bb2cc7190d005f686a851a65024ae86"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1Container.xhtml#a0bb2cc7190d005f686a851a65024ae86">m_min</a> [MAX_DIMENSIONS]</td></tr>
 <tr class="separator:a0bb2cc7190d005f686a851a65024ae86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af89aef93b3375a2633ca38ed010a9ff8"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgrid_1_1Container.xhtml#af89aef93b3375a2633ca38ed010a9ff8">m_max</a> [MAX_DIMENSIONS]</td></tr>
@@ -224,7 +228,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Constructs a new container </p>
 
-<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00082">82</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
+<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00084">84</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
 
 </div>
 </div>
@@ -251,7 +255,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The communicator for this container </dd></dl>
 
-<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00184">184</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
+<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00195">195</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
 
 </div>
 </div>
@@ -416,6 +420,32 @@ Private Attributes</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The difference between to grid cells </dd></dl>
 
 <p>Implemented in <a class="el" href="classgrid_1_1SimpleContainer.xhtml#ae0ffee888db614cf63d00883e48dfb38">grid::SimpleContainer&lt; Level, Type &gt;</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aba52e72021950a4ce8b14124ed86d60a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int grid::Container::getDimensions </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of dimensions in the grid </dd></dl>
+
+<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00121">121</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
 
 </div>
 </div>
@@ -606,7 +636,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The maximum range of the grid in dimension <code>n</code> </dd></dl>
 
-<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00128">128</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
+<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00139">139</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
 
 </div>
 </div>
@@ -633,7 +663,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The minimum range of the grid in dimension <code>n</code> </dd></dl>
 
-<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00118">118</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
+<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00129">129</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
 
 </div>
 </div>
@@ -734,7 +764,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The NUMA communicator for this container </dd></dl>
 
-<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00192">192</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
+<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00203">203</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
 
 </div>
 </div>
@@ -760,7 +790,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The time dimension or -1 if not time dimension is set </dd></dl>
 
-<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00200">200</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
+<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00211">211</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
 
 </div>
 </div>
@@ -786,7 +816,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The value position for this container </dd></dl>
 
-<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00208">208</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
+<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00219">219</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
 
 </div>
 </div>
@@ -814,6 +844,29 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aaee0a515548a20caa5efa553da2576e0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int grid::Container::m_dimensions</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>The number of dimensions (set by subclasses) </p>
+
+<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00074">74</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="af89aef93b3375a2633ca38ed010a9ff8"></a>
 <div class="memitem">
 <div class="memproto">
@@ -833,7 +886,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum in each dimension (set by subclasses) </p>
 
-<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00076">76</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
+<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00078">78</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
 
 </div>
 </div>
@@ -856,7 +909,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Minimum in each dimension (set by subclasses) </p>
 
-<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00074">74</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
+<p>Definition at line <a class="el" href="container_8h_source.xhtml#l00076">76</a> of file <a class="el" href="container_8h_source.xhtml">container.h</a>.</p>
 
 </div>
 </div>
