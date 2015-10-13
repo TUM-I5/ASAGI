@@ -73,12 +73,12 @@ public:
 		: Blocked<Type>(comm, numa, type),
 		  m_cache(0L)
 	{
-		if (&this->numa() && this->numaDomainId() == 0)
-			this->numa().template free<Allocator>(m_cache);
 	}
 
 	virtual ~Cache()
 	{
+		if (&this->numa() && this->numaDomainId() == 0)
+			this->numa().template free<Allocator>(m_cache);
 	}
 
 	/**
