@@ -82,6 +82,8 @@ public:
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		mpi::CommThread::commThread.send(tag, rank, 42);
 
+		MPI_Barrier(MPI_COMM_WORLD);
+
 		mpi::CommThread::commThread.unregisterReceiver(tag);
 
 		mpi::CommThread::commThread.finialize();

@@ -283,10 +283,17 @@ private:
 
 			MPI_Recv(&data, 1, MPI_MESSAGE, MPI_ANY_SOURCE, MPI_ANY_TAG, commThread.m_comm, &status);
 
-			if (status.MPI_TAG == EXIT_TAG)
+			if (status.MPI_TAG == EXIT_TAG) {
+				if (status.MPI_SOURCE != commThread.m_rank)
+					logError() << "Rank is not allowed to send exit command";
+
 				break;
+			}
 
 			if (status.MPI_TAG == UNREG_TAG) {
+				if (status.MPI_SOURCE != commThread.m_rank)
+					logError() << "Rank is not allowed to send unregister command";
+
 				commThread.m_receiver.erase(data);
 				commThread.m_lock.unlock(); // Release the lock from unregisterReceiver
 				continue;
