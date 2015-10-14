@@ -1,3 +1,4 @@
 <map id="transfer::MPIThreadFull" name="transfer::MPIThreadFull">
-<area shape="rect" id="node2" href="$classmpi_1_1Receiver.xhtml" title="mpi::Receiver" alt="" coords="33,5,135,35"/>
+<area shape="rect" id="node2" href="$classmpi_1_1Receiver.xhtml" title="mpi::Receiver" alt="" coords="5,5,107,35"/>
+<area shape="rect" id="node4" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="131,5,285,35"/>
 </map>

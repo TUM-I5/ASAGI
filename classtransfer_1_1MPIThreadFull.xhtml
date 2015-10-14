@@ -111,7 +111,7 @@ Inheritance diagram for transfer::MPIThreadFull:</div>
 <div class="dynheader">
 Collaboration diagram for transfer::MPIThreadFull:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classtransfer_1_1MPIThreadFull__coll__graph.svg" width="168" height="118"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classtransfer_1_1MPIThreadFull__coll__graph.svg" width="299" height="136"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.xhtml">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -140,6 +140,8 @@ Private Attributes</h2></td></tr>
 <tr class="separator:ac0ac8fab6c9a81ba2d8df289fbca28aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06a5d28f7bbf71dce612d0d362afb937"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadFull.xhtml#a06a5d28f7bbf71dce612d0d362afb937">m_tag</a></td></tr>
 <tr class="separator:a06a5d28f7bbf71dce612d0d362afb937"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab35aa95d484be66364cfc245e3d8cd8a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classthreads_1_1PthreadMutex.xhtml">threads::Mutex</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadFull.xhtml#ab35aa95d484be66364cfc245e3d8cd8a">m_sendRecvMutex</a></td></tr>
+<tr class="separator:ab35aa95d484be66364cfc245e3d8cd8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -217,7 +219,7 @@ Additional Inherited Members</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpithreadfull_8h_source.xhtml#l00121">121</a> of file <a class="el" href="mpithreadfull_8h_source.xhtml">mpithreadfull.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadfull_8h_source.xhtml#l00128">128</a> of file <a class="el" href="mpithreadfull_8h_source.xhtml">mpithreadfull.h</a>.</p>
 
 </div>
 </div>
@@ -263,7 +265,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classmpi_1_1Receiver.xhtml#a017e40bc2af6e19033a445b05dbd0362">mpi::Receiver</a>.</p>
 
-<p>Definition at line <a class="el" href="mpithreadfull_8h_source.xhtml#l00167">167</a> of file <a class="el" href="mpithreadfull_8h_source.xhtml">mpithreadfull.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadfull_8h_source.xhtml#l00182">182</a> of file <a class="el" href="mpithreadfull_8h_source.xhtml">mpithreadfull.h</a>.</p>
 
 </div>
 </div>
@@ -314,7 +316,7 @@ Additional Inherited Members</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpithreadfull_8h_source.xhtml#l00156">156</a> of file <a class="el" href="mpithreadfull_8h_source.xhtml">mpithreadfull.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadfull_8h_source.xhtml#l00169">169</a> of file <a class="el" href="mpithreadfull_8h_source.xhtml">mpithreadfull.h</a>.</p>
 
 </div>
 </div>
@@ -431,6 +433,29 @@ Additional Inherited Members</h2></td></tr>
 <p>The NUMA domain ID </p>
 
 <p>Definition at line <a class="el" href="mpithreadfull_8h_source.xhtml#l00084">84</a> of file <a class="el" href="mpithreadfull_8h_source.xhtml">mpithreadfull.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab35aa95d484be66364cfc245e3d8cd8a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classthreads_1_1PthreadMutex.xhtml">threads::Mutex</a>* transfer::MPIThreadFull::m_sendRecvMutex</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Lock send-receive pairs to avoid threading issues </p>
+
+<p>Definition at line <a class="el" href="mpithreadfull_8h_source.xhtml#l00096">96</a> of file <a class="el" href="mpithreadfull_8h_source.xhtml">mpithreadfull.h</a>.</p>
 
 </div>
 </div>
