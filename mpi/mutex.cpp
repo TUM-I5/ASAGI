@@ -43,10 +43,9 @@ mpi::Mutex::Mutex()
 	  m_lock(0L),
 	  m_lockCopy(0L),
 	  m_window(MPI_WIN_NULL),
-	  m_otherRanksType(MPI_DATATYPE_NULL)
+	  m_otherRanksType(MPI_DATATYPE_NULL),
+	  m_tag(0)
 {
-	std::lock_guard<threads::Mutex> lock(nextTagMutex);
-	m_tag = nextTag++;
 }
 
 /**
@@ -85,6 +84,13 @@ asagi::Grid::Error mpi::Mutex::init(const MPIComm& comm)
 		return asagi::Grid::MPI_ERROR;
 	
 	size_t windowSize = 0;
+
+	// select the tag
+	nextTagMutex.lock();
+	if (MPI_Allreduce(MPI_IN_PLACE, &nextTag, 1, MPI_INT, MPI_MAX, comm.comm())
+			!= MPI_SUCCESS)
+	m_tag = nextTag++;
+	nextTagMutex.unlock();
 
 	if (comm.rank() == m_homeRank) {
 		windowSize = sizeof(long) * comm.size();

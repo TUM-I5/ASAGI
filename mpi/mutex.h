@@ -41,6 +41,7 @@
 #include "asagi.h"
 
 #include <cassert>
+#include <mutex>
 
 #include "utils/logger.h"
 
@@ -106,7 +107,10 @@ public:
 	{
 		int mpiResult; NDBG_UNUSED(mpiResult);
 
-		m_threadMutex.lock();
+		// It is only possible to let one thread wait on this mutex,
+		// otherwise the wrong thread might receive the wakeup message
+		// TODO Find a better way to do this
+		std::lock_guard<threads::Mutex> lock(m_threadMutex);
 
 		// add self to lock list and get all other locks
 		mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, m_homeRank,
@@ -129,8 +133,6 @@ public:
 		assert(mpiResult == MPI_SUCCESS);
 
 		mpiResult = MPI_Win_unlock(m_homeRank, m_window);
-
-		m_threadMutex.unlock();
 
 		// check to see if lock is already held
 		int i;
@@ -157,7 +159,7 @@ public:
 	{
 		int mpiResult; NDBG_UNUSED(mpiResult);
 
-		m_threadMutex.lock();
+		std::lock_guard<threads::Mutex> lock(m_threadMutex);
 
 		// remove self from waitlist
 		mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, m_homeRank,
@@ -181,8 +183,6 @@ public:
 
 		mpiResult = MPI_Win_unlock(m_homeRank, m_window);
 		assert(mpiResult == MPI_SUCCESS);
-
-		m_threadMutex.unlock();
 
 		// find the next rank waiting for the lock (use round robin)
 		for (int i = m_comm->rank(); i < (m_comm->size() - 1); i++) {
