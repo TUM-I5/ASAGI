@@ -103,83 +103,89 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;          m_lock(0L),</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;          m_lockCopy(0L),</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;          m_window(MPI_WIN_NULL),</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;          m_otherRanksType(MPI_DATATYPE_NULL)</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;{</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        std::lock_guard&lt;threads::Mutex&gt; lock(nextTagMutex);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        m_tag = nextTag++;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;}</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
-<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="classmpi_1_1Mutex.xhtml#a68a6889ca4efe80ac06df9006bc9bb01">   55</a></span>&#160;<a class="code" href="classmpi_1_1Mutex.xhtml#a68a6889ca4efe80ac06df9006bc9bb01">mpi::Mutex::~Mutex</a>()</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;{</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordflow">if</span> (m_window != MPI_WIN_NULL)</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                MPI_Win_free(&amp;m_window);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        MPI_Free_mem(m_lock);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keyword">delete</span> [] m_lockCopy;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        MPI_Type_free(&amp;m_otherRanksType);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;}</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
-<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classmpi_1_1Mutex.xhtml#a99a23d6377a35328dd01d49838e4a586">   73</a></span>&#160;<a class="code" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a> <a class="code" href="classmpi_1_1Mutex.xhtml#a99a23d6377a35328dd01d49838e4a586">mpi::Mutex::init</a>(<span class="keyword">const</span> <a class="code" href="classmpi_1_1MPIComm.xhtml">MPIComm</a>&amp; comm)</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;{</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        m_comm = &amp;comm;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keywordflow">if</span> (comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() == 0)</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;                <span class="comment">// Skip the rand initialization</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                <span class="comment">// We only want to distribute different mutexes among different</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                <span class="comment">// ranks. No need for true randomness</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;                m_homeRank = rand() % comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a2499a3f76a00ce668c90263cf811c9d3">size</a>();</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="comment">// Distribute to homeRank to all processes</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordflow">if</span>(MPI_Bcast(&amp;m_homeRank, 1, MPI_INT, 0, comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a4a20ee50b25a8736c14c2f0c1f851cc3">comm</a>()) != MPI_SUCCESS)</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69">asagi::Grid::MPI_ERROR</a>;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordtype">size_t</span> windowSize = 0;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">if</span> (comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() == m_homeRank) {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;                windowSize = <span class="keyword">sizeof</span>(long) * comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a2499a3f76a00ce668c90263cf811c9d3">size</a>();</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;                </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;                <span class="keywordflow">if</span> (MPI_Alloc_mem(windowSize,</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;                        MPI_INFO_NULL, &amp;m_lock) != MPI_SUCCESS)</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;                        <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69">asagi::Grid::MPI_ERROR</a>;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                </div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;                <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a2499a3f76a00ce668c90263cf811c9d3">size</a>(); i++) {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;                        m_lock[i] = -1;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;                }</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        }</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="keywordflow">if</span> (MPI_Win_create(m_lock,</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                windowSize,</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;                <span class="keyword">sizeof</span>(<span class="keywordtype">long</span>),</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;                MPI_INFO_NULL,</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;                comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a4a20ee50b25a8736c14c2f0c1f851cc3">comm</a>(),</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                &amp;m_window) != MPI_SUCCESS)</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69">asagi::Grid::MPI_ERROR</a>;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="comment">// Create the mpi datatype</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        <span class="keywordtype">int</span> blockLenght[2] = {comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>(), comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a2499a3f76a00ce668c90263cf811c9d3">size</a>() - comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() - 1};</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        <span class="keywordtype">int</span> displacements[2] = {0, comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() + 1};</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        <span class="keywordflow">if</span> (MPI_Type_indexed(2, blockLenght, displacements,</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                MPI_LONG, &amp;m_otherRanksType) != MPI_SUCCESS)</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69">asagi::Grid::MPI_ERROR</a>;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keywordflow">if</span> (MPI_Type_commit(&amp;m_otherRanksType) != MPI_SUCCESS)</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69">asagi::Grid::MPI_ERROR</a>;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        <span class="comment">// Used to fetch the lock array</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        m_lockCopy = <span class="keyword">new</span> <span class="keywordtype">long</span>[comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a2499a3f76a00ce668c90263cf811c9d3">size</a>()-1];</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a69656f79342520e170ee22f4dfcb6d29">asagi::Grid::SUCCESS</a>;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;}</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="keywordtype">int</span> <a class="code" href="classmpi_1_1Mutex.xhtml#aa9558a618fa0228cbf6452e1241d6fcd">mpi::Mutex::nextTag</a> = 0;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;          m_otherRanksType(MPI_DATATYPE_NULL),</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;          m_tag(0)</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;{</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;}</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classmpi_1_1Mutex.xhtml#a68a6889ca4efe80ac06df9006bc9bb01">   54</a></span>&#160;<a class="code" href="classmpi_1_1Mutex.xhtml#a68a6889ca4efe80ac06df9006bc9bb01">mpi::Mutex::~Mutex</a>()</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;{</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">if</span> (m_window != MPI_WIN_NULL)</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                MPI_Win_free(&amp;m_window);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        MPI_Free_mem(m_lock);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keyword">delete</span> [] m_lockCopy;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        MPI_Type_free(&amp;m_otherRanksType);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;}</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="classmpi_1_1Mutex.xhtml#a99a23d6377a35328dd01d49838e4a586">   72</a></span>&#160;<a class="code" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a> <a class="code" href="classmpi_1_1Mutex.xhtml#a99a23d6377a35328dd01d49838e4a586">mpi::Mutex::init</a>(<span class="keyword">const</span> <a class="code" href="classmpi_1_1MPIComm.xhtml">MPIComm</a>&amp; comm)</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;{</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        m_comm = &amp;comm;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        <span class="keywordflow">if</span> (comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() == 0)</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;                <span class="comment">// Skip the rand initialization</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;                <span class="comment">// We only want to distribute different mutexes among different</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                <span class="comment">// ranks. No need for true randomness</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                m_homeRank = rand() % comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a2499a3f76a00ce668c90263cf811c9d3">size</a>();</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        </div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="comment">// Distribute to homeRank to all processes</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keywordflow">if</span>(MPI_Bcast(&amp;m_homeRank, 1, MPI_INT, 0, comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a4a20ee50b25a8736c14c2f0c1f851cc3">comm</a>()) != MPI_SUCCESS)</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69">asagi::Grid::MPI_ERROR</a>;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <span class="keywordtype">size_t</span> windowSize = 0;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <span class="comment">// select the tag</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        nextTagMutex.lock();</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordflow">if</span> (MPI_Allreduce(MPI_IN_PLACE, &amp;nextTag, 1, MPI_INT, MPI_MAX, comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a4a20ee50b25a8736c14c2f0c1f851cc3">comm</a>())</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;                        != MPI_SUCCESS)</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        m_tag = nextTag++;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        nextTagMutex.unlock();</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <span class="keywordflow">if</span> (comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() == m_homeRank) {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;                windowSize = <span class="keyword">sizeof</span>(long) * comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a2499a3f76a00ce668c90263cf811c9d3">size</a>();</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;                </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;                <span class="keywordflow">if</span> (MPI_Alloc_mem(windowSize,</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;                        MPI_INFO_NULL, &amp;m_lock) != MPI_SUCCESS)</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                        <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69">asagi::Grid::MPI_ERROR</a>;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a2499a3f76a00ce668c90263cf811c9d3">size</a>(); i++) {</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;                        m_lock[i] = -1;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;                }</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        }</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        <span class="keywordflow">if</span> (MPI_Win_create(m_lock,</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;                windowSize,</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;                <span class="keyword">sizeof</span>(<span class="keywordtype">long</span>),</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                MPI_INFO_NULL,</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;                comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a4a20ee50b25a8736c14c2f0c1f851cc3">comm</a>(),</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;                &amp;m_window) != MPI_SUCCESS)</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69">asagi::Grid::MPI_ERROR</a>;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        </div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="comment">// Create the mpi datatype</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="keywordtype">int</span> blockLenght[2] = {comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>(), comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a2499a3f76a00ce668c90263cf811c9d3">size</a>() - comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() - 1};</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <span class="keywordtype">int</span> displacements[2] = {0, comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#acd622dade32fc1ed4862e8935bf4a0dd">rank</a>() + 1};</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        <span class="keywordflow">if</span> (MPI_Type_indexed(2, blockLenght, displacements,</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;                MPI_LONG, &amp;m_otherRanksType) != MPI_SUCCESS)</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69">asagi::Grid::MPI_ERROR</a>;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <span class="keywordflow">if</span> (MPI_Type_commit(&amp;m_otherRanksType) != MPI_SUCCESS)</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69">asagi::Grid::MPI_ERROR</a>;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        </div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="comment">// Used to fetch the lock array</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        m_lockCopy = <span class="keyword">new</span> <span class="keywordtype">long</span>[comm.<a class="code" href="classmpi_1_1MPIComm.xhtml#a2499a3f76a00ce668c90263cf811c9d3">size</a>()-1];</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<a class="code" href="classthreads_1_1PthreadMutex.xhtml">threads::Mutex</a> <a class="code" href="classmpi_1_1Mutex.xhtml#acfc716a6eae80a7c1c96c8e7b7d394ce">mpi::Mutex::nextTagMutex</a>;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a69656f79342520e170ee22f4dfcb6d29">asagi::Grid::SUCCESS</a>;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;}</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="keywordtype">int</span> <a class="code" href="classmpi_1_1Mutex.xhtml#aa9558a618fa0228cbf6452e1241d6fcd">mpi::Mutex::nextTag</a> = 0;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<a class="code" href="classthreads_1_1PthreadMutex.xhtml">threads::Mutex</a> <a class="code" href="classmpi_1_1Mutex.xhtml#acfc716a6eae80a7c1c96c8e7b7d394ce">mpi::Mutex::nextTagMutex</a>;</div>
 <div class="ttc" id="group__cxx__interface_xhtml_gac1191f4df7554b1b99e515962ebc2bb5"><div class="ttname"><a href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a></div><div class="ttdeci">Error</div><div class="ttdef"><b>Definition:</b> <a href="asagi_8h_source.xhtml#l00092">asagi.h:92</a></div></div>
 <div class="ttc" id="classmpi_1_1MPIComm_xhtml"><div class="ttname"><a href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a></div><div class="ttdef"><b>Definition:</b> <a href="mpicomm_8h_source.xhtml#l00073">mpicomm.h:73</a></div></div>
-<div class="ttc" id="classmpi_1_1Mutex_xhtml_a99a23d6377a35328dd01d49838e4a586"><div class="ttname"><a href="classmpi_1_1Mutex.xhtml#a99a23d6377a35328dd01d49838e4a586">mpi::Mutex::init</a></div><div class="ttdeci">asagi::Grid::Error init(const MPIComm &amp;comm)</div><div class="ttdef"><b>Definition:</b> <a href="mutex_8cpp_source.xhtml#l00073">mutex.cpp:73</a></div></div>
+<div class="ttc" id="classmpi_1_1Mutex_xhtml_a99a23d6377a35328dd01d49838e4a586"><div class="ttname"><a href="classmpi_1_1Mutex.xhtml#a99a23d6377a35328dd01d49838e4a586">mpi::Mutex::init</a></div><div class="ttdeci">asagi::Grid::Error init(const MPIComm &amp;comm)</div><div class="ttdef"><b>Definition:</b> <a href="mutex_8cpp_source.xhtml#l00072">mutex.cpp:72</a></div></div>
 <div class="ttc" id="classmpi_1_1Mutex_xhtml_acfc716a6eae80a7c1c96c8e7b7d394ce"><div class="ttname"><a href="classmpi_1_1Mutex.xhtml#acfc716a6eae80a7c1c96c8e7b7d394ce">mpi::Mutex::nextTagMutex</a></div><div class="ttdeci">static threads::Mutex nextTagMutex</div><div class="ttdef"><b>Definition:</b> <a href="mpi_2mutex_8h_source.xhtml#l00210">mutex.h:210</a></div></div>
 <div class="ttc" id="group__cxx__interface_xhtml_ggac1191f4df7554b1b99e515962ebc2bb5a69656f79342520e170ee22f4dfcb6d29"><div class="ttname"><a href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a69656f79342520e170ee22f4dfcb6d29">asagi::Grid::SUCCESS</a></div><div class="ttdef"><b>Definition:</b> <a href="asagi_8h_source.xhtml#l00094">asagi.h:94</a></div></div>
-<div class="ttc" id="classmpi_1_1Mutex_xhtml_a68a6889ca4efe80ac06df9006bc9bb01"><div class="ttname"><a href="classmpi_1_1Mutex.xhtml#a68a6889ca4efe80ac06df9006bc9bb01">mpi::Mutex::~Mutex</a></div><div class="ttdeci">virtual ~Mutex()</div><div class="ttdef"><b>Definition:</b> <a href="mutex_8cpp_source.xhtml#l00055">mutex.cpp:55</a></div></div>
+<div class="ttc" id="classmpi_1_1Mutex_xhtml_a68a6889ca4efe80ac06df9006bc9bb01"><div class="ttname"><a href="classmpi_1_1Mutex.xhtml#a68a6889ca4efe80ac06df9006bc9bb01">mpi::Mutex::~Mutex</a></div><div class="ttdeci">virtual ~Mutex()</div><div class="ttdef"><b>Definition:</b> <a href="mutex_8cpp_source.xhtml#l00054">mutex.cpp:54</a></div></div>
 <div class="ttc" id="group__cxx__interface_xhtml_ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69"><div class="ttname"><a href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5ad70f0e05f5b076e8dd6bc5be37ab9f69">asagi::Grid::MPI_ERROR</a></div><div class="ttdef"><b>Definition:</b> <a href="asagi_8h_source.xhtml#l00096">asagi.h:96</a></div></div>
 <div class="ttc" id="classmpi_1_1Mutex_xhtml_aa9558a618fa0228cbf6452e1241d6fcd"><div class="ttname"><a href="classmpi_1_1Mutex.xhtml#aa9558a618fa0228cbf6452e1241d6fcd">mpi::Mutex::nextTag</a></div><div class="ttdeci">static int nextTag</div><div class="ttdef"><b>Definition:</b> <a href="mpi_2mutex_8h_source.xhtml#l00208">mutex.h:208</a></div></div>
 <div class="ttc" id="classthreads_1_1PthreadMutex_xhtml"><div class="ttname"><a href="classthreads_1_1PthreadMutex.xhtml">threads::PthreadMutex</a></div><div class="ttdef"><b>Definition:</b> <a href="pthreadmutex_8h_source.xhtml#l00053">pthreadmutex.h:53</a></div></div>
