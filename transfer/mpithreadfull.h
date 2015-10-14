@@ -92,20 +92,27 @@ private:
 	/** The tag used for communication */
 	int m_tag;
 
+	/** Lock send-receive pairs to avoid threading issues */
+	threads::Mutex* m_sendRecvMutex;
+
 public:
 	MPIThreadFull()
 		: m_data(0L),
 		  m_blockSize(0), m_typeSize(0),
 		  m_numaDomainId(0),
 		  m_comm(MPI_COMM_NULL), m_mpiType(MPI_DATATYPE_NULL),
-		  m_tag(-1)
+		  m_tag(-1),
+		  m_sendRecvMutex(0L)
 	{
 	}
 
 	virtual ~MPIThreadFull()
 	{
-		if (m_numaDomainId == 0 && m_tag >= 0)
+		if (m_numaDomainId == 0 && m_tag >= 0) {
 			mpi::CommThread::commThread.unregisterReceiver(m_tag);
+
+			delete m_sendRecvMutex;
+		}
 	}
 
 	/**
@@ -137,9 +144,15 @@ public:
 				.registerReceiver(m_comm, *this, m_tag);
 			if (err != asagi::Grid::SUCCESS)
 				return err;
+
+			m_sendRecvMutex = new threads::Mutex();
 		}
 
 		asagi::Grid::Error err = numaComm.broadcast(m_tag);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
+		err = numaComm.broadcast(m_sendRecvMutex);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
@@ -157,6 +170,8 @@ public:
 			unsigned char *cache)
 	{
 		int mpiResult; NDBG_UNUSED(mpiResult);
+
+		std::lock_guard<threads::Mutex> lock(*m_sendRecvMutex);
 
 		mpi::CommThread::commThread.send(m_tag, remoteRank, offset);
 
