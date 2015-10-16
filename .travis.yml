@@ -28,11 +28,19 @@ script:
  - make doc
  - make devdoc
  - cd ..
+ - mkdir build_numa && cd build_numa && cmake ../ -DTESTS=ON -DDEBUG_NUMA=ON
+ - make
+ - make test
+ - cd ..
  - mkdir build_nonuma && cd build_nonuma && cmake ../ -DTESTS=ON -DNONUMA=ON
  - make
  - make test
  - cd ..
  - mkdir build_nompi && cd build_nompi && cmake ../ -DTESTS=ON -DNOMPI=ON
+ - make
+ - make test
+ - cd ..
+ - mkdir build_numa_nompi && cd build_numa && cmake ../ -DTESTS=ON -DNOMPI=ON -DDEBUG_NUMA=ON
  - make
  - make test
  - cd ..
