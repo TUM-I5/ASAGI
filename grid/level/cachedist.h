@@ -44,7 +44,9 @@
 #include "allocator/mpialloc.h"
 #include "transfer/numacache.h"
 #include "transfer/numano.h"
+#ifdef USE_MPI3
 #include "transfer/mpiwincache.h"
+#endif // USE_MPI3
 #include "transfer/mpithreadcache.h"
 #include "transfer/mpino.h"
 
@@ -76,7 +78,7 @@ public:
 	/**
 	 * @copydoc Cache::Cache
 	 */
-	CacheDist(const mpi::MPIComm &comm,
+	CacheDist(mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
 		: Cache<Type, Allocator>(comm, numa, type),
@@ -157,6 +159,7 @@ public:
 			// Try NUMA first
 			if (m_numaTrans.transfer(globalBlockId, data)) {
 				this->incCounter(perf::Counter::NUMA);
+
 				m_mpiTrans.addBlock(globalBlockId,
 						this->blockRank(globalBlockId),
 						this->blockNodeOffset(globalBlockId),
@@ -219,17 +222,21 @@ using CacheDistNuma = CacheDist<transfer::MPINo, transfer::NumaCache, Type, allo
 template<class Type>
 using CacheDistMPIThread = CacheDist<transfer::MPIThreadCache, transfer::NumaNo, Type, allocator::MPIAlloc>;
 
+#ifdef USE_MPI3
 /** Cached distributed level with MPI windows */
 template<class Type>
 using CacheDistMPIWin = CacheDist<transfer::MPIWinCache, transfer::NumaNo, Type, allocator::MPIAlloc>;
+#endif // USE_MPI3
 
 /** Cached distributed level with MPI (communication thread) and NUMA */
 template<class Type>
 using CacheDistMPIThreadNuma = CacheDist<transfer::MPIThreadCache, transfer::NumaCache, Type, allocator::MPIAlloc>;
 
+#ifdef USE_MPI3
 /** Cached distributed level with MPI windows and NUMA */
 template<class Type>
 using CacheDistMPIWinNuma = CacheDist<transfer::MPIWinCache, transfer::NumaCache, Type, allocator::MPIAlloc>;
+#endif // USE_MPI3
 
 }
 

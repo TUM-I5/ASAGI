@@ -70,7 +70,7 @@ public:
 	 * @copydoc Level::Level(const mpi::MPIComm&,
 	 *  const numa::Numa&, Type&)
 	 */
-	Blocked(const mpi::MPIComm &comm,
+	Blocked(mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
 		: Level<Type>(comm, numa, type),

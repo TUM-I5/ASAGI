@@ -47,6 +47,7 @@
 #include <mutex>
 
 #include "mpi/mpicomm.h"
+#include "mpi/lockassert.h"
 #include "threads/mutex.h"
 #include "types/type.h"
 #endif // ASAGI_NOMPI
@@ -131,7 +132,7 @@ public:
 
 			// Create the mpi window for distributed blocks
 			if (MPI_Win_create(data,
-					blockCount * blockSize * typeSize,
+					blockCount * blockSize * typeSize * numaComm.totalDomains(),
 					typeSize,
 					MPI_INFO_NULL,
 					mpiComm.comm(),
@@ -172,7 +173,7 @@ public:
 #endif // THREADSAFE_MPI
 
 		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, remoteRank,
-			MPI_MODE_NOCHECK, m_window);
+			ASAGI_MPI_MODE_NOCHECK, m_window);
 		assert(mpiResult == MPI_SUCCESS);
 
 		mpiResult = MPI_Get(cache,

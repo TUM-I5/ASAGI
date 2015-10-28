@@ -36,6 +36,7 @@
  */
 
 #include <asagi.h>
+#include <pthread.h>
 
 // Do not abort to get real failure
 #define LOG_ABORT
@@ -49,10 +50,12 @@ void* work(void *p);
 
 int main(int argc, char** argv)
 {
-	MPI_Init(&argc, &argv);
-
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	int provided;
+	MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+	if (provided != MPI_THREAD_MULTIPLE) {
+		logError() << "Test requires MPI_THREAD_MULTIPLE support";
+		return 1;
+	}
 
 	Grid* grid = Grid::create();
 	grid->setComm(MPI_COMM_WORLD);

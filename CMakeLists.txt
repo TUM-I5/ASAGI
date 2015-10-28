@@ -46,6 +46,7 @@ option( SHARED_LIB "Compile the shared library" ON )
 option( STATIC_LIB "Compile the static library" OFF )
 option( FORTRAN_SUPPORT "Enable Fortran support" ON )
 set( MAX_DIMENSIONS 4 CACHE STRING "Maximum number of dimension supported" )
+option( MPI3 "Enable MPI-3 implementations" ON )
 option( THREADSAFE "Enable support for multiple threads on each node" ON )
 option( THREADSAFE_COUNTER "Make access counters thread-safe" OFF )
 option( THREADSAFE_MPI "Make MPI calls thread-safe (required for non thread-safe MPI libraries)" ON )
@@ -167,6 +168,10 @@ else( NOMPI )
 	
 	# Do not include OpenMPI C++ Bindings
 	add_definitions( -DOMPI_SKIP_MPICXX )
+	
+	if( MPI3 )
+	    add_definitions( -DUSE_MPI3 )
+	endif( MPI3 )
 endif( NOMPI )
 
 # Find pthread

@@ -45,11 +45,19 @@ namespace transfer
 
 /**
  * A dictionary for cache entries
+ *
+ * If lock is true, the class will allocate memory for an additional
+ * long int after each dictionary entry. This can be used to store
+ * a mutex for each dictionary entry. The mutex value will be initialized
+ * with -1.
  */
-template<class Allocator>
+template<class Allocator, bool lock>
 class MPICache
 {
 private:
+	/** The MPI communicator */
+	const mpi::MPIComm* m_mpiComm;
+
 	/** The NUMA domain ID */
 	unsigned int m_numaDomainId;
 
@@ -59,11 +67,16 @@ private:
 	/** Local part of the dictionary */
 	long* m_dictionary;
 
+	/** Number of blocks on one rank */
+	unsigned long m_rankCacheSize;
+
 protected:
 	MPICache()
-		: m_numaDomainId(0),
+		: m_mpiComm(0L),
+		  m_numaDomainId(0),
 		  m_dictEntrySize(4), // Default (can not be changed at the moment)
-		  m_dictionary(0L)
+		  m_dictionary(0L),
+		  m_rankCacheSize(0)
 	{}
 
 public:
@@ -77,15 +90,20 @@ protected:
 	/**
 	 * Initialize the the dictionary
 	 */
-	asagi::Grid::Error init(unsigned long blockCount,
+	asagi::Grid::Error init(unsigned int cacheSize,
+			unsigned long blockCount,
+			const mpi::MPIComm &mpiComm,
 			numa::NumaComm &numaComm)
 	{
+		m_mpiComm = &mpiComm;
 		m_numaDomainId = numaComm.domainId();
+
+		m_rankCacheSize = cacheSize * numaComm.totalDomains();
 
 		// Allocate the memory and broadcast the pointer
 		if (m_numaDomainId == 0) {
 			Allocator::allocate(
-					blockCount * dictEntrySize() * numaComm.totalDomains(),
+					blockCount * totalDictEntrySize() * numaComm.totalDomains(),
 					m_dictionary);
 		}
 
@@ -94,11 +112,27 @@ protected:
 			return err;
 
 		// Set everything in the dictionary to undefined
-		for (unsigned long i = blockCount * dictEntrySize() * m_numaDomainId;
-				i < blockCount * dictEntrySize() * (m_numaDomainId+1); i++)
+		for (unsigned long i = blockCount * totalDictEntrySize() * m_numaDomainId;
+				i < blockCount * totalDictEntrySize() * (m_numaDomainId+1); i++)
 			m_dictionary[i] = -1;
 
 		return asagi::Grid::SUCCESS;
+	}
+
+	/**
+	 * Get the MPI communicator
+	 */
+	const mpi::MPIComm& mpiComm() const
+	{
+		return *m_mpiComm;
+	}
+
+	/**
+	 * The total size of the cache in this process
+	 */
+	unsigned long rankCacheSize() const
+	{
+		return m_rankCacheSize;
 	}
 
 	/**
@@ -174,11 +208,19 @@ protected:
 	}
 
 	/**
+	 * @return The number entries per element including the lock value
+	 */
+	unsigned int totalDictEntrySize() const
+	{
+		return m_dictEntrySize + (lock ? 1 : 0);
+	}
+
+	/**
 	 * @return A pointer to a specific dictionary entry
 	 */
 	long* dictionary(unsigned long entry)
 	{
-		return &m_dictionary[entry * m_dictEntrySize];
+		return &m_dictionary[entry * totalDictEntrySize()];
 	}
 
 	/**

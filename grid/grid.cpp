@@ -176,6 +176,10 @@ grid::Grid::Grid(unsigned int count,
 
 grid::Grid::~Grid()
 {
+	// Wait for all processes to finish
+	if (m_comm.size() > 1)
+		m_comm.barrier();
+
 	delete m_type;
 
 	for (std::vector<Container*>::const_iterator it = m_containers.begin();
@@ -382,13 +386,21 @@ void grid::Grid::initContainers()
 			*it = TypeSelector<SimpleContainer, level::CacheDistMPIThread, typelist>::createContainer(*this);
 			break;
 		case CACHE_MPIWIN:
+#ifdef USE_MPI3
 			*it = TypeSelector<SimpleContainer, level::CacheDistMPIWin, typelist>::createContainer(*this);
+#else // USE_MPI3
+			logError() << "ASAGI: These options require MPI-3 support";
+#endif // USE_MPI3
 			break;
 		case CACHE_MPITHREAD_NUMA:
 			*it = TypeSelector<SimpleContainer, level::CacheDistMPIThreadNuma, typelist>::createContainer(*this);
 			break;
 		case CACHE_MPIWIN_NUMA:
+#ifdef USE_MPI3
 			*it = TypeSelector<SimpleContainer, level::CacheDistMPIWinNuma, typelist>::createContainer(*this);
+#else // USE_MPI3
+			logError() << "ASAGI: These options require MPI-3 support";
+#endif // USE_MPI3
 			break;
 		case FULL:
 			*it = TypeSelector<SimpleContainer, level::FullDefault, typelist>::createContainer(*this);

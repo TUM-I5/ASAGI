@@ -80,7 +80,7 @@ public:
 	/**
 	 * @copydoc Full::Full
 	 */
-	FullDist(const mpi::MPIComm &comm,
+	FullDist(mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
 		: Full<Type, Allocator>(comm, numa, type),

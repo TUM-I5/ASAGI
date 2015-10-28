@@ -36,8 +36,7 @@
 ##### Files #####
 set( mpiSources
     commthread.cpp
-    mpicomm.cpp
-	mutex.cpp )
+    mpicomm.cpp )
 
 ##### Add to library #####
 add_sources( ${mpiSources} )

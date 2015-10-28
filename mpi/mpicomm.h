@@ -82,10 +82,14 @@ private:
 	/** Total number of ranks */
 	int m_size;
 
+	/** MPI key for next free tag */
+	int m_nextFreeTag;
+
 public:
 	MPIComm()
 		: m_comm(MPI_COMM_NULL),
-		  m_rank(0), m_size(1)
+		  m_rank(0), m_size(1),
+		  m_nextFreeTag(0)
 	{ }
 
 	virtual ~MPIComm()
@@ -136,6 +140,27 @@ public:
 	int size() const
 	{
 		return m_size;
+	}
+
+	/**
+	 * MPI barrier
+	 */
+	void barrier() const
+	{
+		MPI_Barrier(m_comm);
+	}
+
+	/**
+	 * Reserves <code>num</code> consecutive tags in this communicator
+	 *
+	 * @param num The number of tags that should be reserved
+	 * @return The first tag that was reserved
+	 */
+	int reserveTags(unsigned int num)
+	{
+		int tag = m_nextFreeTag;
+		m_nextFreeTag += num;
+		return tag;
 	}
 
 public:

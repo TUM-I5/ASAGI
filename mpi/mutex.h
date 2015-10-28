@@ -64,150 +64,152 @@ namespace mpi {
 class Mutex
 {
 private:
-	/** The communicator we use to create the window and for send/recv */
+	/** The communicator associated with the window */
 	const MPIComm* m_comm;
-	
-	/** Rank were the lock array {@link m_lock} is stored */
-	int m_homeRank;
-	
-	/**
-	 * The lock array contains all the locks, only available
-	 * on rank {@link m_homeRank} */
-	long* m_lock;
-	
-	/** Local copy of the lock array */
-	long* m_lockCopy;
 
 	/** The window is used to store the locks */
 	MPI_Win m_window;
 	
-	/**
-	 * Allows to access all elements from {@link m_lock} without the
-	 * current rank
-	 */
-	MPI_Datatype m_otherRanksType;
-	
-	/** The tag we use for send/recv */
-	int m_tag;
+	/** The numa communicator */
+	const numa::NumaComm* m_numa;
 
-	/** Make sure that the MPI window is only accessed by one thread */
-	threads::Mutex m_threadMutex;
+	/** The tag offset we use for send/recv */
+	int m_tagOffset;
+
 public:
-	Mutex();
-	virtual ~Mutex();
-	
-	asagi::Grid::Error init(const MPIComm& comm);
+	Mutex()
+		: m_comm(0L),
+		  m_window(MPI_WIN_NULL),
+		  m_numa(0L),
+		  m_tagOffset(0)
+	{
+	}
+
+	virtual ~Mutex()
+	{
+	}
+
+	/**
+	 * Initialize the mutex
+	 *
+	 * @param comm The communicator used for this mutex.
+	 * @param window The MPI window where the mutex values are stored
+	 * @param numThreads The number of threads per processor
+	 */
+	void init(MPIComm& comm, MPI_Win window, const numa::NumaComm& numa)
+	{
+		m_comm = &comm;
+		m_window = window;
+		m_numa = &numa;
+
+		m_tagOffset = comm.reserveTags(numa.totalThreads());
+	}
 	
 	/**
-	 * @brief Acquire a lock for a block
+	 * Initialize a mutex memory location
 	 *
-	 * @param block The block that should be locked
+	 * @param lock Reference to the mutex memory location
 	 */
-	void acquire(unsigned long block)
+	void initMutexMem(long& lock)
+	{
+		lock = MUTEX_UNLOCKED;
+	}
+
+	/**
+	 * @brief Acquire a lock
+	 *
+	 * The caller has to make sure that the window is locked exclusively (e.g. with
+	 * MPI_Win_lock) before/after the acquire call. This function will call
+	 * MPI_Win_flush_local on the MPI window.
+	 *
+	 * @param rank The rank where the lock is stored
+	 * @param offset The offset in the window (in window units) where the local is
+	 *  stored
+	 * @return A value < 0 if the mutex could be acquired. If a value >= 0 is
+	 *  returned the caller has to call {@link wait(long)} afterwards to finish the
+	 *  acquisition. In this case the mutex was locked.
+	 */
+	long acquire(int rank, unsigned long offset)
 	{
 		int mpiResult; NDBG_UNUSED(mpiResult);
 
-		// It is only possible to let one thread wait on this mutex,
-		// otherwise the wrong thread might receive the wakeup message
-		// TODO Find a better way to do this
-		std::lock_guard<threads::Mutex> lock(m_threadMutex);
-
-		// add self to lock list and get all other locks
-		mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, m_homeRank,
-			0, m_window);
+		long newLock = lockId(m_numa->threadId());
+		long oldLock;
+		mpiResult = MPI_Fetch_and_op(&newLock, &oldLock, MPI_LONG, rank,
+				offset, MPI_REPLACE, m_window);
 		assert(mpiResult == MPI_SUCCESS);
 
-		long myblock = block;
-		mpiResult = MPI_Put(&myblock,
-			1, MPI_LONG,
-			m_homeRank, m_comm->rank(),
-			1 , MPI_LONG,
-			m_window);
+		mpiResult = MPI_Win_flush_local(rank, m_window);
 		assert(mpiResult == MPI_SUCCESS);
 
-		mpiResult = MPI_Get(m_lockCopy,
-			m_comm->size() - 1, MPI_LONG,
-			m_homeRank, 0,
-			1, m_otherRanksType,
-			m_window);
+		return oldLock;
+	}
+
+	/**
+	 *
+	 * @param oldLock
+	 */
+	void wait(long oldLock)
+	{
+		// Not waiting required
+		if (oldLock < 0)
+			return;
+
+		int mpiResult; NDBG_UNUSED(mpiResult);
+
+		// The rank and thread id of the remote process/thread
+		// that holds the lock
+		int rank = oldLock / m_numa->totalThreads();
+		int tag = oldLock % m_numa->totalThreads();
+		MPI_Ssend(0L, 0, MPI_BYTE, rank, tag, m_comm->comm());
 		assert(mpiResult == MPI_SUCCESS);
-
-		mpiResult = MPI_Win_unlock(m_homeRank, m_window);
-
-		// check to see if lock is already held
-		int i;
-		for (i = 0; i < (m_comm->size() - 1); i ++) {
-			if (m_lockCopy[i] == static_cast<long>(block))
-				break;
-		}
-
-		if (i < (m_comm->size() - 1)) {
-			// wait for notification from some other process
-			mpiResult = MPI_Recv(0L, 0, MPI_BYTE,
-				MPI_ANY_SOURCE , m_tag, m_comm->comm(),
-				MPI_STATUS_IGNORE);
-			assert(mpiResult == MPI_SUCCESS);
-		}
 	}
 	
 	/**
 	 * @brief Release the lock for a block
 	 *
-	 * Releasing a block without acquiring the lock is erroneous
+	 * Releasing a block without acquiring the lock is erroneous.<br>
+	 * The caller has to make sure that the window is locked exclusively (e.g. with
+	 * MPI_Win_lock) before/after the acquire call. This function will call
+	 * MPI_Win_flush_local on the MPI window.
+	 *
+	 * @param rank The rank where the lock is stored
+	 * @param offset The offset in the window (in window units) where the local is
+	 *  stored
 	 */
-	void release(unsigned long block)
+	void release(int rank, unsigned long offset)
 	{
 		int mpiResult; NDBG_UNUSED(mpiResult);
 
-		std::lock_guard<threads::Mutex> lock(m_threadMutex);
+		unsigned int threadId = m_numa->threadId();
 
-		// remove self from waitlist
-		mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, m_homeRank,
-			0, m_window);
+		long mutexUnlocked = MUTEX_UNLOCKED;
+		long myLock = lockId(threadId);
+		long oldLock;
+		mpiResult = MPI_Compare_and_swap(&mutexUnlocked, &myLock, &oldLock,
+				MPI_LONG, rank, offset, m_window);
 		assert(mpiResult == MPI_SUCCESS);
 
-		mpiResult = MPI_Get(m_lockCopy,
-			m_comm->size() - 1, MPI_LONG,
-			m_homeRank, 0,
-			1, m_otherRanksType,
-			m_window);
+		mpiResult = MPI_Win_flush_local(rank, m_window);
 		assert(mpiResult == MPI_SUCCESS);
 
-		long myblock = -1;
-		mpiResult = MPI_Put(&myblock,
-			1, MPI_LONG,
-			m_homeRank, m_comm->rank(),
-			1, MPI_LONG,
-			m_window);
-		assert(mpiResult == MPI_SUCCESS);
-
-		mpiResult = MPI_Win_unlock(m_homeRank, m_window);
-		assert(mpiResult == MPI_SUCCESS);
-
-		// find the next rank waiting for the lock (use round robin)
-		for (int i = m_comm->rank(); i < (m_comm->size() - 1); i++) {
-			if (m_lockCopy[i] == static_cast<long>(block)) {
-				// Rank is of by one
-				mpiResult = MPI_Send(0L, 0, MPI_BYTE,
-					i+1, m_tag, m_comm->comm());
-				assert(mpiResult == MPI_SUCCESS);
-				return;
-			}
-		}
-		for (int i = 0; i < m_comm->rank(); i++) {
-			if (m_lockCopy[i] == static_cast<long>(block)) {
-				mpiResult = MPI_Send(0L, 0, MPI_BYTE,
-					i, m_tag, m_comm->comm());
-				assert(mpiResult == MPI_SUCCESS);
-				return;
-			}
-		}
+		if (oldLock != myLock)
+			mpiResult = MPI_Recv(0L, 0, MPI_BYTE, MPI_ANY_SOURCE, threadId,
+					m_comm->comm(), MPI_STATUS_IGNORE);
+			assert(mpiResult == MPI_SUCCESS);
 	}
 
 private:
-	static int nextTag;
+	/**
+	 * Computes the lock id used for this thread
+	 */
+	long lockId(unsigned int threadId) const
+	{
+		return m_comm->rank() * m_numa->totalThreads() + threadId;
+	}
 
-	static threads::Mutex nextTagMutex;
+private:
+	static const long MUTEX_UNLOCKED = -1;
 };
 
 }

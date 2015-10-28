@@ -66,7 +66,7 @@ public:
 	/**
 	 * @copydoc Blocked::Blocked
 	 */
-	Full(const mpi::MPIComm &comm,
+	Full(mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
 		: Blocked<Type>(comm, numa, type),

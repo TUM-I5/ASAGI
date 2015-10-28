@@ -35,49 +35,10 @@
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef MPI_NOMPICOMM_H
-#define MPI_NOMPICOMM_H
-
-namespace mpi
-{
-
-/**
- * MPI Communicator if MPI is disabled
- */
-class NoMPIComm
-{
-public:
-	NoMPIComm()
-	{ }
-
-	virtual ~NoMPIComm()
-	{
-	}
-
-	/**
-	 * @return 0
-	 */
-	int rank() const
-	{
-		return 0;
-	}
-
-	/**
-	 * @return 1
-	 */
-	int size() const
-	{
-		return 1;
-	}
-
-	/**
-	 * Does nothing
-	 */
-	void barrier() const
-	{
-	}
-};
-
-}
-
-#endif // MPI_NOMPICOMM_H
+// Work around a bug in OpenMPI 1.10
+// See: https://github.com/open-mpi/ompi-release/pull/700
+#if OMPI_MAJOR_VERSION == 1 && OMPI_MINOR_VERSION == 10 && OMPI_RELEASE_VERSION == 0
+#define ASAGI_MPI_MODE_NOCHECK 0
+#else // OMPI_MAJOR_VERSION == 1 && OMPI_MINOR_VERSION == 10 && OMPI_RELEASE_VERSION == 0
+#define ASAGI_MPI_MODE_NOCHECK MPI_MODE_NOCHECK
+#endif // OMPI_MAJOR_VERSION == 1 && OMPI_MINOR_VERSION == 10 && OMPI_RELEASE_VERSION == 0

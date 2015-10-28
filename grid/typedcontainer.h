@@ -60,7 +60,7 @@ public:
 	/**
 	 * @copydoc Container::Container
 	 */
-	TypedContainer(const mpi::MPIComm &comm,
+	TypedContainer(mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type,
 			int timeDimension,

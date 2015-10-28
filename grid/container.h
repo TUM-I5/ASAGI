@@ -58,7 +58,7 @@ class Container
 {
 private:
 	/** The MPI Communicator used for this container */
-	const mpi::MPIComm &m_comm;
+	mpi::MPIComm &m_comm;
 
 	/** NUMA "communicator" for this container */
 	const numa::Numa &m_numa;
@@ -81,7 +81,7 @@ public:
 	/**
 	 * Constructs a new container
 	 */
-	Container(const mpi::MPIComm &comm,
+	Container(mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			int timeDimension,
 			ValuePosition valuePos)
@@ -197,6 +197,14 @@ protected:
 		return m_comm;
 	}
 	
+	/**
+	 * @return The communicator for this container
+	 */
+	mpi::MPIComm& comm()
+	{
+		return m_comm;
+	}
+
 	/**
 	 * @return The NUMA communicator for this container
 	 */

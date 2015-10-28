@@ -92,8 +92,6 @@ int main(int argc, char** argv)
 	}
 #endif
 
-	MPI_Barrier(MPI_COMM_WORLD);
-
 	delete grid;
 
 	Grid::stopCommThread();

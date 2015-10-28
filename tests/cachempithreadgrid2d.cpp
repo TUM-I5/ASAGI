@@ -100,8 +100,6 @@ int main(int argc, char** argv)
 				<< "but is" << accesses;
 		return 1;
 	}
-	
-	MPI_Barrier(MPI_COMM_WORLD);
 
 	delete grid;
 	

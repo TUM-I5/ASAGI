@@ -71,7 +71,7 @@ class Level
 {
 private:
 	/** The MPI Communicator used for this level */
-	const mpi::MPIComm* m_mpiComm;
+	mpi::MPIComm* m_mpiComm;
 
 	/** NUMA communicator for this level */
 	numa::NumaComm* m_numaComm;
@@ -133,7 +133,7 @@ public:
 	/**
 	 * Constructs a new grid level
 	 */
-	Level(const mpi::MPIComm &comm,
+	Level(mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
 		: m_mpiComm(&comm), m_numaComm(numa.createComm()),
@@ -273,6 +273,14 @@ protected:
 	 * @return The MPI communicator
 	 */
 	const mpi::MPIComm& comm() const
+	{
+		return *m_mpiComm;
+	}
+
+	/**
+	 * @return The MPI communicator
+	 */
+	mpi::MPIComm& comm()
 	{
 		return *m_mpiComm;
 	}

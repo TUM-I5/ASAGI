@@ -47,6 +47,7 @@
 #include <mutex>
 #include <vector>
 
+#include "mpicache.h"
 #include "allocator/default.h"
 #include "cache/cachemanager.h"
 #include "mpi/commthread.h"
@@ -64,7 +65,7 @@ typedef MPINo MPIThreadCache;
 /**
  * Copies blocks between MPI processes assuming cache storage
  */
-class MPIThreadCache : private MPICache<allocator::Default>
+class MPIThreadCache : private MPICache<allocator::Default, false>
 {
 private:
 	/**
@@ -97,7 +98,7 @@ private:
 
 			MPI_Request request;
 			mpiResult = MPI_Isend(&entry, 1, MPI_LONG, sender, ENTRY_TAG,
-					m_parent->m_mpiComm->comm(), &request);
+					m_parent->mpiComm().comm(), &request);
 			assert(mpiResult == MPI_SUCCESS);
 
 			int done = 0;
@@ -143,7 +144,7 @@ private:
 				mpiResult = MPI_Isend(const_cast<unsigned char*>(data),
 						m_parent->m_blockSize, m_parent->m_mpiType,
 						sender, TRANSFER_TAG,
-						m_parent->m_mpiComm->comm(), &request);
+						m_parent->mpiComm().comm(), &request);
 				assert(mpiResult == MPI_SUCCESS);
 
 				int done = 0;
@@ -158,7 +159,7 @@ private:
 				char ack;
 				MPI_Request request;
 				mpiResult = MPI_Isend(&ack, 1, MPI_CHAR, sender, TRANSFER_FAIL_TAG,
-						m_parent->m_mpiComm->comm(), &request);
+						m_parent->mpiComm().comm(), &request);
 				assert(mpiResult == MPI_SUCCESS);
 
 				int done = 0;
@@ -196,8 +197,8 @@ private:
 		void recv(int sender, unsigned long data)
 		{
 			// Extract the information
-			unsigned long dictOffset = data / m_parent->m_rankCacheSize;
-			unsigned long offset = data % m_parent->m_rankCacheSize;
+			unsigned long dictOffset = data / m_parent->rankCacheSize();
+			unsigned long offset = data % m_parent->rankCacheSize();
 
 			m_parent->addBlock(dictOffset, sender, offset);
 		}
@@ -229,17 +230,14 @@ private:
 		void recv(int sender, unsigned long data)
 		{
 			// Extract the information
-			unsigned long dictOffset = data / m_parent->m_rankCacheSize;
-			unsigned long offset = data % m_parent->m_rankCacheSize;
+			unsigned long dictOffset = data / m_parent->rankCacheSize();
+			unsigned long offset = data % m_parent->rankCacheSize();
 
 			m_parent->deleteBlock(dictOffset, sender, offset);
 		}
 	};
 
 private:
-	/** The MPI communicator */
-	const mpi::MPIComm* m_mpiComm;
-
 	/** The NUMA domain ID */
 	unsigned int m_numaDomainId;
 
@@ -273,9 +271,6 @@ private:
 	/** Deleter tag */
 	int m_deleterTag;
 
-	/** Number of blocks on one rank */
-	unsigned long m_rankCacheSize;
-
 	/** Number of elements in one block */
 	unsigned long m_blockSize;
 
@@ -288,15 +283,13 @@ private:
 
 public:
 	MPIThreadCache()
-		: m_mpiComm(0L),
-		  m_numaDomainId(0),
+		: m_numaDomainId(0),
 		  m_cacheManager(0L),
 		  m_mutexes(0L),
 		  m_blockInfoTag(-1),
 		  m_transfererTag(-1),
 		  m_adderTag(-1),
 		  m_deleterTag(-1),
-		  m_rankCacheSize(0),
 		  m_blockSize(0),
 		  m_mpiType(MPI_DATATYPE_NULL),
 		  m_sendRecvMutex(0L)
@@ -337,15 +330,13 @@ public:
 			const mpi::MPIComm &mpiComm,
 			numa::NumaComm &numaComm)
 	{
-		m_mpiComm = &mpiComm;
 		m_numaDomainId = numaComm.domainId();
 		m_cacheManager = &cacheManager;
 		m_blockSize = blockSize;
 		m_mpiType = type.getMPIType();
 
-		m_rankCacheSize = cacheSize * numaComm.totalDomains();
-
-		MPICache::init(blockCount, numaComm);
+		MPICache<allocator::Default, false>::init(cacheSize,
+				blockCount, mpiComm, numaComm);
 
 		m_blockInfoResponder.init(*this);
 		m_blockTransferer.init(*this);
@@ -354,7 +345,7 @@ public:
 
 		if (m_numaDomainId == 0) {
 			// Create the mutexes for the blocks
-			m_mutexes = new threads::Mutex[blockCount];
+			m_mutexes = new threads::Mutex[blockCount * numaComm.totalDomains()];
 
 			// Initialize the receivers
 			asagi::Grid::Error err = mpi::CommThread::commThread
@@ -420,7 +411,7 @@ public:
 	long startTransfer(unsigned long blockId, int dictRank,
 			unsigned long dictOffset, unsigned long offset)
 	{
-		if (dictRank == m_mpiComm->rank())
+		if (dictRank == mpiComm().rank())
 			return fetchBlockInfo(dictOffset);
 
 		// Ask remote process
@@ -432,7 +423,7 @@ public:
 
 		long entry;
 		mpiResult = MPI_Recv(&entry, 1, MPI_LONG, dictRank, ENTRY_TAG,
-				m_mpiComm->comm(), MPI_STATUS_IGNORE);
+				mpiComm().comm(), MPI_STATUS_IGNORE);
 		assert(mpiResult == MPI_SUCCESS);
 
 		return entry;
@@ -455,10 +446,10 @@ public:
 			return false;
 		}
 
-		int rank = entry / m_rankCacheSize;
+		int rank = entry / rankCacheSize();
 
 		assert(rank >= 0);
-		assert(rank != m_mpiComm->rank());
+		assert(rank != mpiComm().rank());
 
 		std::lock_guard<threads::Mutex> lock(*m_sendRecvMutex);
 
@@ -467,13 +458,13 @@ public:
 
 		int mpiResult; NDBG_UNUSED(mpiResult);
 		MPI_Status status;
-		mpiResult = MPI_Probe(rank, MPI_ANY_TAG, m_mpiComm->comm(), &status);
+		mpiResult = MPI_Probe(rank, MPI_ANY_TAG, mpiComm().comm(), &status);
 		assert(mpiResult == MPI_SUCCESS);
 
 		switch (status.MPI_TAG) {
 		case TRANSFER_TAG:
 			mpiResult = MPI_Recv(cache, m_blockSize, m_mpiType, rank, TRANSFER_TAG,
-					m_mpiComm->comm(), MPI_STATUS_IGNORE);
+					mpiComm().comm(), MPI_STATUS_IGNORE);
 			assert(mpiResult == MPI_SUCCESS);
 
 			retry = false;
@@ -481,7 +472,7 @@ public:
 		case TRANSFER_FAIL_TAG:
 			char ack;
 			mpiResult = MPI_Recv(&ack, 1, MPI_CHAR, rank, TRANSFER_FAIL_TAG,
-					m_mpiComm->comm(), MPI_STATUS_IGNORE);
+					mpiComm().comm(), MPI_STATUS_IGNORE);
 			assert(mpiResult == MPI_SUCCESS);
 
 			retry = true;
@@ -520,11 +511,11 @@ public:
 	void addBlock(unsigned long blockId, int dictRank,
 			unsigned long dictOffset, unsigned long offset)
 	{
-		if (dictRank == m_mpiComm->rank())
+		if (dictRank == mpiComm().rank())
 			addBlock(dictOffset, dictRank, offset);
 		else {
 			// Assemble information
-			unsigned long data = dictOffset * m_rankCacheSize + offset;
+			unsigned long data = dictOffset * rankCacheSize() + offset;
 
 			mpi::CommThread::commThread.send(m_adderTag, dictRank, data);
 		}
@@ -545,11 +536,11 @@ public:
 			// Invalid block id
 			return;
 
-		if (dictRank == m_mpiComm->rank())
+		if (dictRank == mpiComm().rank())
 			deleteBlock(dictOffset, dictRank, offset);
 		else {
 			// Assemble information
-			unsigned long data = dictOffset * m_rankCacheSize + offset;
+			unsigned long data = dictOffset * rankCacheSize() + offset;
 
 			mpi::CommThread::commThread.send(m_deleterTag, dictRank, data);
 		}
@@ -581,7 +572,7 @@ private:
 	{
 		std::lock_guard<threads::Mutex> lock(m_mutexes[dictOffset]);
 
-		updateBlockInfo(dictionary(dictOffset), rank * m_rankCacheSize + offset);
+		updateBlockInfo(dictionary(dictOffset), rank * rankCacheSize() + offset);
 	}
 
 	/**
@@ -595,7 +586,7 @@ private:
 	{
 		std::lock_guard<threads::Mutex> lock(m_mutexes[dictOffset]);
 
-		deleteBlockInfo(dictionary(dictOffset), rank * m_rankCacheSize + offset);
+		deleteBlockInfo(dictionary(dictOffset), rank * rankCacheSize() + offset);
 	}
 
 private:

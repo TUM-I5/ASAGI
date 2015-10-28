@@ -67,7 +67,7 @@ public:
 	/**
 	 * @copydoc Blocked::Blocked
 	 */
-	Cache(const mpi::MPIComm &comm,
+	Cache(mpi::MPIComm &comm,
 			const numa::Numa &numa,
 			Type &type)
 		: Blocked<Type>(comm, numa, type),
