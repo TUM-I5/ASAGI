@@ -1,6 +1,9 @@
 <map id="transfer::MPIWinCache" name="transfer::MPIWinCache">
-<area shape="rect" id="node2" href="$classtransfer_1_1MPICache.xhtml" title="transfer::MPICache\l\&lt; allocator::MPIAlloc \&gt;" alt="" coords="540,5,695,51"/>
-<area shape="rect" id="node4" href="$classmpi_1_1MPIComm.xhtml" title="mpi::MPIComm" alt="" coords="261,141,376,171"/>
-<area shape="rect" id="node9" href="$classmpi_1_1Mutex.xhtml" title="mpi::Mutex" alt="" coords="575,191,660,220"/>
-<area shape="rect" id="node6" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="5,141,160,171"/>
+<area shape="rect" id="node2" href="$classtransfer_1_1MPICache.xhtml" title="transfer::MPICache\l\&lt; allocator::MPIAlloc,\l true \&gt;" alt="" coords="81,344,228,408"/>
+<area shape="rect" id="node4" href="$classmpi_1_1MPIComm.xhtml" title="mpi::MPIComm" alt="" coords="111,232,225,261"/>
+<area shape="rect" id="node9" href="$classmpi_1_1Mutex.xhtml" title="mpi::Mutex" alt="" coords="252,361,337,391"/>
+<area shape="rect" id="node6" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="5,136,160,165"/>
+<area shape="rect" id="node12" href="$classnuma_1_1NumaComm.xhtml" title="numa::NumaComm" alt="" coords="303,232,439,261"/>
+<area shape="rect" id="node14" href="$classthreads_1_1Sync.xhtml" title="Synchronizes a set of threads. " alt="" coords="221,15,323,44"/>
+<area shape="rect" id="node16" href="$classnuma_1_1Numa.xhtml" title="numa::Numa" alt="" coords="371,136,467,165"/>
 </map>

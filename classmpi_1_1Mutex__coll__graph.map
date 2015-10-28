@@ -1,4 +1,7 @@
 <map id="mpi::Mutex" name="mpi::Mutex">
-<area shape="rect" id="node2" href="$classmpi_1_1MPIComm.xhtml" title="mpi::MPIComm" alt="" coords="141,101,256,131"/>
-<area shape="rect" id="node4" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="5,5,160,35"/>
+<area shape="rect" id="node2" href="$classmpi_1_1MPIComm.xhtml" title="mpi::MPIComm" alt="" coords="25,232,140,261"/>
+<area shape="rect" id="node4" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="5,136,160,165"/>
+<area shape="rect" id="node6" href="$classnuma_1_1NumaComm.xhtml" title="numa::NumaComm" alt="" coords="164,232,300,261"/>
+<area shape="rect" id="node8" href="$classthreads_1_1Sync.xhtml" title="Synchronizes a set of threads. " alt="" coords="188,15,289,44"/>
+<area shape="rect" id="node10" href="$classnuma_1_1Numa.xhtml" title="numa::Numa" alt="" coords="323,136,419,165"/>
 </map>

@@ -93,7 +93,66 @@ CMake does not find MPI</h1>
 <p>On some plattforms, CMake has problems finding MPI. Try to set the environment variable <code>CMAKE_PREFIX_PATH</code> (see section <a class="el" href="build.xhtml">Building and Installing ASAGI</a>) or select the MPI compiler before running CMake by setting the enviroment variable <code>CXX</code>.</p>
 <h1><a class="anchor" id="hang"></a>
 The program hangs</h1>
+<h2><a class="anchor" id="intelmpi"></a>
+Intel MPI</h2>
 <p>Due to a bug (<a href="http://software.intel.com/en-us/forums/showthread.php?t=103456">http://software.intel.com/en-us/forums/showthread.php?t=103456</a>) in the Intel MPI library (version 4.0 update 3 and probably earlier versions) the remote memory access in ASAGI does not work properly. This only happens when fabric is set to "ofa" or "shm:ofa". Selecting a different fabric by changing the environment variable "I_MPI_FABRICS" solves the problem.</p>
+<h2><a class="anchor" id="OpenMPI"></a>
+OpenMPI</h2>
+<p>OpenMPI windows also have a bug that might create deadlocks if more than one thread is used.</p>
+<p>The bug could be reproduced with the following example with OpenMPI 1.8.7: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;mpi.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;unistd.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"></div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="minimal_8c.xhtml#a3c04138a5bfe5d72780bb7e82a18e627">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[]) {</div>
+<div class="line">  <span class="keywordtype">int</span> provided;</div>
+<div class="line">  MPI_Init_thread(&amp;argc, &amp;argv, MPI_THREAD_SERIALIZED, &amp;provided);</div>
+<div class="line">  <span class="comment">//MPI_Init(&amp;argc, &amp;argv);</span></div>
+<div class="line"></div>
+<div class="line">  <span class="keywordtype">int</span> rank;</div>
+<div class="line">  MPI_Comm_rank(MPI_COMM_WORLD, &amp;rank);</div>
+<div class="line"></div>
+<div class="line">  MPI_Win window;</div>
+<div class="line">  <span class="keywordtype">int</span>* data;</div>
+<div class="line">  MPI_Alloc_mem(<span class="keyword">sizeof</span>(<span class="keywordtype">int</span>), MPI_INFO_NULL, &amp;data);</div>
+<div class="line">  *data = 0;</div>
+<div class="line"></div>
+<div class="line">  MPI_Win_create(data,</div>
+<div class="line">    <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>),</div>
+<div class="line">    <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>),</div>
+<div class="line">    MPI_INFO_NULL,</div>
+<div class="line">    MPI_COMM_WORLD, &amp;window);</div>
+<div class="line"></div>
+<div class="line">  <span class="keywordflow">if</span> (rank == 0) {</div>
+<div class="line">    sleep(3);</div>
+<div class="line"></div>
+<div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Start rank 0&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"></div>
+<div class="line">    MPI_Win_lock(MPI_LOCK_SHARED, 1, 0, window);</div>
+<div class="line">    <span class="keywordtype">int</span> mydata = 1;</div>
+<div class="line">    MPI_Put(&amp;mydata, 1, MPI_INT, 1, 0, 1, MPI_INT, window);</div>
+<div class="line">    MPI_Win_unlock(1, window);</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">char</span> signal = 0;</div>
+<div class="line">    MPI_Send(&amp;signal, 1, MPI_CHAR, 1, 0, MPI_COMM_WORLD);</div>
+<div class="line"></div>
+<div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;End rank 0&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line">  } <span class="keywordflow">else</span> {</div>
+<div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Start rank 1&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">char</span> signal;</div>
+<div class="line">    MPI_Recv(&amp;signal, 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);</div>
+<div class="line"></div>
+<div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;End rank 1&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line">  }</div>
+<div class="line"></div>
+<div class="line">  MPI_Win_free(&amp;window);</div>
+<div class="line">  MPI_Free_mem(data);</div>
+<div class="line"></div>
+<div class="line">  MPI_Finalize();</div>
+<div class="line"></div>
+<div class="line">  <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>This bug seems to be fixed in version 1.10.0.</p>
 <h1><a class="anchor" id="mappedmemory"></a>
 The program fails with "PMPI_Win_create: Assertion</h1>
 <p>'winptr-&gt;lock_table[i]' failed" or "function:MPI_WIN_LOCK, Invalid win argument"</p>

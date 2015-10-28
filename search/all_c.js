@@ -10,8 +10,6 @@ var searchData=
   ['netcdfreader_2ecpp',['netcdfreader.cpp',['../netcdfreader_8cpp.xhtml',1,'']]],
   ['netcdfreader_2eh',['netcdfreader.h',['../netcdfreader_8h.xhtml',1,'']]],
   ['netcdfreadertest_2ecpp',['netcdfreadertest.cpp',['../netcdfreadertest_8cpp.xhtml',1,'']]],
-  ['nexttag',['nextTag',['../classmpi_1_1Mutex.xhtml#aa9558a618fa0228cbf6452e1241d6fcd',1,'mpi::Mutex']]],
-  ['nexttagmutex',['nextTagMutex',['../classmpi_1_1Mutex.xhtml#acfc716a6eae80a7c1c96c8e7b7d394ce',1,'mpi::Mutex']]],
   ['node_5fhit',['NODE_HIT',['../classperf_1_1Counter.xhtml#a19ab3ea97990707e1787a16dbc70790fa87f2640bd2fd2e19ac8225275a823935',1,'perf::Counter']]],
   ['nodeblockcount',['nodeBlockCount',['../classgrid_1_1level_1_1Blocked.xhtml#a56d3a27c3a2763490a735fd50ae02673',1,'grid::level::Blocked']]],
   ['nodelocalrank',['nodeLocalRank',['../group__cxx__interface.xhtml#ga7a59f91949d3c0e7fcf4e94581f63072',1,'asagi::Grid']]],

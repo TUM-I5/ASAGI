@@ -1,13 +1,13 @@
 <map id="transfer::MPIThreadCache" name="transfer::MPIThreadCache">
-<area shape="rect" id="node18" href="$classtransfer_1_1MPIThreadCache_1_1Adder.xhtml" title="transfer::MPIThreadCache\l::Adder" alt="" coords="1312,271,1488,318"/>
-<area shape="rect" id="node23" href="$classtransfer_1_1MPIThreadCache_1_1BlockTransferer.xhtml" title="transfer::MPIThreadCache\l::BlockTransferer" alt="" coords="1312,401,1488,447"/>
-<area shape="rect" id="node27" href="$classtransfer_1_1MPIThreadCache_1_1BlockInfoResponder.xhtml" title="transfer::MPIThreadCache\l::BlockInfoResponder" alt="" coords="1312,13,1488,59"/>
-<area shape="rect" id="node31" href="$classtransfer_1_1MPIThreadCache_1_1Deleter.xhtml" title="transfer::MPIThreadCache\l::Deleter" alt="" coords="1312,142,1488,189"/>
-<area shape="rect" id="node2" href="$classtransfer_1_1MPICache.xhtml" title="transfer::MPICache\l\&lt; allocator::Default \&gt;" alt="" coords="643,77,787,123"/>
-<area shape="rect" id="node4" href="$classcache_1_1CacheManager.xhtml" title="Manages a block cache. " alt="" coords="639,147,791,176"/>
-<area shape="rect" id="node6" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="331,215,485,244"/>
-<area shape="rect" id="node14" href="$classmpi_1_1MPIComm.xhtml" title="mpi::MPIComm" alt="" coords="657,200,772,229"/>
-<area shape="rect" id="node8" href="$classcache_1_1CacheList.xhtml" title="Controls a list of blocks. " alt="" coords="347,119,469,148"/>
-<area shape="rect" id="node10" href="$classcache_1_1LRU.xhtml" title="cache::LRU" alt="" coords="48,84,139,113"/>
-<area shape="rect" id="node20" href="$classmpi_1_1Receiver.xhtml" title="mpi::Receiver" alt="" coords="987,312,1088,341"/>
+<area shape="rect" id="node18" href="$classtransfer_1_1MPIThreadCache_1_1Adder.xhtml" title="transfer::MPIThreadCache\l::Adder" alt="" coords="1296,271,1472,318"/>
+<area shape="rect" id="node23" href="$classtransfer_1_1MPIThreadCache_1_1BlockTransferer.xhtml" title="transfer::MPIThreadCache\l::BlockTransferer" alt="" coords="1296,401,1472,447"/>
+<area shape="rect" id="node27" href="$classtransfer_1_1MPIThreadCache_1_1BlockInfoResponder.xhtml" title="transfer::MPIThreadCache\l::BlockInfoResponder" alt="" coords="1296,13,1472,59"/>
+<area shape="rect" id="node31" href="$classtransfer_1_1MPIThreadCache_1_1Deleter.xhtml" title="transfer::MPIThreadCache\l::Deleter" alt="" coords="1296,142,1472,189"/>
+<area shape="rect" id="node2" href="$classtransfer_1_1MPICache.xhtml" title="transfer::MPICache\l\&lt; allocator::Default,\l false \&gt;" alt="" coords="631,157,767,221"/>
+<area shape="rect" id="node4" href="$classmpi_1_1MPIComm.xhtml" title="mpi::MPIComm" alt="" coords="336,165,451,195"/>
+<area shape="rect" id="node6" href="$classthreads_1_1PthreadMutex.xhtml" title="threads::PthreadMutex" alt="" coords="16,165,171,195"/>
+<area shape="rect" id="node8" href="$classcache_1_1CacheManager.xhtml" title="Manages a block cache. " alt="" coords="623,245,775,275"/>
+<area shape="rect" id="node11" href="$classcache_1_1CacheList.xhtml" title="Controls a list of blocks. " alt="" coords="332,284,455,313"/>
+<area shape="rect" id="node13" href="$classcache_1_1LRU.xhtml" title="cache::LRU" alt="" coords="48,341,139,371"/>
+<area shape="rect" id="node20" href="$classmpi_1_1Receiver.xhtml" title="mpi::Receiver" alt="" coords="971,312,1072,341"/>
 </map>

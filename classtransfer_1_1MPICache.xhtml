@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.7"/>
-<title>ASAGI: transfer::MPICache&lt; Allocator &gt; Class Template Reference</title>
+<title>ASAGI: transfer::MPICache&lt; Allocator, lock &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -99,73 +99,90 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classtransfer_1_1MPICache-members.xhtml">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">transfer::MPICache&lt; Allocator &gt; Class Template Reference</div>  </div>
+<div class="title">transfer::MPICache&lt; Allocator, lock &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
 <p><code>#include &lt;<a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>&gt;</code></p>
+<div class="dynheader">
+Collaboration diagram for transfer::MPICache&lt; Allocator, lock &gt;:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classtransfer_1_1MPICache__coll__graph.svg" width="171" height="251"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+<center><span class="legend">[<a href="graph_legend.xhtml">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a123518183987e39b3023453991ebc604"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a123518183987e39b3023453991ebc604">init</a> (unsigned long blockCount, <a class="el" href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a> &amp;numaComm)</td></tr>
-<tr class="separator:a123518183987e39b3023453991ebc604"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a749103800a552ca4d10b5055b251e7ee"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a749103800a552ca4d10b5055b251e7ee">fetchBlockInfo</a> (const long *dictEntry)</td></tr>
-<tr class="separator:a749103800a552ca4d10b5055b251e7ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24aba2787d37cd89a7b26fe409d940c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a24aba2787d37cd89a7b26fe409d940c9">updateBlockInfo</a> (long *dictEntry, unsigned long newEntry)</td></tr>
-<tr class="separator:a24aba2787d37cd89a7b26fe409d940c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01348d5f73e0537c289d3ac78de9b7c1"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a01348d5f73e0537c289d3ac78de9b7c1">fetchAndUpdateBlockInfo</a> (long *dictEntry, unsigned long newEntry)</td></tr>
-<tr class="separator:a01348d5f73e0537c289d3ac78de9b7c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab98e65b988763e31a6590a0e36e3a0f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#aab98e65b988763e31a6590a0e36e3a0f">deleteBlockInfo</a> (long *dictEntry, long entry)</td></tr>
-<tr class="separator:aab98e65b988763e31a6590a0e36e3a0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c0c93888345487e58ec9f8cd9fd2d9c"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a> () const </td></tr>
-<tr class="separator:a7c0c93888345487e58ec9f8cd9fd2d9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9b4179a7fefeec41c02516e27828040"><td class="memItemLeft" align="right" valign="top">long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#af9b4179a7fefeec41c02516e27828040">dictionary</a> (unsigned long entry)</td></tr>
-<tr class="separator:af9b4179a7fefeec41c02516e27828040"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7512cf1bbec259dbafff999a1e7ef465"><td class="memItemLeft" align="right" valign="top">const long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a7512cf1bbec259dbafff999a1e7ef465">dictionary</a> () const </td></tr>
-<tr class="separator:a7512cf1bbec259dbafff999a1e7ef465"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35cd391ed0881a8b6cecd441f7e60409"><td class="memItemLeft" align="right" valign="top">long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a35cd391ed0881a8b6cecd441f7e60409">dictionary</a> ()</td></tr>
-<tr class="separator:a35cd391ed0881a8b6cecd441f7e60409"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a765b4c41bb1ef954929477ef9179990d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a765b4c41bb1ef954929477ef9179990d">init</a> (unsigned int cacheSize, unsigned long blockCount, const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> &amp;<a class="el" href="classtransfer_1_1MPICache.xhtml#a98a81af4007cc9a12ef753e4c9375955">mpiComm</a>, <a class="el" href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a> &amp;numaComm)</td></tr>
+<tr class="separator:a765b4c41bb1ef954929477ef9179990d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98a81af4007cc9a12ef753e4c9375955"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a98a81af4007cc9a12ef753e4c9375955">mpiComm</a> () const </td></tr>
+<tr class="separator:a98a81af4007cc9a12ef753e4c9375955"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a734e55c05b35d6aea69675d728918071"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a734e55c05b35d6aea69675d728918071">rankCacheSize</a> () const </td></tr>
+<tr class="separator:a734e55c05b35d6aea69675d728918071"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f538c72b7d8d5540b54fb8fcaeb2205"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a7f538c72b7d8d5540b54fb8fcaeb2205">fetchBlockInfo</a> (const long *dictEntry)</td></tr>
+<tr class="separator:a7f538c72b7d8d5540b54fb8fcaeb2205"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58246e581c82b70850d8bec0e6f6abd2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a58246e581c82b70850d8bec0e6f6abd2">updateBlockInfo</a> (long *dictEntry, unsigned long newEntry)</td></tr>
+<tr class="separator:a58246e581c82b70850d8bec0e6f6abd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8d278f2a9f607f48b34a45b2c34d016"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#ac8d278f2a9f607f48b34a45b2c34d016">fetchAndUpdateBlockInfo</a> (long *dictEntry, unsigned long newEntry)</td></tr>
+<tr class="separator:ac8d278f2a9f607f48b34a45b2c34d016"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9de69d1f3c660d8028a1cce5213195e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a9de69d1f3c660d8028a1cce5213195e5">deleteBlockInfo</a> (long *dictEntry, long entry)</td></tr>
+<tr class="separator:a9de69d1f3c660d8028a1cce5213195e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8655ee872854887b97b98fb098cf984"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#ad8655ee872854887b97b98fb098cf984">dictEntrySize</a> () const </td></tr>
+<tr class="separator:ad8655ee872854887b97b98fb098cf984"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10a2f8a4fce4aba0ffadaa89ea9c59fa"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a10a2f8a4fce4aba0ffadaa89ea9c59fa">totalDictEntrySize</a> () const </td></tr>
+<tr class="separator:a10a2f8a4fce4aba0ffadaa89ea9c59fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d258e89b5fe09c0d01ad618689c06a6"><td class="memItemLeft" align="right" valign="top">long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a8d258e89b5fe09c0d01ad618689c06a6">dictionary</a> (unsigned long entry)</td></tr>
+<tr class="separator:a8d258e89b5fe09c0d01ad618689c06a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6e1546c8a40d27fb5d4325381b99d58"><td class="memItemLeft" align="right" valign="top">const long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#ae6e1546c8a40d27fb5d4325381b99d58">dictionary</a> () const </td></tr>
+<tr class="separator:ae6e1546c8a40d27fb5d4325381b99d58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a301dc38a57b04fdc4af19ef287994824"><td class="memItemLeft" align="right" valign="top">long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a301dc38a57b04fdc4af19ef287994824">dictionary</a> ()</td></tr>
+<tr class="separator:a301dc38a57b04fdc4af19ef287994824"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
 Static Protected Attributes</h2></td></tr>
-<tr class="memitem:a3bdcf48c0ff57f28cbef3f88c97993dc"><td class="memItemLeft" align="right" valign="top">static const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a3bdcf48c0ff57f28cbef3f88c97993dc">MAX_DICT_SIZE</a> = 8</td></tr>
-<tr class="separator:a3bdcf48c0ff57f28cbef3f88c97993dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73cc31801e613cbf873b7a333d9324b4"><td class="memItemLeft" align="right" valign="top">static const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a73cc31801e613cbf873b7a333d9324b4">MAX_DICT_SIZE</a> = 8</td></tr>
+<tr class="separator:a73cc31801e613cbf873b7a333d9324b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:a1c9203c93719f26a8f80b244a723c9e7"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a1c9203c93719f26a8f80b244a723c9e7">fetchBlockInfo</a> (const long *dictEntry, unsigned int &amp;count)</td></tr>
-<tr class="separator:a1c9203c93719f26a8f80b244a723c9e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf570c72e63191aac52e001198ace216"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#aaf570c72e63191aac52e001198ace216">updateBlockInfo</a> (long *dictEntry, unsigned long newEntry, unsigned int count)</td></tr>
-<tr class="separator:aaf570c72e63191aac52e001198ace216"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50b2d876ae1e45d214ceaba96fdd0335"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a50b2d876ae1e45d214ceaba96fdd0335">fetchBlockInfo</a> (const long *dictEntry, unsigned int &amp;count)</td></tr>
+<tr class="separator:a50b2d876ae1e45d214ceaba96fdd0335"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a18b6b3a0682fae59cee41317902b1e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a6a18b6b3a0682fae59cee41317902b1e">updateBlockInfo</a> (long *dictEntry, unsigned long newEntry, unsigned int count)</td></tr>
+<tr class="separator:a6a18b6b3a0682fae59cee41317902b1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:a4ae299717ab8060bab5aebee9f201556"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a4ae299717ab8060bab5aebee9f201556">m_numaDomainId</a></td></tr>
-<tr class="separator:a4ae299717ab8060bab5aebee9f201556"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a677736c7c25ce045777ee937183582e1"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a677736c7c25ce045777ee937183582e1">m_dictEntrySize</a></td></tr>
-<tr class="separator:a677736c7c25ce045777ee937183582e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22eb601e38eb9ce79c4fbd19e217e920"><td class="memItemLeft" align="right" valign="top">long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a22eb601e38eb9ce79c4fbd19e217e920">m_dictionary</a></td></tr>
-<tr class="separator:a22eb601e38eb9ce79c4fbd19e217e920"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a105344316a2c1ab4ac0b5467f31562e0"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a105344316a2c1ab4ac0b5467f31562e0">m_mpiComm</a></td></tr>
+<tr class="separator:a105344316a2c1ab4ac0b5467f31562e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15680ce3fa27b4fd654dfab17aeaba8e"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a15680ce3fa27b4fd654dfab17aeaba8e">m_numaDomainId</a></td></tr>
+<tr class="separator:a15680ce3fa27b4fd654dfab17aeaba8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef24d29ed5c91fe88b9146eba1cb5f44"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#aef24d29ed5c91fe88b9146eba1cb5f44">m_dictEntrySize</a></td></tr>
+<tr class="separator:aef24d29ed5c91fe88b9146eba1cb5f44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b4334f45530082d5f1e22789760a069"><td class="memItemLeft" align="right" valign="top">long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a8b4334f45530082d5f1e22789760a069">m_dictionary</a></td></tr>
+<tr class="separator:a8b4334f45530082d5f1e22789760a069"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fa63ea6045068c53298427b9ab8176a"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a3fa63ea6045068c53298427b9ab8176a">m_rankCacheSize</a></td></tr>
+<tr class="separator:a3fa63ea6045068c53298427b9ab8176a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;class Allocator&gt;<br />
-class transfer::MPICache&lt; Allocator &gt;</h3>
+<div class="textblock"><h3>template&lt;class Allocator, bool lock&gt;<br />
+class transfer::MPICache&lt; Allocator, lock &gt;</h3>
 
-<p>A dictionary for cache entries </p>
+<p>A dictionary for cache entries</p>
+<p>If lock is true, the class will allocate memory for an additional long int after each dictionary entry. This can be used to store a mutex for each dictionary entry. The mutex value will be initialized with -1. </p>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00050">50</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00055">55</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="aab98e65b988763e31a6590a0e36e3a0f"></a>
+<a class="anchor" id="a9de69d1f3c660d8028a1cce5213195e5"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::deleteBlockInfo </td>
+          <td class="memname">void <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::deleteBlockInfo </td>
           <td>(</td>
           <td class="paramtype">long *&#160;</td>
           <td class="paramname"><em>dictEntry</em>, </td>
@@ -197,21 +214,21 @@ template&lt;class Allocator&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00154">154</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00188">188</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a7c0c93888345487e58ec9f8cd9fd2d9c"></a>
+<a class="anchor" id="ad8655ee872854887b97b98fb098cf984"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">unsigned int <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::dictEntrySize </td>
+          <td class="memname">unsigned int <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::dictEntrySize </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -225,21 +242,21 @@ template&lt;class Allocator&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number entries per element </dd></dl>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00171">171</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00205">205</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="af9b4179a7fefeec41c02516e27828040"></a>
+<a class="anchor" id="a8d258e89b5fe09c0d01ad618689c06a6"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">long* <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::dictionary </td>
+          <td class="memname">long* <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::dictionary </td>
           <td>(</td>
           <td class="paramtype">unsigned long&#160;</td>
           <td class="paramname"><em>entry</em></td><td>)</td>
@@ -254,21 +271,21 @@ template&lt;class Allocator&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A pointer to a specific dictionary entry </dd></dl>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00179">179</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00221">221</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a7512cf1bbec259dbafff999a1e7ef465"></a>
+<a class="anchor" id="ae6e1546c8a40d27fb5d4325381b99d58"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const long* <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::dictionary </td>
+          <td class="memname">const long* <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::dictionary </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -282,21 +299,21 @@ template&lt;class Allocator&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the complete dictionary </dd></dl>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00187">187</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00229">229</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a35cd391ed0881a8b6cecd441f7e60409"></a>
+<a class="anchor" id="a301dc38a57b04fdc4af19ef287994824"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">long* <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::dictionary </td>
+          <td class="memname">long* <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::dictionary </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -310,21 +327,21 @@ template&lt;class Allocator&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the complete dictionary </dd></dl>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00195">195</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00237">237</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a01348d5f73e0537c289d3ac78de9b7c1"></a>
+<a class="anchor" id="ac8d278f2a9f607f48b34a45b2c34d016"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">long <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::fetchAndUpdateBlockInfo </td>
+          <td class="memname">long <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::fetchAndUpdateBlockInfo </td>
           <td>(</td>
           <td class="paramtype">long *&#160;</td>
           <td class="paramname"><em>dictEntry</em>, </td>
@@ -357,21 +374,21 @@ template&lt;class Allocator&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A dictionary entry from where the block can be transfered </dd></dl>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00139">139</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00173">173</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a749103800a552ca4d10b5055b251e7ee"></a>
+<a class="anchor" id="a7f538c72b7d8d5540b54fb8fcaeb2205"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">long <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::fetchBlockInfo </td>
+          <td class="memname">long <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::fetchBlockInfo </td>
           <td>(</td>
           <td class="paramtype">const long *&#160;</td>
           <td class="paramname"><em>dictEntry</em></td><td>)</td>
@@ -393,21 +410,21 @@ template&lt;class Allocator&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The entry or -1 of the block is not stored anywhere </dd></dl>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00110">110</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00144">144</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a1c9203c93719f26a8f80b244a723c9e7"></a>
+<a class="anchor" id="a50b2d876ae1e45d214ceaba96fdd0335"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">long <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::fetchBlockInfo </td>
+          <td class="memname">long <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::fetchBlockInfo </td>
           <td>(</td>
           <td class="paramtype">const long *&#160;</td>
           <td class="paramname"><em>dictEntry</em>, </td>
@@ -440,24 +457,36 @@ template&lt;class Allocator&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The entry or -1 of the block is not stored anywhere </dd></dl>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00208">208</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00250">250</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a123518183987e39b3023453991ebc604"></a>
+<a class="anchor" id="a765b4c41bb1ef954929477ef9179990d"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a> <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::init </td>
+          <td class="memname"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a> <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::init </td>
           <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>cacheSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">unsigned long&#160;</td>
           <td class="paramname"><em>blockCount</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> &amp;&#160;</td>
+          <td class="paramname"><em>mpiComm</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -479,21 +508,105 @@ template&lt;class Allocator&gt; </div>
 </div><div class="memdoc">
 <p>Initialize the the dictionary </p>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00080">80</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00093">93</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a24aba2787d37cd89a7b26fe409d940c9"></a>
+<a class="anchor" id="a98a81af4007cc9a12ef753e4c9375955"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::updateBlockInfo </td>
+          <td class="memname">const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a>&amp; <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::mpiComm </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get the MPI communicator </p>
+
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00125">125</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a734e55c05b35d6aea69675d728918071"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Allocator, bool lock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::rankCacheSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>The total size of the cache in this process </p>
+
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00133">133</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a10a2f8a4fce4aba0ffadaa89ea9c59fa"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Allocator, bool lock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::totalDictEntrySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number entries per element including the lock value </dd></dl>
+
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00213">213</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a58246e581c82b70850d8bec0e6f6abd2"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Allocator, bool lock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::updateBlockInfo </td>
           <td>(</td>
           <td class="paramtype">long *&#160;</td>
           <td class="paramname"><em>dictEntry</em>, </td>
@@ -525,21 +638,21 @@ template&lt;class Allocator&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00122">122</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00156">156</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aaf570c72e63191aac52e001198ace216"></a>
+<a class="anchor" id="a6a18b6b3a0682fae59cee41317902b1e"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::updateBlockInfo </td>
+          <td class="memname">void <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::updateBlockInfo </td>
           <td>(</td>
           <td class="paramtype">long *&#160;</td>
           <td class="paramname"><em>dictEntry</em>, </td>
@@ -578,22 +691,22 @@ template&lt;class Allocator&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00228">228</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00270">270</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a677736c7c25ce045777ee937183582e1"></a>
+<a class="anchor" id="aef24d29ed5c91fe88b9146eba1cb5f44"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">unsigned int <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::m_dictEntrySize</td>
+          <td class="memname">unsigned int <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::m_dictEntrySize</td>
         </tr>
       </table>
   </td>
@@ -604,21 +717,21 @@ template&lt;class Allocator&gt; </div>
 </div><div class="memdoc">
 <p>Number of dictionary entries per element </p>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00057">57</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00065">65</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a22eb601e38eb9ce79c4fbd19e217e920"></a>
+<a class="anchor" id="a8b4334f45530082d5f1e22789760a069"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">long* <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::m_dictionary</td>
+          <td class="memname">long* <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::m_dictionary</td>
         </tr>
       </table>
   </td>
@@ -629,21 +742,46 @@ template&lt;class Allocator&gt; </div>
 </div><div class="memdoc">
 <p>Local part of the dictionary </p>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00060">60</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00068">68</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a4ae299717ab8060bab5aebee9f201556"></a>
+<a class="anchor" id="a105344316a2c1ab4ac0b5467f31562e0"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">unsigned int <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::m_numaDomainId</td>
+          <td class="memname">const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a>* <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::m_mpiComm</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>The MPI communicator </p>
+
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00059">59</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a15680ce3fa27b4fd654dfab17aeaba8e"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Allocator, bool lock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::m_numaDomainId</td>
         </tr>
       </table>
   </td>
@@ -654,21 +792,46 @@ template&lt;class Allocator&gt; </div>
 </div><div class="memdoc">
 <p>The NUMA domain ID </p>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00054">54</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00062">62</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a3bdcf48c0ff57f28cbef3f88c97993dc"></a>
+<a class="anchor" id="a3fa63ea6045068c53298427b9ab8176a"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Allocator&gt; </div>
+template&lt;class Allocator, bool lock&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const unsigned int <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator &gt;::MAX_DICT_SIZE = 8</td>
+          <td class="memname">unsigned long <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::m_rankCacheSize</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Number of blocks on one rank </p>
+
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00071">71</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a73cc31801e613cbf873b7a333d9324b4"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Allocator, bool lock&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const unsigned int <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache</a>&lt; Allocator, lock &gt;::MAX_DICT_SIZE = 8</td>
         </tr>
       </table>
   </td>
@@ -679,7 +842,7 @@ template&lt;class Allocator&gt; </div>
 </div><div class="memdoc">
 <p>Maximum allowed dictionary size </p>
 
-<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00241">241</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicache_8h_source.xhtml#l00283">283</a> of file <a class="el" href="mpicache_8h_source.xhtml">mpicache.h</a>.</p>
 
 </div>
 </div>

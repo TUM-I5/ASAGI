@@ -120,6 +120,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:acd622dade32fc1ed4862e8935bf4a0dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2499a3f76a00ce668c90263cf811c9d3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1MPIComm.xhtml#a2499a3f76a00ce668c90263cf811c9d3">size</a> () const </td></tr>
 <tr class="separator:a2499a3f76a00ce668c90263cf811c9d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1a0e693578ede37d7a58ea7951aa5e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1MPIComm.xhtml#aa1a0e693578ede37d7a58ea7951aa5e9">barrier</a> () const </td></tr>
+<tr class="separator:aa1a0e693578ede37d7a58ea7951aa5e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67e2189a45f1f897da2c8980775154b0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1MPIComm.xhtml#a67e2189a45f1f897da2c8980775154b0">reserveTags</a> (unsigned int num)</td></tr>
+<tr class="separator:a67e2189a45f1f897da2c8980775154b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -134,12 +138,40 @@ Private Attributes</h2></td></tr>
 <tr class="separator:af1111f1d67824f4cc367545db956668a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8eb1898491478ee6432b447e281ae9a7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1MPIComm.xhtml#a8eb1898491478ee6432b447e281ae9a7">m_size</a></td></tr>
 <tr class="separator:a8eb1898491478ee6432b447e281ae9a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0daa2275859e9b29c406297c1ff7679"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1MPIComm.xhtml#ac0daa2275859e9b29c406297c1ff7679">m_nextFreeTag</a></td></tr>
+<tr class="separator:ac0daa2275859e9b29c406297c1ff7679"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Small wrapper around the MPI communicator </p>
 
 <p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00073">73</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="aa1a0e693578ede37d7a58ea7951aa5e9"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mpi::MPIComm::barrier </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>MPI barrier </p>
+
+<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00148">148</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a4a20ee50b25a8736c14c2f0c1f851cc3"></a>
 <div class="memitem">
 <div class="memproto">
@@ -162,7 +194,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The associated communicator </dd></dl>
 
-<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00120">120</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00124">124</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
 
 </div>
 </div>
@@ -189,7 +221,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Initialize the communicator </p>
 
-<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00102">102</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00106">106</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
 
 </div>
 </div>
@@ -215,7 +247,41 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>My rank </dd></dl>
 
-<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00128">128</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00132">132</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a67e2189a45f1f897da2c8980775154b0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int mpi::MPIComm::reserveTags </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>num</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Reserves <code>num</code> consecutive tags in this communicator</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>The number of tags that should be reserved </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The first tag that was reserved </dd></dl>
+
+<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00159">159</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
 
 </div>
 </div>
@@ -241,7 +307,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>Size of the communicator </dd></dl>
 
-<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00136">136</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00140">140</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
 
 </div>
 </div>
@@ -266,6 +332,29 @@ Private Attributes</h2></td></tr>
 <p>The communicator </p>
 
 <p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00077">77</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac0daa2275859e9b29c406297c1ff7679"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int mpi::MPIComm::m_nextFreeTag</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>MPI key for next free tag </p>
+
+<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00086">86</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
 
 </div>
 </div>
@@ -334,7 +423,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Lock to protect all MPI calls </p>
 
-<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00142">142</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00167">167</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
 
 </div>
 </div>

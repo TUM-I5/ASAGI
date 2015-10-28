@@ -108,13 +108,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="dynheader">
 Inheritance diagram for transfer::MPIThreadCache:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classtransfer_1_1MPIThreadCache__inherit__graph.svg" width="187" height="136"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classtransfer_1_1MPIThreadCache__inherit__graph.svg" width="187" height="152"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.xhtml">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for transfer::MPIThreadCache:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classtransfer_1_1MPIThreadCache__coll__graph.svg" width="1494" height="471"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classtransfer_1_1MPIThreadCache__coll__graph.svg" width="1478" height="471"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.xhtml">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -131,7 +131,7 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a4de0fd9a8744e05c199c47576601ef8d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadCache.xhtml#a4de0fd9a8744e05c199c47576601ef8d">init</a> (unsigned char *cache, unsigned int cacheSize, <a class="el" href="classcache_1_1CacheManager.xhtml">cache::CacheManager</a> &amp;cacheManager, unsigned long blockCount, unsigned long blockSize, const <a class="el" href="classtypes_1_1Type.xhtml">types::Type</a> &amp;type, const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> &amp;mpiComm, <a class="el" href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a> &amp;numaComm)</td></tr>
+<tr class="memitem:a4de0fd9a8744e05c199c47576601ef8d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadCache.xhtml#a4de0fd9a8744e05c199c47576601ef8d">init</a> (unsigned char *cache, unsigned int cacheSize, <a class="el" href="classcache_1_1CacheManager.xhtml">cache::CacheManager</a> &amp;cacheManager, unsigned long blockCount, unsigned long blockSize, const <a class="el" href="classtypes_1_1Type.xhtml">types::Type</a> &amp;type, const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> &amp;<a class="el" href="classtransfer_1_1MPICache.xhtml#a98a81af4007cc9a12ef753e4c9375955">mpiComm</a>, <a class="el" href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a> &amp;numaComm)</td></tr>
 <tr class="separator:a4de0fd9a8744e05c199c47576601ef8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8da55326c414ae510609a05683824b35"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadCache.xhtml#a8da55326c414ae510609a05683824b35">startTransfer</a> (unsigned long blockId, int dictRank, unsigned long dictOffset, unsigned long offset)</td></tr>
 <tr class="separator:a8da55326c414ae510609a05683824b35"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -152,29 +152,33 @@ Private Member Functions</h2></td></tr>
 <tr class="separator:a0dc3b44adff940ee49441720ab7b1a82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13c5c75f9b8eed11c10fc5800e4cf6be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadCache.xhtml#a13c5c75f9b8eed11c10fc5800e4cf6be">deleteBlock</a> (unsigned long dictOffset, int rank, unsigned long offset)</td></tr>
 <tr class="separator:a13c5c75f9b8eed11c10fc5800e4cf6be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a123518183987e39b3023453991ebc604 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a123518183987e39b3023453991ebc604">init</a> (unsigned long blockCount, <a class="el" href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a> &amp;numaComm)</td></tr>
-<tr class="separator:a123518183987e39b3023453991ebc604 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a749103800a552ca4d10b5055b251e7ee inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a749103800a552ca4d10b5055b251e7ee">fetchBlockInfo</a> (const long *dictEntry)</td></tr>
-<tr class="separator:a749103800a552ca4d10b5055b251e7ee inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24aba2787d37cd89a7b26fe409d940c9 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a24aba2787d37cd89a7b26fe409d940c9">updateBlockInfo</a> (long *dictEntry, unsigned long newEntry)</td></tr>
-<tr class="separator:a24aba2787d37cd89a7b26fe409d940c9 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01348d5f73e0537c289d3ac78de9b7c1 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a01348d5f73e0537c289d3ac78de9b7c1">fetchAndUpdateBlockInfo</a> (long *dictEntry, unsigned long newEntry)</td></tr>
-<tr class="separator:a01348d5f73e0537c289d3ac78de9b7c1 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab98e65b988763e31a6590a0e36e3a0f inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#aab98e65b988763e31a6590a0e36e3a0f">deleteBlockInfo</a> (long *dictEntry, long entry)</td></tr>
-<tr class="separator:aab98e65b988763e31a6590a0e36e3a0f inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c0c93888345487e58ec9f8cd9fd2d9c inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a7c0c93888345487e58ec9f8cd9fd2d9c">dictEntrySize</a> () const</td></tr>
-<tr class="separator:a7c0c93888345487e58ec9f8cd9fd2d9c inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9b4179a7fefeec41c02516e27828040 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#af9b4179a7fefeec41c02516e27828040">dictionary</a> (unsigned long entry)</td></tr>
-<tr class="separator:af9b4179a7fefeec41c02516e27828040 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7512cf1bbec259dbafff999a1e7ef465 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">const long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a7512cf1bbec259dbafff999a1e7ef465">dictionary</a> () const</td></tr>
-<tr class="separator:a7512cf1bbec259dbafff999a1e7ef465 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35cd391ed0881a8b6cecd441f7e60409 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a35cd391ed0881a8b6cecd441f7e60409">dictionary</a> ()</td></tr>
-<tr class="separator:a35cd391ed0881a8b6cecd441f7e60409 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a765b4c41bb1ef954929477ef9179990d inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a765b4c41bb1ef954929477ef9179990d">init</a> (unsigned int cacheSize, unsigned long blockCount, const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> &amp;<a class="el" href="classtransfer_1_1MPICache.xhtml#a98a81af4007cc9a12ef753e4c9375955">mpiComm</a>, <a class="el" href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a> &amp;numaComm)</td></tr>
+<tr class="separator:a765b4c41bb1ef954929477ef9179990d inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98a81af4007cc9a12ef753e4c9375955 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a98a81af4007cc9a12ef753e4c9375955">mpiComm</a> () const</td></tr>
+<tr class="separator:a98a81af4007cc9a12ef753e4c9375955 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a734e55c05b35d6aea69675d728918071 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a734e55c05b35d6aea69675d728918071">rankCacheSize</a> () const</td></tr>
+<tr class="separator:a734e55c05b35d6aea69675d728918071 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f538c72b7d8d5540b54fb8fcaeb2205 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a7f538c72b7d8d5540b54fb8fcaeb2205">fetchBlockInfo</a> (const long *dictEntry)</td></tr>
+<tr class="separator:a7f538c72b7d8d5540b54fb8fcaeb2205 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58246e581c82b70850d8bec0e6f6abd2 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a58246e581c82b70850d8bec0e6f6abd2">updateBlockInfo</a> (long *dictEntry, unsigned long newEntry)</td></tr>
+<tr class="separator:a58246e581c82b70850d8bec0e6f6abd2 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8d278f2a9f607f48b34a45b2c34d016 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#ac8d278f2a9f607f48b34a45b2c34d016">fetchAndUpdateBlockInfo</a> (long *dictEntry, unsigned long newEntry)</td></tr>
+<tr class="separator:ac8d278f2a9f607f48b34a45b2c34d016 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9de69d1f3c660d8028a1cce5213195e5 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a9de69d1f3c660d8028a1cce5213195e5">deleteBlockInfo</a> (long *dictEntry, long entry)</td></tr>
+<tr class="separator:a9de69d1f3c660d8028a1cce5213195e5 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8655ee872854887b97b98fb098cf984 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#ad8655ee872854887b97b98fb098cf984">dictEntrySize</a> () const</td></tr>
+<tr class="separator:ad8655ee872854887b97b98fb098cf984 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10a2f8a4fce4aba0ffadaa89ea9c59fa inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a10a2f8a4fce4aba0ffadaa89ea9c59fa">totalDictEntrySize</a> () const</td></tr>
+<tr class="separator:a10a2f8a4fce4aba0ffadaa89ea9c59fa inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d258e89b5fe09c0d01ad618689c06a6 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a8d258e89b5fe09c0d01ad618689c06a6">dictionary</a> (unsigned long entry)</td></tr>
+<tr class="separator:a8d258e89b5fe09c0d01ad618689c06a6 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6e1546c8a40d27fb5d4325381b99d58 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">const long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#ae6e1546c8a40d27fb5d4325381b99d58">dictionary</a> () const</td></tr>
+<tr class="separator:ae6e1546c8a40d27fb5d4325381b99d58 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a301dc38a57b04fdc4af19ef287994824 inherit pub_methods_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a301dc38a57b04fdc4af19ef287994824">dictionary</a> ()</td></tr>
+<tr class="separator:a301dc38a57b04fdc4af19ef287994824 inherit pub_methods_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:aa14ce9ddbef202e703547d2e23d4b099"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadCache.xhtml#aa14ce9ddbef202e703547d2e23d4b099">m_mpiComm</a></td></tr>
-<tr class="separator:aa14ce9ddbef202e703547d2e23d4b099"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85450114b21547d2f98b826c1bc6ae9e"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadCache.xhtml#a85450114b21547d2f98b826c1bc6ae9e">m_numaDomainId</a></td></tr>
 <tr class="separator:a85450114b21547d2f98b826c1bc6ae9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a335edb4e78173d6ebc9749f397cbb7ed"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcache_1_1CacheManager.xhtml">cache::CacheManager</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadCache.xhtml#a335edb4e78173d6ebc9749f397cbb7ed">m_cacheManager</a></td></tr>
@@ -197,8 +201,6 @@ Private Attributes</h2></td></tr>
 <tr class="separator:a4c6ca209b712c398fd8f65fcc86cd45c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65f48dd1ebdcb61e419a888e4d282899"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadCache.xhtml#a65f48dd1ebdcb61e419a888e4d282899">m_deleterTag</a></td></tr>
 <tr class="separator:a65f48dd1ebdcb61e419a888e4d282899"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acecaa6e1a90fffa0f627b0a26cb3809d"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadCache.xhtml#acecaa6e1a90fffa0f627b0a26cb3809d">m_rankCacheSize</a></td></tr>
-<tr class="separator:acecaa6e1a90fffa0f627b0a26cb3809d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace291fa8045f67bcbce7ad3fb61daec3"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadCache.xhtml#ace291fa8045f67bcbce7ad3fb61daec3">m_blockSize</a></td></tr>
 <tr class="separator:ace291fa8045f67bcbce7ad3fb61daec3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e89e9d7c933679f3e52eabe0ca5b2df"><td class="memItemLeft" align="right" valign="top">MPI_Datatype&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadCache.xhtml#a0e89e9d7c933679f3e52eabe0ca5b2df">m_mpiType</a></td></tr>
@@ -214,14 +216,14 @@ Static Private Attributes</h2></td></tr>
 <tr class="separator:a7c218d5be83fa94196daa8b620fd3fe6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4bb6ad0dcfd009894f2fab6dc0c96436"><td class="memItemLeft" align="right" valign="top">static const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPIThreadCache.xhtml#a4bb6ad0dcfd009894f2fab6dc0c96436">TRANSFER_FAIL_TAG</a> = 2</td></tr>
 <tr class="separator:a4bb6ad0dcfd009894f2fab6dc0c96436"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_static_attribs_classtransfer_1_1MPICache"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classtransfer_1_1MPICache')"><img src="closed.png" alt="-"/>&#160;Static Private Attributes inherited from <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache&lt; allocator::Default &gt;</a></td></tr>
-<tr class="memitem:a3bdcf48c0ff57f28cbef3f88c97993dc inherit pub_static_attribs_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">static const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a3bdcf48c0ff57f28cbef3f88c97993dc">MAX_DICT_SIZE</a></td></tr>
-<tr class="separator:a3bdcf48c0ff57f28cbef3f88c97993dc inherit pub_static_attribs_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_attribs_classtransfer_1_1MPICache"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classtransfer_1_1MPICache')"><img src="closed.png" alt="-"/>&#160;Static Private Attributes inherited from <a class="el" href="classtransfer_1_1MPICache.xhtml">transfer::MPICache&lt; allocator::Default, false &gt;</a></td></tr>
+<tr class="memitem:a73cc31801e613cbf873b7a333d9324b4 inherit pub_static_attribs_classtransfer_1_1MPICache"><td class="memItemLeft" align="right" valign="top">static const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtransfer_1_1MPICache.xhtml#a73cc31801e613cbf873b7a333d9324b4">MAX_DICT_SIZE</a></td></tr>
+<tr class="separator:a73cc31801e613cbf873b7a333d9324b4 inherit pub_static_attribs_classtransfer_1_1MPICache"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Copies blocks between MPI processes assuming cache storage </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00067">67</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00068">68</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a25ac0d52e3d84d29eb41105f04560ebe"></a>
 <div class="memitem">
@@ -278,7 +280,7 @@ Static Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A dictionary entry that has to be passed to <a class="el" href="namespacetransfer.xhtml">transfer</a> if the block should be fetched from a remote rank </dd></dl>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00520">520</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00511">511</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -329,7 +331,7 @@ Static Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00580">580</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00571">571</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -387,7 +389,7 @@ Static Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00541">541</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00532">532</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -438,7 +440,7 @@ Static Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00594">594</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00585">585</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -496,7 +498,7 @@ Static Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00504">504</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00495">495</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -530,7 +532,7 @@ Static Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The global offset of a storage or -1 if the block is not in any cache </dd></dl>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00566">566</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00557">557</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -616,7 +618,7 @@ Static Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00331">331</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00324">324</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -675,7 +677,7 @@ Static Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A dictionary entry that has to be passed to <a class="el" href="namespacetransfer.xhtml">transfer</a> if the block should be fetched from a remote rank </dd></dl>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00420">420</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00411">411</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -734,7 +736,7 @@ Static Private Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the block was fetched, false otherwise </dd></dl>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00451">451</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00442">442</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -758,7 +760,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Tag for return entry value </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00603">603</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00594">594</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -781,7 +783,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Class responsible for adding block info </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00265">265</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00263">263</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -804,7 +806,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p><a class="el" href="classtransfer_1_1MPIThreadCache_1_1Adder.xhtml">Adder</a> tag </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00268">268</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00266">266</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -827,7 +829,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Class responsible for responding to block info requests </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00253">253</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00251">251</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -850,7 +852,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Responder tag </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00256">256</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00254">254</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -873,7 +875,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Number of elements in one block </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00280">280</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00275">275</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -896,7 +898,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Class responsible for sending blocks </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00259">259</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00257">257</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -919,7 +921,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The cache manager (required to lock blocks in cache) </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00247">247</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00245">245</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -942,7 +944,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Class responsible for deleting remote requests </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00271">271</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00269">269</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -965,30 +967,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p><a class="el" href="classtransfer_1_1MPIThreadCache_1_1Deleter.xhtml">Deleter</a> tag </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00274">274</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aa14ce9ddbef202e703547d2e23d4b099"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="classmpi_1_1MPIComm.xhtml">mpi::MPIComm</a>* transfer::MPIThreadCache::m_mpiComm</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>The MPI communicator </p>
-
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00241">241</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00272">272</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -1011,7 +990,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The type MPI type of an element </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00283">283</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00278">278</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -1034,7 +1013,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>A list of mutexes (one for each block) </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00250">250</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00248">248</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -1057,30 +1036,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The NUMA domain ID </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00244">244</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="acecaa6e1a90fffa0f627b0a26cb3809d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned long transfer::MPIThreadCache::m_rankCacheSize</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Number of blocks on one rank </p>
-
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00277">277</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00242">242</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -1103,7 +1059,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Lock send-receive pairs to avoid threading issues </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00286">286</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00281">281</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -1126,7 +1082,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Transfer tag </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00262">262</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00260">260</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -1149,7 +1105,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Tag for unsuccessful transfer </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00609">609</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00600">600</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
@@ -1172,7 +1128,7 @@ Static Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Tag for successful transfer </p>
 
-<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00606">606</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
+<p>Definition at line <a class="el" href="mpithreadcache_8h_source.xhtml#l00597">597</a> of file <a class="el" href="mpithreadcache_8h_source.xhtml">mpithreadcache.h</a>.</p>
 
 </div>
 </div>
