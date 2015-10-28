@@ -22,25 +22,25 @@ branches:
   - gh-pages
 
 script:
- - mkdir build && cd build && cmake ../ -DTESTS=ON
+ - mkdir build && cd build && cmake ../ -DTESTS=ON -DMPI3=OFF
  - make
  - make test
  - make doc
  - make devdoc
  - cd ..
- - mkdir build_numa && cd build_numa && cmake ../ -DTESTS=ON -DDEBUG_NUMA=ON
+ - mkdir build_numa && cd build_numa && cmake ../ -DTESTS=ON -DDEBUG_NUMA=ON -DMPI3=OFF
  - make
  - make test
  - cd ..
- - mkdir build_nonuma && cd build_nonuma && cmake ../ -DTESTS=ON -DNONUMA=ON
+ - mkdir build_nonuma && cd build_nonuma && cmake ../ -DTESTS=ON -DNONUMA=ON -DMPI3=OFF
  - make
  - make test
  - cd ..
- - mkdir build_nompi && cd build_nompi && cmake ../ -DTESTS=ON -DNOMPI=ON
+ - mkdir build_nompi && cd build_nompi && cmake ../ -DTESTS=ON -DNOMPI=ON -DDEBUG_NUMA=ON
  - make
  - make test
  - cd ..
- - mkdir build_numa_nompi && cd build_numa && cmake ../ -DTESTS=ON -DNOMPI=ON -DDEBUG_NUMA=ON
+ - mkdir build_numa_nompi && cd build_numa && cmake ../ -DTESTS=ON -DNONUMA=ON -DMPI3=OFF
  - make
  - make test
  - cd ..
