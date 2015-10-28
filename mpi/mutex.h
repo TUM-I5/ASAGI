@@ -161,7 +161,7 @@ public:
 		// that holds the lock
 		int rank = oldLock / m_numa->totalThreads();
 		int tag = oldLock % m_numa->totalThreads();
-		MPI_Ssend(0L, 0, MPI_BYTE, rank, tag, m_comm->comm());
+		mpiResult = MPI_Ssend(0L, 0, MPI_BYTE, rank, tag, m_comm->comm());
 		assert(mpiResult == MPI_SUCCESS);
 	}
 	
