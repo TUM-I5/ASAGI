@@ -116,6 +116,8 @@
  *  that require MPI communication will be disabled. <code>[OFF]</code>
  * @li <b>NONUMA = ON | OFF</b> Do not compile with NUMA support. All intra-node
  *  communications will be turned off. <code>[OFF]</code>
+ * @li <b>MPI3 = ON | OFF</b> Compile MPI-3 functionality. Some features are
+ *  only available when this flag is switched on. <code>[ON]</code>
  * @li <b>TESTS = ON | OFF</b> Compile tests. <code>[OFF]</code>
  * @li <b>EXAMPLES = ON | OFF</b> Compile example programs. <code>[OFF]</code>
  *

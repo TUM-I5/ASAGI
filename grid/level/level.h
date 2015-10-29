@@ -272,7 +272,7 @@ protected:
 	/**
 	 * @return The MPI communicator
 	 */
-	const mpi::MPIComm& comm() const
+	mpi::MPIComm& comm()
 	{
 		return *m_mpiComm;
 	}
@@ -280,7 +280,7 @@ protected:
 	/**
 	 * @return The MPI communicator
 	 */
-	mpi::MPIComm& comm()
+	const mpi::MPIComm& comm() const
 	{
 		return *m_mpiComm;
 	}
