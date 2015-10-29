@@ -449,7 +449,6 @@ public:
 		int rank = entry / rankCacheSize();
 
 		assert(rank >= 0);
-		assert(rank != mpiComm().rank());
 
 		std::lock_guard<threads::Mutex> lock(*m_sendRecvMutex);
 
