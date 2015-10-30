@@ -98,9 +98,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#ifndef NUMA_NUMA_H</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#define NUMA_NUMA_H</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#ifdef ASAGI_NONUMA</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#ifndef USE_PTHREAD</span></div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="nonuma_8h.xhtml">nonuma.h</a>&quot;</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#else // ASAGI_NONUMA</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#else // USE_PTHREAD</span></div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="asagi_8h.xhtml">asagi.h</a>&quot;</span></div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span></div>
@@ -115,15 +115,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#else // _LP64</span></div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keyword">typedef</span> uint16_t <a class="code" href="numa_8h.xhtml#a9be3d15ee486d29758bd140fc8357bc4">id_t</a>;</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#endif // _LP64</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#endif // ASAGI_NONUMA</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#endif // USE_PTHREAD</span></div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword">namespace </span>numa</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;{</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#ifdef ASAGI_NONUMA</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#ifndef USE_PTHREAD</span></div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">typedef</span> NoNuma Numa;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#else // ASAGI_NONUMA</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#else // USE_PTHREAD</span></div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="keyword">class </span>NumaComm;</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
@@ -156,7 +156,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a69656f79342520e170ee22f4dfcb6d29">asagi::Grid::SUCCESS</a>;</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        }</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <a class="code" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a> <a class="code" href="classnuma_1_1Numa.xhtml#a7a695cee75f3d866fe2e900748b39ab9">registerThread</a>(<span class="keywordtype">bool</span> &amp;masterThread);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <a class="code" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a> <a class="code" href="classnuma_1_1Numa.xhtml#a47fc208f0d81485a674bcafe06286338">registerThread</a>(<span class="keywordtype">bool</span> &amp;masterThread, <span class="keywordtype">bool</span> detectNumaDomains = <span class="keyword">true</span>);</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
 <div class="line"><a name="l00122"></a><span class="lineno"><a class="line" href="classnuma_1_1Numa.xhtml#a224621ee88d7f6b68ac40c0135988ef8">  122</a></span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classnuma_1_1Numa.xhtml#a224621ee88d7f6b68ac40c0135988ef8">totalThreads</a>()<span class="keyword"> const</span></div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="keyword">        </span>{</div>
@@ -190,7 +190,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        <a class="code" href="classnuma_1_1NumaComm.xhtml">NumaComm</a>* <a class="code" href="classnuma_1_1Numa.xhtml#a6545f011eed2fbc30b0c1d58a1bf5522">createComm</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;};</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="preprocessor">#endif // ASAGI_NONUMA</span></div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="preprocessor">#endif // USE_PHTREAD</span></div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;}</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;</div>
@@ -202,17 +202,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="group__cxx__interface_xhtml_ggac1191f4df7554b1b99e515962ebc2bb5a69656f79342520e170ee22f4dfcb6d29"><div class="ttname"><a href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a69656f79342520e170ee22f4dfcb6d29">asagi::Grid::SUCCESS</a></div><div class="ttdef"><b>Definition:</b> <a href="asagi_8h_source.xhtml#l00094">asagi.h:94</a></div></div>
 <div class="ttc" id="classthreads_1_1Sync_xhtml"><div class="ttname"><a href="classthreads_1_1Sync.xhtml">threads::Sync</a></div><div class="ttdoc">Synchronizes a set of threads. </div><div class="ttdef"><b>Definition:</b> <a href="sync_8h_source.xhtml#l00054">sync.h:54</a></div></div>
 <div class="ttc" id="classnuma_1_1Numa_xhtml"><div class="ttname"><a href="classnuma_1_1Numa.xhtml">numa::Numa</a></div><div class="ttdef"><b>Definition:</b> <a href="numa_8h_source.xhtml#l00077">numa.h:77</a></div></div>
-<div class="ttc" id="classnuma_1_1Numa_xhtml_a6545f011eed2fbc30b0c1d58a1bf5522"><div class="ttname"><a href="classnuma_1_1Numa.xhtml#a6545f011eed2fbc30b0c1d58a1bf5522">numa::Numa::createComm</a></div><div class="ttdeci">NumaComm * createComm() const </div><div class="ttdef"><b>Definition:</b> <a href="numa_8cpp_source.xhtml#l00147">numa.cpp:147</a></div></div>
+<div class="ttc" id="classnuma_1_1Numa_xhtml_a6545f011eed2fbc30b0c1d58a1bf5522"><div class="ttname"><a href="classnuma_1_1Numa.xhtml#a6545f011eed2fbc30b0c1d58a1bf5522">numa::Numa::createComm</a></div><div class="ttdeci">NumaComm * createComm() const </div><div class="ttdef"><b>Definition:</b> <a href="numa_8cpp_source.xhtml#l00158">numa.cpp:158</a></div></div>
 <div class="ttc" id="classnuma_1_1Numa_xhtml_ad9bb2109f526160b540cbe3402e4e795"><div class="ttname"><a href="classnuma_1_1Numa.xhtml#ad9bb2109f526160b540cbe3402e4e795">numa::Numa::totalDomains</a></div><div class="ttdeci">unsigned int totalDomains() const </div><div class="ttdef"><b>Definition:</b> <a href="numa_8h_source.xhtml#l00130">numa.h:130</a></div></div>
 <div class="ttc" id="classnuma_1_1Numa_xhtml_ab2bf02a2acf369b84b56fa950d69aaa9"><div class="ttname"><a href="classnuma_1_1Numa.xhtml#ab2bf02a2acf369b84b56fa950d69aaa9">numa::Numa::m_totalThreads</a></div><div class="ttdeci">unsigned int m_totalThreads</div><div class="ttdef"><b>Definition:</b> <a href="numa_8h_source.xhtml#l00081">numa.h:81</a></div></div>
 <div class="ttc" id="classnuma_1_1NumaComm_xhtml"><div class="ttname"><a href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a></div><div class="ttdef"><b>Definition:</b> <a href="numacomm_8h_source.xhtml#l00052">numacomm.h:52</a></div></div>
 <div class="ttc" id="classnuma_1_1Numa_xhtml_a947455927d02fa586fb8ce57f45ccba3"><div class="ttname"><a href="classnuma_1_1Numa.xhtml#a947455927d02fa586fb8ce57f45ccba3">numa::Numa::threadId</a></div><div class="ttdeci">unsigned int threadId() const </div><div class="ttdef"><b>Definition:</b> <a href="numa_8h_source.xhtml#l00138">numa.h:138</a></div></div>
 <div class="ttc" id="classnuma_1_1Numa_xhtml_a6aac75bf24e221620fd3cda4b59c4e86"><div class="ttname"><a href="classnuma_1_1Numa.xhtml#a6aac75bf24e221620fd3cda4b59c4e86">numa::Numa::m_syncThreads</a></div><div class="ttdeci">threads::Sync m_syncThreads</div><div class="ttdef"><b>Definition:</b> <a href="numa_8h_source.xhtml#l00099">numa.h:99</a></div></div>
 <div class="ttc" id="asagi_8h_xhtml"><div class="ttname"><a href="asagi_8h.xhtml">asagi.h</a></div><div class="ttdoc">Include file for C and C++ API. </div></div>
-<div class="ttc" id="classnuma_1_1Numa_xhtml_a7a695cee75f3d866fe2e900748b39ab9"><div class="ttname"><a href="classnuma_1_1Numa.xhtml#a7a695cee75f3d866fe2e900748b39ab9">numa::Numa::registerThread</a></div><div class="ttdeci">asagi::Grid::Error registerThread(bool &amp;masterThread)</div><div class="ttdoc">Registers a thread and detects the NUMA domain for this thread. </div><div class="ttdef"><b>Definition:</b> <a href="numa_8cpp_source.xhtml#l00070">numa.cpp:70</a></div></div>
 <div class="ttc" id="classnuma_1_1Numa_xhtml_a7314202ad38d8c25df11fa929a13bf10"><div class="ttname"><a href="classnuma_1_1Numa.xhtml#a7314202ad38d8c25df11fa929a13bf10">numa::Numa::m_syncDomains</a></div><div class="ttdeci">threads::Sync m_syncDomains</div><div class="ttdef"><b>Definition:</b> <a href="numa_8h_source.xhtml#l00102">numa.h:102</a></div></div>
 <div class="ttc" id="nonuma_8h_xhtml"><div class="ttname"><a href="nonuma_8h.xhtml">nonuma.h</a></div></div>
 <div class="ttc" id="classnuma_1_1Numa_xhtml_a5623f7f1b62f352e3ebc46b359d9c925"><div class="ttname"><a href="classnuma_1_1Numa.xhtml#a5623f7f1b62f352e3ebc46b359d9c925">numa::Numa::m_domains</a></div><div class="ttdeci">std::map&lt; int, unsigned int &gt; m_domains</div><div class="ttdef"><b>Definition:</b> <a href="numa_8h_source.xhtml#l00084">numa.h:84</a></div></div>
+<div class="ttc" id="classnuma_1_1Numa_xhtml_a47fc208f0d81485a674bcafe06286338"><div class="ttname"><a href="classnuma_1_1Numa.xhtml#a47fc208f0d81485a674bcafe06286338">numa::Numa::registerThread</a></div><div class="ttdeci">asagi::Grid::Error registerThread(bool &amp;masterThread, bool detectNumaDomains=true)</div><div class="ttdoc">Registers a thread and detects the NUMA domain for this thread. </div><div class="ttdef"><b>Definition:</b> <a href="numa_8cpp_source.xhtml#l00073">numa.cpp:73</a></div></div>
 <div class="ttc" id="sync_8h_xhtml"><div class="ttname"><a href="sync_8h.xhtml">sync.h</a></div></div>
 <div class="ttc" id="classnuma_1_1Numa_xhtml_a8994ec972e435f1e4ffd9a0b7a31b9c6"><div class="ttname"><a href="classnuma_1_1Numa.xhtml#a8994ec972e435f1e4ffd9a0b7a31b9c6">numa::Numa::m_initialized</a></div><div class="ttdeci">bool m_initialized</div><div class="ttdef"><b>Definition:</b> <a href="numa_8h_source.xhtml#l00093">numa.h:93</a></div></div>
 <div class="ttc" id="classnuma_1_1Numa_xhtml_ab6196c5e4944cf282524953fd46a2a16"><div class="ttname"><a href="classnuma_1_1Numa.xhtml#ab6196c5e4944cf282524953fd46a2a16">numa::Numa::domainId</a></div><div class="ttdeci">unsigned int domainId() const </div><div class="ttdef"><b>Definition:</b> <a href="numa_8h_source.xhtml#l00147">numa.h:147</a></div></div>

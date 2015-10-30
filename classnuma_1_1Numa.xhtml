@@ -113,9 +113,9 @@ Collaboration diagram for numa::Numa:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a154ab0e679be6d60199736d5e1dc74aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnuma_1_1Numa.xhtml#a154ab0e679be6d60199736d5e1dc74aa">setThreads</a> (unsigned int threads)</td></tr>
 <tr class="separator:a154ab0e679be6d60199736d5e1dc74aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a695cee75f3d866fe2e900748b39ab9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnuma_1_1Numa.xhtml#a7a695cee75f3d866fe2e900748b39ab9">registerThread</a> (bool &amp;masterThread)</td></tr>
-<tr class="memdesc:a7a695cee75f3d866fe2e900748b39ab9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a thread and detects the NUMA domain for this thread.  <a href="#a7a695cee75f3d866fe2e900748b39ab9">More...</a><br /></td></tr>
-<tr class="separator:a7a695cee75f3d866fe2e900748b39ab9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47fc208f0d81485a674bcafe06286338"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnuma_1_1Numa.xhtml#a47fc208f0d81485a674bcafe06286338">registerThread</a> (bool &amp;masterThread, bool detectNumaDomains=true)</td></tr>
+<tr class="memdesc:a47fc208f0d81485a674bcafe06286338"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a thread and detects the NUMA domain for this thread.  <a href="#a47fc208f0d81485a674bcafe06286338">More...</a><br /></td></tr>
+<tr class="separator:a47fc208f0d81485a674bcafe06286338"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a224621ee88d7f6b68ac40c0135988ef8"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnuma_1_1Numa.xhtml#a224621ee88d7f6b68ac40c0135988ef8">totalThreads</a> () const </td></tr>
 <tr class="separator:a224621ee88d7f6b68ac40c0135988ef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9bb2109f526160b540cbe3402e4e795"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnuma_1_1Numa.xhtml#ad9bb2109f526160b540cbe3402e4e795">totalDomains</a> () const </td></tr>
@@ -194,7 +194,7 @@ Private Attributes</h2></td></tr>
 <p>Creates <b>one</b> NUMA communicator. This is a collective operation among all NUMA domains</p>
 <dl class="section warning"><dt>Warning</dt><dd>The caller is responsible for freeing the communicator. </dd></dl>
 
-<p>Definition at line <a class="el" href="numa_8cpp_source.xhtml#l00147">147</a> of file <a class="el" href="numa_8cpp_source.xhtml">numa.cpp</a>.</p>
+<p>Definition at line <a class="el" href="numa_8cpp_source.xhtml#l00158">158</a> of file <a class="el" href="numa_8cpp_source.xhtml">numa.cpp</a>.</p>
 
 </div>
 </div>
@@ -224,7 +224,7 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a7a695cee75f3d866fe2e900748b39ab9"></a>
+<a class="anchor" id="a47fc208f0d81485a674bcafe06286338"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -232,8 +232,18 @@ Private Attributes</h2></td></tr>
           <td class="memname"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a> numa::Numa::registerThread </td>
           <td>(</td>
           <td class="paramtype">bool &amp;&#160;</td>
-          <td class="paramname"><em>masterThread</em></td><td>)</td>
+          <td class="paramname"><em>masterThread</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>detectNumaDomains</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -243,11 +253,12 @@ Private Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">masterThread</td><td>True up on return, if this is the master thread, false otherwise </td></tr>
+    <tr><td class="paramname">detectNumaDomains</td><td>Set this to false to disable the NUMA detection. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="numa_8cpp_source.xhtml#l00070">70</a> of file <a class="el" href="numa_8cpp_source.xhtml">numa.cpp</a>.</p>
+<p>Definition at line <a class="el" href="numa_8cpp_source.xhtml#l00073">73</a> of file <a class="el" href="numa_8cpp_source.xhtml">numa.cpp</a>.</p>
 
 </div>
 </div>

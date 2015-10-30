@@ -144,8 +144,7 @@ Private Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
-<tr class="memitem:a59d5f7b88618abea9d57b7f68a9408a5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a59d5f7b88618abea9d57b7f68a9408a5"></a>
-static const long&#160;</td><td class="memItemRight" valign="bottom"><b>MUTEX_UNLOCKED</b> = -1</td></tr>
+<tr class="memitem:a59d5f7b88618abea9d57b7f68a9408a5"><td class="memItemLeft" align="right" valign="top">static const long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1Mutex.xhtml#a59d5f7b88618abea9d57b7f68a9408a5">MUTEX_UNLOCKED</a> = -1</td></tr>
 <tr class="separator:a59d5f7b88618abea9d57b7f68a9408a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -244,7 +243,7 @@ static const long&#160;</td><td class="memItemRight" valign="bottom"><b>MUTEX_UN
   <table class="params">
     <tr><td class="paramname">comm</td><td>The communicator used for this mutex. </td></tr>
     <tr><td class="paramname">window</td><td>The MPI window where the mutex values are stored </td></tr>
-    <tr><td class="paramname">numThreads</td><td>The number of threads per processor </td></tr>
+    <tr><td class="paramname">numa</td><td>The NUMA communicator used by this mutex </td></tr>
   </table>
   </dd>
 </dl>
@@ -482,6 +481,29 @@ static const long&#160;</td><td class="memItemRight" valign="bottom"><b>MUTEX_UN
 <p>The window is used to store the locks </p>
 
 <p>Definition at line <a class="el" href="mpi_2mutex_8h_source.xhtml#l00071">71</a> of file <a class="el" href="mpi_2mutex_8h_source.xhtml">mutex.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a59d5f7b88618abea9d57b7f68a9408a5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const long mpi::Mutex::MUTEX_UNLOCKED = -1</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Value of an unlocked mutex </p>
+
+<p>Definition at line <a class="el" href="mpi_2mutex_8h_source.xhtml#l00213">213</a> of file <a class="el" href="mpi_2mutex_8h_source.xhtml">mutex.h</a>.</p>
 
 </div>
 </div>
