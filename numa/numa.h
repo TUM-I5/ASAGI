@@ -38,9 +38,9 @@
 #ifndef NUMA_NUMA_H
 #define NUMA_NUMA_H
 
-#ifdef ASAGI_NONUMA
+#ifndef USE_PTHREAD
 #include "nonuma.h"
-#else // ASAGI_NONUMA
+#else // USE_PTHREAD
 #include "asagi.h"
 
 #include <cstdint>
@@ -59,15 +59,15 @@ typedef uint32_t id_t;
 #else // _LP64
 typedef uint16_t id_t;
 #endif // _LP64
-#endif // ASAGI_NONUMA
+#endif // USE_PTHREAD
 
 namespace numa
 {
 
-#ifdef ASAGI_NONUMA
+#ifndef USE_PTHREAD
 /** NUMA dummy implementation if NUMA is disabled */
 typedef NoNuma Numa;
-#else // ASAGI_NONUMA
+#else // USE_PTHREAD
 
 class NumaComm;
 
@@ -114,7 +114,7 @@ public:
 		return asagi::Grid::SUCCESS;
 	}
 
-	asagi::Grid::Error registerThread(bool &masterThread);
+	asagi::Grid::Error registerThread(bool &masterThread, bool detectNumaDomains = true);
 
 	/**
 	 * @return The total number of threads
@@ -163,7 +163,7 @@ public:
 	NumaComm* createComm() const;
 };
 
-#endif // ASAGI_NONUMA
+#endif // USE_PHTREAD
 
 }
 

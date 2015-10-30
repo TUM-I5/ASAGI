@@ -35,7 +35,9 @@
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
+#ifndef ASAGI_NONUMA
 #include <numa.h>
+#endif // ASAGI_NONUMA
 #include <sched.h>
 
 #include "numa.h"
@@ -66,8 +68,9 @@ numa::Numa::~Numa()
  *
  * @param masterThread True up on return, if this is the master thread,
  *  false otherwise
+ * @param detectNumaDomains Set this to false to disable the NUMA detection.
  */
-asagi::Grid::Error numa::Numa::registerThread(bool &masterThread)
+asagi::Grid::Error numa::Numa::registerThread(bool &masterThread, bool detectNumaDomains)
 {
 	if (m_initialized) {
 		masterThread = m_masterThreads[threadId()];
@@ -78,9 +81,13 @@ asagi::Grid::Error numa::Numa::registerThread(bool &masterThread)
 	int cpu = sched_getcpu();
 	if (cpu < 0)
 		return asagi::Grid::NUMA_ERROR;
+#ifdef ASAGI_NONUMA
+	int domain = 0;
+#else // ASAGI_NONUMA
 	int domain = numa_node_of_cpu(cpu);
 	if (domain < 0)
 		return asagi::Grid::NUMA_ERROR;
+#endif // ASAGI_NONUMA
 
 	// Lock all variables
 	if (!m_syncThreads.startBarrier())
@@ -92,6 +99,10 @@ asagi::Grid::Error numa::Numa::registerThread(bool &masterThread)
 	// Each thread gets its own domain
 	domain = threadId;
 #endif // DEBUG_NUMA
+
+	// NUMA detection enabled?
+	if (!detectNumaDomains)
+		domain = 0;
 
 	// Detect if we are the master thread
 	if (m_masterThreads.size() <= threadId)

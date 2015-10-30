@@ -160,14 +160,40 @@
  * Multi-thread support is required if you want to use ASAGI's NUMA
  * functionality (see @ref NUMA).
  *
+ * In addition, for ASAGI to work correctly, it has to now about all threads the
+ * application is using. Use {@link asagi::Grid::setThreads()} to set the number
+ * of threads and call {@link asagi::Grid::open()} from all threads.
+ * {@link asagi::Grid::open()} is a collective operation for all threads.
+ *
  * @section NUMA
  *
  * ASAGI is able to detect the NUMA domains of your node. If more than one NUMA
  * domain is detected, ASAGI will place a cache on each NUMA domain to increase
- * locality. To enable the NUMA detection, call
- * {@link asagi::Grid::setThreads()} with the <b>total</b> number of threads
- * you are using. In this case, {@link asagi::Grid::open()} has to be called by
- * all threads and is a collective operation.
+ * locality. You can control the NUMA detection, with the configuration parameter
+ * <code>NUMA_COMMUNICATION</code> (see @ref Parameters).
+ *
+ * @subsection mpicommunication MPI Communication
+ *
+ * ASAGI supports two different MPI communication patterns: Via MPI remote
+ * memory access (MPI windows) or a separate communication thread. The MPI
+ * windows are used by default since they do not have any special requirement
+ * and are easy to use. However, in some MPI libraries, RMA is poorly tested
+ * and does not work well, especially with hybrid parallelization.
+ *
+ * Therefore, you can use the communication thread. In this mode, a separate
+ * thread is required which is responsible for answering remote requests. You
+ * have to start the thread with {@link asagi::Grid::startCommThread}
+ * <b>before</b> any grid using the communication thread is opened. Multiple
+ * grids will share one communication thread does you must not start more than
+ * communication. However, you have to make sure that the MPI communicator
+ * for the communication thread includes all grid communicators. Once the last
+ * grid using the communication thread is closed, you should stop the
+ * additional with {@link asagi::Grid::stopCommThread}. To use the
+ * communication thread it is also necessary to have a thread-safe MPI
+ * implementation.
+ *
+ * To disable MPI communication completely, set <code>MPI_COMMUNICATION</code>
+ * to <code>OFF</code>
  *
  * @section Parameters
  *
@@ -187,15 +213,20 @@
  *   <td>yes</td>
  *  </tr>
  *  <tr>
- *   <td>NUMA-CACHE</td>
- *   <td>YES | NO</td>
- *   <td>For full-grids, try local caches before using MPI</td>
+ *   <td>NUMA_COMMUNICATION</td>
+ *   <td>ON | OFF | CACHE</td>
+ *   <td>Enable/disable NUMA detection. <code>CACHE</code> can be used in
+ *    combination with the "full grid". It enables NUMA detection and in
+ *    addition ASAGI will look into all node local NUMA caches before activating
+ *    MPI communication. (default: <code>ON</code> if compiled with NUMA
+ *    support)</td>
  *   <td>yes</td>
  *  </tr>
  *  <tr>
  *   <td>MPI_COMMUNICATION</td>
- *   <td>THREAD | WINDOW</td>
- *   <td>Use a communication thread or MPI RMA (windows) for MPI communication (default: WINDOW, see @ref mpicommunication)</td>
+ *   <td>OFF | THREAD | WINDOW</td>
+ *   <td>Use a communication thread or MPI RMA (windows) for MPI communication
+ *    (default: WINDOW, see @ref mpicommunication)</td>
  *   <td>yes</td>
  *  </tr>
  *  <tr>
@@ -243,26 +274,6 @@
  * @anchor gridglobal (*) If yes, the parameter can only be set for all levels
  *  at the same time. Set the parameter <code>level</code> in
  *  {@link asagi::Grid::setParam()} to 0 to change value.
- *
- * @subsection mpicommunication MPI Communication
- *
- * ASAGI supports two different MPI communication patterns: Via MPI remote
- * memory access (MPI windows) or a separate communication thread. The MPI
- * windows are used by default since they do not have any special requirement
- * and are easy to use. However, in some MPI libraries, RMA is poorly tested
- * and does not work well, especially with hybrid parallelization.
- *
- * Therefore, you can use the communication thread. In this mode, a separate
- * thread is required which is responsible for answering remote requests. You
- * have to start the thread with {@link asagi::Grid::startCommThread}
- * <b>before</b> any grid using the communication thread is opened. Multiple
- * grids will share one communication thread does you must not start more than
- * communication. However, you have to make sure that the MPI communicator
- * for the communication thread includes all grid communicators. Once the last
- * grid using the communication thread is closed, you should stop the
- * additional with {@link asagi::Grid::stopCommThread}. To use the
- * communication thread it is also necessary to have a thread-safe MPI
- * implementation.
  *
  * @section accesscounter Access counters
  *

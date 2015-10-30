@@ -214,12 +214,13 @@ void grid::Grid::setParam(const char* name, const char* value, unsigned int leve
 asagi::Grid::Error grid::Grid::open(const char* filename, unsigned int level)
 {
 	bool domainMaster;
-	asagi::Grid::Error err = m_numa.registerThread(domainMaster);
+	asagi::Grid::Error err = m_numa.registerThread(domainMaster,
+			param<std::string>("NUMA_COMMUNICATION", "ON") != "OFF");
 	if (err != asagi::Grid::SUCCESS)
 		return err;
 
 	if (domainMaster) {
-		// Make sure the container has the correct size
+		// Initialize the containers
 		m_resizeOnce.saveExec(*this, &Grid::initContainers);
 
 		int blockSizes[MAX_DIMENSIONS];
@@ -316,26 +317,39 @@ void grid::Grid::initContainers()
 		mpiType = "WINDOW";
 	}
 #endif // THREADSAFE_MPI
+	if (m_comm.size() == 1)
+		mpiType = "OFF";
+
+	// Select NUMA communication
+#ifdef ASAGI_NONUMA
+	std::string numaType = param("NUMA_COMMUNICATION", "OFF");
+	if (numaType != "OFF")
+		logWarning(m_comm.rank()) << "ASAGI: NUMA communication could not be enabled because the"
+			" ASAGI is not compiled with NUMA support.";
+#else // ASAGI_NONUMA
+	std::string numaType = param("NUMA_COMMUNICATION", "ON");
+#endif // ASAGI_NONUMA
+	if (m_numa.totalDomains() == 1)
+		numaType = "OFF";
 
 	// Select the container type
 	std::string gridType = param("GRID", "FULL");
 	if (gridType == "CACHE") {
-		if (m_comm.size() == 1 && m_numa.totalDomains() > 1)
-			containerType = CACHE_NUMA;
-		else if (m_comm.size() > 1 && m_numa.totalDomains() == 1) {
-			if (mpiType == "WINDOW")
-				containerType = CACHE_MPIWIN;
+		if (mpiType == "OFF") {
+			if (numaType == "OFF")
+				containerType = CACHE_NUMA;
 			else
+				containerType = CACHE;
+		} else if (mpiType == "THREAD") {
+			if (numaType == "OFF")
 				containerType = CACHE_MPITHREAD;
-		} else if (m_comm.size() > 1 && m_numa.totalDomains() > 1) {
-			if (mpiType == "WINDOW")
-				containerType = CACHE_MPIWIN_NUMA;
 			else
 				containerType = CACHE_MPITHREAD_NUMA;
 		} else {
-			assert(m_comm.size() == 1);
-			assert(m_numa.totalDomains() == 1);
-			containerType = CACHE;
+			if (numaType == "OFF")
+				containerType = CACHE_MPIWIN;
+			else
+				containerType = CACHE_MPIWIN_NUMA;
 		}
 	} else if (gridType == "PASS_THROUGH")
 		containerType = PASS_THROUGH;
@@ -345,29 +359,25 @@ void grid::Grid::initContainers()
 			logWarning(m_comm.rank()) << "ASAGI: Assuming FULL";
 		}
 
-		if (m_comm.size() == 1 && m_numa.totalDomains() > 1)
-			containerType = FULL_NUMA;
-		else if (m_comm.size() > 1 && m_numa.totalDomains() == 1) {
-			if (mpiType == "WINDOW")
-				containerType = FULL_MPIWIN;
+		if (mpiType == "OFF") {
+			if (numaType == "OFF")
+				containerType = FULL;
 			else
+				containerType = FULL_NUMA;
+		} else if (mpiType == "THREAD") {
+			if (numaType == "OFF")
 				containerType = FULL_MPITHREAD;
-		} else if (m_comm.size() > 1 && m_numa.totalDomains() > 1) {
-			if (param("NUMA_CACHE", false)) {
-				if (mpiType == "WINDOW")
-					containerType = FULL_MPIWIN_NUMACACHE;
-				else
-					containerType = FULL_MPITHREAD_NUMACACHE;
-			} else {
-				if (mpiType == "WINDOW")
-					containerType = FULL_MPIWIN_NUMA;
-				else
-					containerType = FULL_MPITHREAD_NUMA;
-			}
+			else if (numaType == "CACHE")
+				containerType = FULL_MPITHREAD_NUMACACHE;
+			else
+				containerType = FULL_MPITHREAD_NUMA;
 		} else {
-			assert(m_comm.size() == 1);
-			assert(m_numa.totalDomains() == 1);
-			containerType = FULL;
+			if (numaType == "OFF")
+				containerType = FULL_MPIWIN;
+			else if (numaType == "CACHE")
+				containerType = FULL_MPIWIN_NUMACACHE;
+			else
+				containerType = FULL_MPIWIN_NUMA;
 		}
 	}
 

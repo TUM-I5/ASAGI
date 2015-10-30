@@ -94,7 +94,7 @@ public:
 	 *
 	 * @param comm The communicator used for this mutex.
 	 * @param window The MPI window where the mutex values are stored
-	 * @param numThreads The number of threads per processor
+	 * @param numa The NUMA communicator used by this mutex
 	 */
 	void init(MPIComm& comm, MPI_Win window, const numa::NumaComm& numa)
 	{
@@ -161,7 +161,7 @@ public:
 		// that holds the lock
 		int rank = oldLock / m_numa->totalThreads();
 		int tag = oldLock % m_numa->totalThreads();
-		mpiResult = MPI_Ssend(0L, 0, MPI_BYTE, rank, tag, m_comm->comm());
+		mpiResult = MPI_Ssend(0L, 0, MPI_BYTE, rank, m_tagOffset+tag, m_comm->comm());
 		assert(mpiResult == MPI_SUCCESS);
 	}
 	
@@ -194,7 +194,7 @@ public:
 		assert(mpiResult == MPI_SUCCESS);
 
 		if (oldLock != myLock)
-			mpiResult = MPI_Recv(0L, 0, MPI_BYTE, MPI_ANY_SOURCE, threadId,
+			mpiResult = MPI_Recv(0L, 0, MPI_BYTE, MPI_ANY_SOURCE, m_tagOffset+threadId,
 					m_comm->comm(), MPI_STATUS_IGNORE);
 			assert(mpiResult == MPI_SUCCESS);
 	}
@@ -209,6 +209,7 @@ private:
 	}
 
 private:
+	/** Value of an unlocked mutex */
 	static const long MUTEX_UNLOCKED = -1;
 };
 

@@ -34,13 +34,13 @@
 # @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
 
 ##### Files #####
-if( NONUMA )
-    set( numaSources
-        nonuma.cpp )
-else( NONUMA )
+if( THREADS_FOUND )
     set( numaSources
 	    numa.cpp )
-endif( NONUMA )
+else( THREADS_FOUND )
+    set( numaSources
+        nonuma.cpp )
+endif( THREADS_FOUND )
 
 ##### Add to library #####
 add_sources( ${numaSources} )
