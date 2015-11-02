@@ -182,7 +182,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="comment">// recv contains now an array of hostnames from all MPI ranks of</span></div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <span class="comment">// this communicator. They are sorted ascending by the MPI rank.</span></div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        <span class="keywordtype">int</span> nodeRank, realNodeRank = 0;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        mpiResult = MPI_Comm_rank(comm, &amp;nodeRank);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        mpiResult = MPI_Comm_rank(nodeComm, &amp;nodeRank);</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        assert(mpiResult == MPI_SUCCESS);</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nodeRank; i++) {</div>
