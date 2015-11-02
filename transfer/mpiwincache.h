@@ -46,6 +46,8 @@
 #include <algorithm>
 #include <cstdlib>
 
+#include "utils/logger.h"
+
 #include "mpicache.h"
 #include "allocator/mpialloc.h"
 #include "mpi/mpicomm.h"

@@ -126,7 +126,7 @@ int asagi::Grid::nodeLocalRank(MPI_Comm comm)
 	// recv contains now an array of hostnames from all MPI ranks of
 	// this communicator. They are sorted ascending by the MPI rank.
 	int nodeRank, realNodeRank = 0;
-	mpiResult = MPI_Comm_rank(comm, &nodeRank);
+	mpiResult = MPI_Comm_rank(nodeComm, &nodeRank);
 	assert(mpiResult == MPI_SUCCESS);
 
 	for (int i = 0; i < nodeRank; i++) {

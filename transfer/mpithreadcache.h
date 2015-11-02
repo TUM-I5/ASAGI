@@ -47,6 +47,8 @@
 #include <mutex>
 #include <vector>
 
+#include "utils/logger.h"
+
 #include "mpicache.h"
 #include "allocator/default.h"
 #include "cache/cachemanager.h"
@@ -338,12 +340,12 @@ public:
 		MPICache<allocator::Default, false>::init(cacheSize,
 				blockCount, mpiComm, numaComm);
 
-		m_blockInfoResponder.init(*this);
-		m_blockTransferer.init(*this);
-		m_adder.init(*this);
-		m_deleter.init(*this);
-
 		if (m_numaDomainId == 0) {
+			m_blockInfoResponder.init(*this);
+			m_blockTransferer.init(*this);
+			m_adder.init(*this);
+			m_deleter.init(*this);
+
 			// Create the mutexes for the blocks
 			m_mutexes = new threads::Mutex[blockCount * numaComm.totalDomains()];
 
