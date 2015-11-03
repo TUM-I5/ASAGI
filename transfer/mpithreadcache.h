@@ -140,7 +140,17 @@ private:
 			unsigned long cacheOffset;
 			const unsigned char* data;
 
-			if (m_parent->m_cacheManager->tryGet(blockId, cacheOffset, data)) {
+			// TODO for a large number of NUMA domains, this might be inefficient
+			// In this case, it might be better to transfer the domainId and the blockId
+			cache::CacheManager* cacheManager = 0L;
+			for (unsigned int i = 0; i < m_parent->m_numaDomainSize; i++) {
+				if (m_parent->m_cacheManager[i]->tryGet(blockId, cacheOffset, data)) {
+					cacheManager = m_parent->m_cacheManager[i];
+					break;
+				}
+			}
+
+			if (cacheManager) {
 				// Block found
 				MPI_Request request;
 				mpiResult = MPI_Isend(const_cast<unsigned char*>(data),
@@ -155,7 +165,7 @@ private:
 					assert(mpiResult == MPI_SUCCESS);
 				}
 
-				m_parent->m_cacheManager->unlock(cacheOffset);
+				cacheManager->unlock(cacheOffset);
 			} else {
 				// Block not found
 				char ack;
@@ -243,10 +253,13 @@ private:
 	/** The NUMA domain ID */
 	unsigned int m_numaDomainId;
 
-	/** The cache manager (required to lock blocks in cache) */
-	cache::CacheManager* m_cacheManager;
+	/** The total number of NUMA domains */
+	unsigned int m_numaDomainSize;
 
-	/** A list of mutexes (one for each block) */
+	/** List of all cache managers */
+	cache::CacheManager** m_cacheManager;
+
+	/** A list of mutexes (one for each local block) */
 	threads::Mutex* m_mutexes;
 
 	/** Class responsible for responding to block info requests */
@@ -282,10 +295,10 @@ private:
 	/** Lock send-receive pairs to avoid threading issues */
 	threads::Mutex* m_sendRecvMutex;
 
-
 public:
 	MPIThreadCache()
 		: m_numaDomainId(0),
+		  m_numaDomainSize(0),
 		  m_cacheManager(0L),
 		  m_mutexes(0L),
 		  m_blockInfoTag(-1),
@@ -301,6 +314,8 @@ public:
 	virtual ~MPIThreadCache()
 	{
 		if (m_numaDomainId == 0 && m_blockInfoTag >= 0) {
+			delete [] m_cacheManager;
+
 			mpi::CommThread::commThread.unregisterReceiver(m_blockInfoTag);
 			mpi::CommThread::commThread.unregisterReceiver(m_transfererTag);
 			mpi::CommThread::commThread.unregisterReceiver(m_adderTag);
@@ -333,7 +348,7 @@ public:
 			numa::NumaComm &numaComm)
 	{
 		m_numaDomainId = numaComm.domainId();
-		m_cacheManager = &cacheManager;
+		m_numaDomainSize = numaComm.totalDomains();
 		m_blockSize = blockSize;
 		m_mpiType = type.getMPIType();
 
@@ -341,13 +356,15 @@ public:
 				blockCount, mpiComm, numaComm);
 
 		if (m_numaDomainId == 0) {
+			m_cacheManager = new cache::CacheManager*[m_numaDomainSize];
+
 			m_blockInfoResponder.init(*this);
 			m_blockTransferer.init(*this);
 			m_adder.init(*this);
 			m_deleter.init(*this);
 
 			// Create the mutexes for the blocks
-			m_mutexes = new threads::Mutex[blockCount * numaComm.totalDomains()];
+			m_mutexes = new threads::Mutex[blockCount * m_numaDomainSize];
 
 			// Initialize the receivers
 			asagi::Grid::Error err = mpi::CommThread::commThread
@@ -373,7 +390,13 @@ public:
 			m_sendRecvMutex = new threads::Mutex();
 		}
 
-		asagi::Grid::Error err = numaComm.broadcast(m_mutexes);
+		asagi::Grid::Error err = numaComm.broadcast(m_cacheManager);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
+		m_cacheManager[m_numaDomainId] = &cacheManager;
+
+		err = numaComm.broadcast(m_mutexes);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
@@ -459,8 +482,19 @@ public:
 
 		int mpiResult; NDBG_UNUSED(mpiResult);
 		MPI_Status status;
-		mpiResult = MPI_Probe(rank, MPI_ANY_TAG, mpiComm().comm(), &status);
-		assert(mpiResult == MPI_SUCCESS);
+		int done = 0;
+		while (!done) {
+			// Try success full transfer first
+			mpiResult = MPI_Iprobe(rank, TRANSFER_TAG, mpiComm().comm(), &done, &status);
+			assert(mpiResult == MPI_SUCCESS);
+
+			if (!done) {
+				// Try unsuccessfull transfer
+				mpiResult = MPI_Iprobe(rank, TRANSFER_FAIL_TAG, mpiComm().comm(),
+					 &done, &status);
+				assert(mpiResult == MPI_SUCCESS);
+			}
+		}
 
 		switch (status.MPI_TAG) {
 		case TRANSFER_TAG:
@@ -516,6 +550,7 @@ public:
 			addBlock(dictOffset, dictRank, offset);
 		else {
 			// Assemble information
+			assert(offset < rankCacheSize());
 			unsigned long data = dictOffset * rankCacheSize() + offset;
 
 			mpi::CommThread::commThread.send(m_adderTag, dictRank, data);
@@ -541,6 +576,7 @@ public:
 			deleteBlock(dictOffset, dictRank, offset);
 		else {
 			// Assemble information
+			assert(offset < rankCacheSize());
 			unsigned long data = dictOffset * rankCacheSize() + offset;
 
 			mpi::CommThread::commThread.send(m_deleterTag, dictRank, data);

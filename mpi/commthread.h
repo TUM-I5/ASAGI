@@ -185,7 +185,7 @@ public:
 		// Send exit signal
 		message_t data = 0;
 		MPI_Request request; // Use asynchronous send to work around a deadlock with Intel MPI
-		MPI_Isend(&data, 1, MPI_MESSAGE, m_rank, EXIT_TAG, m_comm, &request);
+		MPI_Issend(&data, 1, MPI_MESSAGE, m_rank, EXIT_TAG, m_comm, &request);
 
 		int done = 0;
 		while (!done)
@@ -249,7 +249,7 @@ public:
 		m_lock.lock(); // The lock is released by the communication thread
 
 		message_t data = tag; // Tag is provided in the data field
-		MPI_Send(&data, 1, MPI_MESSAGE, m_rank, UNREG_TAG, m_comm);
+		MPI_Ssend(&data, 1, MPI_MESSAGE, m_rank, UNREG_TAG, m_comm);
 	}
 
 	/**
