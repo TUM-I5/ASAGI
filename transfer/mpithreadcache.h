@@ -99,7 +99,8 @@ private:
 			long entry = m_parent->fetchBlockInfo(dictOffset);
 
 			MPI_Request request;
-			mpiResult = MPI_Isend(&entry, 1, MPI_LONG, sender, ENTRY_TAG,
+			mpiResult = MPI_Isend(&entry, 1, MPI_LONG, sender,
+					m_parent->m_tagOffset+ENTRY_TAG,
 					m_parent->mpiComm().comm(), &request);
 			assert(mpiResult == MPI_SUCCESS);
 
@@ -155,7 +156,7 @@ private:
 				MPI_Request request;
 				mpiResult = MPI_Isend(const_cast<unsigned char*>(data),
 						m_parent->m_blockSize, m_parent->m_mpiType,
-						sender, TRANSFER_TAG,
+						sender, m_parent->m_tagOffset+TRANSFER_TAG,
 						m_parent->mpiComm().comm(), &request);
 				assert(mpiResult == MPI_SUCCESS);
 
@@ -170,7 +171,8 @@ private:
 				// Block not found
 				char ack;
 				MPI_Request request;
-				mpiResult = MPI_Isend(&ack, 1, MPI_CHAR, sender, TRANSFER_FAIL_TAG,
+				mpiResult = MPI_Isend(&ack, 1, MPI_CHAR, sender,
+						m_parent->m_tagOffset+TRANSFER_FAIL_TAG,
 						m_parent->mpiComm().comm(), &request);
 				assert(mpiResult == MPI_SUCCESS);
 
@@ -286,14 +288,20 @@ private:
 	/** Deleter tag */
 	int m_deleterTag;
 
+	/** Tag offset for responses */
+	int m_tagOffset;
+
+	/** Lock info send-receive pairs to avoid threading issues */
+	threads::Mutex* m_infoMutex;
+
+	/** Lock send-block send-receive pairs to avoid threading issues */
+	threads::Mutex* m_blockMutex;
+
 	/** Number of elements in one block */
 	unsigned long m_blockSize;
 
 	/** The type MPI type of an element */
 	MPI_Datatype m_mpiType;
-
-	/** Lock send-receive pairs to avoid threading issues */
-	threads::Mutex* m_sendRecvMutex;
 
 public:
 	MPIThreadCache()
@@ -305,9 +313,11 @@ public:
 		  m_transfererTag(-1),
 		  m_adderTag(-1),
 		  m_deleterTag(-1),
+		  m_tagOffset(0),
+		  m_infoMutex(0L),
+		  m_blockMutex(0L),
 		  m_blockSize(0),
-		  m_mpiType(MPI_DATATYPE_NULL),
-		  m_sendRecvMutex(0L)
+		  m_mpiType(MPI_DATATYPE_NULL)
 	{
 	}
 
@@ -322,7 +332,8 @@ public:
 			mpi::CommThread::commThread.unregisterReceiver(m_deleterTag);
 
 			delete [] m_mutexes;
-			delete m_sendRecvMutex;
+			delete m_infoMutex;
+			delete m_blockMutex;
 		}
 	}
 
@@ -344,7 +355,7 @@ public:
 			unsigned long blockCount,
 			unsigned long blockSize,
 			const types::Type &type,
-			const mpi::MPIComm &mpiComm,
+			mpi::MPIComm &mpiComm,
 			numa::NumaComm &numaComm)
 	{
 		m_numaDomainId = numaComm.domainId();
@@ -387,7 +398,10 @@ public:
 			if (err != asagi::Grid::SUCCESS)
 				return err;
 
-			m_sendRecvMutex = new threads::Mutex();
+			m_tagOffset = mpiComm.reserveTags(3);
+
+			m_infoMutex = new threads::Mutex();
+			m_blockMutex = new threads::Mutex();
 		}
 
 		asagi::Grid::Error err = numaComm.broadcast(m_cacheManager);
@@ -416,7 +430,15 @@ public:
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
-		err = numaComm.broadcast(m_sendRecvMutex);
+		err = numaComm.broadcast(m_tagOffset);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
+		err = numaComm.broadcast(m_infoMutex);
+		if (err != asagi::Grid::SUCCESS)
+			return err;
+
+		err = numaComm.broadcast(m_blockMutex);
 		if (err != asagi::Grid::SUCCESS)
 			return err;
 
@@ -442,7 +464,7 @@ public:
 		// Ask remote process
 		int mpiResult; NDBG_UNUSED(mpiResult);
 
-		std::lock_guard<threads::Mutex> lock(*m_sendRecvMutex);
+		std::lock_guard<threads::Mutex> lock(*m_infoMutex);
 
 		mpi::CommThread::commThread.send(m_blockInfoTag, dictRank, dictOffset);
 
@@ -475,7 +497,7 @@ public:
 
 		assert(rank >= 0);
 
-		std::lock_guard<threads::Mutex> lock(*m_sendRecvMutex);
+		std::lock_guard<threads::Mutex> lock(*m_blockMutex);
 
 		// Send the message to the remote rank
 		mpi::CommThread::commThread.send(m_transfererTag, rank, blockId);
@@ -485,37 +507,34 @@ public:
 		int done = 0;
 		while (!done) {
 			// Try success full transfer first
-			mpiResult = MPI_Iprobe(rank, TRANSFER_TAG, mpiComm().comm(), &done, &status);
+			mpiResult = MPI_Iprobe(rank, m_tagOffset+TRANSFER_TAG, mpiComm().comm(), &done, &status);
 			assert(mpiResult == MPI_SUCCESS);
 
 			if (!done) {
 				// Try unsuccessfull transfer
-				mpiResult = MPI_Iprobe(rank, TRANSFER_FAIL_TAG, mpiComm().comm(),
+				mpiResult = MPI_Iprobe(rank, m_tagOffset+TRANSFER_FAIL_TAG, mpiComm().comm(),
 					 &done, &status);
 				assert(mpiResult == MPI_SUCCESS);
 			}
 		}
 
-		switch (status.MPI_TAG) {
-		case TRANSFER_TAG:
-			mpiResult = MPI_Recv(cache, m_blockSize, m_mpiType, rank, TRANSFER_TAG,
+		if (status.MPI_TAG == m_tagOffset+TRANSFER_TAG) {
+			// Success
+			mpiResult = MPI_Recv(cache, m_blockSize, m_mpiType, rank, m_tagOffset+TRANSFER_TAG,
 					mpiComm().comm(), MPI_STATUS_IGNORE);
 			assert(mpiResult == MPI_SUCCESS);
 
 			retry = false;
 			return true;
-		case TRANSFER_FAIL_TAG:
-			char ack;
-			mpiResult = MPI_Recv(&ack, 1, MPI_CHAR, rank, TRANSFER_FAIL_TAG,
-					mpiComm().comm(), MPI_STATUS_IGNORE);
-			assert(mpiResult == MPI_SUCCESS);
-
-			retry = true;
-			return false;
-		default:
-			logError() << "Invalid tag" << status.MPI_TAG << "received";
 		}
 
+		// Fail
+		char ack;
+		mpiResult = MPI_Recv(&ack, 1, MPI_CHAR, rank, m_tagOffset+TRANSFER_FAIL_TAG,
+				mpiComm().comm(), MPI_STATUS_IGNORE);
+		assert(mpiResult == MPI_SUCCESS);
+
+		retry = true;
 		return false;
 	}
 
