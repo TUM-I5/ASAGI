@@ -149,7 +149,9 @@ public:
 	 */
 	bool tryGet(unsigned long blockId, unsigned long &cacheOffset, const unsigned char* &data)
 	{
-		m_cacheMutex.lock();
+		if (!m_cacheMutex.try_lock())
+			// Use try_lock here to avoid deadlocks
+			return false;
 
 		if (!m_cacheList.getIndex(blockId, cacheOffset, false)) {
 			m_cacheMutex.unlock();
