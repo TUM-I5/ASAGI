@@ -120,6 +120,10 @@ asagi::Grid::Error io::NetCdfReader::open(const char* varname)
 			<< m_names[i];
 	}
 	
+	nc_type type;
+	nc_inq_vartype(m_file, m_variable, &type);
+	nc_inq_type(m_file, type, 0L, &m_varSize);
+
 	return asagi::Grid::SUCCESS;
 }
 

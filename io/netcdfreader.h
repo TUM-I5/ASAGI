@@ -85,6 +85,9 @@ private:
 	/** The variable we read */
 	int m_variable;
 
+	/** The size of the dimensions in the netCDF file */
+	size_t m_varSize;
+
 	/** Number of dimension in the netCDF file */
 	int m_dimensions;
 	
@@ -216,13 +219,7 @@ public:
 	 */
 	unsigned int getVarSize() const
 	{
-		std::lock_guard<threads::Mutex> lock(netcdfLock);
-		nc_type type;
-		nc_inq_vartype(m_file, m_variable, &type);
-		size_t size;
-		nc_inq_type(m_file, type, 0L, &size);
-
-		return size;
+		return m_varSize;
 	}
 	
 private:
