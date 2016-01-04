@@ -51,6 +51,7 @@ int main(int argc, char** argv)
 	MPI_Init(&argc, &argv);
 #endif // ASAGI_NOMPI
 
+	// TODO maybe we should create a real struct in netCDF
 	unsigned int blockSize = 1;
 	unsigned long displacement = 0;
 	asagi::Grid::Type type = asagi::Grid::FLOAT;

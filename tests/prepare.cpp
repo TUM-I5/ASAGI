@@ -119,6 +119,31 @@ int main()
 
 	nc_close(file);
 
+	// 2d compound
+	nc_create(NC_2DCOMPOUND, NC_NETCDF4, &file);
+
+	nc_def_dim(file, "y", LENGTH, &dim[0]);
+	nc_def_dim(file, "x", WIDTH, &dim[1]);
+
+	int type;
+	nc_def_compound(file, 2*sizeof(float), "compound", &type);
+	nc_insert_compound(file, type, "a", 0, NC_FLOAT);
+	nc_insert_compound(file, type, "b", sizeof(float), NC_FLOAT);
+
+	nc_def_var(file, "z", type, 2, dim, &var);
+
+	float values2_2d[LENGTH][WIDTH][2];
+
+	for (unsigned int i = 0; i < WIDTH; i++)
+		for (unsigned int j = 0; j < LENGTH; j++) {
+			values2_2d[j][i][0] = i * LENGTH + j;
+			values2_2d[j][i][1] = i * LENGTH + j + 10000;
+		}
+
+	nc_put_var(file, var, values2_2d);
+
+	nc_close(file);
+
 	// 3d
 	nc_create(NC_3D, NC_NETCDF4, &file);
 	

@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef IO_NETCDFREADER_H
@@ -42,6 +42,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <limits>
 #include <mutex>
 #include <string>
@@ -63,6 +64,8 @@
 
 /**
  * @brief Classes for read/writing files
+ *
+ * @todo Test if we can do better than netCDFs varm
  */
 namespace io
 {
@@ -205,12 +208,12 @@ public:
 
 		// The distance between 2 values in the internal representation
 		ptrdiff_t imap[MAX_DIMENSIONS];
-		imap[m_dimensions-1] = getBasicSize<T>();
+		imap[m_dimensions-1] = 1;
 		for (int i = m_dimensions-2; i >= 0; i--)
 			imap[i] = imap[i+1] * size[i+1];
 
 		std::lock_guard<threads::Mutex> lock(netcdfLock);
-		getVar(offset, actSize, imap,
+		getVar(offset, actSize, size, imap,
 			static_cast<T*>(block));
 	}
 	
@@ -224,38 +227,25 @@ public:
 	
 private:
 	/**
-	 * @return The size of one value in a hyperslab
-	 */
-	template<typename T>
-	size_t getBasicSize() const
-	{
-		return 1;
-	}
-
-	/**
 	 * Reads a hyperslab from the netCDF file
+	 *
+	 * @param offset The offset in the netCDF file
+	 * @param size The number of elements that should be red in each dimension
+	 * @param blockSize The size of the memory block
+	 * @param imap The netCDF mapping parameter
+	 * @param buffer The buffer for the block
 	 */
 	template<typename T>
 	void getVar(const size_t *offset, const size_t *size,
-		const ptrdiff_t *imap, T *buffer);
+		const size_t *blockSize, const ptrdiff_t *imap, T *buffer);
 };
-
-/**
- * For void types, this functions returns the actual size of the elements
- * in bytes.
- */
-template<> inline
-size_t NetCdfReader::getBasicSize<void>() const
-{
-	return getVarSize();
-}
 
 /**
  * @copydoc getVar\<T\>
  */
 template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
-		const ptrdiff_t *imap, unsigned char *buffer)
+		const size_t *blockSize, const ptrdiff_t *imap, unsigned char *buffer)
 {
 	nc_get_varm_uchar(m_file, m_variable, offset, size, 0L, imap, buffer);
 }
@@ -265,7 +255,7 @@ void NetCdfReader::getVar(const size_t *offset, const size_t *size,
  */
 template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
-		const ptrdiff_t *imap, int *buffer)
+		const size_t *blockSize, const ptrdiff_t *imap, int *buffer)
 {
 	nc_get_varm_int(m_file, m_variable, offset, size, 0L, imap, buffer);
 }
@@ -275,7 +265,7 @@ void NetCdfReader::getVar(const size_t *offset, const size_t *size,
  */
 template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
-		const ptrdiff_t *imap, long *buffer)
+		const size_t *blockSize, const ptrdiff_t *imap, long *buffer)
 {
 	nc_get_varm_long(m_file, m_variable, offset, size, 0L, imap, buffer);
 }
@@ -285,7 +275,7 @@ void NetCdfReader::getVar(const size_t *offset, const size_t *size,
  */
 template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
-		const ptrdiff_t *imap, float *buffer)
+		const size_t *blockSize, const ptrdiff_t *imap, float *buffer)
 {
 	nc_get_varm_float(m_file, m_variable, offset, size, 0L, imap, buffer);
 }
@@ -295,7 +285,7 @@ void NetCdfReader::getVar(const size_t *offset, const size_t *size,
  */
 template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
-		const ptrdiff_t *imap, double *buffer)
+		const size_t *blockSize, const ptrdiff_t *imap, double *buffer)
 {
 	nc_get_varm_double(m_file, m_variable, offset, size, 0L, imap, buffer);
 }
@@ -305,9 +295,55 @@ void NetCdfReader::getVar(const size_t *offset, const size_t *size,
  */
 template<> inline
 void NetCdfReader::getVar(const size_t *offset, const size_t *size,
-		const ptrdiff_t *imap, void *buffer)
+		const size_t *blockSize, const ptrdiff_t *imap, void *buffer)
 {
-	nc_get_varm(m_file, m_variable, offset, size, 0L, imap, buffer);
+	// Read the data unmapped (netCDF does not support mapping for non-builtin data types)
+	nc_get_vara(m_file, m_variable, offset, size, buffer);
+
+	// Mapping required?
+	bool doMapping = false;
+	for (int i = 1; i < m_dimensions; i++)
+		if (size[i] != blockSize[i])
+			doMapping = true;
+
+	if (!doMapping)
+		return;
+
+	// Apply mapping ...
+	char* byteBuf = reinterpret_cast<char*>(buffer);
+
+	// Compute initial indices and position
+	long pos[MAX_DIMENSIONS];
+	long indexFile = 1;
+	for (int i = 0; i < m_dimensions; i++) {
+		pos[i] = size[i]-1;
+		indexFile *= size[i];
+	}
+
+	size_t indexBuf = size[0]-1;
+	for (int i = 1; i < m_dimensions; i++) {
+		indexBuf *= blockSize[i];
+		indexBuf += size[i]-1;
+	}
+
+	// Loop over all elements
+	for (indexFile--; indexFile >= 0 && indexFile < static_cast<long>(indexBuf); indexFile--) {
+		memcpy(&byteBuf[indexBuf * getVarSize()],
+				&byteBuf[indexFile * getVarSize()],
+				getVarSize());
+
+		// Adjust the actual position
+		pos[m_dimensions-1]--;
+		indexBuf--;
+
+		for (int i = m_dimensions-1; pos[i] < 0 && i > 0; i--) {
+			pos[i-1]--;
+			pos[i] = size[i]-1;
+
+			indexBuf -= imap[i-1];
+			indexBuf += imap[i] * size[i];
+		}
+	}
 }
 
 }
