@@ -106,6 +106,7 @@ var searchData=
   ['m_5ftypesize',['m_typeSize',['../classgrid_1_1level_1_1Level.xhtml#ab7f4c5000e4ddbcd69e074fc6ab55df7',1,'grid::level::Level::m_typeSize()'],['../classtransfer_1_1MPIThreadFull.xhtml#a7d0cf567136a7400480ebb41ca0b981e',1,'transfer::MPIThreadFull::m_typeSize()'],['../classtransfer_1_1MPIWinCache.xhtml#a2e3faca0025496bfa412b53332331100',1,'transfer::MPIWinCache::m_typeSize()']]],
   ['m_5fvaluepos',['m_valuePos',['../classgrid_1_1Container.xhtml#a1d05c8f93dfdaee4b1918619687b91db',1,'grid::Container']]],
   ['m_5fvariable',['m_variable',['../classio_1_1NetCdfReader.xhtml#a8cb71e3f44f6f352ca2c10a6bc0e0493',1,'io::NetCdfReader']]],
+  ['m_5fvarsize',['m_varSize',['../classio_1_1NetCdfReader.xhtml#a535e4eba969b70079719c4f1183b2efc',1,'io::NetCdfReader']]],
   ['m_5fwindow',['m_window',['../classmpi_1_1Mutex.xhtml#ab2f4fd3232d4b0d57ab4d3a00aad0deb',1,'mpi::Mutex::m_window()'],['../classtransfer_1_1MPIWinFull.xhtml#acf15ac3da5e3d298058f608e34b503fe',1,'transfer::MPIWinFull::m_window()']]],
   ['m_5fwinmutex',['m_winMutex',['../classtransfer_1_1MPIWinFull.xhtml#af9eb0bc46d0286438a2b84d5746da2a7',1,'transfer::MPIWinFull']]],
   ['max_5fdict_5fsize',['MAX_DICT_SIZE',['../classtransfer_1_1MPICache.xhtml#a73cc31801e613cbf873b7a333d9324b4',1,'transfer::MPICache']]],
