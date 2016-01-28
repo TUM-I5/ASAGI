@@ -31,14 +31,11 @@
 #  mit diesem Programm erhalten haben. Wenn nicht, siehe
 #  <http://www.gnu.org/licenses/>.
 # 
-# @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+# @copyright 2015-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
 
 ##### Files #####
 set( typesSources
-	arraytype.cpp
-	basictype.cpp
-	structtype.cpp
-	type.cpp )
+	structtype.cpp )
 
 ##### Add to library #####
 add_sources( ${typesSources} )
