@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2015-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef MPI_MPICOMM_H
@@ -51,6 +51,8 @@
 #else // THREADSAFE_MPI
 #include "threads/noopmutex.h"
 #endif // THREADSAFE_MPI
+
+#include "scorephelper.h"
 
 namespace mpi
 {
@@ -96,7 +98,7 @@ public:
 	{
 		if (m_comm != MPI_COMM_NULL) {
 			std::lock_guard<Lock> lock(mpiLock);
-			MPI_Comm_free(&m_comm);
+			MPI_FUN(MPI_Comm_free)(&m_comm);
 		}
 	}
 
@@ -107,12 +109,12 @@ public:
 	{
 		std::lock_guard<Lock> lock(mpiLock);
 
-		if (MPI_Comm_dup(comm, &m_comm) != MPI_SUCCESS)
+		if (MPI_FUN(MPI_Comm_dup)(comm, &m_comm) != MPI_SUCCESS)
 			return asagi::Grid::MPI_ERROR;
 
-		if (MPI_Comm_rank(m_comm, &m_rank) != MPI_SUCCESS)
+		if (MPI_FUN(MPI_Comm_rank)(m_comm, &m_rank) != MPI_SUCCESS)
 			return asagi::Grid::MPI_ERROR;
-		if (MPI_Comm_size(m_comm, &m_size) != MPI_SUCCESS)
+		if (MPI_FUN(MPI_Comm_size)(m_comm, &m_size) != MPI_SUCCESS)
 			return asagi::Grid::MPI_ERROR;
 
 		return asagi::Grid::SUCCESS;
@@ -147,7 +149,7 @@ public:
 	 */
 	void barrier() const
 	{
-		MPI_Barrier(m_comm);
+		MPI_FUN(MPI_Barrier)(m_comm);
 	}
 
 	/**

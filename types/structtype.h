@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TYPES_STRUCTTYPE_H
@@ -43,6 +43,7 @@
 #include <mutex>
 
 #include "basictype.h"
+#include "mpi/scorephelper.h"
 #include "threads/mutex.h"
 
 namespace types {
@@ -128,7 +129,7 @@ public:
 	virtual ~StructType()
 	{
 #ifndef ASAGI_NOMPI
-		MPI_Type_free(&m_mpiType);
+		MPI_FUN(MPI_Type_free)(&m_mpiType);
 		
 		delete [] m_blockLength;
 		delete [] m_displacements;
@@ -154,21 +155,21 @@ public:
 			MPI_Datatype tmpType;
 		
 			// Create the mpi datatype
-			if (MPI_Type_create_struct(
+			if (MPI_FUN(MPI_Type_create_struct)(
 					m_count,
 					m_blockLength,
 					m_displacements,
 					m_types,
 					&tmpType) != MPI_SUCCESS)
 				return asagi::Grid::MPI_ERROR;
-			if (MPI_Type_create_resized(tmpType, 0, size, &m_mpiType)
+			if (MPI_FUN(MPI_Type_create_resized)(tmpType, 0, size, &m_mpiType)
 					!= MPI_SUCCESS)
 				return asagi::Grid::MPI_ERROR;
 
-			if (MPI_Type_commit(&m_mpiType) != MPI_SUCCESS)
+			if (MPI_FUN(MPI_Type_commit)(&m_mpiType) != MPI_SUCCESS)
 				return asagi::Grid::MPI_ERROR;
 
-			if (MPI_Type_free(&tmpType) != MPI_SUCCESS)
+			if (MPI_FUN(MPI_Type_free)(&tmpType) != MPI_SUCCESS)
 				return asagi::Grid::MPI_ERROR;
 		
 			// We do not need them anymore

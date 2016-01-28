@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2015-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  *
  * @page build Building and Installing ASAGI
  * 
@@ -118,6 +118,9 @@
  *  communications will be turned off. <code>[OFF]</code>
  * @li <b>MPI3 = ON | OFF</b> Compile MPI-3 functionality. Some features are
  *  only available when this flag is switched on. <code>[ON]</code>
+ * @li <b>SUPPORT_SCOREP = ON | OFF</b> Score-P cannot profile MPI functions in
+ *  OpenMP and PThread at the same. This flag disable MPI profiling within
+ *  ASAGI. <code>[OFF]<code>
  * @li <b>TESTS = ON | OFF</b> Compile tests. <code>[OFF]</code>
  * @li <b>EXAMPLES = ON | OFF</b> Compile example programs. <code>[OFF]</code>
  *

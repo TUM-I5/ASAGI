@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2015-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TRANSFER_MPIWINFULL_H
@@ -48,6 +48,7 @@
 
 #include "mpi/mpicomm.h"
 #include "mpi/lockassert.h"
+#include "mpi/scorephelper.h"
 #include "threads/mutex.h"
 #include "types/type.h"
 #endif // ASAGI_NOMPI
@@ -98,7 +99,7 @@ public:
 			delete m_winMutex;
 
 			std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
-			MPI_Win_free(&m_window);
+			MPI_FUN(MPI_Win_free)(&m_window);
 		}
 	}
 
@@ -131,7 +132,7 @@ public:
 			std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
 
 			// Create the mpi window for distributed blocks
-			if (MPI_Win_create(data,
+			if (MPI_FUN(MPI_Win_create)(data,
 					blockCount * blockSize * typeSize * numaComm.totalDomains(),
 					typeSize,
 					MPI_INFO_NULL,
@@ -172,11 +173,11 @@ public:
 		std::lock_guard<threads::Mutex> winLock(*m_winMutex);
 #endif // THREADSAFE_MPI
 
-		mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, remoteRank,
+		mpiResult = MPI_FUN(MPI_Win_lock)(MPI_LOCK_SHARED, remoteRank,
 			ASAGI_MPI_MODE_NOCHECK, m_window);
 		assert(mpiResult == MPI_SUCCESS);
 
-		mpiResult = MPI_Get(cache,
+		mpiResult = MPI_FUN(MPI_Get)(cache,
 			m_blockSize,
 			m_mpiType,
 			remoteRank,
@@ -186,7 +187,7 @@ public:
 			m_window);
 		assert(mpiResult == MPI_SUCCESS);
 
-		mpiResult = MPI_Win_unlock(remoteRank, m_window);
+		mpiResult = MPI_FUN(MPI_Win_unlock)(remoteRank, m_window);
 		assert(mpiResult == MPI_SUCCESS);
 	}
 };

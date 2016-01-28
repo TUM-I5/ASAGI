@@ -32,64 +32,17 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
- * @copyright 2013-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#ifndef ALLOCATOR_MPIALLOC_H
-#define ALLOCATOR_MPIALLOC_H
+#ifndef MPI_SCOREPHELPER_H
+#define MPI_SCOREPHELPER_H
 
-#ifdef ASAGI_NOMPI
-#include "default.h"
-#else // ASAGI_NOMPI
-#include "asagi.h"
+#ifdef PREP_SCOREP
+// Do not use the weak symbols to avoid calling Score-P functions
+#define MPI_FUN(name) P##name
+#else // PREP_SCOREP
+#define MPI_FUN(name) name
+#endif // PREP_SCOREP
 
-#include "mpi/mpicomm.h"
-#include "mpi/scorephelper.h"
-#endif // ASAGI_NOMPI
-
-namespace allocator
-{
-
-#ifdef ASAGI_NOMPI
-/** Use the default allocator if MPI is not available */
-typedef Default MPIAlloc;
-#else // ASAGI_NOMPI
-
-/**
- * This allocator uses MPI mechanisms to allocate/free memory
- */
-class MPIAlloc
-{
-public:
-	/**
-	 * @copydoc Default::allocate
-	 */
-	template<typename T>
-	static asagi::Grid::Error allocate(size_t size, T* &ptr)
-	{
-		std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
-
-		if (MPI_FUN(MPI_Alloc_mem)(size * sizeof(T), MPI_INFO_NULL, &ptr) != MPI_SUCCESS)
-			return asagi::Grid::MPI_ERROR;
-
-		return asagi::Grid::SUCCESS;
-	}
-
-	/**
-	 * @copydoc Default::free
-	 */
-	template<typename T>
-	static void free(T *ptr)
-	{
-		if (ptr) {
-			std::lock_guard<mpi::Lock> lock(mpi::MPIComm::mpiLock);
-			MPI_FUN(MPI_Free_mem)(ptr);
-		}
-	}
-};
-
-#endif // ASAGI_NOMPI
-
-}
-
-#endif // ALLOCATOR_MPIALLOC_H
+#endif // MPI_SCOREPHELPER

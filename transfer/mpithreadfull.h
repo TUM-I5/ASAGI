@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2015-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TRANSFER_MPITHREADFULL_H
@@ -50,6 +50,7 @@
 
 #include "mpi/commthread.h"
 #include "mpi/mpicomm.h"
+#include "mpi/scorephelper.h"
 #include "types/type.h"
 #endif // ASAGI_NOMPI
 
@@ -175,7 +176,7 @@ public:
 
 		mpi::CommThread::commThread.send(m_tag, remoteRank, offset);
 
-		mpiResult = MPI_Recv(cache, m_blockSize, m_mpiType, remoteRank, 0, m_comm, MPI_STATUS_IGNORE);
+		mpiResult = MPI_FUN(MPI_Recv)(cache, m_blockSize, m_mpiType, remoteRank, 0, m_comm, MPI_STATUS_IGNORE);
 		assert(mpiResult == MPI_SUCCESS);
 	}
 
@@ -185,7 +186,7 @@ public:
 
 		int mpiResult; NDBG_UNUSED(mpiResult);
 
-		mpiResult = MPI_Send(const_cast<unsigned char*>(&m_data[blockId*m_blockSize*m_typeSize]),
+		mpiResult = MPI_FUN(MPI_Send)(const_cast<unsigned char*>(&m_data[blockId*m_blockSize*m_typeSize]),
 				m_blockSize, m_mpiType, sender, 0, m_comm);
 		assert(mpiResult == MPI_SUCCESS);
 	}

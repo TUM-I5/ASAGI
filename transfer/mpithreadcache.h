@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2015-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TRANSFER_MPITHREADCACHE_H
@@ -53,6 +53,7 @@
 #include "allocator/default.h"
 #include "cache/cachemanager.h"
 #include "mpi/commthread.h"
+#include "mpi/scorephelper.h"
 #include "threads/mutex.h"
 #endif // ASAGI_NOMPI
 
@@ -99,14 +100,14 @@ private:
 			long entry = m_parent->fetchBlockInfo(dictOffset);
 
 			MPI_Request request;
-			mpiResult = MPI_Isend(&entry, 1, MPI_LONG, sender,
+			mpiResult = MPI_FUN(MPI_Isend)(&entry, 1, MPI_LONG, sender,
 					m_parent->m_tagOffset+ENTRY_TAG,
 					m_parent->mpiComm().comm(), &request);
 			assert(mpiResult == MPI_SUCCESS);
 
 			int done = 0;
 			while (!done) {
-				mpiResult = MPI_Test(&request, &done, MPI_STATUS_IGNORE);
+				mpiResult = MPI_FUN(MPI_Test)(&request, &done, MPI_STATUS_IGNORE);
 				assert(mpiResult == MPI_SUCCESS);
 			}
 		}
@@ -154,7 +155,7 @@ private:
 			if (cacheManager) {
 				// Block found
 				MPI_Request request;
-				mpiResult = MPI_Isend(const_cast<unsigned char*>(data),
+				mpiResult = MPI_FUN(MPI_Isend)(const_cast<unsigned char*>(data),
 						m_parent->m_blockSize, m_parent->m_mpiType,
 						sender, m_parent->m_tagOffset+TRANSFER_TAG,
 						m_parent->mpiComm().comm(), &request);
@@ -162,7 +163,7 @@ private:
 
 				int done = 0;
 				while (!done) {
-					mpiResult = MPI_Test(&request, &done, MPI_STATUS_IGNORE);
+					mpiResult = MPI_FUN(MPI_Test)(&request, &done, MPI_STATUS_IGNORE);
 					assert(mpiResult == MPI_SUCCESS);
 				}
 
@@ -171,14 +172,14 @@ private:
 				// Block not found
 				char ack;
 				MPI_Request request;
-				mpiResult = MPI_Isend(&ack, 1, MPI_CHAR, sender,
+				mpiResult = MPI_FUN(MPI_Isend)(&ack, 1, MPI_CHAR, sender,
 						m_parent->m_tagOffset+TRANSFER_FAIL_TAG,
 						m_parent->mpiComm().comm(), &request);
 				assert(mpiResult == MPI_SUCCESS);
 
 				int done = 0;
 				while (!done) {
-					mpiResult = MPI_Test(&request, &done, MPI_STATUS_IGNORE);
+					mpiResult = MPI_FUN(MPI_Test)(&request, &done, MPI_STATUS_IGNORE);
 					assert(mpiResult == MPI_SUCCESS);
 				}
 			}
@@ -469,7 +470,7 @@ public:
 		mpi::CommThread::commThread.send(m_blockInfoTag, dictRank, dictOffset);
 
 		long entry;
-		mpiResult = MPI_Recv(&entry, 1, MPI_LONG, dictRank, ENTRY_TAG,
+		mpiResult = MPI_FUN(MPI_Recv)(&entry, 1, MPI_LONG, dictRank, ENTRY_TAG,
 				mpiComm().comm(), MPI_STATUS_IGNORE);
 		assert(mpiResult == MPI_SUCCESS);
 
@@ -507,12 +508,12 @@ public:
 		int done = 0;
 		while (!done) {
 			// Try success full transfer first
-			mpiResult = MPI_Iprobe(rank, m_tagOffset+TRANSFER_TAG, mpiComm().comm(), &done, &status);
+			mpiResult = MPI_FUN(MPI_Iprobe)(rank, m_tagOffset+TRANSFER_TAG, mpiComm().comm(), &done, &status);
 			assert(mpiResult == MPI_SUCCESS);
 
 			if (!done) {
 				// Try unsuccessfull transfer
-				mpiResult = MPI_Iprobe(rank, m_tagOffset+TRANSFER_FAIL_TAG, mpiComm().comm(),
+				mpiResult = MPI_FUN(MPI_Iprobe)(rank, m_tagOffset+TRANSFER_FAIL_TAG, mpiComm().comm(),
 					 &done, &status);
 				assert(mpiResult == MPI_SUCCESS);
 			}
@@ -520,7 +521,7 @@ public:
 
 		if (status.MPI_TAG == m_tagOffset+TRANSFER_TAG) {
 			// Success
-			mpiResult = MPI_Recv(cache, m_blockSize, m_mpiType, rank, m_tagOffset+TRANSFER_TAG,
+			mpiResult = MPI_FUN(MPI_Recv)(cache, m_blockSize, m_mpiType, rank, m_tagOffset+TRANSFER_TAG,
 					mpiComm().comm(), MPI_STATUS_IGNORE);
 			assert(mpiResult == MPI_SUCCESS);
 
@@ -530,7 +531,7 @@ public:
 
 		// Fail
 		char ack;
-		mpiResult = MPI_Recv(&ack, 1, MPI_CHAR, rank, m_tagOffset+TRANSFER_FAIL_TAG,
+		mpiResult = MPI_FUN(MPI_Recv)(&ack, 1, MPI_CHAR, rank, m_tagOffset+TRANSFER_FAIL_TAG,
 				mpiComm().comm(), MPI_STATUS_IGNORE);
 		assert(mpiResult == MPI_SUCCESS);
 

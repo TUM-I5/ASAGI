@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef MPI_MUTEX_H
@@ -46,6 +46,7 @@
 #include "utils/logger.h"
 
 #include "mpicomm.h"
+#include "scorephelper.h"
 #include "threads/mutex.h"
 
 /**
@@ -135,11 +136,11 @@ public:
 
 		long newLock = lockId(m_numa->threadId());
 		long oldLock;
-		mpiResult = MPI_Fetch_and_op(&newLock, &oldLock, MPI_LONG, rank,
+		mpiResult = MPI_FUN(MPI_Fetch_and_op)(&newLock, &oldLock, MPI_LONG, rank,
 				offset, MPI_REPLACE, m_window);
 		assert(mpiResult == MPI_SUCCESS);
 
-		mpiResult = MPI_Win_flush_local(rank, m_window);
+		mpiResult = MPI_FUN(MPI_Win_flush_local)(rank, m_window);
 		assert(mpiResult == MPI_SUCCESS);
 
 		return oldLock;
@@ -161,7 +162,7 @@ public:
 		// that holds the lock
 		int rank = oldLock / m_numa->totalThreads();
 		int tag = oldLock % m_numa->totalThreads();
-		mpiResult = MPI_Ssend(0L, 0, MPI_BYTE, rank, m_tagOffset+tag, m_comm->comm());
+		mpiResult = MPI_FUN(MPI_Ssend)(0L, 0, MPI_BYTE, rank, m_tagOffset+tag, m_comm->comm());
 		assert(mpiResult == MPI_SUCCESS);
 	}
 	
@@ -186,15 +187,15 @@ public:
 		long mutexUnlocked = MUTEX_UNLOCKED;
 		long myLock = lockId(threadId);
 		long oldLock;
-		mpiResult = MPI_Compare_and_swap(&mutexUnlocked, &myLock, &oldLock,
+		mpiResult = MPI_FUN(MPI_Compare_and_swap)(&mutexUnlocked, &myLock, &oldLock,
 				MPI_LONG, rank, offset, m_window);
 		assert(mpiResult == MPI_SUCCESS);
 
-		mpiResult = MPI_Win_flush_local(rank, m_window);
+		mpiResult = MPI_FUN(MPI_Win_flush_local)(rank, m_window);
 		assert(mpiResult == MPI_SUCCESS);
 
 		if (oldLock != myLock)
-			mpiResult = MPI_Recv(0L, 0, MPI_BYTE, MPI_ANY_SOURCE, m_tagOffset+threadId,
+			mpiResult = MPI_FUN(MPI_Recv)(0L, 0, MPI_BYTE, MPI_ANY_SOURCE, m_tagOffset+threadId,
 					m_comm->comm(), MPI_STATUS_IGNORE);
 			assert(mpiResult == MPI_SUCCESS);
 	}

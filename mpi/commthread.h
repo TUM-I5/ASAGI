@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2015-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef MPI_COMMTHREAD_H
@@ -47,6 +47,7 @@
 
 #include "utils/logger.h"
 
+#include "scorephelper.h"
 #include "threads/mutex.h"
 
 namespace mpi
@@ -134,7 +135,7 @@ public:
 
 		// Make sure the communication thread is not initialized
 		int initialized = m_comm != MPI_COMM_NULL;
-		if (MPI_Allreduce(MPI_IN_PLACE, &initialized, 1, MPI_INT, MPI_LOR, comm)
+		if (MPI_FUN(MPI_Allreduce)(MPI_IN_PLACE, &initialized, 1, MPI_INT, MPI_LOR, comm)
 				!= MPI_SUCCESS)
 			return asagi::Grid::MPI_ERROR;
 
@@ -142,12 +143,12 @@ public:
 			return asagi::Grid::ALREADY_INITIALIZED;
 
 		// Setup the communicator
-		if (MPI_Comm_dup(comm, &m_comm) != MPI_SUCCESS)
+		if (MPI_FUN(MPI_Comm_dup)(comm, &m_comm) != MPI_SUCCESS)
 			return asagi::Grid::MPI_ERROR;
-		if (MPI_Comm_group(m_comm, &m_group) != MPI_SUCCESS)
+		if (MPI_FUN(MPI_Comm_group)(m_comm, &m_group) != MPI_SUCCESS)
 			return asagi::Grid::MPI_ERROR;
 
-		if (MPI_Comm_rank(m_comm, &m_rank))
+		if (MPI_FUN(MPI_Comm_rank)(m_comm, &m_rank))
 			return asagi::Grid::MPI_ERROR;
 
 		// Start the thread
@@ -185,11 +186,11 @@ public:
 		// Send exit signal
 		message_t data = 0;
 		MPI_Request request; // Use asynchronous send to work around a deadlock with Intel MPI
-		MPI_Issend(&data, 1, MPI_MESSAGE, m_rank, EXIT_TAG, m_comm, &request);
+		MPI_FUN(MPI_Issend)(&data, 1, MPI_MESSAGE, m_rank, EXIT_TAG, m_comm, &request);
 
 		int done = 0;
 		while (!done)
-			MPI_Test(&request, &done, MPI_STATUS_IGNORE);
+			MPI_FUN(MPI_Test)(&request, &done, MPI_STATUS_IGNORE);
 
 		// Wait for thread to finish
 		pthread_join(m_thread, 0L);
@@ -202,7 +203,7 @@ public:
 		}
 
 		// Free the communicator
-		MPI_Comm_free(&m_comm);
+		MPI_FUN(MPI_Comm_free)(&m_comm);
 	}
 
 	/**
@@ -224,7 +225,7 @@ public:
 			return asagi::Grid::NOT_INITIALIZED;
 
 		// Compute the tag
-		if (MPI_Allreduce(&m_nextTag, &tag, 1, MPI_INT, MPI_MAX, comm) != MPI_SUCCESS)
+		if (MPI_FUN(MPI_Allreduce)(&m_nextTag, &tag, 1, MPI_INT, MPI_MAX, comm) != MPI_SUCCESS)
 			return asagi::Grid::MPI_ERROR;
 
 		m_nextTag = tag+1;
@@ -232,7 +233,7 @@ public:
 		// Save the receiver
 		ReceiverDetail detail;
 		detail.recv = &receiver;
-		MPI_Comm_group(comm, &detail.group);
+		MPI_FUN(MPI_Comm_group)(comm, &detail.group);
 		m_receiver[tag] = detail;
 
 		return asagi::Grid::SUCCESS;
@@ -249,7 +250,7 @@ public:
 		m_lock.lock(); // The lock is released by the communication thread
 
 		message_t data = tag; // Tag is provided in the data field
-		MPI_Ssend(&data, 1, MPI_MESSAGE, m_rank, UNREG_TAG, m_comm);
+		MPI_FUN(MPI_Ssend)(&data, 1, MPI_MESSAGE, m_rank, UNREG_TAG, m_comm);
 	}
 
 	/**
@@ -266,8 +267,8 @@ public:
 			logWarning() << "ASAGI: Sending message from unregistered tag" << tag;
 		else {
 			int recvRank;
-			MPI_Group_translate_ranks(it->second.group, 1, &recv, m_group, &recvRank);
-			MPI_Send(&data, 1, MPI_MESSAGE, recvRank, tag, m_comm);
+			MPI_FUN(MPI_Group_translate_ranks)(it->second.group, 1, &recv, m_group, &recvRank);
+			MPI_FUN(MPI_Send)(&data, 1, MPI_MESSAGE, recvRank, tag, m_comm);
 		}
 	}
 
@@ -281,7 +282,7 @@ private:
 			message_t data;
 			MPI_Status status;
 
-			MPI_Recv(&data, 1, MPI_MESSAGE, MPI_ANY_SOURCE, MPI_ANY_TAG, commThread.m_comm, &status);
+			MPI_FUN(MPI_Recv)(&data, 1, MPI_MESSAGE, MPI_ANY_SOURCE, MPI_ANY_TAG, commThread.m_comm, &status);
 
 			if (status.MPI_TAG == EXIT_TAG) {
 				if (status.MPI_SOURCE != commThread.m_rank)
@@ -304,7 +305,7 @@ private:
 				logWarning() << "ASAGI: Received unregistered message with tag" << status.MPI_TAG;
 			else {
 				int senderRank;
-				MPI_Group_translate_ranks(commThread.m_group, 1, &status.MPI_SOURCE, it->second.group, &senderRank);
+				MPI_FUN(MPI_Group_translate_ranks)(commThread.m_group, 1, &status.MPI_SOURCE, it->second.group, &senderRank);
 				it->second.recv->recv(senderRank, data);
 			}
 		}

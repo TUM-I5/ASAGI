@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2015-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TRANSFER_MPIWINCACHE_H
@@ -53,6 +53,7 @@
 #include "mpi/mpicomm.h"
 #include "mpi/mutex.h"
 #include "mpi/lockassert.h"
+#include "mpi/scorephelper.h"
 #include "threads/mutex.h"
 #endif // ASAGI_NOMPI
 
@@ -126,9 +127,9 @@ public:
 			delete m_cacheWinMutex;
 
 			if (m_dictWin != MPI_WIN_NULL)
-				MPI_Win_free(&m_dictWin);
+				MPI_FUN(MPI_Win_free)(&m_dictWin);
 			if (m_cacheWin != MPI_WIN_NULL)
-				MPI_Win_free(&m_cacheWin);
+				MPI_FUN(MPI_Win_free)(&m_cacheWin);
 			mpi::MPIComm::mpiLock.unlock();
 		}
 	}
@@ -174,7 +175,7 @@ public:
 
 			m_dictWinMutex = new threads::Mutex();
 
-			if (MPI_Win_create(dictionary(),
+			if (MPI_FUN(MPI_Win_create)(dictionary(),
 				sizeof(long) * totalDictEntrySize() * blockCount * numaComm.totalDomains(),
 				sizeof(long),
 				MPI_INFO_NULL,
@@ -190,7 +191,7 @@ public:
 			m_cacheWinMutex = new threads::Mutex();
 
 			// Create the window to access the cache
-			if (MPI_Win_create(cache,
+			if (MPI_FUN(MPI_Win_create)(cache,
 				m_typeSize * blockSize * rankCacheSize(),
 				m_typeSize,
 				MPI_INFO_NULL,
@@ -260,11 +261,11 @@ public:
 
 		long dictEntry[MAX_DICT_SIZE];
 
-		mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, dictRank, 0, m_dictWin);
+		mpiResult = MPI_FUN(MPI_Win_lock)(MPI_LOCK_EXCLUSIVE, dictRank, 0, m_dictWin);
 		assert(mpiResult == MPI_SUCCESS);
 
 		if (dictRank != mpiComm().rank()) {
-			mpiResult = MPI_Get(dictEntry,
+			mpiResult = MPI_FUN(MPI_Get)(dictEntry,
 					dictEntrySize(),
 					MPI_LONG,
 					dictRank,
@@ -280,7 +281,7 @@ public:
 
 		if (lock >= 0) {
 			// We do not have the lock, wait re-read the dictionary entry
-			mpiResult = MPI_Win_unlock(dictRank, m_dictWin);
+			mpiResult = MPI_FUN(MPI_Win_unlock)(dictRank, m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
 
 #ifndef THREADSAFE_MPI
@@ -293,11 +294,11 @@ public:
 			m_dictWinMutex->lock();
 #endif // THREADSAFE_MPI
 
-			mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, dictRank, 0, m_dictWin);
+			mpiResult = MPI_FUN(MPI_Win_lock)(MPI_LOCK_EXCLUSIVE, dictRank, 0, m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
 
 			if (dictRank != mpiComm().rank()) {
-				mpiResult = MPI_Get(dictEntry,
+				mpiResult = MPI_FUN(MPI_Get)(dictEntry,
 						dictEntrySize(),
 						MPI_LONG,
 						dictRank,
@@ -307,7 +308,7 @@ public:
 						m_dictWin);
 				assert(mpiResult == MPI_SUCCESS);
 
-				mpiResult = MPI_Win_flush_local(dictRank, m_dictWin);
+				mpiResult = MPI_FUN(MPI_Win_flush_local)(dictRank, m_dictWin);
 				assert(mpiResult == MPI_SUCCESS);
 			}
 		}
@@ -322,7 +323,7 @@ public:
 			entry = fetchAndUpdateBlockInfo(dictEntry,
 					mpiComm().rank() * rankCacheSize() + offset);
 
-			mpiResult = MPI_Put(dictEntry,
+			mpiResult = MPI_FUN(MPI_Put)(dictEntry,
 					dictEntrySize(),
 					MPI_LONG,
 					dictRank,
@@ -333,7 +334,7 @@ public:
 			assert(mpiResult == MPI_SUCCESS);
 		}
 
-		mpiResult = MPI_Win_unlock(dictRank, m_dictWin);
+		mpiResult = MPI_FUN(MPI_Win_unlock)(dictRank, m_dictWin);
 		assert(mpiResult == MPI_SUCCESS);
 
 #ifndef THREADSAFE_MPI
@@ -381,7 +382,7 @@ public:
 #endif // THREADSAFE_MPI
 
 			// Lock remote window
-			mpiResult = MPI_Win_lock(MPI_LOCK_SHARED, rank,
+			mpiResult = MPI_FUN(MPI_Win_lock)(MPI_LOCK_SHARED, rank,
 					ASAGI_MPI_MODE_NOCHECK, m_cacheWin);
 			assert(mpiResult == MPI_SUCCESS);
 
@@ -397,7 +398,7 @@ public:
 			assert(mpiResult == MPI_SUCCESS);
 
 			// Unlock remote window
-			mpiResult = MPI_Win_unlock(rank, m_cacheWin);
+			mpiResult = MPI_FUN(MPI_Win_unlock)(rank, m_cacheWin);
 			assert(mpiResult == MPI_SUCCESS);
 		}
 
@@ -425,13 +426,13 @@ public:
 
 		int mpiResult; NDBG_UNUSED(mpiResult);
 
-		mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, dictRank, 0, m_dictWin);
+		mpiResult = MPI_FUN(MPI_Win_lock)(MPI_LOCK_EXCLUSIVE, dictRank, 0, m_dictWin);
 		assert(mpiResult == MPI_SUCCESS);
 
 		m_mpiMutex->release(dictRank,
 				dictEntrySize() + dictOffset * totalDictEntrySize());
 
-		mpiResult = MPI_Win_unlock(dictRank, m_dictWin);
+		mpiResult = MPI_FUN(MPI_Win_unlock)(dictRank, m_dictWin);
 		assert(mpiResult == MPI_SUCCESS);
 
 		mpi::MPIComm::mpiLock.unlock();
@@ -485,11 +486,11 @@ public:
 
 		long dictEntry[MAX_DICT_SIZE];
 
-		mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, dictRank, 0, m_dictWin);
+		mpiResult = MPI_FUN(MPI_Win_lock)(MPI_LOCK_EXCLUSIVE, dictRank, 0, m_dictWin);
 		assert(mpiResult == MPI_SUCCESS);
 
 		if (dictRank != mpiComm().rank()) {
-			mpiResult = MPI_Get(dictEntry,
+			mpiResult = MPI_FUN(MPI_Get)(dictEntry,
 					dictEntrySize(),
 					MPI_LONG,
 					dictRank,
@@ -505,11 +506,11 @@ public:
 
 		if (lock < 0) {
 			// Just synchronize the window properly to make sure the release works
-			mpiResult = MPI_Win_flush(dictRank, m_dictWin);
+			mpiResult = MPI_FUN(MPI_Win_flush)(dictRank, m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
 		} else {
 			// We do not have the lock, wait re-read the dictionary entry
-			mpiResult = MPI_Win_unlock(dictRank, m_dictWin);
+			mpiResult = MPI_FUN(MPI_Win_unlock)(dictRank, m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
 
 #ifndef THREADSAFE_MPI
@@ -522,11 +523,11 @@ public:
 			m_dictWinMutex->lock();
 #endif // THREADSAFE_MPI
 
-			mpiResult = MPI_Win_lock(MPI_LOCK_EXCLUSIVE, dictRank, 0, m_dictWin);
+			mpiResult = MPI_FUN(MPI_Win_lock)(MPI_LOCK_EXCLUSIVE, dictRank, 0, m_dictWin);
 			assert(mpiResult == MPI_SUCCESS);
 
 			if (dictRank != mpiComm().rank()) {
-				mpiResult = MPI_Get(dictEntry,
+				mpiResult = MPI_FUN(MPI_Get)(dictEntry,
 						dictEntrySize(),
 						MPI_LONG,
 						dictRank,
@@ -536,7 +537,7 @@ public:
 						m_dictWin);
 				assert(mpiResult == MPI_SUCCESS);
 
-				mpiResult = MPI_Win_flush_local(dictRank, m_dictWin);
+				mpiResult = MPI_FUN(MPI_Win_flush_local)(dictRank, m_dictWin);
 				assert(mpiResult == MPI_SUCCESS);
 			}
 		}
@@ -549,7 +550,7 @@ public:
 			deleteBlockInfo(dictEntry,
 					mpiComm().rank() * rankCacheSize() + offset);
 
-			mpiResult = MPI_Put(dictEntry,
+			mpiResult = MPI_FUN(MPI_Put)(dictEntry,
 					dictEntrySize(),
 					MPI_LONG,
 					dictRank,
@@ -563,7 +564,7 @@ public:
 		m_mpiMutex->release(dictRank,
 				dictEntrySize() + dictOffset * totalDictEntrySize());
 
-		mpiResult = MPI_Win_unlock(dictRank, m_dictWin);
+		mpiResult = MPI_FUN(MPI_Win_unlock)(dictRank, m_dictWin);
 		assert(mpiResult == MPI_SUCCESS);
 
 #ifndef THREADSAFE_MPI

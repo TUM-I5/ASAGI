@@ -44,6 +44,7 @@
 
 #include "basictype.h"
 #include "io/netcdfreader.h"
+#include "mpi/scorephelper.h"
 #include "threads/mutex.h"
 
 namespace types {
@@ -79,7 +80,7 @@ public:
 	virtual ~ArrayType()
 	{
 #ifndef ASAGI_NOMPI
-		MPI_Type_free(&m_mpiType);
+		MPI_FUN(MPI_Type_free)(&m_mpiType);
 #endif // ASAGI_NOMPI
 	}
 
@@ -103,10 +104,10 @@ public:
 
 #ifndef ASAGI_NOMPI
 			// Create the mpi datatype
-			if (MPI_Type_contiguous(m_arraySize, BasicType<T>::getMPIType(),
+			if (MPI_FUN(MPI_Type_contiguous)(m_arraySize, BasicType<T>::getMPIType(),
 					&m_mpiType) != MPI_SUCCESS)
 				return asagi::Grid::MPI_ERROR;
-			if (MPI_Type_commit(&m_mpiType) != MPI_SUCCESS)
+			if (MPI_FUN(MPI_Type_commit)(&m_mpiType) != MPI_SUCCESS)
 				return asagi::Grid::MPI_ERROR;
 #endif // ASAGI_NOMPI
 		} else {
