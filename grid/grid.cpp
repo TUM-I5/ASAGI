@@ -229,10 +229,13 @@ asagi::Grid::Error grid::Grid::open(const char* filename, unsigned int level)
 			blockSizes[i] = param(sizeName.c_str(), 0, level); // 0 -> use default
 		}
 
+		unsigned int cacheSize = param("CACHE_SIZE", 128u, level);
+		if (cacheSize == 0)
+			logError() << "ASAGI: Cache size cannot be 0.";
 		err = m_containers[m_numa.domainId()]->init(filename,
 				param("VARIABLE", "z", level),
 				blockSizes,
-				param("CACHE_SIZE", 128u, level),
+				cacheSize,
 				param("CACHE_HAND_SPREAD", -1, level),
 				level);
 		if (err != asagi::Grid::SUCCESS)
