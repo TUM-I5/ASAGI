@@ -38,6 +38,8 @@
 #ifndef TRANSFER_MPINO_H
 #define TRANSFER_MPINO_H
 
+#include <cassert>
+
 namespace transfer
 {
 
@@ -95,6 +97,7 @@ public:
 	void transfer(int remoteRank, unsigned long offset,
 			unsigned char *cache)
 	{
+		assert(false);
 	}
 
 	/**
