@@ -87,17 +87,15 @@ private:
 
 public:
 	MPIComm()
-		: m_comm(MPI_COMM_NULL),
+		: m_comm(MPI_COMM_SELF),
 		  m_rank(0), m_size(1),
 		  m_nextFreeTag(0)
 	{ }
 
 	virtual ~MPIComm()
 	{
-		if (m_comm != MPI_COMM_NULL) {
-			std::lock_guard<Lock> lock(mpiLock);
-			MPI_Comm_free(&m_comm);
-		}
+		std::lock_guard<Lock> lock(mpiLock);
+		freeComm();
 	}
 
 	/**
@@ -106,6 +104,8 @@ public:
 	asagi::Grid::Error init(MPI_Comm comm)
 	{
 		std::lock_guard<Lock> lock(mpiLock);
+
+		freeComm();
 
 		if (MPI_Comm_dup(comm, &m_comm) != MPI_SUCCESS)
 			return asagi::Grid::MPI_ERROR;
@@ -161,6 +161,19 @@ public:
 		int tag = m_nextFreeTag;
 		m_nextFreeTag += num;
 		return tag;
+	}
+
+private:
+	/**
+	 * Free the current communicator
+	 *
+	 * @warning This function does not lock {@link mpiLock}
+	 */
+	int freeComm()
+	{
+		if (m_comm != MPI_COMM_SELF)
+			return MPI_Comm_free(&m_comm);
+		return MPI_SUCCESS;
 	}
 
 public:

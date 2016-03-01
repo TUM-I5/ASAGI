@@ -313,13 +313,18 @@ void grid::Grid::initContainers()
 	// Select MPI communication
 	std::string mpiType = param("MPI_COMMUNICATION", "WINDOW");
 #ifdef THREADSAFE_MPI
-	if (mpiType != "WINDOW") {
+	if (mpiType == "THREAD") {
 		logWarning(m_comm.rank()) << "ASAGI: Communication thread requires a thread-safe MPI library";
 		mpiType = "WINDOW";
 	}
 #endif // THREADSAFE_MPI
 	if (m_comm.size() == 1)
 		mpiType = "OFF";
+#ifndef ASAGI_NOMPI
+	else if (mpiType == "OFF")
+		// Reset the communicator if MPI is disabled
+		setComm(MPI_COMM_SELF);
+#endif
 
 	// Select NUMA communication
 #ifdef ASAGI_NONUMA
