@@ -95,6 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classmpi_1_1MPIComm-members.xhtml">List of all members</a>  </div>
   <div class="headertitle">
@@ -129,6 +130,11 @@ Public Member Functions</h2></td></tr>
 Static Public Attributes</h2></td></tr>
 <tr class="memitem:a439184c276be1db707d982174de4bc00"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespacempi.xhtml#a0703a974a59133c4a796489641002ddb">Lock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1MPIComm.xhtml#a439184c276be1db707d982174de4bc00">mpiLock</a></td></tr>
 <tr class="separator:a439184c276be1db707d982174de4bc00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:adfadc4d6e4d8ae7e27c9c98af2b65e55"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpi_1_1MPIComm.xhtml#adfadc4d6e4d8ae7e27c9c98af2b65e55">freeComm</a> ()</td></tr>
+<tr class="separator:adfadc4d6e4d8ae7e27c9c98af2b65e55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -198,6 +204,33 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="adfadc4d6e4d8ae7e27c9c98af2b65e55"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int mpi::MPIComm::freeComm </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Free the current communicator</p>
+<dl class="section warning"><dt>Warning</dt><dd>This function does not lock <a class="el" href="classmpi_1_1MPIComm.xhtml#a439184c276be1db707d982174de4bc00">mpiLock</a> </dd></dl>
+
+<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00172">172</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a17e4c81f4afd72d1510bc886b5e1642d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -221,7 +254,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Initialize the communicator </p>
 
-<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00106">106</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00104">104</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
 
 </div>
 </div>
@@ -423,7 +456,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Lock to protect all MPI calls </p>
 
-<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00167">167</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
+<p>Definition at line <a class="el" href="mpicomm_8h_source.xhtml#l00180">180</a> of file <a class="el" href="mpicomm_8h_source.xhtml">mpicomm.h</a>.</p>
 
 </div>
 </div>

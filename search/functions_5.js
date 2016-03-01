@@ -27,6 +27,7 @@ var searchData=
   ['fetchblockinfo',['fetchBlockInfo',['../classtransfer_1_1MPICache.xhtml#a7f538c72b7d8d5540b54fb8fcaeb2205',1,'transfer::MPICache::fetchBlockInfo(const long *dictEntry)'],['../classtransfer_1_1MPICache.xhtml#a50b2d876ae1e45d214ceaba96fdd0335',1,'transfer::MPICache::fetchBlockInfo(const long *dictEntry, unsigned int &amp;count)'],['../classtransfer_1_1MPIThreadCache.xhtml#ab1efd07e68795dae964cc13173d30d06',1,'transfer::MPIThreadCache::fetchBlockInfo()']]],
   ['finialize',['finialize',['../classmpi_1_1CommThread.xhtml#a713f351b266a4097c9e380987f0b19e5',1,'mpi::CommThread']]],
   ['free',['free',['../classallocator_1_1Default.xhtml#ac52c7607db5c8c82076bcfafc65d16b0',1,'allocator::Default::free()'],['../classallocator_1_1MPIAlloc.xhtml#a942e426b06662c7a80a09749fb818e92',1,'allocator::MPIAlloc::free()'],['../classnuma_1_1NumaComm.xhtml#a902b049618c90393c09351328f0fe99f',1,'numa::NumaComm::free()']]],
+  ['freecomm',['freeComm',['../classmpi_1_1MPIComm.xhtml#adfadc4d6e4d8ae7e27c9c98af2b65e55',1,'mpi::MPIComm']]],
   ['full',['Full',['../classgrid_1_1level_1_1Full.xhtml#afe691a6146820107cb59e9f6d4d68d3e',1,'grid::level::Full']]],
   ['fulldist',['FullDist',['../classgrid_1_1level_1_1FullDist.xhtml#aab3218dbc6904fab0ab8f3adfdebeef6',1,'grid::level::FullDist']]]
 ];

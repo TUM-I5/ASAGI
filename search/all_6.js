@@ -31,8 +31,9 @@ var searchData=
   ['float',['FLOAT',['../group__cxx__interface.xhtml#gga26042863b1e4f739f16b0cdbe5639d9ba4ad2d2aa2fbc52541732e920fb160e49',1,'asagi::Grid']]],
   ['fortran',['fortran',['../namespacefortran.xhtml',1,'']]],
   ['free',['free',['../classallocator_1_1Default.xhtml#ac52c7607db5c8c82076bcfafc65d16b0',1,'allocator::Default::free()'],['../classallocator_1_1MPIAlloc.xhtml#a942e426b06662c7a80a09749fb818e92',1,'allocator::MPIAlloc::free()'],['../classnuma_1_1NumaComm.xhtml#a902b049618c90393c09351328f0fe99f',1,'numa::NumaComm::free()']]],
-  ['full',['Full',['../classgrid_1_1level_1_1Full.xhtml#afe691a6146820107cb59e9f6d4d68d3e',1,'grid::level::Full']]],
+  ['freecomm',['freeComm',['../classmpi_1_1MPIComm.xhtml#adfadc4d6e4d8ae7e27c9c98af2b65e55',1,'mpi::MPIComm']]],
   ['full',['Full',['../classgrid_1_1level_1_1Full.xhtml',1,'grid::level']]],
+  ['full',['Full',['../classgrid_1_1level_1_1Full.xhtml#afe691a6146820107cb59e9f6d4d68d3e',1,'grid::level::Full']]],
   ['full_2eh',['full.h',['../full_8h.xhtml',1,'']]],
   ['fulldefault',['FullDefault',['../namespacegrid_1_1level.xhtml#af2d6eb195c7c57a5936cd4ab7dbf7f30',1,'grid::level']]],
   ['fulldist',['FullDist',['../classgrid_1_1level_1_1FullDist.xhtml',1,'grid::level']]],
@@ -45,5 +46,6 @@ var searchData=
   ['fulldistmpiwinnuma',['FullDistMPIWinNuma',['../namespacegrid_1_1level.xhtml#ab9f97087cc77cd09a48bbdcaa535d488',1,'grid::level']]],
   ['fulldistmpiwinnumacache',['FullDistMPIWinNumaCache',['../namespacegrid_1_1level.xhtml#a750c1e9aabe8519babf6e88bd7d3a547',1,'grid::level']]],
   ['fulldistnuma',['FullDistNuma',['../namespacegrid_1_1level.xhtml#af2b212430942b3bcaf94a33e4801bc79',1,'grid::level']]],
+  ['fulldistnumacache',['FullDistNumaCache',['../namespacegrid_1_1level.xhtml#a2e98588dc12500250d475e2e21aacabd',1,'grid::level']]],
   ['fulltest_2ecpp',['fulltest.cpp',['../fulltest_8cpp.xhtml',1,'']]]
 ];

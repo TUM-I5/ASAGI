@@ -2,7 +2,6 @@ var searchData=
 [
   ['barrier',['barrier',['../classmpi_1_1MPIComm.xhtml#aa1a0e693578ede37d7a58ea7951aa5e9',1,'mpi::MPIComm::barrier()'],['../classmpi_1_1NoMPIComm.xhtml#abea27991febe7923ec35908a11d25a98',1,'mpi::NoMPIComm::barrier()'],['../classnuma_1_1NoNuma.xhtml#a60563ab815bcf05b5cd64009c989a9a5',1,'numa::NoNuma::barrier()'],['../classnuma_1_1Numa.xhtml#ac2bf52714b1bb9667d38190edc30a7ff',1,'numa::Numa::barrier()'],['../classthreads_1_1Sync.xhtml#a61d4849519250d63d6dca777b10b6809',1,'threads::Sync::barrier()']]],
   ['basictype',['BasicType',['../classtypes_1_1BasicType.xhtml',1,'types']]],
-  ['basictype_2ecpp',['basictype.cpp',['../basictype_8cpp.xhtml',1,'']]],
   ['basictype_2eh',['basictype.h',['../basictype_8h.xhtml',1,'']]],
   ['blockbycoords',['blockByCoords',['../classgrid_1_1level_1_1Blocked.xhtml#a3faefe3c2cea4d0d0f1c20e054b6b8dc',1,'grid::level::Blocked']]],
   ['blockdomain',['blockDomain',['../classgrid_1_1level_1_1Blocked.xhtml#a5325f96434fe828b989bdb4a10843436',1,'grid::level::Blocked']]],

@@ -8,7 +8,6 @@ var searchData=
   ['allocate',['allocate',['../classallocator_1_1Default.xhtml#a45e26d676b509e5fab2a0f642fd4e694',1,'allocator::Default::allocate()'],['../classallocator_1_1MPIAlloc.xhtml#a1b1acf801d4f51c0a35bc293a2978887',1,'allocator::MPIAlloc::allocate()'],['../classnuma_1_1NumaComm.xhtml#ad215a4182c54252a5105b88bf879ae71',1,'numa::NumaComm::allocate()']]],
   ['already_5finitialized',['ALREADY_INITIALIZED',['../group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a15cd796c3a9ee5e49922cf238911cf49',1,'asagi::Grid']]],
   ['arraytype',['ArrayType',['../classtypes_1_1ArrayType.xhtml',1,'types']]],
-  ['arraytype_2ecpp',['arraytype.cpp',['../arraytype_8cpp.xhtml',1,'']]],
   ['arraytype_2eh',['arraytype.h',['../arraytype_8h.xhtml',1,'']]],
   ['arraytypetest_2ecpp',['arraytypetest.cpp',['../arraytypetest_8cpp.xhtml',1,'']]],
   ['asagi',['asagi',['../classasagi.xhtml',1,'asagi'],['../namespaceasagi.xhtml',1,'asagi']]],
