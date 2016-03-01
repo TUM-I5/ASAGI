@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2015-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "grid.h"
@@ -281,6 +281,7 @@ void grid::Grid::initContainers()
 		CACHE_MPIWIN_NUMA,
 		FULL,
 		FULL_NUMA,
+		FULL_NUMACACHE,
 		FULL_MPITHREAD,
 		FULL_MPIWIN,
 		FULL_MPITHREAD_NUMA,
@@ -362,6 +363,8 @@ void grid::Grid::initContainers()
 		if (mpiType == "OFF") {
 			if (numaType == "OFF")
 				containerType = FULL;
+			else if (numaType == "CACHE")
+				containerType = FULL_NUMACACHE;
 			else
 				containerType = FULL_NUMA;
 		} else if (mpiType == "THREAD") {
@@ -417,6 +420,9 @@ void grid::Grid::initContainers()
 			break;
 		case FULL_NUMA:
 			*it = TypeSelector<SimpleContainer, level::FullDistNuma, typelist>::createContainer(*this);
+			break;
+		case FULL_NUMACACHE:
+			*it = TypeSelector<SimpleContainer, level::FullDistNumaCache, typelist>::createContainer(*this);
 			break;
 		case FULL_MPITHREAD:
 			*it = TypeSelector<SimpleContainer, level::FullDistMPIThread, typelist>::createContainer(*this);

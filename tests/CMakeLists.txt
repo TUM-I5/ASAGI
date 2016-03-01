@@ -31,7 +31,7 @@
 #  mit diesem Programm erhalten haben. Wenn nicht, siehe
 #  <http://www.gnu.org/licenses/>.
 # 
-# @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+# @copyright 2015-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
 
 # Tests may want to include more header files
 include_directories( ${CMAKE_SOURCE_DIR} )
@@ -130,6 +130,7 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
 #add_test_executable( largegrid1d YES )
 add_test_executable( fullgrid2d )
 add_test_executable( fullnumagrid2d YES )
+add_test_executable( fullnumacachegrid2d YES )
 add_test_executable( fullmpiwingrid2d NO YES )
 add_test_executable( fullmpinumagrid2d YES YES )
 add_test_executable( fullmpiwinnumacachegrid2d YES YES )
@@ -166,6 +167,7 @@ add_subdirectory( unittest )
 #add_test_run( LargeGrid1D test_largegrid1d 2 )
 add_test_run( FullGrid2D test_fullgrid2d )
 add_test_run( FullNumaGrid2D test_fullnumagrid2d YES )
+add_test_run( FullNumaCacheGrid2D test_fullnumacachegrid2d YES )
 add_test_run( FullMPIWinGrid2D test_fullmpiwingrid2d NO 2 )
 add_test_run( FullMPINumaGrid2D test_fullmpinumagrid2d YES 2 )
 add_test_run( FullMPIWinNumaCacheGrid2D test_fullmpiwinnumacachegrid2d YES 2 )

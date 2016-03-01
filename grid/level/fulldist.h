@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  * 
- * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2012-2016 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef GRID_LEVEL_FULLDIST_H
@@ -202,6 +202,10 @@ public:
 /** Full distributed level with NUMA */
 template<class Type>
 using FullDistNuma = FullDist<transfer::MPINo, transfer::NumaFull, Type, allocator::Default>;
+
+/** Full distributed level with NUMA and Cache lookup */
+template<class Type>
+using FullDistNumaCache = FullDist<transfer::MPINo, transfer::NumaFullCache, Type, allocator::Default>;
 
 /** Full distributed level with MPI (communication thread) */
 template<class Type>
