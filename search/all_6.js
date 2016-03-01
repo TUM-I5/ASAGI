@@ -36,8 +36,8 @@ var searchData=
   ['full',['Full',['../classgrid_1_1level_1_1Full.xhtml#afe691a6146820107cb59e9f6d4d68d3e',1,'grid::level::Full']]],
   ['full_2eh',['full.h',['../full_8h.xhtml',1,'']]],
   ['fulldefault',['FullDefault',['../namespacegrid_1_1level.xhtml#af2d6eb195c7c57a5936cd4ab7dbf7f30',1,'grid::level']]],
-  ['fulldist',['FullDist',['../classgrid_1_1level_1_1FullDist.xhtml',1,'grid::level']]],
   ['fulldist',['FullDist',['../classgrid_1_1level_1_1FullDist.xhtml#aab3218dbc6904fab0ab8f3adfdebeef6',1,'grid::level::FullDist']]],
+  ['fulldist',['FullDist',['../classgrid_1_1level_1_1FullDist.xhtml',1,'grid::level']]],
   ['fulldist_2eh',['fulldist.h',['../fulldist_8h.xhtml',1,'']]],
   ['fulldistmpithread',['FullDistMPIThread',['../namespacegrid_1_1level.xhtml#ae21285aed43fabbec848d547da6066e7',1,'grid::level']]],
   ['fulldistmpithreadnuma',['FullDistMPIThreadNuma',['../namespacegrid_1_1level.xhtml#aef1c40c7a7b09cb49b860245694a1650',1,'grid::level']]],
@@ -46,6 +46,5 @@ var searchData=
   ['fulldistmpiwinnuma',['FullDistMPIWinNuma',['../namespacegrid_1_1level.xhtml#ab9f97087cc77cd09a48bbdcaa535d488',1,'grid::level']]],
   ['fulldistmpiwinnumacache',['FullDistMPIWinNumaCache',['../namespacegrid_1_1level.xhtml#a750c1e9aabe8519babf6e88bd7d3a547',1,'grid::level']]],
   ['fulldistnuma',['FullDistNuma',['../namespacegrid_1_1level.xhtml#af2b212430942b3bcaf94a33e4801bc79',1,'grid::level']]],
-  ['fulldistnumacache',['FullDistNumaCache',['../namespacegrid_1_1level.xhtml#a2e98588dc12500250d475e2e21aacabd',1,'grid::level']]],
   ['fulltest_2ecpp',['fulltest.cpp',['../fulltest_8cpp.xhtml',1,'']]]
 ];

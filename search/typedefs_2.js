@@ -7,6 +7,5 @@ var searchData=
   ['fulldistmpiwin',['FullDistMPIWin',['../namespacegrid_1_1level.xhtml#aef4610968d9493e3e69e9dbd9eeea854',1,'grid::level']]],
   ['fulldistmpiwinnuma',['FullDistMPIWinNuma',['../namespacegrid_1_1level.xhtml#ab9f97087cc77cd09a48bbdcaa535d488',1,'grid::level']]],
   ['fulldistmpiwinnumacache',['FullDistMPIWinNumaCache',['../namespacegrid_1_1level.xhtml#a750c1e9aabe8519babf6e88bd7d3a547',1,'grid::level']]],
-  ['fulldistnuma',['FullDistNuma',['../namespacegrid_1_1level.xhtml#af2b212430942b3bcaf94a33e4801bc79',1,'grid::level']]],
-  ['fulldistnumacache',['FullDistNumaCache',['../namespacegrid_1_1level.xhtml#a2e98588dc12500250d475e2e21aacabd',1,'grid::level']]]
+  ['fulldistnuma',['FullDistNuma',['../namespacegrid_1_1level.xhtml#af2b212430942b3bcaf94a33e4801bc79',1,'grid::level']]]
 ];
