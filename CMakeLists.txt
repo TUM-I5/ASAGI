@@ -38,8 +38,8 @@ cmake_minimum_required( VERSION 2.8 )
 # ASAGI
 project( ASAGI )
 
-set( ASAGI_VERSION_MAJOR 0 )
-set( ASAGI_VERSION_MINOR 5 )
+set( ASAGI_VERSION_MAJOR 1 )
+set( ASAGI_VERSION_MINOR 0 )
 
 ##### User configuration #####
 option( SHARED_LIB "Compile the shared library" ON )
