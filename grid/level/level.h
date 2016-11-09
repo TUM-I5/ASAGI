@@ -41,6 +41,7 @@
 #include "asagi.h"
 
 #include <cassert>
+#include <cmath>
 #include <utility>
 
 #include "utils/logger.h"
@@ -407,7 +408,7 @@ private:
 	 */
 	static double round(double value)
 	{
-		return floor(value + 0.5);
+		return std::floor(value + 0.5);
 	}
 };
 
