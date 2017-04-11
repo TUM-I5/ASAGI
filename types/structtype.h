@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,8 +31,8 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2012-2017 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TYPES_STRUCTTYPE_H
@@ -61,7 +61,7 @@ template<typename T> class StructType : public BasicType<T>
 private:
 	/** Size of this struct */
 	unsigned int m_size;
-	
+
 #ifndef ASAGI_NOMPI
 	/** Number of blocks in this struct */
 	unsigned int m_count;
@@ -71,7 +71,7 @@ private:
 	MPI_Aint *m_displacements;
 	/** Datatype of each block */
 	MPI_Datatype *m_types;
-	
+
 	/** The MPI_Datatype representing this type*/
 	MPI_Datatype m_mpiType;
 #endif // ASAGI_NOMPI
@@ -98,7 +98,7 @@ private:
 		m_blockLength = new int[count];
 		m_displacements = new MPI_Aint[count];
 		m_types = new MPI_Datatype[count];
-		
+
 		for (unsigned int i = 0; i < count; i++) {
 			m_blockLength[i] = blockLength[i];
 			m_displacements[i] = displacements[i];
@@ -128,8 +128,9 @@ public:
 	virtual ~StructType()
 	{
 #ifndef ASAGI_NOMPI
-		MPI_Type_free(&m_mpiType);
-		
+		if (m_mpiType != MPI_DATATYPE_NULL)
+			MPI_Type_free(&m_mpiType);
+
 		delete [] m_blockLength;
 		delete [] m_displacements;
 		delete [] m_types;
@@ -149,10 +150,10 @@ public:
 			m_size = size;
 
 			m_lock.unlock();
-		
+
 #ifndef ASAGI_NOMPI
 			MPI_Datatype tmpType;
-		
+
 			// Create the mpi datatype
 			if (MPI_Type_create_struct(
 					m_count,
@@ -170,12 +171,12 @@ public:
 
 			if (MPI_Type_free(&tmpType) != MPI_SUCCESS)
 				return asagi::Grid::MPI_ERROR;
-		
+
 			// We do not need them anymore
 			delete [] m_blockLength;
 			delete [] m_displacements;
 			delete [] m_types;
-		
+
 			m_blockLength = 0L;
 			m_displacements = 0L;
 			m_types = 0L;
@@ -186,7 +187,7 @@ public:
 			if (size != m_size)
 				return asagi::Grid::WRONG_SIZE;
 		}
-		
+
 		return asagi::Grid::SUCCESS;
 	}
 
@@ -194,7 +195,7 @@ public:
 	{
 		return m_size;
 	}
-	
+
 #ifndef ASAGI_NOMPI
 	MPI_Datatype getMPIType() const
 	{

@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,8 +31,8 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
- * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ *
+ * @copyright 2012-2017 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef TYPES_ARRAYTYPE_H
@@ -58,12 +58,12 @@ template<typename T> class ArrayType : public BasicType<T>
 private:
 	/** Number of elements in the array */
 	unsigned int m_arraySize;
-	
+
 #ifndef ASAGI_NOMPI
 	/** The MPI_Datatype representing this type*/
 	MPI_Datatype m_mpiType;
 #endif // ASAGI_NOMPI
-	
+
 	/** Lock for the check */
 	threads::Mutex m_lock;
 
@@ -75,11 +75,12 @@ public:
 #endif // ASAGI_NOMPI
 	{
 	}
-	
+
 	virtual ~ArrayType()
 	{
 #ifndef ASAGI_NOMPI
-		MPI_Type_free(&m_mpiType);
+		if (m_mpiType != MPI_DATATYPE_NULL)
+			MPI_Type_free(&m_mpiType);
 #endif // ASAGI_NOMPI
 	}
 
@@ -90,7 +91,7 @@ public:
 	{
 		if (file.getVarSize() % sizeof(T) != 0)
 			return asagi::Grid::INVALID_VAR_SIZE;
-		
+
 		unsigned int arraySize = file.getVarSize() / sizeof(T);
 
 		// Lock the array size
@@ -115,7 +116,7 @@ public:
 			if (arraySize != m_arraySize)
 				return asagi::Grid::WRONG_SIZE;
 		}
-		
+
 		return asagi::Grid::SUCCESS;
 	}
 
