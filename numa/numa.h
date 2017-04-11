@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2015-2017 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef NUMA_NUMA_H
@@ -156,6 +156,17 @@ public:
 	asagi::Grid::Error barrier() const
 	{
 		if (!m_syncThreads.barrier(m_totalThreads))
+			return asagi::Grid::THREAD_ERROR;
+		return asagi::Grid::SUCCESS;
+	}
+
+	/**
+	 * Broadcast between all threads
+	 */
+	template<typename T>
+	asagi::Grid::Error broadcast(T &data, unsigned int root = 0) const
+	{
+		if (!m_syncThreads.broadcast(data, m_totalThreads, threadId(), root))
 			return asagi::Grid::THREAD_ERROR;
 		return asagi::Grid::SUCCESS;
 	}

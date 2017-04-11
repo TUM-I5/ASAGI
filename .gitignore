@@ -6,5 +6,9 @@
 .settings
 .pydevproject
 
+# KDevelop
+*.kdev4
+.kdev4/
+
 # Executables
 tools/pinning_test/pinning_test

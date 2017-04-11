@@ -32,7 +32,7 @@
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
  *
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * @copyright 2015-2017 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "grid.h"
@@ -238,12 +238,14 @@ asagi::Grid::Error grid::Grid::open(const char* filename, unsigned int level)
 				cacheSize,
 				param("CACHE_HAND_SPREAD", -1, level),
 				level);
-		if (err != asagi::Grid::SUCCESS)
-			return err;
 	}
 
-	// Make sure everything is setup
-	return m_numa.barrier();
+	// Synchronize the return value (also acts as a barrier)
+	asagi::Grid::Error err2 = m_numa.broadcast(err);
+	if (err2 != asagi::Grid::SUCCESS)
+		return err2;
+
+	return err;
 }
 
 unsigned long grid::Grid::getCounter(const char* name, unsigned int level)
