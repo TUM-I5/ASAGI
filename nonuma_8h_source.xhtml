@@ -153,13 +153,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a69656f79342520e170ee22f4dfcb6d29">asagi::Grid::SUCCESS</a>;</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        }</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <a class="code" href="classnuma_1_1NumaComm.xhtml">NumaComm</a>* <a class="code" href="classnuma_1_1NoNuma.xhtml#af54f0ccc638d21f115dd436911c25fff">createComm</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;};</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;}</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor">#endif // NUMA_NONUMA_H</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00125"></a><span class="lineno"><a class="line" href="classnuma_1_1NoNuma.xhtml#a2584c0de0b29098b45daaf5bc51c0f3f">  125</a></span>&#160;        <a class="code" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a> <a class="code" href="classnuma_1_1NoNuma.xhtml#a2584c0de0b29098b45daaf5bc51c0f3f">broadcast</a>(T &amp;data, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> root = 0)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="keyword">        </span>{</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a69656f79342520e170ee22f4dfcb6d29">asagi::Grid::SUCCESS</a>;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        }</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        <a class="code" href="classnuma_1_1NumaComm.xhtml">NumaComm</a>* <a class="code" href="classnuma_1_1NoNuma.xhtml#af54f0ccc638d21f115dd436911c25fff">createComm</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;};</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;}</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="preprocessor">#endif // NUMA_NONUMA_H</span></div>
 <div class="ttc" id="classnuma_1_1NoNuma_xhtml"><div class="ttname"><a href="classnuma_1_1NoNuma.xhtml">numa::NoNuma</a></div><div class="ttdef"><b>Definition:</b> <a href="nonuma_8h_source.xhtml#l00051">nonuma.h:51</a></div></div>
 <div class="ttc" id="group__cxx__interface_xhtml_gac1191f4df7554b1b99e515962ebc2bb5"><div class="ttname"><a href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a></div><div class="ttdeci">Error</div><div class="ttdef"><b>Definition:</b> <a href="asagi_8h_source.xhtml#l00092">asagi.h:92</a></div></div>
 <div class="ttc" id="group__cxx__interface_xhtml_ggac1191f4df7554b1b99e515962ebc2bb5a69656f79342520e170ee22f4dfcb6d29"><div class="ttname"><a href="group__cxx__interface.xhtml#ggac1191f4df7554b1b99e515962ebc2bb5a69656f79342520e170ee22f4dfcb6d29">asagi::Grid::SUCCESS</a></div><div class="ttdef"><b>Definition:</b> <a href="asagi_8h_source.xhtml#l00094">asagi.h:94</a></div></div>
@@ -168,6 +174,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classnuma_1_1NoNuma_xhtml_a2aed56775d7d96bd598e269d8816f652"><div class="ttname"><a href="classnuma_1_1NoNuma.xhtml#a2aed56775d7d96bd598e269d8816f652">numa::NoNuma::setThreads</a></div><div class="ttdeci">asagi::Grid::Error setThreads(unsigned int threads)</div><div class="ttdef"><b>Definition:</b> <a href="nonuma_8h_source.xhtml#l00066">nonuma.h:66</a></div></div>
 <div class="ttc" id="classnuma_1_1NoNuma_xhtml_ad9fac546365e24fb0517e6cb99bbdeda"><div class="ttname"><a href="classnuma_1_1NoNuma.xhtml#ad9fac546365e24fb0517e6cb99bbdeda">numa::NoNuma::domainId</a></div><div class="ttdeci">unsigned int domainId() const </div><div class="ttdef"><b>Definition:</b> <a href="nonuma_8h_source.xhtml#l00108">nonuma.h:108</a></div></div>
 <div class="ttc" id="classnuma_1_1NumaComm_xhtml"><div class="ttname"><a href="classnuma_1_1NumaComm.xhtml">numa::NumaComm</a></div><div class="ttdef"><b>Definition:</b> <a href="numacomm_8h_source.xhtml#l00052">numacomm.h:52</a></div></div>
+<div class="ttc" id="classnuma_1_1NoNuma_xhtml_a2584c0de0b29098b45daaf5bc51c0f3f"><div class="ttname"><a href="classnuma_1_1NoNuma.xhtml#a2584c0de0b29098b45daaf5bc51c0f3f">numa::NoNuma::broadcast</a></div><div class="ttdeci">asagi::Grid::Error broadcast(T &amp;data, unsigned int root=0) const </div><div class="ttdef"><b>Definition:</b> <a href="nonuma_8h_source.xhtml#l00125">nonuma.h:125</a></div></div>
 <div class="ttc" id="classnuma_1_1NoNuma_xhtml_a60563ab815bcf05b5cd64009c989a9a5"><div class="ttname"><a href="classnuma_1_1NoNuma.xhtml#a60563ab815bcf05b5cd64009c989a9a5">numa::NoNuma::barrier</a></div><div class="ttdeci">asagi::Grid::Error barrier() const </div><div class="ttdef"><b>Definition:</b> <a href="nonuma_8h_source.xhtml#l00116">nonuma.h:116</a></div></div>
 <div class="ttc" id="asagi_8h_xhtml"><div class="ttname"><a href="asagi_8h.xhtml">asagi.h</a></div><div class="ttdoc">Include file for C and C++ API. </div></div>
 <div class="ttc" id="classnuma_1_1NoNuma_xhtml_aba5a4b4283d549c08b5b491af90bb0f5"><div class="ttname"><a href="classnuma_1_1NoNuma.xhtml#aba5a4b4283d549c08b5b491af90bb0f5">numa::NoNuma::registerThread</a></div><div class="ttdeci">asagi::Grid::Error registerThread(bool &amp;masterThread)</div><div class="ttdef"><b>Definition:</b> <a href="nonuma_8h_source.xhtml#l00075">nonuma.h:75</a></div></div>

@@ -126,6 +126,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab6196c5e4944cf282524953fd46a2a16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2bf52714b1bb9667d38190edc30a7ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnuma_1_1Numa.xhtml#ac2bf52714b1bb9667d38190edc30a7ff">barrier</a> () const </td></tr>
 <tr class="separator:ac2bf52714b1bb9667d38190edc30a7ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f9a80bf02f8099f800ce3c2cffed2e9"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a1f9a80bf02f8099f800ce3c2cffed2e9"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classnuma_1_1Numa.xhtml#a1f9a80bf02f8099f800ce3c2cffed2e9">broadcast</a> (T &amp;data, unsigned int root=0) const </td></tr>
+<tr class="separator:a1f9a80bf02f8099f800ce3c2cffed2e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6545f011eed2fbc30b0c1d58a1bf5522"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnuma_1_1NumaComm.xhtml">NumaComm</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnuma_1_1Numa.xhtml#a6545f011eed2fbc30b0c1d58a1bf5522">createComm</a> () const </td></tr>
 <tr class="separator:a6545f011eed2fbc30b0c1d58a1bf5522"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -176,6 +179,45 @@ Private Attributes</h2></td></tr>
 <p>Synchronizes all threads </p>
 
 <p>Definition at line <a class="el" href="numa_8h_source.xhtml#l00156">156</a> of file <a class="el" href="numa_8h_source.xhtml">numa.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1f9a80bf02f8099f800ce3c2cffed2e9"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__cxx__interface.xhtml#gac1191f4df7554b1b99e515962ebc2bb5">asagi::Grid::Error</a> numa::Numa::broadcast </td>
+          <td>(</td>
+          <td class="paramtype">T &amp;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>root</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Broadcast between all threads </p>
+
+<p>Definition at line <a class="el" href="numa_8h_source.xhtml#l00167">167</a> of file <a class="el" href="numa_8h_source.xhtml">numa.h</a>.</p>
 
 </div>
 </div>
