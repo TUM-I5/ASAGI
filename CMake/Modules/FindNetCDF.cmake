@@ -1,77 +1,134 @@
-# - Find NetCDF
-# Find the native NetCDF includes and library
-#
-#  NETCDF_INCLUDES    - where to find netcdf.h, etc
-#  NETCDF_LIBRARIES   - Link these libraries when using NetCDF
-#  NETCDF_FOUND       - True if NetCDF found including required interfaces (see below)
-#
-# Your package can require certain interfaces to be FOUND by setting these
-#
-#  NETCDF_CXX         - require the C++ interface and link the C++ library
-#  NETCDF_CXX4        - require the new C++4 interface and link the C++4 library
-#  NETCDF_F77         - require the F77 interface and link the fortran library
-#  NETCDF_F90         - require the F90 interface and link the fortran library
-#
-# The following are not for general use and are included in
-# NETCDF_LIBRARIES if the corresponding option above is set.
-#
-#  NETCDF_LIBRARIES_C    - Just the C interface
-#  NETCDF_LIBRARIES_CXX  - C++ interface, if available
-#  NETCDF_LIBRARIES_F77  - Fortran 77 interface, if available
-#  NETCDF_LIBRARIES_F90  - Fortran 90 interface, if available
-#
-# Normal usage would be:
-#  set (NETCDF_F90 "YES")
-#  find_package (NetCDF REQUIRED)
-#  target_link_libraries (uses_f90_interface ${NETCDF_LIBRARIES})
-#  target_link_libraries (only_uses_c_interface ${NETCDF_LIBRARIES_C})
+#[==[
+Provides the following variables:
 
-if (NETCDF_INCLUDES AND NETCDF_LIBRARIES)
-  # Already in cache, be silent
-  set (NETCDF_FIND_QUIETLY TRUE)
-endif (NETCDF_INCLUDES AND NETCDF_LIBRARIES)
+  * `NetCDF_FOUND`: Whether NetCDF was found or not.
+  * `NetCDF_INCLUDE_DIRS`: Include directories necessary to use NetCDF.
+  * `NetCDF_LIBRARIES`: Libraries necessary to use NetCDF.
+  * `NetCDF_VERSION`: The version of NetCDF found.
+  * `NetCDF::NetCDF`: A target to use with `target_link_libraries`.
+#]==]
 
-find_path (NETCDF_INCLUDES_C netcdf.h
-  HINTS NETCDF_DIR ENV NETCDF_DIR)
-mark_as_advanced(NETCDF_INCLUDES_C)
+# Stolen from VTK with some small modifications
+# https://github.com/Kitware/VTK/blob/master/CMake/FindNetCDF.cmake
+# (BSD 3-Clause License)
 
-find_library (NETCDF_LIBRARIES_C       NAMES netcdf)
-mark_as_advanced(NETCDF_LIBRARIES_C)
+#[[=========================================================================
 
-set (NetCDF_has_interfaces "YES") # will be set to NO if we're missing any interfaces
-set (NetCDF_incs "${NETCDF_INCLUDES_C}")
-set (NetCDF_libs "${NETCDF_LIBRARIES_C}")
+  Program:   Visualization Toolkit
+  Module:    Copyright.txt
 
-get_filename_component (NetCDF_lib_dirs "${NETCDF_LIBRARIES_C}" PATH)
+Copyright (c) 1993-2015 Ken Martin, Will Schroeder, Bill Lorensen
+All rights reserved.
 
-macro (NetCDF_check_interface lang header libs)
-  if (NETCDF_${lang})
-    find_path (NETCDF_INCLUDES_${lang} NAMES ${header}
-      HINTS "${NETCDF_INCLUDES_C}")
-    find_library (NETCDF_LIBRARIES_${lang} NAMES ${libs}
-      HINTS "${NetCDF_lib_dirs}")
-    mark_as_advanced (NETCDF_INCLUDES_${lang} NETCDF_LIBRARIES_${lang})
-    if (NETCDF_INCLUDES_${lang} AND NETCDF_LIBRARIES_${lang})
-      list (APPEND NetCDF_incs ${NETCDF_INCLUDES_${lang}})
-      list (INSERT NetCDF_libs 0 ${NETCDF_LIBRARIES_${lang}}) # prepend so that -lnetcdf is last
-    else (NETCDF_INCLUDES_${lang} AND NETCDF_LIBRARIES_${lang})
-      set (NetCDF_has_interfaces "NO")
-      message (STATUS "Failed to find NetCDF interface for ${lang}")
-    endif (NETCDF_INCLUDES_${lang} AND NETCDF_LIBRARIES_${lang})
-  endif (NETCDF_${lang})
-endmacro (NetCDF_check_interface)
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
 
-NetCDF_check_interface (CXX netcdfcpp.h netcdf_c++)
-NetCDF_check_interface (CXX4 netcdf netcdf_c++4)
-NetCDF_check_interface (F77 netcdf.inc  netcdff)
-NetCDF_check_interface (F90 netcdf.mod  netcdff)
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
 
-set (NETCDF_INCLUDES "${NetCDF_incs}")
-set (NETCDF_LIBRARIES "${NetCDF_libs}")
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
 
-# handle the QUIETLY and REQUIRED arguments and set NETCDF_FOUND to TRUE if
-# all listed variables are TRUE
-include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (NetCDF DEFAULT_MSG NETCDF_LIBRARIES NETCDF_INCLUDES NetCDF_has_interfaces)
+ * Neither name of Ken Martin, Will Schroeder, or Bill Lorensen nor the names
+   of any contributors may be used to endorse or promote products derived
+   from this software without specific prior written permission.
 
-mark_as_advanced (NETCDF_LIBRARIES NETCDF_INCLUDES)
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================]]
+# Note: The version from VTK tries to first find a CMake built version of CMake and then
+# a pkgConf built one. This doesn't work on all systems with custom built versions of
+# CMake + HDF5.
+# Thus, first try to find it manually, then fall back on CMake/PkgConfig
+
+find_path(NetCDF_INCLUDE_DIR
+  NAMES netcdf.h
+  HINTS $ENV{NETCDF_DIR}/include $ENV{NETCDF_INCLUDE_DIR}
+  DOC "netcdf include directories")
+mark_as_advanced(NetCDF_INCLUDE_DIR)
+
+find_library(NetCDF_LIBRARY
+  NAMES netcdf
+  HINTS $ENV{NETCDF_DIR}/lib $ENV{NETCDF_LIB_DIR}
+  DOC "netcdf library")
+mark_as_advanced(NetCDF_LIBRARY)
+
+if (NetCDF_INCLUDE_DIR)
+  file(STRINGS "${NetCDF_INCLUDE_DIR}/netcdf_meta.h" _netcdf_version_lines
+    REGEX "#define[ \t]+NC_VERSION_(MAJOR|MINOR|PATCH|NOTE)")
+  string(REGEX REPLACE ".*NC_VERSION_MAJOR *\([0-9]*\).*" "\\1" _netcdf_version_major "${_netcdf_version_lines}")
+  string(REGEX REPLACE ".*NC_VERSION_MINOR *\([0-9]*\).*" "\\1" _netcdf_version_minor "${_netcdf_version_lines}")
+  string(REGEX REPLACE ".*NC_VERSION_PATCH *\([0-9]*\).*" "\\1" _netcdf_version_patch "${_netcdf_version_lines}")
+  string(REGEX REPLACE ".*NC_VERSION_NOTE *\"\([^\"]*\)\".*" "\\1" _netcdf_version_note "${_netcdf_version_lines}")
+  set(NetCDF_VERSION "${_netcdf_version_major}.${_netcdf_version_minor}.${_netcdf_version_patch}${_netcdf_version_note}")
+  unset(_netcdf_version_major)
+  unset(_netcdf_version_minor)
+  unset(_netcdf_version_patch)
+  unset(_netcdf_version_note)
+  unset(_netcdf_version_lines)
+endif ()
+
+if (NetCDF_FOUND)
+  set(NetCDF_INCLUDE_DIRS "${NetCDF_INCLUDE_DIR}")
+  set(NetCDF_LIBRARIES "${NetCDF_LIBRARY}")
+
+  if (NOT TARGET NetCDF::NetCDF)
+    add_library(NetCDF::NetCDF UNKNOWN IMPORTED)
+    set_target_properties(NetCDF::NetCDF PROPERTIES
+      IMPORTED_LOCATION "${NetCDF_LIBRARY}"
+      INTERFACE_INCLUDE_DIRECTORIES "${NetCDF_INCLUDE_DIR}")
+  endif ()
+else()
+  # Try to find a CMake-built NetCDF.
+  find_package(netCDF CONFIG QUIET)
+  if (netCDF_FOUND)
+    # Forward the variables in a consistent way.
+    set(NetCDF_FOUND "${netCDF_FOUND}")
+    set(NetCDF_INCLUDE_DIRS "${netCDF_INCLUDE_DIR}")
+    set(NetCDF_LIBRARIES "${netCDF_LIBRARIES}")
+    set(NetCDF_VERSION "${NetCDFVersion}")
+    if (NOT TARGET NetCDF::NetCDF)
+      add_library(NetCDF::NetCDF INTERFACE IMPORTED)
+      set_target_properties(NetCDF::NetCDF PROPERTIES
+        INTERFACE_LINK_LIBRARIES "${NetCDF_LIBRARIES}")
+    endif ()
+    # Skip the rest of the logic in this file.
+    return ()
+  endif ()
+
+  find_package(PkgConfig QUIET)
+  if (PkgConfig_FOUND)
+    pkg_check_modules(_NetCDF QUIET netcdf IMPORTED_TARGET)
+    if (_NetCDF_FOUND)
+      # Forward the variables in a consistent way.
+      set(NetCDF_FOUND "${_NetCDF_FOUND}")
+      set(NetCDF_INCLUDE_DIRS "${_NetCDF_INCLUDE_DIRS}")
+      set(NetCDF_LIBRARIES "${_NetCDF_LIBRARIES}")
+      set(NetCDF_VERSION "${_NetCDF_VERSION}")
+      if (NOT TARGET NetCDF::NetCDF)
+        add_library(NetCDF::NetCDF INTERFACE IMPORTED)
+        set_target_properties(NetCDF::NetCDF PROPERTIES
+          INTERFACE_LINK_LIBRARIES "PkgConfig::_NetCDF")
+      endif ()
+      # Skip the rest of the logic in this file.
+      return ()
+    endif ()
+  endif ()
+endif ()
+
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(NetCDF
+  REQUIRED_VARS NetCDF_LIBRARY NetCDF_INCLUDE_DIR
+  VERSION_VAR NetCDF_VERSION)
+
