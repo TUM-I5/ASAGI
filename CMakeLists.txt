@@ -204,7 +204,8 @@ endif( DEBUG_NUMA )
 
 # Find netcdf
 find_package( NetCDF REQUIRED )
-include_directories( SYSTEM ${NETCDF_INCLUDES} )
+include_directories( SYSTEM ${NetCDF_INCLUDE_DIRS} )
+set( asagiLibs ${NetCDF_LIBRARY} )
 
 # Add library include files for all exectuables
 include_directories( ${CMAKE_SOURCE_DIR}/include )
@@ -233,9 +234,6 @@ add_subdirectory( types )
 
 # Add sources
 add_sources( ${mainSources} )
-
-# List libraries required by ASAGI (and library directories)
-set( asagiLibs ${NETCDF_LIBRARIES} )
 
 if( THREADS_FOUND )
     set( asagiLibs ${asagiLibs} ${CMAKE_THREAD_LIBS_INIT} )
