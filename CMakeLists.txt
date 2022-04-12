@@ -235,9 +235,6 @@ add_subdirectory( types )
 # Add sources
 add_sources( ${mainSources} )
 
-# List libraries required by ASAGI (and library directories)
-set( asagiLibs ${NETCDF_LIBRARIES} )
-
 if( THREADS_FOUND )
     set( asagiLibs ${asagiLibs} ${CMAKE_THREAD_LIBS_INIT} )
 endif( THREADS_FOUND )
