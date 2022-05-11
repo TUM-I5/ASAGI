@@ -78,7 +78,7 @@ if (NetCDF_INCLUDE_DIR)
   unset(_netcdf_version_lines)
 endif ()
 
-if (NetCDF_FOUND)
+if (NetCDF_INCLUDE_DIR AND NetCDF_LIBRARY)
   set(NetCDF_INCLUDE_DIRS "${NetCDF_INCLUDE_DIR}")
   set(NetCDF_LIBRARIES "${NetCDF_LIBRARY}")
 
