@@ -194,9 +194,11 @@ public:
 		assert(mpiResult == MPI_SUCCESS);
 
 		if (oldLock != myLock)
+ 		{
 			mpiResult = MPI_Recv(0L, 0, MPI_BYTE, MPI_ANY_SOURCE, m_tagOffset+threadId,
 					m_comm->comm(), MPI_STATUS_IGNORE);
 			assert(mpiResult == MPI_SUCCESS);
+		}
 	}
 
 private:
