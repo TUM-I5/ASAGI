@@ -38,7 +38,9 @@
 #ifndef ASAGI_NONUMA
 #include <numa.h>
 #endif // ASAGI_NONUMA
+#ifndef __APPLE__
 #include <sched.h>
+#endif
 
 #include "numa.h"
 #include "numacomm.h"
@@ -78,9 +80,11 @@ asagi::Grid::Error numa::Numa::registerThread(bool &masterThread, bool detectNum
 	}
 
 	// Get the NUMA domain
+#ifndef __APPLE__
 	int cpu = sched_getcpu();
 	if (cpu < 0)
 		return asagi::Grid::NUMA_ERROR;
+#endif
 #ifdef ASAGI_NONUMA
 	int domain = 0;
 #else // ASAGI_NONUMA

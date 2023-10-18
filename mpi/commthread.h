@@ -154,6 +154,7 @@ public:
 		if (pthread_create(&m_thread, 0L, &commThreadHandler, 0L) != 0)
 			return asagi::Grid::THREAD_ERROR;
 
+#ifndef __APPLE__
 		// Pin the thread
 		int numCPUs = std::thread::hardware_concurrency();
 		if (schedCPU < numCPUs && -schedCPU <= numCPUs) {
@@ -170,6 +171,7 @@ public:
 		} else
 			logInfo(m_rank) << "ASAGI: Invalid CPU id" << schedCPU
 				<< "The communication thread will not be pined.";
+#endif // __APPLE__
 
 		return asagi::Grid::SUCCESS;
 	}
