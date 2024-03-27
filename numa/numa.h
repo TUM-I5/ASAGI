@@ -49,6 +49,15 @@
 #include <vector>
 
 #include "threads/sync.h"
+#endif // USE_PTHREAD
+
+namespace numa
+{
+
+#ifndef USE_PTHREAD
+/** NUMA dummy implementation if NUMA is disabled */
+typedef NoNuma Numa;
+#else // USE_PTHREAD
 
 /**
  * Defines the size of thread and NUMA id so we can store
@@ -59,15 +68,6 @@ typedef uint32_t id_t;
 #else // _LP64
 typedef uint16_t id_t;
 #endif // _LP64
-#endif // USE_PTHREAD
-
-namespace numa
-{
-
-#ifndef USE_PTHREAD
-/** NUMA dummy implementation if NUMA is disabled */
-typedef NoNuma Numa;
-#else // USE_PTHREAD
 
 class NumaComm;
 
