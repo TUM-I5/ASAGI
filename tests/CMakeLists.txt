@@ -5,6 +5,10 @@
 # Tests may want to include more header files
 include_directories( ${CMAKE_SOURCE_DIR} )
 
+if (FORTRAN_SUPPORT)
+	find_package( MPI COMPONENTS Fortran REQUIRED )
+endif()
+
 # Add test executable
 function( add_test_executable name )
     if( ARGV1 AND NONUMA )
@@ -38,12 +42,12 @@ function( add_test_executable name )
 	target_link_libraries( test_${name} ${asagiTarget} ${asagiLibs} )
 	if( ARGV2 )
 		# Link with mpi library
-		target_link_libraries( test_${name}
-		    ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES} )
+		target_link_libraries( test_${name} MPI::MPI_C )
 	endif( ARGV2 )
 	
 	# Fortran linker?
 	if( ARGV3 )
+		target_link_libraries( test_${name} MPI::MPI_Fortran )
         set_target_properties( test_${name} PROPERTIES
 	        LINKER_LANGUAGE Fortran )
 	endif( ARGV3 )
