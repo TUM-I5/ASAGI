@@ -83,7 +83,7 @@ set( TestPrepareSources
 add_executable( test_prepare
 	${TestPrepareSources} )
 target_link_libraries( test_prepare
-	${NETCDF_LIBRARIES} )
+	${NetCDF_LIBRARY} )
 
 # Test that generates the grid files
 add_test( NAME prepare COMMAND test_prepare )
