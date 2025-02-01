@@ -14,7 +14,7 @@ jobs:
       - name: apt-get
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y libomp-dev libopenmpi-dev openmpi-bin openmpi-common ninja-build
+          sudo apt-get install -y libomp-dev libopenmpi-dev openmpi-bin openmpi-common ninja-build libnetcdf-dev
 
           # keep, for once clang-19 or higher is needed
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -

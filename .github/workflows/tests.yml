@@ -35,7 +35,8 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y software-properties-common
           sudo add-apt-repository ppa:deadsnakes/ppa
-          sudo apt-get install -y libomp-dev libopenmpi-dev openmpi-bin openmpi-common ninja-build gfortran openmpi-bin openmpi-common libopenmpi-dev libnetcdf11 libnetcdf-dev libnuma1 libnuma-dev cmake doxygen graphviz texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-font-utils ghostscript
+          sudo apt-get update -y
+          sudo apt-get install -y libomp-dev libopenmpi-dev openmpi-bin openmpi-common ninja-build gfortran openmpi-bin openmpi-common libopenmpi-dev libnetcdf-dev libnuma-dev cmake
           sudo apt-get install -y cxxtest
 
       - name: build
