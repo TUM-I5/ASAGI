@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,7 +31,7 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
+ *
  * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -43,51 +43,46 @@
 #include <cstring>
 
 namespace io {
-	class NetCdfReader;
+class NetCdfReader;
 }
 
 /**
  * @brief Types specific code
  */
-namespace types
-{
+namespace types {
 
 /**
  * Describes the type of the variable stored in each grid cell.
- * 
+ *
  * This is a base class for arbitrary types with some default implemtentations.
  */
-class Type
-{
-public:
-	/**
-	 * Empty destructor, makes sure constructor
-	 * of child classes is called
-	 */
-	virtual ~Type() { }
-	
-	/**
-	 * @return The size of the variable
-	 */
-	virtual unsigned int size() const = 0;
-	
+class Type {
+  public:
+  /**
+   * Empty destructor, makes sure constructor
+   * of child classes is called
+   */
+  virtual ~Type() {}
+
+  /**
+   * @return The size of the variable
+   */
+  virtual unsigned int size() const = 0;
+
 #ifndef ASAGI_NOMPI
-	/**
-	 * @return The corresponding MPI_Datatype for this type
-	 */
-	virtual MPI_Datatype getMPIType() const = 0;
+  /**
+   * @return The corresponding MPI_Datatype for this type
+   */
+  virtual MPI_Datatype getMPIType() const = 0;
 #endif // ASAGI_NOMPI
-	
-protected:
-	/**
-	 * Copies the data from <code>data</code> to <code>buf</code>
-	 */
-	static void copy(const void* data, void* buf, unsigned int size)
-	{
-		memcpy(buf, data, size);
-	}
+
+  protected:
+  /**
+   * Copies the data from <code>data</code> to <code>buf</code>
+   */
+  static void copy(const void* data, void* buf, unsigned int size) { memcpy(buf, data, size); }
 };
 
-}
+} // namespace types
 
 #endif // TYPES_TYPE_H

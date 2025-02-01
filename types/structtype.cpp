@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,7 +31,7 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
+ *
  * @copyright 2012-2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -39,37 +39,30 @@
 
 /**
  * Creates a struct type
- * 
+ *
  * @relates types::StructType
  */
-types::Type* types::createStruct(
-	unsigned int count,
-	unsigned int blockLength[],
-	unsigned long displacements[],
-	asagi::Grid::Type types[])
-{
-	assert(count >= 1);
-	assert(displacements[0] == 0);
-	
-	switch (types[0]) {
-	case asagi::Grid::BYTE:
-		return new types::StructType<unsigned char>(count, blockLength,
-			displacements, types);
-	case asagi::Grid::INT:
-		return new types::StructType<int>(count, blockLength,
-			displacements, types);
-	case asagi::Grid::LONG:
-		return new types::StructType<long>(count, blockLength,
-			displacements, types);
-	case asagi::Grid::FLOAT:
-		return new types::StructType<float>(count, blockLength,
-			displacements, types);
-	case asagi::Grid::DOUBLE:
-		return new types::StructType<double>(count, blockLength,
-			displacements, types);
-	}
-	
-	assert(false);
-	
-	return 0L;
+types::Type* types::createStruct(unsigned int count,
+                                 unsigned int blockLength[],
+                                 unsigned long displacements[],
+                                 asagi::Grid::Type types[]) {
+  assert(count >= 1);
+  assert(displacements[0] == 0);
+
+  switch (types[0]) {
+  case asagi::Grid::BYTE:
+    return new types::StructType<unsigned char>(count, blockLength, displacements, types);
+  case asagi::Grid::INT:
+    return new types::StructType<int>(count, blockLength, displacements, types);
+  case asagi::Grid::LONG:
+    return new types::StructType<long>(count, blockLength, displacements, types);
+  case asagi::Grid::FLOAT:
+    return new types::StructType<float>(count, blockLength, displacements, types);
+  case asagi::Grid::DOUBLE:
+    return new types::StructType<double>(count, blockLength, displacements, types);
+  }
+
+  assert(false);
+
+  return 0L;
 }

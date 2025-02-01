@@ -4,7 +4,7 @@
 //
 // The QtGui displays a simple progress bar using the Qt Toolkit.  It
 // has been tested with versions 2.x and 3.x.
-// 
+//
 // Apart from normal Qt command-line arguments, it accepts the following options:
 //   -minimized    Start minimized, pop up on error
 //   -keep         Don't close the window at the end
@@ -25,247 +25,195 @@
 #include <qprogressbar.h>
 #include <qstatusbar.h>
 
-namespace CxxTest
-{
-    class QtGui : public GuiListener
-    {
-    public:
-        void enterGui( int &argc, char **argv )
-        {
-            parseCommandLine( argc, argv );
-            createApplication( argc, argv );
-        }
+namespace CxxTest {
+class QtGui : public GuiListener {
+  public:
+  void enterGui(int& argc, char** argv) {
+    parseCommandLine(argc, argv);
+    createApplication(argc, argv);
+  }
 
-        void enterWorld( const WorldDescription &wd )
-        {
-            createWindow( wd );
-            processEvents();
-        }
+  void enterWorld(const WorldDescription& wd) {
+    createWindow(wd);
+    processEvents();
+  }
 
-        void guiEnterSuite( const char *suiteName )
-        {
-            showSuiteName( suiteName );
-        }
+  void guiEnterSuite(const char* suiteName) { showSuiteName(suiteName); }
 
-        void guiEnterTest( const char *suiteName, const char *testName )
-        {
-            setCaption( suiteName, testName );
-            advanceProgressBar();
-            showTestName( testName );
-            showTestsDone( _progressBar->progress() );
-            processEvents();
-        }
+  void guiEnterTest(const char* suiteName, const char* testName) {
+    setCaption(suiteName, testName);
+    advanceProgressBar();
+    showTestName(testName);
+    showTestsDone(_progressBar->progress());
+    processEvents();
+  }
 
-        void yellowBar()
-        {
-            setColor( 255, 255, 0 );
-            setIcon( QMessageBox::Warning );
-            getTotalTests();
-            processEvents();
-        }
-        
-        void redBar()
-        {
-            if ( _startMinimized && _mainWindow->isMinimized() )
-                showNormal();
-            setColor( 255, 0, 0 );
-            setIcon( QMessageBox::Critical );
-            getTotalTests();
-            processEvents();
-        }
+  void yellowBar() {
+    setColor(255, 255, 0);
+    setIcon(QMessageBox::Warning);
+    getTotalTests();
+    processEvents();
+  }
 
-        void leaveGui()
-        {
-            if ( keep() ) {
-                showSummary();
-                _application->exec();
-            }
-            else
-                _mainWindow->close( true );
-        }
+  void redBar() {
+    if (_startMinimized && _mainWindow->isMinimized())
+      showNormal();
+    setColor(255, 0, 0);
+    setIcon(QMessageBox::Critical);
+    getTotalTests();
+    processEvents();
+  }
 
-    private:
-        QString _title;
-        bool _startMinimized, _keep;
-        unsigned _numTotalTests;
-        QString _strTotalTests;
-        QApplication *_application;
-        QWidget *_mainWindow;
-        QVBoxLayout *_layout;
-        QProgressBar *_progressBar;
-        QStatusBar *_statusBar;
-        QLabel *_suiteName, *_testName, *_testsDone;
+  void leaveGui() {
+    if (keep()) {
+      showSummary();
+      _application->exec();
+    } else
+      _mainWindow->close(true);
+  }
 
-        void parseCommandLine( int argc, char **argv )
-        {
-            _startMinimized = _keep = false;
-            _title = argv[0];
-            
-            for ( int i = 1; i < argc; ++ i ) {
-                QString arg( argv[i] );
-                if ( arg == "-minimized" )
-                    _startMinimized = true;
-                else if ( arg == "-keep" )
-                    _keep = true;
-                else if ( arg == "-title" && (i + 1 < argc) )
-                    _title = argv[++i];
-            }
-        }
+  private:
+  QString _title;
+  bool _startMinimized, _keep;
+  unsigned _numTotalTests;
+  QString _strTotalTests;
+  QApplication* _application;
+  QWidget* _mainWindow;
+  QVBoxLayout* _layout;
+  QProgressBar* _progressBar;
+  QStatusBar* _statusBar;
+  QLabel *_suiteName, *_testName, *_testsDone;
 
-        void createApplication( int &argc, char **argv )
-        {
-            _application = new QApplication( argc, argv );
-        }       
-        
-        void createWindow( const WorldDescription &wd )
-        {
-            getTotalTests( wd );            
-            createMainWindow();
-            createProgressBar();
-            createStatusBar();
-            setMainWidget();
-            if ( _startMinimized )
-                showMinimized();
-            else
-                showNormal();
-        }
+  void parseCommandLine(int argc, char** argv) {
+    _startMinimized = _keep = false;
+    _title = argv[0];
 
-        void getTotalTests()
-        {
-            getTotalTests( tracker().world() );
-        }
+    for (int i = 1; i < argc; ++i) {
+      QString arg(argv[i]);
+      if (arg == "-minimized")
+        _startMinimized = true;
+      else if (arg == "-keep")
+        _keep = true;
+      else if (arg == "-title" && (i + 1 < argc))
+        _title = argv[++i];
+    }
+  }
 
-        void getTotalTests( const WorldDescription &wd )
-        {
-            _numTotalTests = wd.numTotalTests();
-            char s[WorldDescription::MAX_STRLEN_TOTAL_TESTS];
-            _strTotalTests = wd.strTotalTests( s );
-        }
+  void createApplication(int& argc, char** argv) { _application = new QApplication(argc, argv); }
 
-        void createMainWindow()
-        {
-            _mainWindow = new QWidget();
-            _layout = new QVBoxLayout( _mainWindow );
-        }
+  void createWindow(const WorldDescription& wd) {
+    getTotalTests(wd);
+    createMainWindow();
+    createProgressBar();
+    createStatusBar();
+    setMainWidget();
+    if (_startMinimized)
+      showMinimized();
+    else
+      showNormal();
+  }
 
-        void createProgressBar()
-        {
-            _layout->addWidget( _progressBar = new QProgressBar( _numTotalTests, _mainWindow ) );
-            _progressBar->setProgress( 0 );
-            setColor( 0, 255, 0 );
-            setIcon( QMessageBox::Information );
-        }
+  void getTotalTests() { getTotalTests(tracker().world()); }
 
-        void createStatusBar()
-        {
-            _layout->addWidget( _statusBar = new QStatusBar( _mainWindow ) );
-            _statusBar->addWidget( _suiteName = new QLabel( _statusBar ), 2 );
-            _statusBar->addWidget( _testName = new QLabel( _statusBar ), 4 );
-            _statusBar->addWidget( _testsDone = new QLabel( _statusBar ), 1 );
-        }
+  void getTotalTests(const WorldDescription& wd) {
+    _numTotalTests = wd.numTotalTests();
+    char s[WorldDescription::MAX_STRLEN_TOTAL_TESTS];
+    _strTotalTests = wd.strTotalTests(s);
+  }
 
-        void setMainWidget()
-        {
-            _application->setMainWidget( _mainWindow );
-        }
+  void createMainWindow() {
+    _mainWindow = new QWidget();
+    _layout = new QVBoxLayout(_mainWindow);
+  }
 
-        void showMinimized()
-        {
-            _mainWindow->showMinimized();
-        }
+  void createProgressBar() {
+    _layout->addWidget(_progressBar = new QProgressBar(_numTotalTests, _mainWindow));
+    _progressBar->setProgress(0);
+    setColor(0, 255, 0);
+    setIcon(QMessageBox::Information);
+  }
 
-        void showNormal()
-        {
-            _mainWindow->showNormal();
-            centerWindow();
-        }
+  void createStatusBar() {
+    _layout->addWidget(_statusBar = new QStatusBar(_mainWindow));
+    _statusBar->addWidget(_suiteName = new QLabel(_statusBar), 2);
+    _statusBar->addWidget(_testName = new QLabel(_statusBar), 4);
+    _statusBar->addWidget(_testsDone = new QLabel(_statusBar), 1);
+  }
 
-        void setCaption( const QString &suiteName, const QString &testName )
-        {
-            _mainWindow->setCaption( _title + " - " + suiteName + "::" + testName + "()" );
-        }
+  void setMainWidget() { _application->setMainWidget(_mainWindow); }
 
-        void showSuiteName( const QString &suiteName )
-        {
-            _suiteName->setText( "class " + suiteName );
-        }
+  void showMinimized() { _mainWindow->showMinimized(); }
 
-        void advanceProgressBar()
-        {
-            _progressBar->setProgress( _progressBar->progress() + 1 );
-        }
+  void showNormal() {
+    _mainWindow->showNormal();
+    centerWindow();
+  }
 
-        void showTestName( const QString &testName )
-        {
-            _testName->setText( testName + "()" );
-        }
+  void setCaption(const QString& suiteName, const QString& testName) {
+    _mainWindow->setCaption(_title + " - " + suiteName + "::" + testName + "()");
+  }
 
-        void showTestsDone( unsigned testsDone )
-        {
-            _testsDone->setText( asString( testsDone ) + " of " + _strTotalTests );
-        }
+  void showSuiteName(const QString& suiteName) { _suiteName->setText("class " + suiteName); }
 
-        static QString asString( unsigned n )
-        {
-            return QString::number( n );
-        }
+  void advanceProgressBar() { _progressBar->setProgress(_progressBar->progress() + 1); }
 
-        void setColor( int r, int g, int b )
-        {
-            QPalette palette = _progressBar->palette();
-            palette.setColor( QColorGroup::Highlight, QColor( r, g, b ) );
-            _progressBar->setPalette( palette );
-        }
+  void showTestName(const QString& testName) { _testName->setText(testName + "()"); }
 
-        void setIcon( QMessageBox::Icon icon )
-        {
+  void showTestsDone(unsigned testsDone) {
+    _testsDone->setText(asString(testsDone) + " of " + _strTotalTests);
+  }
+
+  static QString asString(unsigned n) { return QString::number(n); }
+
+  void setColor(int r, int g, int b) {
+    QPalette palette = _progressBar->palette();
+    palette.setColor(QColorGroup::Highlight, QColor(r, g, b));
+    _progressBar->setPalette(palette);
+  }
+
+  void setIcon(QMessageBox::Icon icon) {
 #if QT_VERSION >= 0x030000
-            _mainWindow->setIcon( QMessageBox::standardIcon( icon ) );
-#else // Qt version < 3.0.0
-            _mainWindow->setIcon( QMessageBox::standardIcon( icon, QApplication::style().guiStyle() ) );
+    _mainWindow->setIcon(QMessageBox::standardIcon(icon));
+#else  // Qt version < 3.0.0
+    _mainWindow->setIcon(QMessageBox::standardIcon(icon, QApplication::style().guiStyle()));
 #endif // QT_VERSION
-        }
+  }
 
-        void processEvents()
-        {
-            _application->processEvents();
-        }
+  void processEvents() { _application->processEvents(); }
 
-        void centerWindow()
-        {
-            QWidget *desktop = QApplication::desktop();
-            int xCenter = desktop->x() + (desktop->width() / 2);
-            int yCenter = desktop->y() + (desktop->height() / 2);
-            
-            int windowWidth = (desktop->width() * 4) / 5;
-            int windowHeight = _mainWindow->height();
-            _mainWindow->setGeometry( xCenter - (windowWidth / 2), yCenter - (windowHeight / 2), windowWidth, windowHeight );
-        }
+  void centerWindow() {
+    QWidget* desktop = QApplication::desktop();
+    int xCenter = desktop->x() + (desktop->width() / 2);
+    int yCenter = desktop->y() + (desktop->height() / 2);
 
-        bool keep()
-        {
-            if ( !_keep )
-                return false;
-            if ( !_startMinimized )
-                return true;
-            return (_mainWindow == _application->activeWindow());
-        }
+    int windowWidth = (desktop->width() * 4) / 5;
+    int windowHeight = _mainWindow->height();
+    _mainWindow->setGeometry(
+        xCenter - (windowWidth / 2), yCenter - (windowHeight / 2), windowWidth, windowHeight);
+  }
 
-        void showSummary()
-        {
-            QString summary = _strTotalTests + (_numTotalTests == 1 ? " test" : " tests");
-            if ( tracker().failedTests() )
-                summary = "Failed " + asString( tracker().failedTests() ) + " of " + summary;
-            else
-                summary = summary + " passed";
+  bool keep() {
+    if (!_keep)
+      return false;
+    if (!_startMinimized)
+      return true;
+    return (_mainWindow == _application->activeWindow());
+  }
 
-            _mainWindow->setCaption( _title + " - " + summary );
+  void showSummary() {
+    QString summary = _strTotalTests + (_numTotalTests == 1 ? " test" : " tests");
+    if (tracker().failedTests())
+      summary = "Failed " + asString(tracker().failedTests()) + " of " + summary;
+    else
+      summary = summary + " passed";
 
-            _statusBar->removeWidget( _suiteName );
-            _statusBar->removeWidget( _testName );
-            _testsDone->setText( summary );
-        }
-    };
+    _mainWindow->setCaption(_title + " - " + summary);
+
+    _statusBar->removeWidget(_suiteName);
+    _statusBar->removeWidget(_testName);
+    _testsDone->setText(summary);
+  }
 };
+}; // namespace CxxTest
 
 #endif // __cxxtest__QtGui_h__

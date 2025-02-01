@@ -42,50 +42,46 @@
 
 #include "mutex.h"
 
-namespace threads
-{
+namespace threads {
 
 /**
  * A small class that executes a function exactly once
  */
 class Once {
-private:
-	/** Already executed */
-	bool m_state;
+  private:
+  /** Already executed */
+  bool m_state;
 
-	/** Mutex to lock the state */
-	Mutex m_mutex;
+  /** Mutex to lock the state */
+  Mutex m_mutex;
 
-public:
-	Once()
-		: m_state(false)
-	{ }
+  public:
+  Once() : m_state(false) {}
 
-	/**
-	 * Executes <code>func</code> of <code>obj</code>
-	 * exactly once. When this function returns, <code>func</code>
-	 * has been executed.
-	 */
-	template<class T>
-	void saveExec(T &obj, void (T::*func)())
-	{
-		// Default case
-		if (m_state)
-			return;
+  /**
+   * Executes <code>func</code> of <code>obj</code>
+   * exactly once. When this function returns, <code>func</code>
+   * has been executed.
+   */
+  template <class T>
+  void saveExec(T& obj, void (T::*func)()) {
+    // Default case
+    if (m_state)
+      return;
 
-		// Lock the state and double check
-		std::lock_guard<Mutex> lock(m_mutex);
-		if (m_state)
-			return;
+    // Lock the state and double check
+    std::lock_guard<Mutex> lock(m_mutex);
+    if (m_state)
+      return;
 
-		// Save execute:
-		// Execute the function before freeing the lock
-		(obj.*func)();
+    // Save execute:
+    // Execute the function before freeing the lock
+    (obj.*func)();
 
-		m_state = true;
-	}
+    m_state = true;
+  }
 };
 
-}
+} // namespace threads
 
 #endif // THREADS_ONCE_H

@@ -41,7 +41,4 @@
 /**
  * @copydoc numa::Numa::createComm
  */
-numa::NumaComm* numa::NoNuma::createComm() const
-{
-	return new NumaComm(*this);
-}
+numa::NumaComm* numa::NoNuma::createComm() const { return new NumaComm(*this); }

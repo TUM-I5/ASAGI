@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,7 +31,7 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
+ *
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -45,50 +45,49 @@
 
 using namespace asagi;
 
-int main(int argc, char** argv)
-{
-	MPI_Init(&argc, &argv);
+int main(int argc, char** argv) {
+  MPI_Init(&argc, &argv);
 
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	Grid* grid = Grid::create();
-	grid->setComm(MPI_COMM_WORLD);
-	grid->setParam("GRID", "CACHE");
+  Grid* grid = Grid::create();
+  grid->setComm(MPI_COMM_WORLD);
+  grid->setParam("GRID", "CACHE");
 
-	if (grid->open(NC_2D) != Grid::SUCCESS) {
-		logError() << "Could not open file";
-		return 1;
-	}
+  if (grid->open(NC_2D) != Grid::SUCCESS) {
+    logError() << "Could not open file";
+    return 1;
+  }
 
-	int value;
+  int value;
 
-	double coords[2];
-	for (int i = 0; i < WIDTH; i++) {
-		coords[0] = i;
+  double coords[2];
+  for (int i = 0; i < WIDTH; i++) {
+    coords[0] = i;
 
-		for (int j = 0; j < LENGTH; j++) {
-			coords[1] = j;
+    for (int j = 0; j < LENGTH; j++) {
+      coords[1] = j;
 
-			value = j + i * LENGTH;
-			if (grid->getInt(coords) != value) {
-				logError() << "Value at" << i << j << "should be"
-					<< value << "but is" << grid->getInt(coords);
-				return 1;
-			}
-		}
-	}
+      value = j + i * LENGTH;
+      if (grid->getInt(coords) != value) {
+        logError() << "Value at" << i << j << "should be" << value << "but is"
+                   << grid->getInt(coords);
+        return 1;
+      }
+    }
+  }
 
-	unsigned long accesses = grid->getCounter("accesses");
-	if (accesses == 0 || accesses > WIDTH * LENGTH * 2) {
-		logError() << "Counter \"accesses\" should be less than" << (WIDTH*LENGTH * 2)
-				<< "but is" << accesses;
-		return 1;
-	}
-	
-	delete grid;
-	
-	MPI_Finalize();
+  unsigned long accesses = grid->getCounter("accesses");
+  if (accesses == 0 || accesses > WIDTH * LENGTH * 2) {
+    logError() << "Counter \"accesses\" should be less than" << (WIDTH * LENGTH * 2) << "but is"
+               << accesses;
+    return 1;
+  }
 
-	return 0;
+  delete grid;
+
+  MPI_Finalize();
+
+  return 0;
 }

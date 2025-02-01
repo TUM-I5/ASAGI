@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,11 +31,11 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
+ *
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
- * 
+ *
  * @brief Contains some useful macros for unit tests
- * 
+ *
  * Should be included after the test framework but before other includes
  */
 
@@ -50,36 +50,30 @@
 
 static bool mainInitSuccess = true;
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
 #ifndef ASAGI_NOMPI
-	if (MPI_Init(&argc, &argv) != MPI_SUCCESS)
-		mainInitSuccess = false;
+  if (MPI_Init(&argc, &argv) != MPI_SUCCESS)
+    mainInitSuccess = false;
 #endif
 
-	return CxxTest::ErrorPrinter().run();
+  return CxxTest::ErrorPrinter().run();
 }
 
 /**
  * The MPIHelper works together with {@link main} to setup
  * and free MPI resources.
  */
-class MPIHelper : public CxxTest::GlobalFixture
-{
-public:
-	bool setUpWorld(void)
-	{
-		return mainInitSuccess;
-	}
-	
-	bool tearDownWorld(void)
-	{
+class MPIHelper : public CxxTest::GlobalFixture {
+  public:
+  bool setUpWorld(void) { return mainInitSuccess; }
+
+  bool tearDownWorld(void) {
 #ifndef ASAGI_NOMPI
-		return (MPI_Finalize() == MPI_SUCCESS);
+    return (MPI_Finalize() == MPI_SUCCESS);
 #endif
 
-		return true;
-	}
+    return true;
+  }
 };
 
 static MPIHelper mpiHelper;

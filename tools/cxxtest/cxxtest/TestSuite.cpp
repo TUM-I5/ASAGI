@@ -3,136 +3,121 @@
 
 #include <cxxtest/TestSuite.h>
 
-namespace CxxTest
-{
-    //
-    // TestSuite members
-    //
-    TestSuite::~TestSuite() {}
-    void TestSuite::setUp() {}
-    void TestSuite::tearDown() {}
+namespace CxxTest {
+//
+// TestSuite members
+//
+TestSuite::~TestSuite() {}
+void TestSuite::setUp() {}
+void TestSuite::tearDown() {}
 
-    //
-    // Test-aborting stuff
-    //
-    static bool currentAbortTestOnFail = false;
+//
+// Test-aborting stuff
+//
+static bool currentAbortTestOnFail = false;
 
-    bool abortTestOnFail()
-    {
-        return currentAbortTestOnFail;
-    }
+bool abortTestOnFail() { return currentAbortTestOnFail; }
 
-    void setAbortTestOnFail( bool value )
-    {
-        currentAbortTestOnFail = value;
-    }
-    
-    void doAbortTest()
-    {
-#   if defined(_CXXTEST_HAVE_EH)
-        if ( currentAbortTestOnFail )
-            throw AbortTest();
-#   endif // _CXXTEST_HAVE_EH
-    }
+void setAbortTestOnFail(bool value) { currentAbortTestOnFail = value; }
 
-    //
-    // Max dump size
-    //
-    static unsigned currentMaxDumpSize = CXXTEST_MAX_DUMP_SIZE;
+void doAbortTest() {
+#if defined(_CXXTEST_HAVE_EH)
+  if (currentAbortTestOnFail)
+    throw AbortTest();
+#endif // _CXXTEST_HAVE_EH
+}
 
-    unsigned maxDumpSize()
-    {
-        return currentMaxDumpSize;
-    }
-    
-    void setMaxDumpSize( unsigned value )
-    {
-        currentMaxDumpSize = value;
-    }
+//
+// Max dump size
+//
+static unsigned currentMaxDumpSize = CXXTEST_MAX_DUMP_SIZE;
 
-    //
-    // Some non-template functions
-    //
-    void doTrace( const char *file, unsigned line, const char *message )
-    {
-        tracker().trace( file, line, message );
-    }
+unsigned maxDumpSize() { return currentMaxDumpSize; }
 
-    void doWarn( const char *file, unsigned line, const char *message )
-    {
-        tracker().warning( file, line, message );
-    }
+void setMaxDumpSize(unsigned value) { currentMaxDumpSize = value; }
 
-    void doFailTest( const char *file, unsigned line, const char *message )
-    {
-        tracker().failedTest( file, line, message );
-        TS_ABORT();
-    }
+//
+// Some non-template functions
+//
+void doTrace(const char* file, unsigned line, const char* message) {
+  tracker().trace(file, line, message);
+}
 
-    void doFailAssert( const char *file, unsigned line,
-                       const char *expression, const char *message )
-    {
-        if ( message )
-            tracker().failedTest( file, line, message );
-        tracker().failedAssert( file, line, expression );
-        TS_ABORT();
-    }
+void doWarn(const char* file, unsigned line, const char* message) {
+  tracker().warning(file, line, message);
+}
 
-    bool sameData( const void *x, const void *y, unsigned size )
-    {
-        if ( size == 0 )
-            return true;
-        
-        if ( x == y )
-            return true;
+void doFailTest(const char* file, unsigned line, const char* message) {
+  tracker().failedTest(file, line, message);
+  TS_ABORT();
+}
 
-        if ( !x || !y )
-            return false;
+void doFailAssert(const char* file, unsigned line, const char* expression, const char* message) {
+  if (message)
+    tracker().failedTest(file, line, message);
+  tracker().failedAssert(file, line, expression);
+  TS_ABORT();
+}
 
-        const char *cx = (const char *)x;
-        const char *cy = (const char *)y;
-        while ( size -- )
-            if ( *cx++ != *cy++ )
-                return false;
+bool sameData(const void* x, const void* y, unsigned size) {
+  if (size == 0)
+    return true;
 
-        return true;
-    }
+  if (x == y)
+    return true;
 
-    void doAssertSameData( const char *file, unsigned line,
-                           const char *xExpr, const void *x,
-                           const char *yExpr, const void *y,
-                           const char *sizeExpr, unsigned size,
-                           const char *message )
-    {
-        if ( !sameData( x, y, size ) ) {
-            if ( message )
-                tracker().failedTest( file, line, message );
-            tracker().failedAssertSameData( file, line, xExpr, yExpr, sizeExpr, x, y, size );
-            TS_ABORT();
-        }
-    }
+  if (!x || !y)
+    return false;
 
-    void doFailAssertThrows( const char *file, unsigned line,
-                             const char *expr, const char *type,
-                             bool otherThrown,
-                             const char *message )
-    {
-        if ( message )
-            tracker().failedTest( file, line, message );
-        
-        tracker().failedAssertThrows( file, line, expr, type, otherThrown );
-        TS_ABORT();
-    }
+  const char* cx = (const char*)x;
+  const char* cy = (const char*)y;
+  while (size--)
+    if (*cx++ != *cy++)
+      return false;
 
-    void doFailAssertThrowsNot( const char *file, unsigned line,
-                                const char *expression, const char *message )
-    {
-        if ( message )
-            tracker().failedTest( file, line, message );
-        
-        tracker().failedAssertThrowsNot( file, line, expression );
-        TS_ABORT();
-    }
-};
+  return true;
+}
+
+void doAssertSameData(const char* file,
+                      unsigned line,
+                      const char* xExpr,
+                      const void* x,
+                      const char* yExpr,
+                      const void* y,
+                      const char* sizeExpr,
+                      unsigned size,
+                      const char* message) {
+  if (!sameData(x, y, size)) {
+    if (message)
+      tracker().failedTest(file, line, message);
+    tracker().failedAssertSameData(file, line, xExpr, yExpr, sizeExpr, x, y, size);
+    TS_ABORT();
+  }
+}
+
+void doFailAssertThrows(const char* file,
+                        unsigned line,
+                        const char* expr,
+                        const char* type,
+                        bool otherThrown,
+                        const char* message) {
+  if (message)
+    tracker().failedTest(file, line, message);
+
+  tracker().failedAssertThrows(file, line, expr, type, otherThrown);
+  TS_ABORT();
+}
+
+void doFailAssertThrowsNot(const char* file,
+                           unsigned line,
+                           const char* expression,
+                           const char* message) {
+  if (message)
+    tracker().failedTest(file, line, message);
+
+  tracker().failedAssertThrowsNot(file, line, expression);
+  TS_ABORT();
+}
+}; // namespace CxxTest
 
 #endif // __cxxtest__TestSuite_cpp__

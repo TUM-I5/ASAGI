@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,7 +31,7 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
+ *
  * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -39,76 +39,70 @@
 
 #include "cache/cachelist.h"
 
-class CacheListTest : public CxxTest::TestSuite
-{
-	cache::CacheList* list;
-public:
-	void setUp(void)
-	{
-		list = new cache::CacheList();
-		list->init(3);
-	}
-	
-	void tearDown(void)
-	{
-		delete list;
-	}
-	
-	void testGetIndex(void)
-	{
-		unsigned long block;
-		
-		block = 5;
-		TS_ASSERT(!list->getIndex(block, block));
-		TS_ASSERT_EQUALS(block, 5u);
-		
-		list->getFreeIndex(block, block);
-		block = 6;
-		list->getFreeIndex(block, block);
-		block = 7;
-		list->getFreeIndex(block, block);
-		
-		block = 6;
-		TS_ASSERT(list->getIndex(block, block));
-		TS_ASSERT_EQUALS(block, 1u);
-		
-		// Override first entry
-		block = 8;
-		list->getFreeIndex(block, block);
-		
-		block = 8;
-		TS_ASSERT(list->getIndex(block, block));
-		TS_ASSERT_EQUALS(block, 0u);
-		
-		block = 5;
-		TS_ASSERT(!list->getIndex(block, block));
-		TS_ASSERT_EQUALS(block, 5u);
-	}
-	
-	void testGetFreeIndex(void)
-	{
-		unsigned long block;
-		
-		block = 5;
-		TS_ASSERT_LESS_THAN(list->getFreeIndex(block, block), 0);
-		TS_ASSERT_EQUALS(block, 0u);
-		
-		block = 6;
-		TS_ASSERT_LESS_THAN(list->getFreeIndex(block, block), 0);
-		TS_ASSERT_EQUALS(block, 1u);
-		
-		block = 7;
-		TS_ASSERT_LESS_THAN(list->getFreeIndex(block, block), 0);
-		TS_ASSERT_EQUALS(block, 2u);
-		
-		// BlockManager with size 3 -> this should override the first
-		// block
-		block = 8;
-		TS_ASSERT_EQUALS(list->getFreeIndex(block, block), 5);
-		TS_ASSERT_EQUALS(block, 0u);
-		
-		block = 7;
-		TS_ASSERT_EQUALS(list->getFreeIndex(block, block), 6);
-		TS_ASSERT_EQUALS(block, 1u);
-	}
+class CacheListTest : public CxxTest::TestSuite {
+  cache::CacheList* list;
+
+  public:
+  void setUp(void) {
+    list = new cache::CacheList();
+    list->init(3);
+  }
+
+  void tearDown(void) { delete list; }
+
+  void testGetIndex(void) {
+    unsigned long block;
+
+    block = 5;
+    TS_ASSERT(!list->getIndex(block, block));
+    TS_ASSERT_EQUALS(block, 5u);
+
+    list->getFreeIndex(block, block);
+    block = 6;
+    list->getFreeIndex(block, block);
+    block = 7;
+    list->getFreeIndex(block, block);
+
+    block = 6;
+    TS_ASSERT(list->getIndex(block, block));
+    TS_ASSERT_EQUALS(block, 1u);
+
+    // Override first entry
+    block = 8;
+    list->getFreeIndex(block, block);
+
+    block = 8;
+    TS_ASSERT(list->getIndex(block, block));
+    TS_ASSERT_EQUALS(block, 0u);
+
+    block = 5;
+    TS_ASSERT(!list->getIndex(block, block));
+    TS_ASSERT_EQUALS(block, 5u);
+  }
+
+  void testGetFreeIndex(void) {
+    unsigned long block;
+
+    block = 5;
+    TS_ASSERT_LESS_THAN(list->getFreeIndex(block, block), 0);
+    TS_ASSERT_EQUALS(block, 0u);
+
+    block = 6;
+    TS_ASSERT_LESS_THAN(list->getFreeIndex(block, block), 0);
+    TS_ASSERT_EQUALS(block, 1u);
+
+    block = 7;
+    TS_ASSERT_LESS_THAN(list->getFreeIndex(block, block), 0);
+    TS_ASSERT_EQUALS(block, 2u);
+
+    // BlockManager with size 3 -> this should override the first
+    // block
+    block = 8;
+    TS_ASSERT_EQUALS(list->getFreeIndex(block, block), 5);
+    TS_ASSERT_EQUALS(block, 0u);
+
+    block = 7;
+    TS_ASSERT_EQUALS(list->getFreeIndex(block, block), 6);
+    TS_ASSERT_EQUALS(block, 1u);
+  }
 };

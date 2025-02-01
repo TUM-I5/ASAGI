@@ -38,14 +38,13 @@
 #ifndef MAGIC_NULLTYPE_H
 #define MAGIC_NULLTYPE_H
 
-namespace magic
-{
+namespace magic {
 
 /**
  * A type doing nothing
  */
 class NullType {};
 
-}
+} // namespace magic
 
 #endif // MAGIC_NULLTYPE_H

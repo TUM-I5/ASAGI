@@ -35,9 +35,9 @@
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  *
  * @page Troubleshooting Troubleshooting
- * 
+ *
  * @section cmakempi CMake does not find MPI
- * 
+ *
  * On some plattforms, CMake has problems finding MPI. Try to set the
  * environment variable <code>CMAKE_PREFIX_PATH</code> (see section @ref build)
  * or select the MPI compiler before running CMake by setting the enviroment

@@ -35,7 +35,7 @@
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  *
  * @page build Building and Installing ASAGI
- * 
+ *
  * @section Pre-requirements
  *
  * @subsection Compiler
@@ -46,7 +46,7 @@
  * to transfer data. An MPI library that supports the new standard is required.
  *
  * @subsection NetCDF
- * 
+ *
  * ASAGI uses the NetCDF library (http://www.unidata.ucar.edu/software/netcdf/)
  * to load data files.
  *
@@ -134,7 +134,7 @@
  * @code{.sh}
  * make install
  * @endcode
- * 
+ *
  * This will install the (static and/or shared) library as well as the header
  * files. If pkg-config was found, this  command will also install a pkg-config
  * configuration file for ASAGI in <code>CMAKE_INSTALL_PREFIX/lib/pkgconfig</code>

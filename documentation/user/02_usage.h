@@ -41,13 +41,13 @@
  * These are minimal C, C++ and Fortran examples that load a 2-dimensional grid
  * and print the value at (0,0). In each case the grid contains floating point
  * values.
- * 
+ *
  * C example:
  * @include minimal.c
- * 
+ *
  * C++ example:
  * @include minimal.cpp
- * 
+ *
  * Fortran example:
  * @include minimal.f90
  *
@@ -78,7 +78,7 @@
  * compilation of ASAGI.) The number of actual dimensions in the grid
  * cannot be specified by calling an ASAGI function but depends on the netCDF
  * input file.
- * 
+ *
  * @remark The order in the dimension in the netCDF file is in Fortran style
  * (column-major, see @ref netcdffiles) but the ASAGI interface uses C/C++
  * ordering (row-major).
@@ -126,7 +126,7 @@
  *
  * @image html valueposition.svg "Cell-centered and vertex-centered grids"
  * @image latex valueposition.eps "Cell-centered and vertex-centered grids"
- * 
+ *
  * @section netcdffiles NetCDF files
  *
  * All NetCDF files opened with ASAGI should respect the COARDS conventions

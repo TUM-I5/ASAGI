@@ -38,46 +38,33 @@
 #ifndef MPI_NOMPICOMM_H
 #define MPI_NOMPICOMM_H
 
-namespace mpi
-{
+namespace mpi {
 
 /**
  * MPI Communicator if MPI is disabled
  */
-class NoMPIComm
-{
-public:
-	NoMPIComm()
-	{ }
+class NoMPIComm {
+  public:
+  NoMPIComm() {}
 
-	virtual ~NoMPIComm()
-	{
-	}
+  virtual ~NoMPIComm() {}
 
-	/**
-	 * @return 0
-	 */
-	int rank() const
-	{
-		return 0;
-	}
+  /**
+   * @return 0
+   */
+  int rank() const { return 0; }
 
-	/**
-	 * @return 1
-	 */
-	int size() const
-	{
-		return 1;
-	}
+  /**
+   * @return 1
+   */
+  int size() const { return 1; }
 
-	/**
-	 * Does nothing
-	 */
-	void barrier() const
-	{
-	}
+  /**
+   * Does nothing
+   */
+  void barrier() const {}
 };
 
-}
+} // namespace mpi
 
 #endif // MPI_NOMPICOMM_H

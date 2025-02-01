@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,19 +31,18 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
+ *
  * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #ifndef GRID_CONSTANTS_H
 #define GRID_CONSTANTS_H
 
-namespace grid
-{
+namespace grid {
 
 /** Possible positions of the values in a grid */
 enum ValuePosition { CELL_CENTERED, VERTEX_CENTERED };
 
-}
+} // namespace grid
 
 #endif // GRID_CONSTANTS_H

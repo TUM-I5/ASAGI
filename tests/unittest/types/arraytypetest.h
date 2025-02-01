@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,7 +31,7 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
+ *
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -40,26 +40,21 @@
 
 #include "types/arraytype.h"
 
-class ArrayTypeTest : public CxxTest::TestSuite
-{
-	io::NetCdfReader* file;
-public:
-	void setUp(void)
-	{
-		file = new io::NetCdfReader("../../" NC_1D, 0);
-		file->open();
-	}
-	
-	void tearDown(void)
-	{
-		delete file;
-	}
-	
-	void testGetSize(void)
-	{
-		types::ArrayType<float> type;
-		type.check(*file);
-		
-		TS_ASSERT_EQUALS(type.size(), sizeof(float));
-	}
+class ArrayTypeTest : public CxxTest::TestSuite {
+  io::NetCdfReader* file;
+
+  public:
+  void setUp(void) {
+    file = new io::NetCdfReader("../../" NC_1D, 0);
+    file->open();
+  }
+
+  void tearDown(void) { delete file; }
+
+  void testGetSize(void) {
+    types::ArrayType<float> type;
+    type.check(*file);
+
+    TS_ASSERT_EQUALS(type.size(), sizeof(float));
+  }
 };

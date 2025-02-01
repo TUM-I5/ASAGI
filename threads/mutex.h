@@ -43,17 +43,15 @@
 #ifdef USE_PTHREAD
 #include "pthreadmutex.h"
 
-namespace threads
-{
+namespace threads {
 /** Mutex type depending on the compilation flags */
 typedef PthreadMutex Mutex;
-}
+} // namespace threads
 
 #else // USE_PTHREAD
 #include "cxxmutex.h"
 
-namespace threads
-{
+namespace threads {
 typedef CxxMutex Mutex;
 }
 
@@ -62,8 +60,7 @@ typedef CxxMutex Mutex;
 #else // THREADSAFE
 #include "noopmutex.h"
 
-namespace threads
-{
+namespace threads {
 typedef NoopMutex Mutex;
 }
 

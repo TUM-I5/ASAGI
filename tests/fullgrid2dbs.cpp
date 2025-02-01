@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,7 +31,7 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
+ *
  * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -45,48 +45,47 @@
 
 using namespace asagi;
 
-int main(int argc, char** argv)
-{
-	Grid* grid = Grid::create();
-	
-	if (grid->open(NC_2D) != Grid::SUCCESS) {
-		logError() << "Could not open file";
-		return 1;
-	}
+int main(int argc, char** argv) {
+  Grid* grid = Grid::create();
 
-	grid->setParam("BLOCK_SIZE_0", "3");
+  if (grid->open(NC_2D) != Grid::SUCCESS) {
+    logError() << "Could not open file";
+    return 1;
+  }
 
-	int value;
+  grid->setParam("BLOCK_SIZE_0", "3");
 
-	double coords[2];
-	for (int i = 0; i < WIDTH; i++) {
-		coords[0] = i;
+  int value;
 
-		for (int j = 0; j < LENGTH; j++) {
-			coords[1] = j;
+  double coords[2];
+  for (int i = 0; i < WIDTH; i++) {
+    coords[0] = i;
 
-			value = j + i * LENGTH;
-			if (grid->getInt(coords) != value) {
-				logError() << "Value at" << i << j << "should be"
-					<< value << "but is" << grid->getInt(coords);
-				return 1;
-			}
-		}
-	}
+    for (int j = 0; j < LENGTH; j++) {
+      coords[1] = j;
 
-	if (grid->getCounter("accesses") != WIDTH * LENGTH) {
-		logError() << "Counter \"accesses\" should be" << (WIDTH*LENGTH)
-				<< "but is" << grid->getCounter("accesses");
-		return 1;
-	}
+      value = j + i * LENGTH;
+      if (grid->getInt(coords) != value) {
+        logError() << "Value at" << i << j << "should be" << value << "but is"
+                   << grid->getInt(coords);
+        return 1;
+      }
+    }
+  }
 
-	if (grid->getCounter("local_hits") != WIDTH * LENGTH) {
-		logError() << "Counter \"file_loads\" should be" << (WIDTH*LENGTH)
-				<< "but is" << grid->getCounter("file_loads");
-		return 1;
-	}
-	
-	delete grid;
-	
-	return 0;
+  if (grid->getCounter("accesses") != WIDTH * LENGTH) {
+    logError() << "Counter \"accesses\" should be" << (WIDTH * LENGTH) << "but is"
+               << grid->getCounter("accesses");
+    return 1;
+  }
+
+  if (grid->getCounter("local_hits") != WIDTH * LENGTH) {
+    logError() << "Counter \"file_loads\" should be" << (WIDTH * LENGTH) << "but is"
+               << grid->getCounter("file_loads");
+    return 1;
+  }
+
+  delete grid;
+
+  return 0;
 }

@@ -39,28 +39,20 @@
 
 #include "threads/once.h"
 
-class OnceTest : public CxxTest::TestSuite
-{
-	int executed;
-	threads::Once once;
+class OnceTest : public CxxTest::TestSuite {
+  int executed;
+  threads::Once once;
 
-public:
-	void setUp(void)
-	{
-		executed = 0;
-	}
+  public:
+  void setUp(void) { executed = 0; }
 
-	void testSaveExec(void)
-	{
-		once.saveExec(*this, &OnceTest::execute);
-		TS_ASSERT_EQUALS(executed, 1);
-		once.saveExec(*this, &OnceTest::execute);
-		TS_ASSERT_EQUALS(executed, 1);
-	}
+  void testSaveExec(void) {
+    once.saveExec(*this, &OnceTest::execute);
+    TS_ASSERT_EQUALS(executed, 1);
+    once.saveExec(*this, &OnceTest::execute);
+    TS_ASSERT_EQUALS(executed, 1);
+  }
 
-private:
-	void execute()
-	{
-		executed++;
-	}
+  private:
+  void execute() { executed++; }
 };

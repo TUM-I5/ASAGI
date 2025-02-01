@@ -31,7 +31,7 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
+ *
  * @copyright 2013 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -45,55 +45,54 @@
 
 using namespace asagi;
 
-int main(int argc, char** argv)
-{
-	Grid* grid = Grid::create();
-	grid->setParam("GRID", "PASS_THROUGH");
+int main(int argc, char** argv) {
+  Grid* grid = Grid::create();
+  grid->setParam("GRID", "PASS_THROUGH");
 
-	if (grid->open(NC_2D) != Grid::SUCCESS) {
-		logError() << "Could not open file";
-		return 1;
-	}
+  if (grid->open(NC_2D) != Grid::SUCCESS) {
+    logError() << "Could not open file";
+    return 1;
+  }
 
-	int value;
-	float buf;
+  int value;
+  float buf;
 
-	double coords[2];
-	for (int i = 0; i < WIDTH; i++) {
-		coords[0] = i;
+  double coords[2];
+  for (int i = 0; i < WIDTH; i++) {
+    coords[0] = i;
 
-		for (int j = 0; j < LENGTH; j++) {
-			coords[1] = j;
+    for (int j = 0; j < LENGTH; j++) {
+      coords[1] = j;
 
-			value = j + i * LENGTH;
-			if (grid->getInt(coords) != value) {
-				logError() << "Value (int) at" << i << j << "should be"
-					<< value << "but is" << grid->getInt(coords);
-				return 1;
-			}
+      value = j + i * LENGTH;
+      if (grid->getInt(coords) != value) {
+        logError() << "Value (int) at" << i << j << "should be" << value << "but is"
+                   << grid->getInt(coords);
+        return 1;
+      }
 
-			grid->getBuf(&buf, coords);
-			if (buf != value) {
-				logError() << "Value (buffer) at" << i << j << "should be"
-					<< value << "but is" << grid->getInt(coords);
-				return 1;
-			}
-		}
-	}
+      grid->getBuf(&buf, coords);
+      if (buf != value) {
+        logError() << "Value (buffer) at" << i << j << "should be" << value << "but is"
+                   << grid->getInt(coords);
+        return 1;
+      }
+    }
+  }
 
-	if (grid->getCounter("accesses") != WIDTH * LENGTH * 2) {
-		logError() << "Counter \"accesses\" should be" << (WIDTH*LENGTH*2)
-				<< "but is" << grid->getCounter("accesses");
-		return 1;
-	}
+  if (grid->getCounter("accesses") != WIDTH * LENGTH * 2) {
+    logError() << "Counter \"accesses\" should be" << (WIDTH * LENGTH * 2) << "but is"
+               << grid->getCounter("accesses");
+    return 1;
+  }
 
-	if (grid->getCounter("file_loads") != WIDTH * LENGTH * 2) {
-		logError() << "Counter \"file_loads\" should be" << (WIDTH*LENGTH*2)
-				<< "but is" << grid->getCounter("file_loads");
-		return 1;
-	}
+  if (grid->getCounter("file_loads") != WIDTH * LENGTH * 2) {
+    logError() << "Counter \"file_loads\" should be" << (WIDTH * LENGTH * 2) << "but is"
+               << grid->getCounter("file_loads");
+    return 1;
+  }
 
-	delete grid;
+  delete grid;
 
-	return 0;
+  return 0;
 }

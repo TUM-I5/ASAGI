@@ -1,7 +1,7 @@
 /**
  * @file
  *  This file is part of ASAGI.
- * 
+ *
  *  ASAGI is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as
  *  published by the Free Software Foundation, either version 3 of
@@ -31,7 +31,7 @@
  *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
  *  mit diesem Programm erhalten haben. Wenn nicht, siehe
  *  <http://www.gnu.org/licenses/>.
- * 
+ *
  * @copyright 2012-2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -52,14 +52,12 @@
 #include "numa/numacomm.h"
 #include "perf/counter.h"
 
-namespace grid
-{
+namespace grid {
 
 /**
  * Contains implementations for one grid level
  */
-namespace level
-{
+namespace level {
 
 /**
  * @brief Base class for a grid level
@@ -67,354 +65,295 @@ namespace level
  * @warning This class also helps mapping from the Fortran order of the
  *  internal representation to the C order of the public interface.
  */
-template<class Type>
-class Level
-{
-private:
-	/** The MPI Communicator used for this level */
-	mpi::MPIComm* m_mpiComm;
+template <class Type>
+class Level {
+  private:
+  /** The MPI Communicator used for this level */
+  mpi::MPIComm* m_mpiComm;
 
-	/** NUMA communicator for this level */
-	numa::NumaComm* m_numaComm;
+  /** NUMA communicator for this level */
+  numa::NumaComm* m_numaComm;
 
-	/** The NUMA domain identifier for this instance */
-	unsigned int m_numaDomainId;
+  /** The NUMA domain identifier for this instance */
+  unsigned int m_numaDomainId;
 
-	/**
-	 * The type of values we save in the grid.
-	 * This class implements all type specific operations.
-	 */
-	Type* m_type;
+  /**
+   * The type of values we save in the grid.
+   * This class implements all type specific operations.
+   */
+  Type* m_type;
 
-	/** The size of the type */
-	unsigned int m_typeSize;
+  /** The size of the type */
+  unsigned int m_typeSize;
 
-	/** The file that contains this grid */
-	io::NetCdfReader *m_inputFile;
-	
-	/** Total number of dimensions */
-	unsigned int m_dims;
+  /** The file that contains this grid */
+  io::NetCdfReader* m_inputFile;
 
-	/** Total number of elements in each dimension */
-	unsigned long m_size[MAX_DIMENSIONS];
+  /** Total number of dimensions */
+  unsigned int m_dims;
 
-	/** Offset of the grid */
-	double m_offset[MAX_DIMENSIONS];
-	
-	/** The difference between to grid points */
-	double m_scaling[MAX_DIMENSIONS];
+  /** Total number of elements in each dimension */
+  unsigned long m_size[MAX_DIMENSIONS];
 
-	/** Minimum possible coordinate in each dimension */
-	double m_min[MAX_DIMENSIONS];
-	/** Maximum possible coordinate in each dimension */
-	double m_max[MAX_DIMENSIONS];
+  /** Offset of the grid */
+  double m_offset[MAX_DIMENSIONS];
 
-	/**
-	 * 1/scaling in most cases (exceptions: scaling = 0
-	 * and scaling = inf), used to convert coordinates to indices
-	 */
-	double m_scalingInv[MAX_DIMENSIONS];
+  /** The difference between to grid points */
+  double m_scaling[MAX_DIMENSIONS];
 
-	/** Access counters for this grid (level) */
-	perf::Counter m_counter;
+  /** Minimum possible coordinate in each dimension */
+  double m_min[MAX_DIMENSIONS];
+  /** Maximum possible coordinate in each dimension */
+  double m_max[MAX_DIMENSIONS];
 
-public:
-	/**
-	 * Specialized copy constructor
-	 */
-	Level(const Level &other)
-		: m_mpiComm(other.m_mpiComm), m_numaComm(other.m_numaComm->copy()),
-		  m_numaDomainId(other.m_numaDomainId), m_type(other.m_type),
-		  m_typeSize(other.m_typeSize),
-		  m_inputFile(other.m_inputFile), m_dims(other.m_dims)
-	{
-		assert(m_numaDomainId == m_numaComm->domainId());
-	}
+  /**
+   * 1/scaling in most cases (exceptions: scaling = 0
+   * and scaling = inf), used to convert coordinates to indices
+   */
+  double m_scalingInv[MAX_DIMENSIONS];
 
-	/**
-	 * Constructs a new grid level
-	 */
-	Level(mpi::MPIComm &comm,
-			const numa::Numa &numa,
-			Type &type)
-		: m_mpiComm(&comm), m_numaComm(numa.createComm()),
-		  m_numaDomainId(numa.domainId()), m_type(&type),
-		  m_typeSize(0L),
-		  m_inputFile(0L), m_dims(0)
-	{
-	}
+  /** Access counters for this grid (level) */
+  perf::Counter m_counter;
 
-	virtual ~Level()
-	{
-		delete m_inputFile;
-		if (m_numaDomainId == 0)
-			delete m_numaComm;
-	}
+  public:
+  /**
+   * Specialized copy constructor
+   */
+  Level(const Level& other)
+      : m_mpiComm(other.m_mpiComm), m_numaComm(other.m_numaComm->copy()),
+        m_numaDomainId(other.m_numaDomainId), m_type(other.m_type), m_typeSize(other.m_typeSize),
+        m_inputFile(other.m_inputFile), m_dims(other.m_dims) {
+    assert(m_numaDomainId == m_numaComm->domainId());
+  }
 
-	/**
-	 * Get the current counter for a specific type
-	 */
-	unsigned long getCounter(perf::Counter::CounterType type) const
-	{
-		return m_counter.get(type);
-	}
-	
-	/**
-	 * @return The number of dimensions
-	 */
-	unsigned int dimensions() const
-	{
-		return m_dims;
-	}
+  /**
+   * Constructs a new grid level
+   */
+  Level(mpi::MPIComm& comm, const numa::Numa& numa, Type& type)
+      : m_mpiComm(&comm), m_numaComm(numa.createComm()), m_numaDomainId(numa.domainId()),
+        m_type(&type), m_typeSize(0L), m_inputFile(0L), m_dims(0) {}
 
-	/**
-	 * The minimum range of the grid in dimension <code>n</code>
-	 *
-	 * @warning Dimensions are in C order
-	 */
-	double min(unsigned int n) const
-	{
-		assert(n < dimensions());
+  virtual ~Level() {
+    delete m_inputFile;
+    if (m_numaDomainId == 0)
+      delete m_numaComm;
+  }
 
-		return m_min[dimensions()-n-1];
-	}
+  /**
+   * Get the current counter for a specific type
+   */
+  unsigned long getCounter(perf::Counter::CounterType type) const { return m_counter.get(type); }
 
-	/**
-	 * The maximum range of the grid in dimension <code>n</code>
-	 *
-	 * @warning Dimensions are in C order
-	 */
-	double max(unsigned int n) const
-	{
-		assert(n < dimensions());
+  /**
+   * @return The number of dimensions
+   */
+  unsigned int dimensions() const { return m_dims; }
 
-		return m_max[dimensions()-n-1];
-	}
+  /**
+   * The minimum range of the grid in dimension <code>n</code>
+   *
+   * @warning Dimensions are in C order
+   */
+  double min(unsigned int n) const {
+    assert(n < dimensions());
 
-	/**
-	 * The difference between to variables in dimension <code>n</code>
-	 *
-	 * @warning Dimensions are in C order
-	 */
-	double delta(unsigned int n) const
-	{
-		assert(n < dimensions());
+    return m_min[dimensions() - n - 1];
+  }
 
-		return m_scaling[dimensions()-n-1];
-	}
+  /**
+   * The maximum range of the grid in dimension <code>n</code>
+   *
+   * @warning Dimensions are in C order
+   */
+  double max(unsigned int n) const {
+    assert(n < dimensions());
 
-protected:
-	/**
-	 * Initialize the grid level
-	 */
-	asagi::Grid::Error open(
-			const char* filename,
-			const char* varname,
-			grid::ValuePosition valuePos)
-	{
-		// Check for NUMA errors from the constructor
-		if (m_numaComm == 0L)
-			return asagi::Grid::THREAD_ERROR;
+    return m_max[dimensions() - n - 1];
+  }
 
-		asagi::Grid::Error err;
+  /**
+   * The difference between to variables in dimension <code>n</code>
+   *
+   * @warning Dimensions are in C order
+   */
+  double delta(unsigned int n) const {
+    assert(n < dimensions());
 
-		// Open NetCDF file
-		m_inputFile = new io::NetCdfReader(filename, comm().rank());
-		if ((err = m_inputFile->open(varname)) != asagi::Grid::SUCCESS)
-			return err;
+    return m_scaling[dimensions() - n - 1];
+  }
 
-		m_dims = m_inputFile->dimensions();
+  protected:
+  /**
+   * Initialize the grid level
+   */
+  asagi::Grid::Error open(const char* filename, const char* varname, grid::ValuePosition valuePos) {
+    // Check for NUMA errors from the constructor
+    if (m_numaComm == 0L)
+      return asagi::Grid::THREAD_ERROR;
 
-		for (unsigned int i = 0; i < m_dims; i++) {
-			// Get dimension size
-			m_size[i] = m_inputFile->getSize(i);
+    asagi::Grid::Error err;
 
-			// Get offset and scaling
-			m_offset[i] = m_inputFile->getOffset(i);
+    // Open NetCDF file
+    m_inputFile = new io::NetCdfReader(filename, comm().rank());
+    if ((err = m_inputFile->open(varname)) != asagi::Grid::SUCCESS)
+      return err;
 
-			m_scaling[i] = m_inputFile->getScaling(i);
-		}
+    m_dims = m_inputFile->dimensions();
 
-		// Set default block size and calculate number of blocks
-		for (unsigned int i = 0; i < m_dims; i++) {
-			m_scalingInv[i] = getInvScaling(m_scaling[i]);
+    for (unsigned int i = 0; i < m_dims; i++) {
+      // Get dimension size
+      m_size[i] = m_inputFile->getSize(i);
 
-			// Set min/max
-			if (std::isinf(m_scaling[i])) {
-				m_min[i] = -std::numeric_limits<double>::infinity();
-				m_max[i] = std::numeric_limits<double>::infinity();
-			} else {
-				// Warning: min and max are inverted of scaling is negative
-				double min = m_offset[i];
-				double max = m_offset[i] + m_scaling[i] * (m_size[i] - 1);
+      // Get offset and scaling
+      m_offset[i] = m_inputFile->getOffset(i);
 
-				if (valuePos == grid::CELL_CENTERED) {
-					// Add half a cell on both ends
-					min -= m_scaling[i] * (0.5 - NUMERIC_PRECISION);
-					max += m_scaling[i] * (0.5 - NUMERIC_PRECISION);
-				}
+      m_scaling[i] = m_inputFile->getScaling(i);
+    }
 
-				m_min[i] = std::min(min, max);
-				m_max[i] = std::max(min, max);
-				m_scaling[i] = std::abs(m_scaling[i]);
-			}
-		}
+    // Set default block size and calculate number of blocks
+    for (unsigned int i = 0; i < m_dims; i++) {
+      m_scalingInv[i] = getInvScaling(m_scaling[i]);
 
-		// Init type
-		err = m_type->check(*m_inputFile);
-		if (err != asagi::Grid::SUCCESS)
-			return err;
+      // Set min/max
+      if (std::isinf(m_scaling[i])) {
+        m_min[i] = -std::numeric_limits<double>::infinity();
+        m_max[i] = std::numeric_limits<double>::infinity();
+      } else {
+        // Warning: min and max are inverted of scaling is negative
+        double min = m_offset[i];
+        double max = m_offset[i] + m_scaling[i] * (m_size[i] - 1);
 
-		m_typeSize = m_type->size();
+        if (valuePos == grid::CELL_CENTERED) {
+          // Add half a cell on both ends
+          min -= m_scaling[i] * (0.5 - NUMERIC_PRECISION);
+          max += m_scaling[i] * (0.5 - NUMERIC_PRECISION);
+        }
 
-		return asagi::Grid::SUCCESS;
-	}
+        m_min[i] = std::min(min, max);
+        m_max[i] = std::max(min, max);
+        m_scaling[i] = std::abs(m_scaling[i]);
+      }
+    }
 
-	/**
-	 * @return The MPI communicator
-	 */
-	mpi::MPIComm& comm()
-	{
-		return *m_mpiComm;
-	}
+    // Init type
+    err = m_type->check(*m_inputFile);
+    if (err != asagi::Grid::SUCCESS)
+      return err;
 
-	/**
-	 * @return The MPI communicator
-	 */
-	const mpi::MPIComm& comm() const
-	{
-		return *m_mpiComm;
-	}
+    m_typeSize = m_type->size();
 
-	/**
-	 * @return The NUMA communicator
-	 */
-	numa::NumaComm& numa()
-	{
-		return *m_numaComm;
-	}
+    return asagi::Grid::SUCCESS;
+  }
 
-	/**
-	 * @copydoc numa()
-	 */
-	const numa::NumaComm& numa() const
-	{
-		return *m_numaComm;
-	}
+  /**
+   * @return The MPI communicator
+   */
+  mpi::MPIComm& comm() { return *m_mpiComm; }
 
-	/**
-	 * @return The domain ID on which this level was created.
-	 *  Should be the same as <code>numa().domainId()</code>
-	 *  except for the destructor.
-	 */
-	unsigned int numaDomainId() const
-	{
-		return m_numaDomainId;
-	}
+  /**
+   * @return The MPI communicator
+   */
+  const mpi::MPIComm& comm() const { return *m_mpiComm; }
 
-	/**
-	 * @return The type for this grid
-	 */
-	const Type& type() const
-	{
-		return *m_type;
-	}
-	
-	/**
-	 * Does the same as <code>type().size()</code> but faster
-	 *
-	 * @return The size of the type
-	 */
-	unsigned int typeSize() const
-	{
-		return m_typeSize;
-	}
+  /**
+   * @return The NUMA communicator
+   */
+  numa::NumaComm& numa() { return *m_numaComm; }
 
-	/**
-	 * @return The input file used for this grid
-	 */
-	io::NetCdfReader& inputFile() const
-	{
-		return *m_inputFile;
-	}
+  /**
+   * @copydoc numa()
+   */
+  const numa::NumaComm& numa() const { return *m_numaComm; }
 
-	/**
-	 * @return The number of cells in dimension n
-	 */
-	unsigned long size(unsigned int n) const
-	{
-		return m_size[n];
-	}
+  /**
+   * @return The domain ID on which this level was created.
+   *  Should be the same as <code>numa().domainId()</code>
+   *  except for the destructor.
+   */
+  unsigned int numaDomainId() const { return m_numaDomainId; }
 
-	/**
-	 * Converts from the real world coordinates to the indices
-	 * of the file.
-	 *
-	 * @param pos The real world coordinates (in C order)
-	 * @param index The indices in the file (in Fortran order)
-	 */
-	void pos2index(const double* pos, size_t* index)
-	{
-		for (int i = m_dims-1; i >= 0; i--) {
-			double x = round((pos[m_dims-i-1] - m_offset[i]) * m_scalingInv[i]);
+  /**
+   * @return The type for this grid
+   */
+  const Type& type() const { return *m_type; }
 
-			if (x < 0 || x >= m_size[i]) {
-				logWarning() << "ASAGI: Coordinate in dimension" << (m_dims-i-1) << " is out of range. Fixing.";
-				if (x < 0)
-					x = 0;
-				else
-					x = m_size[i]-1;
-			}
+  /**
+   * Does the same as <code>type().size()</code> but faster
+   *
+   * @return The size of the type
+   */
+  unsigned int typeSize() const { return m_typeSize; }
 
-			index[i] = x;
-		}
-	}
+  /**
+   * @return The input file used for this grid
+   */
+  io::NetCdfReader& inputFile() const { return *m_inputFile; }
 
-	/**
-	 * Close the input file immediately
-	 */
-	void closeInputFile()
-	{
-		delete m_inputFile;
-		m_inputFile = 0L;
-	}
+  /**
+   * @return The number of cells in dimension n
+   */
+  unsigned long size(unsigned int n) const { return m_size[n]; }
 
-	/**
-	 * Used by subclasses to increment counter
-	 */
-	void incCounter(perf::Counter::CounterType type)
-	{
-		m_counter.inc(type);
-	}
+  /**
+   * Converts from the real world coordinates to the indices
+   * of the file.
+   *
+   * @param pos The real world coordinates (in C order)
+   * @param index The indices in the file (in Fortran order)
+   */
+  void pos2index(const double* pos, size_t* index) {
+    for (int i = m_dims - 1; i >= 0; i--) {
+      double x = round((pos[m_dims - i - 1] - m_offset[i]) * m_scalingInv[i]);
 
-private:
-	/** The smallest number we can represent in a double */
-	static constexpr double NUMERIC_PRECISION = 1e-10;
+      if (x < 0 || x >= m_size[i]) {
+        logWarning() << "ASAGI: Coordinate in dimension" << (m_dims - i - 1)
+                     << " is out of range. Fixing.";
+        if (x < 0)
+          x = 0;
+        else
+          x = m_size[i] - 1;
+      }
 
-	/**
-	 * Calculates 1/scaling, except for scaling = 0 and scaling = inf. In this
-	 * case it returns 0
-	 */
-	static double getInvScaling(double scaling)
-	{
-		if ((scaling == 0) || std::isinf(scaling))
-			return 0;
+      index[i] = x;
+    }
+  }
 
-		return 1/scaling;
-	}
+  /**
+   * Close the input file immediately
+   */
+  void closeInputFile() {
+    delete m_inputFile;
+    m_inputFile = 0L;
+  }
 
-	/**
-	 * Implementation for round-to-nearest
-	 */
-	static double round(double value)
-	{
-		return std::floor(value + 0.5);
-	}
+  /**
+   * Used by subclasses to increment counter
+   */
+  void incCounter(perf::Counter::CounterType type) { m_counter.inc(type); }
+
+  private:
+  /** The smallest number we can represent in a double */
+  static constexpr double NUMERIC_PRECISION = 1e-10;
+
+  /**
+   * Calculates 1/scaling, except for scaling = 0 and scaling = inf. In this
+   * case it returns 0
+   */
+  static double getInvScaling(double scaling) {
+    if ((scaling == 0) || std::isinf(scaling))
+      return 0;
+
+    return 1 / scaling;
+  }
+
+  /**
+   * Implementation for round-to-nearest
+   */
+  static double round(double value) { return std::floor(value + 0.5); }
 };
 
-}
+} // namespace level
 
-}
+} // namespace grid
 
 #endif // GRID_LEVEL_LEVEL_H
-

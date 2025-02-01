@@ -35,10 +35,10 @@
  * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  *
  * @mainpage
- * 
+ *
  * @subpage build
- * 
+ *
  * @subpage usage
- * 
+ *
  * @subpage Troubleshooting
  */
