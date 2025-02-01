@@ -15,4 +15,4 @@ If you want to contribute to ASAGI, the full documentation might be interesting:
 License
 -------
 
-ASAGI is release under LGPLv3 (see [COPYING](COPYING))
+ASAGI is release under LGPL-3.0-or-later (see [COPYING](COPYING))

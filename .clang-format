@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2025 SeisSol Group
 #
-# SPDX-License-Identifier: LGPLv3
+# SPDX-License-Identifier: BSD-3-Clause
 
 Language:        Cpp
 AccessModifierOffset: -4

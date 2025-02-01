@@ -1,5 +1,5 @@
 /**
- * SPDX-License-Identifier: LGPLv3
+ * SPDX-License-Identifier: LGPL-3.0-or-later
  *
  * SPDX-FileCopyrightText: 2012-2017 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
