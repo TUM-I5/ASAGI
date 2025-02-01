@@ -7,6 +7,8 @@
 #ifndef ASAGI_F95_H
 #define ASAGI_F95_H
 
+// NOLINTBEGIN
+
 #include "asagi.h"
 
 #ifdef __cplusplus
@@ -53,5 +55,7 @@ int f90asagi_node_local_rank(int comm);
 #ifdef __cplusplus
 } // end extern "C"
 #endif
+
+// NOLINTEND
 
 #endif // ifndef ASAGI_F95_H

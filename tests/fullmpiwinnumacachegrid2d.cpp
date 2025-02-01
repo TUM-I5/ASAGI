@@ -4,6 +4,8 @@
  * SPDX-FileCopyrightText: 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
+#include <cstdint>
+
 #include <asagi.h>
 
 // Do not abort to get real failure

@@ -4,6 +4,8 @@
  * SPDX-FileCopyrightText: 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
+#include <cstdint>
+
 #include <asagi.h>
 #include <pthread.h>
 
