@@ -12,3 +12,7 @@
 
 # Executables
 tools/pinning_test/pinning_test
+
+build*/
+.cache/
+.vscode/
