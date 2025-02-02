@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+if (NOT TARGET asagi::asagi)
+    include ("${CMAKE_CURRENT_LIST_DIR}/asagiTargets.cmake")
+endif ()

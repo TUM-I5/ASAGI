@@ -7,6 +7,8 @@ cmake_minimum_required( VERSION 3.14 )
 # ASAGI
 project( ASAGI )
 
+include(CMakePackageConfigHelpers)
+
 set( ASAGI_VERSION_MAJOR 1 )
 set( ASAGI_VERSION_MINOR 0 )
 
@@ -311,23 +313,52 @@ endif( PKG_CONFIG_FOUND )
 ##### Installation #####
 if( SHARED_LIB )
     install( TARGETS asagi
-        EXPORT asagi-targets 
+        EXPORT asagi-shared-targets 
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
 endif( SHARED_LIB )
 if( STATIC_LIB )
     install( TARGETS asagi-static
-        EXPORT asagi-targets
+        EXPORT asagi-static-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
 endif( STATIC_LIB )
 install( FILES include/asagi.h include/asagi.f90
 	DESTINATION include )
 
-install(EXPORT asagi-targets
-    FILE asagiTargets.cmake
-    NAMESPACE asagi::
-    DESTINATION lib/cmake/asagi
+set(CONFIG_DESTINATION lib/cmake/asagi)
+
+if( SHARED_LIB )
+    install(EXPORT asagi-shared-targets
+        FILE asagiSharedTargets.cmake
+        NAMESPACE asagi::
+        DESTINATION ${CONFIG_DESTINATION}
+    )
+endif()
+if( STATIC_LIB )
+    install(EXPORT asagi-static-targets
+        FILE asagiStaticTargets.cmake
+        NAMESPACE asagi::
+        DESTINATION ${CONFIG_DESTINATION}
+    )
+endif()
+
+set(PACKAGE_INIT_OLD "${PACKAGE_INIT}")
+set(PACKAGE_INIT "@PACKAGE_INIT@")
+configure_file(CMake/asagiConfig.cmake.in CMake/asagiConfig.cmake @ONLY)
+set(PACKAGE_INIT "${PACKAGE_INIT_OLD}")
+unset(PACKAGE_INIT_OLD)
+
+write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/asagiConfigVersion.cmake"
+        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}
+        COMPATIBILITY SameMajorVersion
+)
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/CMake/asagiConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/asagiConfigVersion.cmake"
+    DESTINATION ${CONFIG_DESTINATION}
 )
 
 ##### Packaging #####
