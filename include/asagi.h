@@ -359,6 +359,8 @@ class asagi::Grid {
 #endif // ASAGI_NOMPI
 };
 
+// NOLINTBEGIN
+
 typedef asagi::Grid asagi_grid;
 /**
  * @see asagi::Grid::Type
@@ -369,7 +371,11 @@ typedef asagi::Grid::Type asagi_type;
  */
 typedef asagi::Grid::Error asagi_error;
 
+// NOLINTEND
+
 #else
+
+// NOLINTBEGIN
 
 /**
  * @ingroup c_interface
@@ -570,5 +576,7 @@ int asagi_node_local_rank(MPI_Comm comm);
 #ifdef __cplusplus
 }
 #endif
+
+// NOLINTEND
 
 #endif
