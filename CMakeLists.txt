@@ -2,7 +2,7 @@
 # 
 # SPDX-FileCopyrightText: 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
 
-cmake_minimum_required( VERSION 3.13 )
+cmake_minimum_required( VERSION 3.14 )
 
 # ASAGI
 project( ASAGI )
@@ -24,9 +24,7 @@ option( NONUMA "Compile without NUMA support" OFF )
 option( TESTS "Enable tests" OFF )
 option( EXAMPLES "Compile examples" OFF )
 option( ROUND_ROBIN "Distribute blocks round robin on nodes" ON )
-mark_as_advanced( ROUND_ROBIN )
-option( DEBUG_NUMA "Overrides CPU NUMA information (each core gets its own NUMA domain" OFF )
-mark_as_advanced( DEBUG_NUMA )
+option( DEBUG_NUMA "Overrides CPU NUMA information (each core gets its own NUMA domain)" OFF )
 
 ##### Default build type #####
 if( NOT CMAKE_BUILD_TYPE )
@@ -96,7 +94,7 @@ add_definitions( -Wall )
 set( CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON )
 
 # Set c++11 standard
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" )
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17" )
 
 # Enable fortran
 if( FORTRAN_SUPPORT )
@@ -121,16 +119,8 @@ if( NOMPI )
 	add_definitions( -DASAGI_NOMPI )
 else( NOMPI )
 	# Find MPI
-	find_package( MPI REQUIRED )
-	if( MPI_LIBRARY )
-		include_directories( SYSTEM ${MPI_C_INCLUDE_PATH} )
-	else()
-		#Workaround for stupid mpicc/mpicxx
-		get_filename_component( MPI_BASE ${MPI_C_COMPILER} PATH )
-		set( MPI_BASE ${MPI_BASE}/.. )
-		include_directories( SYSTEM ${MPI_BASE}/include )
-		link_directories( ${MPI_BASE}/lib )
-	endif()
+    find_package( MPI COMPONENTS C REQUIRED )
+    link_libraries(MPI::MPI_C)
 	
 	# Do not include OpenMPI C++ Bindings
 	add_definitions( -DOMPI_SKIP_MPICXX )
@@ -320,14 +310,25 @@ endif( PKG_CONFIG_FOUND )
 
 ##### Installation #####
 if( SHARED_LIB )
-    install( TARGETS asagi DESTINATION lib )
+    install( TARGETS asagi
+        EXPORT asagi-targets 
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
 endif( SHARED_LIB )
 if( STATIC_LIB )
-    install( TARGETS asagi-static DESTINATION lib )
+    install( TARGETS asagi-static
+        EXPORT asagi-targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
 endif( STATIC_LIB )
 install( FILES include/asagi.h include/asagi.f90
 	DESTINATION include )
 
+install(EXPORT asagi-targets
+    FILE asagiTargets.cmake
+    NAMESPACE asagi::
+    DESTINATION lib/cmake/asagi
+)
 
 ##### Packaging #####
 include( InstallRequiredSystemLibraries )
