@@ -73,11 +73,6 @@ set( mainSources
 	asagi.cpp
 	asagi_f90.cpp )
 
-# Include files for other programs
-set( InterfaceHeaders
-	${CMAKE_SOURCE_DIR}/include/asagi.h
-	${CMAKE_SOURCE_DIR}/include/asagi.inc )
-
 ##### Other configuration #####
 # Additional cmake modules
 set( CMAKE_MODULE_PATH
@@ -225,9 +220,9 @@ endif( NOMPI )
 
 # Libraries (static and shared)
 if( SHARED_LIB )
-    add_library( asagi SHARED ${LibSources} )
-    target_link_libraries( asagi ${asagiLibs} )
-    set_target_properties( asagi
+    add_library( asagi-shared SHARED ${LibSources} )
+    target_link_libraries( asagi-shared ${asagiLibs} )
+    set_target_properties( asagi-shared
         PROPERTIES OUTPUT_NAME ${asagiOutputName}
         VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}
         SOVERSION ${ASAGI_VERSION_MAJOR} )
@@ -241,15 +236,6 @@ if( STATIC_LIB )
     set_target_properties( asagi-static
         PROPERTIES OUTPUT_NAME ${asagiOutputName} )
 endif( STATIC_LIB )
-
-# Set the target that can be used to link programs with ASAGI
-# and ink libraries
-if( SHARED_LIB )
-    set( asagiTarget asagi )
-else( SHARED_LIB )
-    # We assume at least one of shared/static is build
-    set( asagiTarget asagi-static )
-endif( SHARED_LIB )
 
 ##### Excecutables #####
 # Tests
@@ -311,24 +297,20 @@ if( PKG_CONFIG_FOUND )
 endif( PKG_CONFIG_FOUND )
 
 ##### Installation #####
+include(GNUInstallDirs)
+
+set(CONFIG_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/asagi)
+
 if( SHARED_LIB )
-    install( TARGETS asagi
+    target_include_directories(asagi-shared PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+    install( TARGETS asagi-shared
         EXPORT asagi-shared-targets 
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
-endif( SHARED_LIB )
-if( STATIC_LIB )
-    install( TARGETS asagi-static
-        EXPORT asagi-static-targets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
-endif( STATIC_LIB )
-install( FILES include/asagi.h include/asagi.f90
-	DESTINATION include )
-
-set(CONFIG_DESTINATION lib/cmake/asagi)
-
-if( SHARED_LIB )
+    install(FILES include/asagi.h include/asagi.f90
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )
     install(EXPORT asagi-shared-targets
         FILE asagiSharedTargets.cmake
         NAMESPACE asagi::
@@ -336,6 +318,15 @@ if( SHARED_LIB )
     )
 endif()
 if( STATIC_LIB )
+    target_include_directories(asagi-static PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+    install( TARGETS asagi-static
+        EXPORT asagi-static-targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
+    install(FILES include/asagi.h include/asagi.f90
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )
     install(EXPORT asagi-static-targets
         FILE asagiStaticTargets.cmake
         NAMESPACE asagi::
@@ -343,20 +334,27 @@ if( STATIC_LIB )
     )
 endif()
 
+write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/asagiConfigVersion.cmake"
+        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}
+        COMPATIBILITY SameMajorVersion
+)
+# Replace variables in script
+# Note: Configure file also replaces @PACKAGE_INIT@, we don't want that
 set(PACKAGE_INIT_OLD "${PACKAGE_INIT}")
 set(PACKAGE_INIT "@PACKAGE_INIT@")
 configure_file(CMake/asagiConfig.cmake.in CMake/asagiConfig.cmake @ONLY)
 set(PACKAGE_INIT "${PACKAGE_INIT_OLD}")
 unset(PACKAGE_INIT_OLD)
 
-write_basic_package_version_file(
-        "${CMAKE_CURRENT_BINARY_DIR}/asagiConfigVersion.cmake"
-        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}
-        COMPATIBILITY SameMajorVersion
+configure_package_config_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/CMake/asagiConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/asagiConfig.cmake"
+    INSTALL_DESTINATION ${CONFIG_DESTINATION}
 )
 install(
     FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/CMake/asagiConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/asagiConfig.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/asagiConfigVersion.cmake"
     DESTINATION ${CONFIG_DESTINATION}
 )
