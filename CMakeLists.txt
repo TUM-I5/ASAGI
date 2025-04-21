@@ -11,6 +11,7 @@ include(CMakePackageConfigHelpers)
 
 set( ASAGI_VERSION_MAJOR 1 )
 set( ASAGI_VERSION_MINOR 0 )
+set( ASAGI_VERSION_PATCH 1 )
 
 ##### User configuration #####
 option( SHARED_LIB "Compile the shared library" OFF )
@@ -224,7 +225,7 @@ if( SHARED_LIB )
     target_link_libraries( asagi-shared ${asagiLibs} )
     set_target_properties( asagi-shared
         PROPERTIES OUTPUT_NAME ${asagiOutputName}
-        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}
+        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}.${ASAGI_VERSION_PATCH}
         SOVERSION ${ASAGI_VERSION_MAJOR} )
 endif( SHARED_LIB )
 if( STATIC_LIB )
@@ -232,7 +233,7 @@ if( STATIC_LIB )
     target_link_libraries( asagi-static ${asagiLibs} )
     set_target_properties( asagi-static
         PROPERTIES OUTPUT_NAME ${asagiOutputName}
-        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}
+        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}.${ASAGI_VERSION_PATCH}
         SOVERSION ${ASAGI_VERSION_MAJOR} )
 endif( STATIC_LIB )
 
@@ -263,7 +264,7 @@ if( PKG_CONFIG_FOUND )
     set( _PKG_CONFIG_PROJECT_NAME ${PROJECT_NAME} )
     set( _PKG_CONFIG_DESCRIPTION "a pArallel Server for Adaptive GeoInformation" )
     set( _PKG_CONFIG_URL "https://github.com/TUM-I5/ASAGI" )
-    set( _PKG_CONFIG_VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR} )
+    set( _PKG_CONFIG_VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}.${ASAGI_VERSION_PATCH} )
     
     set( _PKG_CONFIG_PREFIX ${CMAKE_INSTALL_PREFIX} )
     set( _PKG_CONFIG_LIBDIR "\${prefix}/lib" )
@@ -335,7 +336,7 @@ endif()
 
 write_basic_package_version_file(
         "${CMAKE_CURRENT_BINARY_DIR}/asagiConfigVersion.cmake"
-        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}
+        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}.${ASAGI_VERSION_PATCH}
         COMPATIBILITY SameMajorVersion
 )
 # Replace variables in script
@@ -367,7 +368,7 @@ SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
 SET(CPACK_PACKAGE_VERSION_MAJOR ${ASAGI_VERSION_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${ASAGI_VERSION_MINOR})
-SET(CPACK_PACKAGE_VERSION_PATCH "0")
+SET(CPACK_PACKAGE_VERSION_PATCH ${ASAGI_VERSION_PATCH})
 set(CPACK_SOURCE_IGNORE_FILES
 	"\\\\.git/"
 	"\\\\.kdev4"
