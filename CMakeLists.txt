@@ -223,6 +223,7 @@ endif( NOMPI )
 if( SHARED_LIB )
     add_library( asagi-shared SHARED ${LibSources} )
     target_link_libraries( asagi-shared ${asagiLibs} )
+    set(asagiTarget asagi-shared)
     set_target_properties( asagi-shared
         PROPERTIES OUTPUT_NAME ${asagiOutputName}
         VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}.${ASAGI_VERSION_PATCH}
@@ -231,6 +232,7 @@ endif( SHARED_LIB )
 if( STATIC_LIB )
     add_library( asagi-static STATIC ${LibSources} )
     target_link_libraries( asagi-static ${asagiLibs} )
+    set(asagiTarget asagi-static)
     set_target_properties( asagi-static
         PROPERTIES OUTPUT_NAME ${asagiOutputName}
         VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}.${ASAGI_VERSION_PATCH}
