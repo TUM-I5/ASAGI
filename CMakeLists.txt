@@ -1,45 +1,17 @@
-# @file
-#  This file is part of ASAGI.
+# SPDX-License-Identifier: LGPL-3.0-or-later
 # 
-#  ASAGI is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU Lesser General Public License as
-#  published by the Free Software Foundation, either version 3 of
-#  the License, or  (at your option) any later version.
-#
-#  ASAGI is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU Lesser General Public License for more details.
-#
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with ASAGI.  If not, see <http://www.gnu.org/licenses/>.
-#
-#  Diese Datei ist Teil von ASAGI.
-#
-#  ASAGI ist Freie Software: Sie koennen es unter den Bedingungen
-#  der GNU Lesser General Public License, wie von der Free Software
-#  Foundation, Version 3 der Lizenz oder (nach Ihrer Option) jeder
-#  spaeteren veroeffentlichten Version, weiterverbreiten und/oder
-#  modifizieren.
-#
-#  ASAGI wird in der Hoffnung, dass es nuetzlich sein wird, aber
-#  OHNE JEDE GEWAEHELEISTUNG, bereitgestellt; sogar ohne die implizite
-#  Gewaehrleistung der MARKTFAEHIGKEIT oder EIGNUNG FUER EINEN BESTIMMTEN
-#  ZWECK. Siehe die GNU Lesser General Public License fuer weitere Details.
-#
-#  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
-#  mit diesem Programm erhalten haben. Wenn nicht, siehe
-#  <http://www.gnu.org/licenses/>.
-# 
-# @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+# SPDX-FileCopyrightText: 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
 
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 3.14 )
 
 # ASAGI
 project( ASAGI )
 
+include(CMakePackageConfigHelpers)
+
 set( ASAGI_VERSION_MAJOR 1 )
 set( ASAGI_VERSION_MINOR 0 )
+set( ASAGI_VERSION_PATCH 1 )
 
 ##### User configuration #####
 option( SHARED_LIB "Compile the shared library" OFF )
@@ -55,9 +27,7 @@ option( NONUMA "Compile without NUMA support" OFF )
 option( TESTS "Enable tests" OFF )
 option( EXAMPLES "Compile examples" OFF )
 option( ROUND_ROBIN "Distribute blocks round robin on nodes" ON )
-mark_as_advanced( ROUND_ROBIN )
-option( DEBUG_NUMA "Overrides CPU NUMA information (each core gets its own NUMA domain" OFF )
-mark_as_advanced( DEBUG_NUMA )
+option( DEBUG_NUMA "Overrides CPU NUMA information (each core gets its own NUMA domain)" OFF )
 
 ##### Default build type #####
 if( NOT CMAKE_BUILD_TYPE )
@@ -104,11 +74,6 @@ set( mainSources
 	asagi.cpp
 	asagi_f90.cpp )
 
-# Include files for other programs
-set( InterfaceHeaders
-	${CMAKE_SOURCE_DIR}/include/asagi.h
-	${CMAKE_SOURCE_DIR}/include/asagi.inc )
-
 ##### Other configuration #####
 # Additional cmake modules
 set( CMAKE_MODULE_PATH
@@ -127,7 +92,7 @@ add_definitions( -Wall )
 set( CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON )
 
 # Set c++11 standard
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" )
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17" )
 
 # Enable fortran
 if( FORTRAN_SUPPORT )
@@ -152,16 +117,8 @@ if( NOMPI )
 	add_definitions( -DASAGI_NOMPI )
 else( NOMPI )
 	# Find MPI
-	find_package( MPI REQUIRED )
-	if( MPI_LIBRARY )
-		include_directories( SYSTEM ${MPI_C_INCLUDE_PATH} )
-	else()
-		#Workaround for stupid mpicc/mpicxx
-		get_filename_component( MPI_BASE ${MPI_C_COMPILER} PATH )
-		set( MPI_BASE ${MPI_BASE}/.. )
-		include_directories( SYSTEM ${MPI_BASE}/include )
-		link_directories( ${MPI_BASE}/lib )
-	endif()
+    find_package( MPI COMPONENTS C REQUIRED )
+    link_libraries(MPI::MPI_C)
 	
 	# Do not include OpenMPI C++ Bindings
 	add_definitions( -DOMPI_SKIP_MPICXX )
@@ -264,31 +221,23 @@ endif( NOMPI )
 
 # Libraries (static and shared)
 if( SHARED_LIB )
-    add_library( asagi SHARED ${LibSources} )
-    target_link_libraries( asagi ${asagiLibs} )
-    set_target_properties( asagi
+    add_library( asagi-shared SHARED ${LibSources} )
+    target_link_libraries( asagi-shared ${asagiLibs} )
+    set(asagiTarget asagi-shared)
+    set_target_properties( asagi-shared
         PROPERTIES OUTPUT_NAME ${asagiOutputName}
-        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}
+        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}.${ASAGI_VERSION_PATCH}
         SOVERSION ${ASAGI_VERSION_MAJOR} )
-    
-    # Unset asagiLibs since we already linked them
-    unset( asagiLibs )
 endif( SHARED_LIB )
 if( STATIC_LIB )
     add_library( asagi-static STATIC ${LibSources} )
     target_link_libraries( asagi-static ${asagiLibs} )
+    set(asagiTarget asagi-static)
     set_target_properties( asagi-static
-        PROPERTIES OUTPUT_NAME ${asagiOutputName} )
+        PROPERTIES OUTPUT_NAME ${asagiOutputName}
+        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}.${ASAGI_VERSION_PATCH}
+        SOVERSION ${ASAGI_VERSION_MAJOR} )
 endif( STATIC_LIB )
-
-# Set the target that can be used to link programs with ASAGI
-# and ink libraries
-if( SHARED_LIB )
-    set( asagiTarget asagi )
-else( SHARED_LIB )
-    # We assume at least one of shared/static is build
-    set( asagiTarget asagi-static )
-endif( SHARED_LIB )
 
 ##### Excecutables #####
 # Tests
@@ -317,7 +266,7 @@ if( PKG_CONFIG_FOUND )
     set( _PKG_CONFIG_PROJECT_NAME ${PROJECT_NAME} )
     set( _PKG_CONFIG_DESCRIPTION "a pArallel Server for Adaptive GeoInformation" )
     set( _PKG_CONFIG_URL "https://github.com/TUM-I5/ASAGI" )
-    set( _PKG_CONFIG_VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR} )
+    set( _PKG_CONFIG_VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}.${ASAGI_VERSION_PATCH} )
     
     set( _PKG_CONFIG_PREFIX ${CMAKE_INSTALL_PREFIX} )
     set( _PKG_CONFIG_LIBDIR "\${prefix}/lib" )
@@ -350,15 +299,67 @@ if( PKG_CONFIG_FOUND )
 endif( PKG_CONFIG_FOUND )
 
 ##### Installation #####
-if( SHARED_LIB )
-    install( TARGETS asagi DESTINATION lib )
-endif( SHARED_LIB )
-if( STATIC_LIB )
-    install( TARGETS asagi-static DESTINATION lib )
-endif( STATIC_LIB )
-install( FILES include/asagi.h include/asagi.f90
-	DESTINATION include )
+include(GNUInstallDirs)
 
+set(CONFIG_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/asagi)
+
+if( SHARED_LIB )
+    target_include_directories(asagi-shared PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+    install( TARGETS asagi-shared
+        EXPORT asagi-shared-targets 
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
+    install(FILES include/asagi.h include/asagi.f90
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )
+    install(EXPORT asagi-shared-targets
+        FILE asagiSharedTargets.cmake
+        NAMESPACE asagi::
+        DESTINATION ${CONFIG_DESTINATION}
+    )
+endif()
+if( STATIC_LIB )
+    target_include_directories(asagi-static PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+    install( TARGETS asagi-static
+        EXPORT asagi-static-targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
+    install(FILES include/asagi.h include/asagi.f90
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} )
+    install(EXPORT asagi-static-targets
+        FILE asagiStaticTargets.cmake
+        NAMESPACE asagi::
+        DESTINATION ${CONFIG_DESTINATION}
+    )
+endif()
+
+write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/asagiConfigVersion.cmake"
+        VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}.${ASAGI_VERSION_PATCH}
+        COMPATIBILITY SameMajorVersion
+)
+# Replace variables in script
+# Note: Configure file also replaces @PACKAGE_INIT@, we don't want that
+set(PACKAGE_INIT_OLD "${PACKAGE_INIT}")
+set(PACKAGE_INIT "@PACKAGE_INIT@")
+configure_file(CMake/asagiConfig.cmake.in CMake/asagiConfig.cmake @ONLY)
+set(PACKAGE_INIT "${PACKAGE_INIT_OLD}")
+unset(PACKAGE_INIT_OLD)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/CMake/asagiConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/asagiConfig.cmake"
+    INSTALL_DESTINATION ${CONFIG_DESTINATION}
+)
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/asagiConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/asagiConfigVersion.cmake"
+    DESTINATION ${CONFIG_DESTINATION}
+)
 
 ##### Packaging #####
 include( InstallRequiredSystemLibraries )
@@ -369,7 +370,7 @@ SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
 SET(CPACK_PACKAGE_VERSION_MAJOR ${ASAGI_VERSION_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${ASAGI_VERSION_MINOR})
-SET(CPACK_PACKAGE_VERSION_PATCH "0")
+SET(CPACK_PACKAGE_VERSION_PATCH ${ASAGI_VERSION_PATCH})
 set(CPACK_SOURCE_IGNORE_FILES
 	"\\\\.git/"
 	"\\\\.kdev4"

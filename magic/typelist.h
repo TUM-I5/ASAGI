@@ -1,39 +1,8 @@
 /**
- * @file
- *  This file is part of ASAGI.
+ * SPDX-License-Identifier: LGPL-3.0-or-later
  *
- *  ASAGI is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as
- *  published by the Free Software Foundation, either version 3 of
- *  the License, or  (at your option) any later version.
- *
- *  ASAGI is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
- *
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with ASAGI.  If not, see <http://www.gnu.org/licenses/>.
- *
- *  Diese Datei ist Teil von ASAGI.
- *
- *  ASAGI ist Freie Software: Sie koennen es unter den Bedingungen
- *  der GNU Lesser General Public License, wie von der Free Software
- *  Foundation, Version 3 der Lizenz oder (nach Ihrer Option) jeder
- *  spaeteren veroeffentlichten Version, weiterverbreiten und/oder
- *  modifizieren.
- *
- *  ASAGI wird in der Hoffnung, dass es nuetzlich sein wird, aber
- *  OHNE JEDE GEWAEHELEISTUNG, bereitgestellt; sogar ohne die implizite
- *  Gewaehrleistung der MARKTFAEHIGKEIT oder EIGNUNG FUER EINEN BESTIMMTEN
- *  ZWECK. Siehe die GNU Lesser General Public License fuer weitere Details.
- *
- *  Sie sollten eine Kopie der GNU Lesser General Public License zusammen
- *  mit diesem Programm erhalten haben. Wenn nicht, siehe
- *  <http://www.gnu.org/licenses/>.
- *
- * @copyright 2001 Andrei Alexandrescu
- * @copyright 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
+ * SPDX-FileCopyrightText: 2001 Andrei Alexandrescu
+ * SPDX-FileCopyrightText: 2015 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 // These parts are taken from
@@ -60,60 +29,72 @@
 /**
  * Template magic
  */
-namespace magic
-{
+namespace magic {
 
 /**
  * A list of types, code taken from
  */
 template <class T, class U>
-struct Typelist
-{
-	typedef T Head;
-	typedef U Tail;
+struct Typelist {
+  typedef T Head;
+  typedef U Tail;
 };
 
 /**
  * Creates a new type list
  */
-template
-<
-	typename T1  = NullType, typename T2  = NullType, typename T3  = NullType,
-	typename T4  = NullType, typename T5  = NullType, typename T6  = NullType,
-	typename T7  = NullType, typename T8  = NullType, typename T9  = NullType,
-	typename T10 = NullType, typename T11 = NullType, typename T12 = NullType,
-	typename T13 = NullType, typename T14 = NullType, typename T15 = NullType,
-	typename T16 = NullType, typename T17 = NullType, typename T18 = NullType
->
-struct MakeTypelist
-{
-private:
-	/** The tail of the type list (everything except the first element) */
-	typedef typename MakeTypelist
-	<
-		T2 , T3 , T4 ,
-		T5 , T6 , T7 ,
-		T8 , T9 , T10,
-		T11, T12, T13,
-		T14, T15, T16,
-		T17, T18
-	>
-	::result TailResult;
+template <typename T1 = NullType,
+          typename T2 = NullType,
+          typename T3 = NullType,
+          typename T4 = NullType,
+          typename T5 = NullType,
+          typename T6 = NullType,
+          typename T7 = NullType,
+          typename T8 = NullType,
+          typename T9 = NullType,
+          typename T10 = NullType,
+          typename T11 = NullType,
+          typename T12 = NullType,
+          typename T13 = NullType,
+          typename T14 = NullType,
+          typename T15 = NullType,
+          typename T16 = NullType,
+          typename T17 = NullType,
+          typename T18 = NullType>
+struct MakeTypelist {
+  private:
+  /** The tail of the type list (everything except the first element) */
+  typedef typename MakeTypelist<T2,
+                                T3,
+                                T4,
+                                T5,
+                                T6,
+                                T7,
+                                T8,
+                                T9,
+                                T10,
+                                T11,
+                                T12,
+                                T13,
+                                T14,
+                                T15,
+                                T16,
+                                T17,
+                                T18>::result TailResult;
 
-public:
-	/** The type list (the first element + tail) */
-	typedef magic::Typelist<T1, TailResult> result;
+  public:
+  /** The type list (the first element + tail) */
+  typedef magic::Typelist<T1, TailResult> result;
 };
 
 /**
  * The tail of the type list (equivalent to a null pointer)
  */
-template<>
-struct MakeTypelist<>
-{
-	typedef magic::NullType result;
+template <>
+struct MakeTypelist<> {
+  typedef magic::NullType result;
 };
 
-}
+} // namespace magic
 
 #endif // MAGIC_TYPELIST_H

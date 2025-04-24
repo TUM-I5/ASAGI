@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: 2024 Technical University of Munich
+# 
+# SPDX-License-Identifier: BSD-3-Clause
+
+name: unittest
+on:
+  - push
+
+jobs:
+  unittest:
+    name: unittest
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        mpi3:
+          - ON
+          - OFF
+        nonuma:
+          - ON
+          - OFF
+        debug_numa:
+          - ON
+          - OFF
+        nompi:
+          - ON
+          - OFF
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+
+      - name: install-packages
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository ppa:deadsnakes/ppa
+          sudo apt-get update -y
+          sudo apt-get install -y libomp-dev libopenmpi-dev openmpi-bin openmpi-common ninja-build gfortran openmpi-bin openmpi-common libopenmpi-dev libnetcdf-dev libnuma-dev cmake
+          sudo apt-get install -y cxxtest
+
+      - name: build
+        run: |
+          mkdir build
+          cd build
+          cmake .. -GNinja -DTESTS=ON -DDEBUG_NUMA=${{matrix.debug_numa}} -DMPI3=${{matrix.mpi3}} -DNOMPI=${{matrix.nompi}} -DNONUMA=${{matrix.nonuma}}
+          ninja
+          ctest --rerun-failed --output-on-failure
+          cd ..
