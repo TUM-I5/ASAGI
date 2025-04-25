@@ -59,7 +59,7 @@ endmacro( add_sources )
 macro( lib_link_libraries lib )
     # Link shared lib
     if( SHARED_LIB )
-        target_link_libraries( ${lib} ${ARGN} )
+        target_link_libraries( ${lib}-shared ${ARGN} )
     endif( SHARED_LIB )
     
     # Link static lib
@@ -68,11 +68,27 @@ macro( lib_link_libraries lib )
     endif( STATIC_LIB )
 endmacro( lib_link_libraries )
 
+# Link static and shared library
+macro( lib_include_directories lib )
+    # Link shared lib
+    if( SHARED_LIB )
+        target_include_directories( ${lib}-shared ${ARGN} )
+    endif( SHARED_LIB )
+    
+    # Link static lib
+    if( STATIC_LIB )
+        target_include_directories( ${lib}-static ${ARGN} )
+    endif( STATIC_LIB )
+endmacro( lib_include_directories )
+
 ##### Files #####
 # Lib Sources
 set( mainSources
 	asagi.cpp
 	asagi_f90.cpp )
+
+set( asagiLibs "" )
+set( asagiIncludes "" )
 
 ##### Other configuration #####
 # Additional cmake modules
@@ -135,7 +151,8 @@ if( NONUMA )
 else( NONUMA )
     find_package( Threads REQUIRED )
     find_package( NUMA REQUIRED )
-    include_directories( SYSTEM ${NUMA_INCLUDE_DIR} )
+    set( asagiLibs ${asagiLibs} ${NUMA_LIBRARIES} )
+    set( asagiIncludes ${asagiIncludes} ${NUMA_INCLUDE_DIR} )
 endif( NONUMA )
 if( THREADS_FOUND )
     add_definitions( -DUSE_PTHREAD )
@@ -158,8 +175,8 @@ endif( DEBUG_NUMA )
 
 # Find netcdf
 find_package( NetCDF REQUIRED )
-include_directories( SYSTEM ${NetCDF_INCLUDE_DIRS} )
-set( asagiLibs ${NetCDF_LIBRARY} )
+set( asagiLibs ${asagiLibs} ${NetCDF_LIBRARY} )
+set( asagiIncludes ${asagiIncludes} ${NetCDF_INCLUDE_DIRS} )
 
 # Add library include files for all exectuables
 include_directories( ${CMAKE_SOURCE_DIR}/include )
@@ -222,8 +239,6 @@ endif( NOMPI )
 # Libraries (static and shared)
 if( SHARED_LIB )
     add_library( asagi-shared SHARED ${LibSources} )
-    target_link_libraries( asagi-shared ${asagiLibs} )
-    set(asagiTarget asagi-shared)
     set_target_properties( asagi-shared
         PROPERTIES OUTPUT_NAME ${asagiOutputName}
         VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}.${ASAGI_VERSION_PATCH}
@@ -231,13 +246,14 @@ if( SHARED_LIB )
 endif( SHARED_LIB )
 if( STATIC_LIB )
     add_library( asagi-static STATIC ${LibSources} )
-    target_link_libraries( asagi-static ${asagiLibs} )
-    set(asagiTarget asagi-static)
     set_target_properties( asagi-static
         PROPERTIES OUTPUT_NAME ${asagiOutputName}
         VERSION ${ASAGI_VERSION_MAJOR}.${ASAGI_VERSION_MINOR}.${ASAGI_VERSION_PATCH}
         SOVERSION ${ASAGI_VERSION_MAJOR} )
 endif( STATIC_LIB )
+
+lib_link_libraries(asagi PUBLIC ${asagiLibs})
+lib_include_directories(asagi PUBLIC ${asagiIncludes})
 
 ##### Excecutables #####
 # Tests
