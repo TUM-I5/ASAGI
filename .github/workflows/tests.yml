@@ -25,6 +25,9 @@ jobs:
         nompi:
           - ON
           - OFF
+        round_robin:
+          - ON
+          - OFF
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,7 +46,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -GNinja -DTESTS=ON -DDEBUG_NUMA=${{matrix.debug_numa}} -DMPI3=${{matrix.mpi3}} -DNOMPI=${{matrix.nompi}} -DNONUMA=${{matrix.nonuma}}
+          cmake .. -GNinja -DTESTS=ON -DDEBUG_NUMA=${{matrix.debug_numa}} -DMPI3=${{matrix.mpi3}} -DNOMPI=${{matrix.nompi}} -DNONUMA=${{matrix.nonuma}} -DROUND_ROBIN=${{matrix.round_robin}}
           ninja
           ctest --rerun-failed --output-on-failure
           cd ..
